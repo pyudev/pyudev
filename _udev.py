@@ -24,33 +24,42 @@
 """
 
 
-import ctypes
+from ctypes import CDLL, Structure, POINTER, c_char_p
 from ctypes.util import find_library
 
 
-class udev(ctypes.Structure):
+class udev(Structure):
     """
     Dummy for ``udev`` structure.
     """
     pass
 
-udev_p = ctypes.POINTER(udev)
+udev_p = POINTER(udev)
 
 
-class udev_enumerate(ctypes.Structure):
+class udev_enumerate(Structure):
     """
     Dummy for ``udev_enumerate`` structure.
     """
 
-udev_enumerate_p = ctypes.POINTER(udev_enumerate)
+udev_enumerate_p = POINTER(udev_enumerate)
 
 
-class udev_list_entry(ctypes.Structure):
+class udev_list_entry(Structure):
     """
     Dummy for ``udev_list_entry`` structure.
     """
 
-udev_list_entry_p = ctypes.POINTER(udev_list_entry)
+udev_list_entry_p = POINTER(udev_list_entry)
+
+
+class udev_device(Structure):
+    """
+    Dummy for ``udev_device`` structure.
+    """
+
+
+udev_device_p = POINTER(udev_device)
 
 
 SIGNATURES = {
@@ -59,23 +68,34 @@ SIGNATURES = {
         new=(None, udev_p),
         unref=([udev_p], None),
         ref=([udev_p], udev_p),
-        get_sys_path=([udev_p], ctypes.c_char_p),
-        get_dev_path=([udev_p], ctypes.c_char_p)),
+        get_sys_path=([udev_p], c_char_p),
+        get_dev_path=([udev_p], c_char_p)),
     # enumeration
     'udev_enumerate': dict(
         new=([udev_p], udev_enumerate_p),
         ref=([udev_enumerate_p], udev_enumerate_p),
         unref=([udev_enumerate_p], None),
-        add_match_subsystem=([udev_enumerate_p, ctypes.c_char_p], int),
-        add_match_property=(
-            [udev_enumerate_p, ctypes.c_char_p, ctypes.c_char_p], int),
+        add_match_subsystem=([udev_enumerate_p, c_char_p], int),
+        add_match_property=([udev_enumerate_p, c_char_p, c_char_p], int),
         scan_devices=([udev_enumerate_p], int),
         get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
     # list entries
     'udev_list_entry': dict(
         get_next=([udev_list_entry_p], udev_list_entry_p),
-        get_name=([udev_list_entry_p], ctypes.c_char_p),
-        get_value=([udev_list_entry_p], ctypes.c_char_p)),
+        get_name=([udev_list_entry_p], c_char_p),
+        get_value=([udev_list_entry_p], c_char_p)),
+    # devices
+    'udev_device': dict(
+        ref=([udev_device_p], udev_device_p),
+        unref=([udev_device_p], None),
+        new_from_syspath=([udev_p, c_char_p], udev_device_p),
+        get_devpath=([udev_device_p], c_char_p),
+        get_subsystem=([udev_device_p], c_char_p),
+        get_syspath=([udev_device_p], c_char_p),
+        get_sysname=([udev_device_p], c_char_p),
+        get_devnode=([udev_device_p], c_char_p),
+        get_property_value=([udev_device_p, c_char_p], c_char_p),
+        get_properties_list_entry=([udev_device_p], udev_list_entry_p)),
     }
 
 
@@ -87,7 +107,7 @@ def load_udev_library():
     Important functions are given proper signatures and return types to
     support type checking and argument conversion.
     """
-    libudev = ctypes.CDLL(find_library('udev'))
+    libudev = CDLL(find_library('udev'))
     # context function signature
     for namespace, members in SIGNATURES.iteritems():
         for funcname, signature in members.iteritems():
