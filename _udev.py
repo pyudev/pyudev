@@ -42,6 +42,17 @@ class udev_enumerate(ctypes.Structure):
     Dummy for ``udev_enumerate`` structure.
     """
 
+udev_enumerate_p = ctypes.POINTER(udev_enumerate)
+
+
+SIGNATURES = dict(
+    udev_new=(None, udev_p),
+    udev_unref=([udev_p], None),
+    udev_ref=([udev_p], udev_p),
+    udev_get_sys_path=([udev_p], ctypes.c_char_p),
+    udev_get_dev_path=([udev_p], ctypes.c_char_p)
+    )
+
 
 def load_udev_library():
     """
@@ -53,14 +64,10 @@ def load_udev_library():
     """
     libudev = ctypes.CDLL(find_library('udev'))
     # context function signature
-    libudev.udev_new.restype = udev_p
-    libudev.udev_unref.argtypes = [udev_p]
-    libudev.udev_unref.restype = None
-    libudev.udev_ref.argtypes =  [udev_p]
-    libudev.udev_ref.restype = udev_p
-    libudev.udev_get_sys_path.argtypes = [udev_p]
-    libudev.udev_get_sys_path.restype = ctypes.c_char_p
-    libudev.udev_get_dev_path.argtypes = [udev_p]
-    libudev.udev_get_dev_path.restype = ctypes.c_char_p
+    for funcname, signature in SIGNATURES.iteritems():
+        func = getattr(libudev, funcname)
+        argtypes, restype = signature
+        func.argtypes = argtypes
+        func.restype = restype
     return libudev
 
