@@ -12,7 +12,7 @@ with open('README.rst') as stream:
 setup(
     name='pyudev',
     version='0.1',
-    url='',
+    url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
     description='A libudeb binding',
