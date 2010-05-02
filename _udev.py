@@ -45,13 +45,38 @@ class udev_enumerate(ctypes.Structure):
 udev_enumerate_p = ctypes.POINTER(udev_enumerate)
 
 
-SIGNATURES = dict(
-    udev_new=(None, udev_p),
-    udev_unref=([udev_p], None),
-    udev_ref=([udev_p], udev_p),
-    udev_get_sys_path=([udev_p], ctypes.c_char_p),
-    udev_get_dev_path=([udev_p], ctypes.c_char_p)
-    )
+class udev_list_entry(ctypes.Structure):
+    """
+    Dummy for ``udev_list_entry`` structure.
+    """
+
+udev_list_entry_p = ctypes.POINTER(udev_list_entry)
+
+
+SIGNATURES = {
+    # context
+    'udev': dict(
+        new=(None, udev_p),
+        unref=([udev_p], None),
+        ref=([udev_p], udev_p),
+        get_sys_path=([udev_p], ctypes.c_char_p),
+        get_dev_path=([udev_p], ctypes.c_char_p)),
+    # enumeration
+    'udev_enumerate': dict(
+        new=([udev_p], udev_enumerate_p),
+        ref=([udev_enumerate_p], udev_enumerate_p),
+        unref=([udev_enumerate_p], None),
+        add_match_subsystem=([udev_enumerate_p, ctypes.c_char_p], int),
+        add_match_property=(
+            [udev_enumerate_p, ctypes.c_char_p, ctypes.c_char_p], int),
+        scan_devices=([udev_enumerate_p], int),
+        get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
+    # list entries
+    'udev_list_entry': dict(
+        get_next=([udev_list_entry_p], udev_list_entry_p),
+        get_name=([udev_list_entry_p], ctypes.c_char_p),
+        get_value=([udev_list_entry_p], ctypes.c_char_p)),
+    }
 
 
 def load_udev_library():
@@ -64,10 +89,12 @@ def load_udev_library():
     """
     libudev = ctypes.CDLL(find_library('udev'))
     # context function signature
-    for funcname, signature in SIGNATURES.iteritems():
-        func = getattr(libudev, funcname)
-        argtypes, restype = signature
-        func.argtypes = argtypes
-        func.restype = restype
+    for namespace, members in SIGNATURES.iteritems():
+        for funcname, signature in members.iteritems():
+            funcname = '{0}_{1}'.format(namespace, funcname)
+            func = getattr(libudev, funcname)
+            argtypes, restype = signature
+            func.argtypes = argtypes
+            func.restype = restype
     return libudev
 
