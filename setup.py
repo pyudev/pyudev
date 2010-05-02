@@ -14,7 +14,7 @@ setup(
     version='0.1',
     url='',
     author='Sebastian Wiesner',
-    author_email='lunaryorn@googlemail.com'
+    author_email='lunaryorn@googlemail.com',
     description='A libudeb binding',
     long_description=long_description,
     license='MIT/X11',
