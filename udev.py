@@ -176,10 +176,30 @@ class Enumerator(object):
 class Device(Mapping):
     """
     A single device.
+
+    This class subclasses the ``Mapping`` ABC, devices therefore support the
+    dictionary protocol.  They map sysfs properties to the corresponding
+    values:
+
+    >>> context = Context
+    >>> devices = context.list_devices().match_subsystem('input')
+    >>> for device in devices:
+    ...     if device.sys_name.startswith('event'):
+    ...         device.sys_name, device.get('ID_INPUT_MOUSE')
+    ...
+    (u'event6', None)
+    (u'event7', 1)
+    (u'event3', None)
+    (u'event4', 1)
+    (u'event5', None)
     """
 
     @classmethod
     def from_sys_path(cls, context, sys_path):
+        """
+        Create a device from the given :class:`Context` and the given
+        ``sys_path``.
+        """
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
         device = libudev.udev_device_new_from_syspath(
