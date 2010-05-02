@@ -20,17 +20,15 @@
 
     A binding to ``libudev``.
 
-    To use this library, a :class:`Context` is required:
-
-    >>> context = Context()
-
-    This contains provides an interface to all udev operations.
+    The central class is the :class:`Context`.  To use this library, create
+    an instance of this class first.  Then use this class to list devices.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
 
 import sys
+from collections import Mapping
 
 import _udev
 
@@ -77,23 +75,32 @@ class Context(object):
             sys.getfilesystemencoding())
 
     def list_devices(self):
+        """
+        Return an :class:`Enumerator` to list devices.
+        """
         return Enumerator(self)
 
 
-def _assert_bytes(v):
-    if not isinstance(v, str):
-        v = v.encode(sys.getfilesystemencoding())
-    return v
+def _assert_bytes(value):
+    if not isinstance(value, str):
+        value = value.encode(sys.getfilesystemencoding())
+    return value
 
-def _property_value_to_bytes(v):
-    if isinstance(v, str):
-        return v
-    elif isinstance(v, unicode):
-        return v.encode(sys.getfilesystemencoding())
-    elif isinstance(v, int):
-        return str(int(v))
+def _property_value_to_bytes(value):
+    if isinstance(value, str):
+        return value
+    elif isinstance(value, unicode):
+        return value.encode(sys.getfilesystemencoding())
+    elif isinstance(value, int):
+        return str(int(value))
     else:
-        return str(v)
+        return str(value)
+
+def _property_value_from_bytes(value):
+    if value.isdigit():
+        return int(value)
+    else:
+        return value.decode(sys.getfilesystemencoding())
 
 def _check_call(func, *args):
     res = func(*args)
@@ -114,6 +121,13 @@ class Enumerator(object):
 
     >>> devices = devices.match_subsystem('input').match_property(
     ...     'ID_INPUT_MOUSE', True)
+    >>> for device in devices:
+    ...     device.sys_name
+    ...
+    u'event7'
+    u'mouse2'
+    u'event4'
+    u'mouse0'
     """
 
     def __init__(self, context):
@@ -154,6 +168,100 @@ class Enumerator(object):
         _check_call(libudev.udev_enumerate_scan_devices, self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         while entry:
-            yield libudev.udev_list_entry_get_name(entry)
+            yield Device.from_sys_path(
+                self.context, libudev.udev_list_entry_get_name(entry))
             entry = libudev.udev_list_entry_get_next(entry)
 
+
+class Device(Mapping):
+    """
+    A single device.
+    """
+
+    @classmethod
+    def from_sys_path(cls, context, sys_path):
+        if not isinstance(context, Context):
+            raise TypeError('Invalid context object')
+        device = libudev.udev_device_new_from_syspath(
+            context._context, _assert_bytes(sys_path))
+        return cls(context, device)
+
+    def __init__(self, context, _device):
+        self.context = context
+        self._device = _device
+
+    def __repr__(self):
+        return 'Device({0.sys_path!r})'.format(self)
+
+    @property
+    def sys_path(self):
+        """
+        Absolute path of this device in ``sysfs`` including the mount point.
+        """
+        return libudev.udev_device_get_syspath(self._device).decode(
+            sys.getfilesystemencoding())
+
+    @property
+    def dev_path(self):
+        """
+        Kernel device path.
+
+        Unlike :attr:`sys_path`, this path does not contain the mount point.
+        However, the path is absolute and starts with a slash ``'/'``.
+        """
+        return libudev.udev_device_get_devpath(self._device).decode(
+            sys.getfilesystemencoding())
+
+    @property
+    def subsystem(self):
+        """
+        Name of the subsystem, this device is part of.
+        """
+        return libudev.udev_device_get_subsystem(self._device).decode(
+            sys.getfilesystemencoding())
+
+    @property
+    def sys_name(self):
+        """
+        Device name inside ``sysfs``.
+        """
+        return libudev.udev_device_get_sysname(self._device).decode(
+            sys.getfilesystemencoding())
+
+    @property
+    def dev_node(self):
+        """
+        Absolute path to the device node (including the device directory).
+        """
+        return libudev.udev_device_get_devnode(self._device).decode(
+            sys.getfilesystemencoding())
+
+    def __iter__(self):
+        entry = libudev.udev_device_get_properties_list_entry(self._device)
+        while entry:
+            yield libudev.udev_list_entry_get_name(entry).decode(
+                sys.getfilesystemencoding())
+            entry = libudev.udev_list_entry_get_next(entry)
+
+    def __len__(self):
+        return len(list(self))
+
+    def __getitem__(self, property):
+        """
+        Get a property from this device.
+        """
+        value = libudev.udev_device_get_property_value(
+            self._device, _assert_bytes(property))
+        if value is None:
+            raise KeyError('No such property: {0}'.format(property))
+        value = _property_value_from_bytes(value)
+        if property == 'DEVLINKS':
+            # special handle for device links list
+            return value.split(' ')
+        return value
+
+    def __eq__(self, other):
+        return self.dev_path == other.dev_path
+
+    def __ne__(self, other):
+        return self.dev_path != other.dev_path
