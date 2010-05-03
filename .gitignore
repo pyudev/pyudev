@@ -2,3 +2,4 @@
 build/*
 .ropeproject/*
 pyudev.egg-info/*
+doc/_build/*
