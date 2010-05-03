@@ -249,30 +249,29 @@ class Enumerator(object):
 
 class Device(Mapping):
     """
-    A single device.
+    A single device with attached attributes and properties.
 
-    This class subclasses the ``Mapping`` ABC, devices therefore support the
-    dictionary protocol.  They map sysfs properties to the corresponding
-    values:
+    This class subclasses the ``Mapping`` ABC, providing a read-only
+    dictionary mapping property names to the corresponding values.
+    Therefore all well-known dicitionary methods and operators
+    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
+    properties.
 
-    >>> context = Context()
-    >>> devices = context.list_devices().match_subsystem('input')
-    >>> for device in devices: #doctest: +SKIP
-    ...     if device.sys_name.startswith('event'):
-    ...         device.sys_name, device.get('ID_INPUT_MOUSE')
-    ...
-    (u'event6', None)
-    (u'event7', 1)
-    (u'event3', None)
-    (u'event4', 1)
-    (u'event5', None)
+    Aside of the properties, a device also has a set of udev-specific
+    attributes like the path inside ``sysfs``.
     """
 
     @classmethod
     def from_sys_path(cls, context, sys_path):
         """
-        Create a device from the given :class:`Context` and the given
-        ``sys_path``.
+        Create a new device from a given ``sys_path``.
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``sys_path`` is a unicode or byte string containing the path of the
+        device inside ``sysfs`` with the mount point included.
+
+        Return a :class:`Device` object for the device, or ``None``, if no
+        device existed at ``sys_path``.
         """
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
@@ -292,7 +291,8 @@ class Device(Mapping):
     @property
     def parent(self):
         """
-        The parent device or ``None``, if there is no parent device.
+        The parent :class:`Device` or ``None``, if there is no parent
+        device.
         """
         parent = libudev.udev_device_get_parent(self._device)
         if not parent:
@@ -304,6 +304,10 @@ class Device(Mapping):
     def traverse(self):
         """
         Traverse all parent devices of this device from bottom to top.
+
+        Return an iterable yielding all parent devices as :class:`Device`
+        objects, *not* including the current device.  The last yielded
+        :class:`Device` is the top of the device hierarchy.
         """
         parent = self.parent
         while parent:
@@ -313,7 +317,8 @@ class Device(Mapping):
     @property
     def sys_path(self):
         """
-        Absolute path of this device in ``sysfs`` including the mount point.
+        Absolute path of this device in ``sysfs`` including the mount point
+        as unicode string.
         """
         return libudev.udev_device_get_syspath(self._device).decode(
             sys.getfilesystemencoding())
@@ -321,7 +326,7 @@ class Device(Mapping):
     @property
     def dev_path(self):
         """
-        Kernel device path.
+        Kernel device path as unicode string.
 
         Unlike :attr:`sys_path`, this path does not contain the mount point.
         However, the path is absolute and starts with a slash ``'/'``.
@@ -332,7 +337,7 @@ class Device(Mapping):
     @property
     def subsystem(self):
         """
-        Name of the subsystem, this device is part of.
+        Name of the subsystem this device is part of as unicode string.
         """
         return libudev.udev_device_get_subsystem(self._device).decode(
             sys.getfilesystemencoding())
@@ -340,7 +345,7 @@ class Device(Mapping):
     @property
     def sys_name(self):
         """
-        Device name inside ``sysfs``.
+        Device file name inside ``sysfs`` unicode string.
         """
         return libudev.udev_device_get_sysname(self._device).decode(
             sys.getfilesystemencoding())
@@ -348,7 +353,8 @@ class Device(Mapping):
     @property
     def dev_node(self):
         """
-        Absolute path to the device node (including the device directory).
+        Absolute path to the device node inside the device directory
+        (including the device directory) as unicode string.
         """
         return libudev.udev_device_get_devnode(self._device).decode(
             sys.getfilesystemencoding())
@@ -356,19 +362,26 @@ class Device(Mapping):
     @property
     def devlinks(self):
         """
-        Return all device file links in the device directory, which point to
-        this device.
+        The device file links in the device directory, which point to this
+        device as a list of unicode strings.
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
         for name in _udev_list_iterate(entry):
             yield name.decode(sys.getfilesystemencoding())
 
     def __iter__(self):
+        """
+        Iterate over the names of all properties defined for this device.
+        Property names are unicode strings.
+        """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         for name in _udev_list_iterate(entry):
             yield name.decode(sys.getfilesystemencoding())
 
     def __len__(self):
+        """
+        Return the amount of properties defined for this device.
+        """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         counter = count()
         for _ in _udev_list_iterate(entry):
@@ -377,7 +390,14 @@ class Device(Mapping):
 
     def __getitem__(self, property):
         """
-        Get a property from this device.
+        Get the given ``property`` from this device.
+
+        ``property`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property as integer or string, or raise a
+        :exc:`~exceptions.KeyError`, the the given property is not defined
+        for this device.
         """
         value = libudev.udev_device_get_property_value(
             self._device, _assert_bytes(property))
