@@ -31,7 +31,7 @@ Please report issues, proposals or enhancements to the `issue tracker`_.
 Development
 ===========
 
-Development happens at GitHub_.  The complete source code is available in a
+Development happens on GitHub_.  The complete source code is available in a
 git_ repository::
 
    git clone git://github.com/lunaryorn/pyudev.git
