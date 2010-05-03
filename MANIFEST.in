@@ -1,0 +1,4 @@
+include *.py
+recursive-include doc/ *.rst *.py Makefile
+prune doc/_build/
+include CHANGES.rst COPYING README.rst
