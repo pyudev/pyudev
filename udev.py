@@ -218,6 +218,27 @@ class Device(Mapping):
         return 'Device({0.sys_path!r})'.format(self)
 
     @property
+    def parent(self):
+        """
+        The parent device or ``None``, if there is no parent device.
+        """
+        parent = libudev.udev_device_get_parent(self._device)
+        if not parent:
+            return None
+        # the parent device is not referenced, thus forcibly acquire a
+        # reference
+        return Device(self.context, libudev.udev_device_ref(parent))
+
+    def traverse(self):
+        """
+        Traverse all parent devices of this device from bottom to top.
+        """
+        parent = self.parent
+        while parent:
+            yield parent
+            parent = parent.parent
+
+    @property
     def sys_path(self):
         """
         Absolute path of this device in ``sysfs`` including the mount point.
