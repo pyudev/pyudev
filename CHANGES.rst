@@ -1,5 +1,5 @@
-0.1 (in development)
-====================
+0.1 (May 03, 2010)
+==================
 
 - Initial release
 - added :class:`udev.Context`
