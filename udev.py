@@ -28,6 +28,7 @@
 
 
 import sys
+from itertools import count
 from collections import Mapping
 
 import _udev
@@ -275,7 +276,11 @@ class Device(Mapping):
             yield name.decode(sys.getfilesystemencoding())
 
     def __len__(self):
-        return len(list(self))
+        entry = libudev.udev_device_get_properties_list_entry(self._device)
+        counter = count()
+        for _ in _udev_list_iterate(entry):
+            next(counter)
+        return next(counter)
 
     def __getitem__(self, property):
         """
