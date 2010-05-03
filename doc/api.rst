@@ -18,3 +18,15 @@
    .. autoattribute:: dev_path
 
    .. automethod:: list_devices
+
+
+:class:`Enumerator` – listing devices
+-------------------------------------
+
+.. autoclass:: Enumerator
+
+   .. automethod:: match_subsystem
+
+   .. automethod:: match_property
+
+   .. automethod:: __iter__
