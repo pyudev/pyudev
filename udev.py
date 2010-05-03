@@ -278,6 +278,8 @@ class Device(Mapping):
             raise TypeError('Invalid context object')
         device = libudev.udev_device_new_from_syspath(
             context._context, _assert_bytes(sys_path))
+        if not device:
+            return None
         return cls(context, device)
 
     def __init__(self, context, _device):
