@@ -212,3 +212,23 @@ man_pages = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'http://docs.python.org/': None}
+
+
+
+def autodoc_strip_module_headings(app, what, name, obj, options, lines):
+    """
+    Strips headings from module docstrings.
+    """
+    if what != 'module':
+        return
+
+    for i, line in enumerate(lines):
+        if not line.strip().strip('=-'):
+            break
+    lines.pop(i-1)
+    lines.pop(i-1)
+
+
+def setup(app):
+    from sphinx.ext.autodoc import cut_lines
+    app.connect('autodoc-process-docstring', cut_lines(2, what=['module']))
