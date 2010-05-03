@@ -286,11 +286,7 @@ class Device(Mapping):
             self._device, _assert_bytes(property))
         if value is None:
             raise KeyError('No such property: {0}'.format(property))
-        value = _property_value_from_bytes(value)
-        if property == 'DEVLINKS':
-            # special handle for device links list
-            return value.split(' ')
-        return value
+        return _property_value_from_bytes(value)
 
     def __eq__(self, other):
         return self.dev_path == other.dev_path
