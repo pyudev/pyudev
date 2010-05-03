@@ -102,6 +102,11 @@ def _property_value_from_bytes(value):
     else:
         return value.decode(sys.getfilesystemencoding())
 
+def _udev_list_iterate(entry):
+    while entry:
+        yield libudev.udev_list_entry_get_name(entry)
+        entry = libudev.udev_list_entry_get_next(entry)
+
 def _check_call(func, *args):
     res = func(*args)
     if res != 0:
@@ -167,10 +172,8 @@ class Enumerator(object):
     def __iter__(self):
         _check_call(libudev.udev_enumerate_scan_devices, self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
-        while entry:
-            yield Device.from_sys_path(
-                self.context, libudev.udev_list_entry_get_name(entry))
-            entry = libudev.udev_list_entry_get_next(entry)
+        for name in _udev_list_iterate(entry):
+            yield Device.from_sys_path(self.context, name)
 
 
 class Device(Mapping):
@@ -263,17 +266,13 @@ class Device(Mapping):
         this device.
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
-        while entry:
-            yield libudev.udev_list_entry_get_name(entry).decode(
-                sys.getfilesystemencoding())
-            entry = libudev.udev_list_entry_get_next(entry)
+        for name in _udev_list_iterate(entry):
+            yield name.decode(sys.getfilesystemencoding())
 
     def __iter__(self):
         entry = libudev.udev_device_get_properties_list_entry(self._device)
-        while entry:
-            yield libudev.udev_list_entry_get_name(entry).decode(
-                sys.getfilesystemencoding())
-            entry = libudev.udev_list_entry_get_next(entry)
+        for name in _udev_list_iterate(entry):
+            yield name.decode(sys.getfilesystemencoding())
 
     def __len__(self):
         return len(list(self))
