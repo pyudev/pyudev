@@ -1,5 +1,6 @@
 *.pyc
 build/*
+dist/*
 .ropeproject/*
 pyudev.egg-info/*
 doc/_build/*
