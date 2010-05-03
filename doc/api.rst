@@ -15,7 +15,7 @@
 
    .. autoattribute:: sys_path
 
-   .. autoattribute:: dev_path
+   .. autoattribute:: device_path
 
    .. automethod:: list_devices
 
@@ -43,13 +43,13 @@
 
    .. autoattribute:: sys_name
 
-   .. autoattribute:: dev_path
+   .. autoattribute:: device_path
 
    .. autoattribute:: subsystem
 
-   .. autoattribute:: dev_node
+   .. autoattribute:: device_node
 
-   .. autoattribute:: devlinks
+   .. autoattribute:: device_links
 
    .. autoattribute:: parent
 

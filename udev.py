@@ -28,7 +28,7 @@
     A :class:`Context` instance provides access to some basic udev
     properties:
 
-    >>> context.dev_path
+    >>> context.device_path
     u'/dev'
     >>> context.sys_path
     u'/sys'
@@ -112,7 +112,7 @@ class Context(object):
             sys.getfilesystemencoding())
 
     @property
-    def dev_path(self):
+    def device_path(self):
         """
         The device directory path as string defaulting to ``/dev`` as
         :func:`unicode`.
@@ -261,7 +261,7 @@ class Device(Mapping):
     attributes like the path inside ``sysfs``.
 
     Devices can compare equal and unequal to other devices and to strings
-    (based on :attr:`dev_path`).  Moreover devices are hashable.  Therefore
+    (based on :attr:`device_path`).  Moreover devices are hashable.  Therefore
     :class:`Device` objects can be used as keys in dictionaries and sets.
     """
 
@@ -328,7 +328,7 @@ class Device(Mapping):
             sys.getfilesystemencoding())
 
     @property
-    def dev_path(self):
+    def device_path(self):
         """
         Kernel device path as unicode string.  This path uniquely identifies
         a single device.
@@ -356,7 +356,7 @@ class Device(Mapping):
             sys.getfilesystemencoding())
 
     @property
-    def dev_node(self):
+    def device_node(self):
         """
         Absolute path to the device node inside the device directory
         (including the device directory) as unicode string.
@@ -365,7 +365,7 @@ class Device(Mapping):
             sys.getfilesystemencoding())
 
     @property
-    def devlinks(self):
+    def device_links(self):
         """
         The device file links in the device directory, which point to this
         device as a list of unicode strings.
@@ -411,16 +411,16 @@ class Device(Mapping):
         return _property_value_from_bytes(value)
 
     def __hash__(self):
-        return hash(self.dev_path)
+        return hash(self.device_path)
 
     def __eq__(self, other):
         if isinstance(other, Device):
-            return self.dev_path == other.dev_path
+            return self.device_path == other.device_path
         else:
-            return self.dev_path == other
+            return self.device_path == other
 
     def __ne__(self, other):
         if isinstance(other, Device):
-            return self.dev_path != other.dev_path
+            return self.device_path != other.device_path
         else:
-            return self.dev_path != other
+            return self.device_path != other
