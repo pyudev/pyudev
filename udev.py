@@ -405,6 +405,9 @@ class Device(Mapping):
             raise KeyError('No such property: {0}'.format(property))
         return _property_value_from_bytes(value)
 
+    def __hash__(self):
+        return hash(self.dev_path)
+
     def __eq__(self, other):
         return self.dev_path == other.dev_path
 
