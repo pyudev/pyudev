@@ -409,7 +409,13 @@ class Device(Mapping):
         return hash(self.dev_path)
 
     def __eq__(self, other):
-        return self.dev_path == other.dev_path
+        if isinstance(other, Device):
+            return self.dev_path == other.dev_path
+        else:
+            return self.dev_path == other
 
     def __ne__(self, other):
-        return self.dev_path != other.dev_path
+        if isinstance(other, Device):
+            return self.dev_path != other.dev_path
+        else:
+            return self.dev_path != other
