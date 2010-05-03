@@ -169,22 +169,21 @@ def _check_call(func, *args):
 
 class Enumerator(object):
     """
-    An iterable over the list of devices.
+    Enumerate all available devices.
 
-    >>> context = Context()
-    >>> devices = context.list_devices()
+    To retrieve devices, simply iterate over an instance of this class.
+    This operation yields :class:`Device` objects representing the available
+    devices.
 
-    Before iterating, the list can be filtered by different criteria:
+    Before iteration the device list can be filtered by subsystem or by
+    property values using :meth:`match_subsystem` and
+    :meth:`match_property`.  All added filters must match for a device to be
+    included in the device list, when eventually iterating over this object.
+    The filter methods return the instance itself again, thus supporting
+    method chaining to apply many filters in a row.
 
-    >>> devices = devices.match_subsystem('input').match_property(
-    ...     'ID_INPUT_MOUSE', True)
-    >>> for device in devices: #doctest: +SKIP
-    ...     device.sys_name
-    ...
-    u'event7'
-    u'mouse2'
-    u'event4'
-    u'mouse0'
+    Once a filter was added, it cannot be removed.  Create a new object
+    instead.
     """
 
     def __init__(self, context):
@@ -193,8 +192,7 @@ class Enumerator(object):
         :class:`Context` instance).
 
         While you can create objects of this class directly, this is not
-        recommended.  You should call :func:`iter` on the ``context`` to
-        retrieve an enumerator.
+        recommended.  Call :method:`Context.list_devices()` instead.
         """
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
@@ -207,6 +205,11 @@ class Enumerator(object):
     def match_subsystem(self, subsystem):
         """
         Include all devices, which are part of the given ``subsystem``.
+
+        ``subsystem`` is either a unicode string or a byte string,
+        containing the name of the subsystem.
+
+        Return the instance again.
         """
         _check_call(libudev.udev_enumerate_add_match_subsystem,
                     self._enumerator, _assert_bytes(subsystem))
@@ -215,6 +218,17 @@ class Enumerator(object):
     def match_property(self, property, value):
         """
         Include all devices, whose ``property`` has the given ``value``.
+
+        ``property`` is either a unicode string or a byte string, containing
+        the name of the property to match.  ``value`` is a property value,
+        being one of the following types:
+
+        - :func:`int`
+        - :func:`bool`
+        - A unicode or byte string
+        - Anything convertable to a byte string
+
+        Return the instance again.
         """
         _check_call(libudev.udev_enumerate_add_match_property,
                     self._enumerator, _assert_bytes(property),
@@ -222,6 +236,11 @@ class Enumerator(object):
         return self
 
     def __iter__(self):
+        """
+        Iterate over all matching devices.
+
+        Yield :class:`Device` objects.
+        """
         _check_call(libudev.udev_enumerate_scan_devices, self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in _udev_list_iterate(entry):
