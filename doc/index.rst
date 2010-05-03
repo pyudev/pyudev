@@ -23,15 +23,18 @@ installation is therefore rather simple, just run::
 Documentation
 -------------
 
-Usage of pyudev is rather simple::
+Usage of pyudev is rather simple:
 
-   >>> for device in udev_context.list_devices().match_subsystem('input').match_property('ID_INPUT_MOUSE', True):
-   ...     if device.sys_name.startswith('event'):
-   ...         device.parent['NAME']
-   ...
-   u'"Logitech USB-PS/2 Optical Mouse"'
-   u'"Broadcom Corp"'
-   u'"PS/2 Mouse"'
+>>> from udev import Context
+>>> context = Context()
+>>> devices = context.list_devices()
+>>> for device in devices.match_subsystem('input').match_property('ID_INPUT_MOUSE', True):
+...     if device.sys_name.startswith('event'):
+...         device.parent['NAME']
+...
+u'"Logitech USB-PS/2 Optical Mouse"'
+u'"Broadcom Corp"'
+u'"PS/2 Mouse"'
 
 Please read the :doc:`API documentation <api>` for detailed information.
 
