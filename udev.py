@@ -102,8 +102,7 @@ class Context(object):
     @property
     def sys_path(self):
         """
-        The ``sysfs`` mount point as string defaulting to ``/sys'`` as
-        :func:`unicode`.
+        The ``sysfs`` mount point defaulting to ``/sys'`` as unicode string.
 
         The mount point can be overwritten using the environment variable
         :envvar:`SYSFS_PATH`.  Use this for testing purposes.
@@ -114,8 +113,7 @@ class Context(object):
     @property
     def device_path(self):
         """
-        The device directory path as string defaulting to ``/dev`` as
-        :func:`unicode`.
+        The device directory path defaulting to ``/dev`` as unicode string.
 
         This can be overridden in the udev configuration.
         """
