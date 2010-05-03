@@ -20,8 +20,52 @@
 
     A binding to ``libudev``.
 
-    The central class is the :class:`Context`.  To use this library, create
-    an instance of this class first.  Then use this class to list devices.
+    The central class is the :class:`Context`.  An instance of this class is
+    mandatory to use any function of this library:
+
+    >>> context = Context()
+
+    A :class:`Context` instance provides access to some basic udev
+    properties:
+
+    >>> context.dev_path
+    u'/dev'
+    >>> context.sys_path
+    u'/sys'
+
+    But most importantly, the context provides access to the list of all
+    available devices through :meth:`Context.list_devices`:
+
+    >>> devices = context.list_devices()
+
+    ``devices`` is an instance of :class:`Enumerator`.  This class provides
+    some methods to filter the list of devices.  You can filter by specific
+    subsystems and by properties.  For instance, the following code only
+    matches all mouse devices:
+
+    >>> devices = devices.match_subsystem('input').match_property(
+    ...     'ID_INPUT_MOUSE', True)
+
+    Once the (optional) filters are applied, you can iterate over
+    ``devices``.  This yields :class:`Device` objects, which provide various
+    attributes to access information:
+
+    >>> for device in devices:
+    ...     if device.sys_name.startswith('event'):
+    ...         device.parent['NAME']
+    ...
+    u'"Logitech USB-PS/2 Optical Mouse"'
+    u'"Broadcom Corp"'
+    u'"PS/2 Mouse"'
+
+    :class:`Device` implements the ``Mapping`` ABC, and thus behaves like a
+    read-only dictionary, mapping the names of udev properties to the
+    corresponding values.  This means, that you can use the well-known
+    dictionary methods to access device information.
+
+    Aside of dictionary access, some special properties are available, that
+    provide access to udev attributes of the device (like its path in
+    ``sysfs``).
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
@@ -40,15 +84,16 @@ class Context(object):
     """
     The udev context.
 
-    The context is the central object to access udev.  It represents the
-    udev configuration and is required for all udev operations.
-
-    The context is iterable, and returns a :class:`Enumerator` upon
-    iteration.  This enumerator provides miscellaneous methods to filter the
-    device tree.
+    This is *the* central object to access udev.  An instance of this class
+    must be created before anything else can be done.  It holds the udev
+    configuration and provides the interface to list devices (see
+    :meth:`list_devices`).
     """
 
     def __init__(self):
+        """
+        Create a new context.
+        """
         self._context = libudev.udev_new()
 
     def __del__(self):
@@ -57,10 +102,11 @@ class Context(object):
     @property
     def sys_path(self):
         """
-        The ``sysfs`` mount point as string, defaults to ``/sys'``.
+        The ``sysfs`` mount point as string defaulting to ``/sys'`` as
+        :func:`unicode`.
 
-        You can override the mount point using the environment variable
-        :envvar:`SYSFS_PATH`.
+        The mount point can be overwritten using the environment variable
+        :envvar:`SYSFS_PATH`.  Use this for testing purposes.
         """
         return libudev.udev_get_sys_path(self._context).decode(
             sys.getfilesystemencoding())
@@ -68,16 +114,21 @@ class Context(object):
     @property
     def dev_path(self):
         """
-        The device directory path as string, defaults to ``/dev``.
+        The device directory path as string defaulting to ``/dev`` as
+        :func:`unicode`.
 
-        The actual value can be overridden in the udev configuration.
+        This can be overridden in the udev configuration.
         """
         return libudev.udev_get_dev_path(self._context).decode(
             sys.getfilesystemencoding())
 
     def list_devices(self):
         """
-        Return an :class:`Enumerator` to list devices.
+        List all available devices.
+
+        This function creates and returns an :class:`Enumerator` object,
+        that can be used to filter the list of devices, and eventually
+        retrieve :class:`Device` objects representing matching devices.
         """
         return Enumerator(self)
 
@@ -127,7 +178,7 @@ class Enumerator(object):
 
     >>> devices = devices.match_subsystem('input').match_property(
     ...     'ID_INPUT_MOUSE', True)
-    >>> for device in devices:
+    >>> for device in devices: #doctest: +SKIP
     ...     device.sys_name
     ...
     u'event7'
@@ -185,9 +236,9 @@ class Device(Mapping):
     dictionary protocol.  They map sysfs properties to the corresponding
     values:
 
-    >>> context = Context
+    >>> context = Context()
     >>> devices = context.list_devices().match_subsystem('input')
-    >>> for device in devices:
+    >>> for device in devices: #doctest: +SKIP
     ...     if device.sys_name.startswith('event'):
     ...         device.sys_name, device.get('ID_INPUT_MOUSE')
     ...
