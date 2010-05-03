@@ -330,7 +330,8 @@ class Device(Mapping):
     @property
     def dev_path(self):
         """
-        Kernel device path as unicode string.
+        Kernel device path as unicode string.  This path uniquely identifies
+        a single device.
 
         Unlike :attr:`sys_path`, this path does not contain the mount point.
         However, the path is absolute and starts with a slash ``'/'``.
