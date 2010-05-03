@@ -20,6 +20,9 @@
 
     A binding to ``libudev``.
 
+    Usage
+    -----
+
     The central class is the :class:`Context`.  An instance of this class is
     mandatory to use any function of this library:
 
@@ -67,6 +70,12 @@
     provide access to udev attributes of the device (like its path in
     ``sysfs``).
 
+    Remarks
+    -------
+
+    If imported with wildcard (``from udev import *``), only :class:`Device`
+    and :class:`Context` will be imported.
+
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
@@ -78,6 +87,7 @@ import _udev
 
 
 __version__ = '0.1'
+__all__ = ['Context', 'Device']
 
 
 libudev = _udev.load_udev_library()
