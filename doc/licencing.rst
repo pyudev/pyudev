@@ -1,0 +1,4 @@
+Licencing
+=========
+
+.. literalinclude:: ../COPYING
