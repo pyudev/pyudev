@@ -70,14 +70,18 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
-
 import sys
 from itertools import count
 from collections import Mapping
 
 import _udev
 
+
+__version__ = '0.1'
+
+
 libudev = _udev.load_udev_library()
+
 
 
 class Context(object):
