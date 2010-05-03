@@ -256,6 +256,14 @@ class Device(Mapping):
         return libudev.udev_device_get_devnode(self._device).decode(
             sys.getfilesystemencoding())
 
+    @property
+    def devlinks(self):
+        entry = libudev.udev_device_get_devlinks_list_entry(self._device)
+        while entry:
+            yield libudev.udev_list_entry_get_name(entry).decode(
+                sys.getfilesystemencoding())
+            entry = libudev.udev_list_entry_get_next(entry)
+
     def __iter__(self):
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         while entry:
