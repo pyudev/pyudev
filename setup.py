@@ -28,5 +28,5 @@ setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    modules=['udev', '_udev'],
+    py_modules=['udev', '_udev'],
     )
