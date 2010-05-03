@@ -15,7 +15,7 @@ setup(
     url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
-    description='A libudeb binding',
+    description='A libudev binding',
     long_description=long_description,
     license='MIT/X11',
     classifiers=[
