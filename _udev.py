@@ -58,7 +58,6 @@ class udev_device(Structure):
     Dummy for ``udev_device`` structure.
     """
 
-
 udev_device_p = POINTER(udev_device)
 
 
