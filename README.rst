@@ -14,8 +14,8 @@ Installation
 ============
 
 The binding is implemented in pure Python atop of ctypes_ and contains no
-native code.  Therefore, no compiler is required for installation, simply
-run::
+native code.  The only requirement is Python 2.6 or newer (Python 3.x is not
+supported as of now).  Installation is therefore rather simple, just run::
 
    python setup.py install
 
