@@ -1,6 +1,8 @@
 0.2 (in development)
 ====================
 
+- added :class:`udev.Monitor` to support event monitoring
+
 0.1 (May 03, 2010)
 ==================
 

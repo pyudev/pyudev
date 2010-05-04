@@ -24,7 +24,7 @@
 """
 
 
-from ctypes import CDLL, Structure, POINTER, c_char_p
+from ctypes import CDLL, Structure, POINTER, c_char_p, c_int
 from ctypes.util import find_library
 
 
@@ -61,6 +61,14 @@ class udev_device(Structure):
 udev_device_p = POINTER(udev_device)
 
 
+class udev_monitor(Structure):
+    """
+    Dummy for ``udev_device`` structure.
+    """
+
+udev_monitor_p = POINTER(udev_monitor)
+
+
 SIGNATURES = {
     # context
     'udev': dict(
@@ -95,8 +103,20 @@ SIGNATURES = {
         get_sysname=([udev_device_p], c_char_p),
         get_devnode=([udev_device_p], c_char_p),
         get_property_value=([udev_device_p, c_char_p], c_char_p),
+        get_action=([udev_device_p], c_char_p),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p)),
+    # monitoring
+    'udev_monitor': dict(
+        ref=([udev_monitor_p], udev_monitor_p),
+        unref=([udev_monitor_p], None),
+        new_from_netlink=([udev_p, c_char_p], udev_monitor_p),
+        new_from_socket=([udev_p, c_char_p], udev_monitor_p),
+        enable_receiving=([udev_monitor_p], c_int),
+        get_fd=([udev_monitor_p], c_int),
+        receive_device=([udev_monitor_p], udev_device_p),
+        filter_add_match_subsystem_devtype=(
+            [udev_monitor_p, c_char_p, c_char_p], c_int))
     }
 
 

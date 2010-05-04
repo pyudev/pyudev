@@ -60,3 +60,27 @@
    .. automethod:: __len__
 
    .. automethod:: __getitem__
+
+
+:class:`Monitor` – monitor devices
+----------------------------------
+
+.. autoclass:: Monitor
+
+   .. automethod:: from_netlink
+
+   .. automethod:: from_socket
+
+   .. automethod:: fileno
+
+   .. automethod:: filter_by
+
+   .. automethod:: enable_receiving
+
+   .. method:: start
+
+      Alias for :meth:`enable_receiving`
+
+   .. automethod:: receive_device
+
+   .. automethod:: __iter__
