@@ -419,7 +419,7 @@ class Device(Mapping):
         property.
 
         Return the property value as unicode string, or raise a
-        :exc:`~exceptions.KeyError`, the the given property is not defined
+        :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device.
         """
         value = libudev.udev_device_get_property_value(
