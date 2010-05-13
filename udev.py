@@ -172,12 +172,6 @@ def _property_value_to_bytes(value):
     else:
         return str(value)
 
-def _property_value_from_bytes(value):
-    if value.isdigit():
-        return int(value)
-    else:
-        return value.decode(sys.getfilesystemencoding())
-
 def _udev_list_iterate(entry):
     while entry:
         yield libudev.udev_list_entry_get_name(entry)
@@ -424,7 +418,7 @@ class Device(Mapping):
         ``property`` is a unicode or byte string containing the name of the
         property.
 
-        Return the property as integer or string, or raise a
+        Return the property value as string, or raise a
         :exc:`~exceptions.KeyError`, the the given property is not defined
         for this device.
         """
@@ -432,7 +426,7 @@ class Device(Mapping):
             self._device, _assert_bytes(property))
         if value is None:
             raise KeyError('No such property: {0}'.format(property))
-        return _property_value_from_bytes(value)
+        return value.decode(sys.getfilesystemencoding())
 
     def __hash__(self):
         return hash(self.device_path)

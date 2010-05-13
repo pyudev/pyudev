@@ -2,6 +2,7 @@
 ====================
 
 - added :class:`udev.Monitor` to support event monitoring
+- removed type magic in :meth:`udev.Device.__getitem__`
 
 0.1 (May 03, 2010)
 ==================
