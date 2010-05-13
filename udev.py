@@ -418,7 +418,7 @@ class Device(Mapping):
         ``property`` is a unicode or byte string containing the name of the
         property.
 
-        Return the property value as string, or raise a
+        Return the property value as unicode string, or raise a
         :exc:`~exceptions.KeyError`, the the given property is not defined
         for this device.
         """
