@@ -368,7 +368,7 @@ class Device(Mapping):
     @property
     def sys_name(self):
         """
-        Device file name inside ``sysfs`` unicode string.
+        Device file name inside ``sysfs`` as unicode string.
         """
         return libudev.udev_device_get_sysname(self._device).decode(
             sys.getfilesystemencoding())
