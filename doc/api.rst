@@ -61,6 +61,10 @@
 
    .. automethod:: __getitem__
 
+   .. automethod:: asint
+
+   .. automethod:: asbool
+
 
 :class:`Monitor` – monitor devices
 ----------------------------------

@@ -428,6 +428,40 @@ class Device(Mapping):
             raise KeyError('No such property: {0}'.format(property))
         return value.decode(sys.getfilesystemencoding())
 
+    def asint(self, property):
+        """
+        Get the given ``property`` from this device as integer.
+
+        ``property`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as integer. Raise a
+        :exc:`~exceptions.KeyError`, if the given property is not defined
+        for this device, or a :exc:`~exceptions.ValueError`, if the property
+        value cannot be converted to an integer.
+        """
+        return int(self[property])
+
+    def asbool(self, property):
+        """
+        Get the given ``property`` from this device as boolean.
+
+        ``property`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as boolean.  A property value of ``'1'``
+        is considered ``True``, a property value of ``'0'`` is considered
+        ``False``, any other property value raises a
+        :exc:`~exceptions.ValueError`.  Raise a
+        :exc:`~exceptions.ValueError`, if the property value cannot be
+        converted to an integer.
+        """
+        value = self[property]
+        if value not in ('1', '0'):
+            raise ValueError('Invalid value for boolean property: '
+                             '{!r}'.format(value))
+        return value == '1'
+
     def __hash__(self):
         return hash(self.device_path)
 
