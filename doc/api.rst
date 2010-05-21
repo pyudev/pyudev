@@ -88,3 +88,36 @@
    .. automethod:: receive_device
 
    .. automethod:: __iter__
+
+
+:mod:`qudev` – Py4Qt integration
+================================
+
+.. module:: qudev
+   :platform: Linux
+   :synopsis: PyQt4 binding to :mod:`udev`
+
+If you already have an existing context or monitor object and simply want to
+plug the monitoring into the Qt event loop, use
+:class:`QUDevMonitorObserver`:
+
+.. autoclass:: QUDevMonitorObserver
+
+   .. automethod:: __init__
+
+   .. pyqt4:signal:: deviceEvent(action, device)
+
+      Emitted upon any device event.  ``action`` is a unicode string
+      containing the action name, and ``device`` is the
+      :class:`~udev.Device` object describing the device.
+
+      The arguments of this signal are basically the return value of
+      :meth:`~udev.Monitor.receive_device`
+
+   .. pyqt4:signal:: deviceAdded(device)
+
+      Emitted if a :class:`~udev.Device` is added.
+
+   .. pyqt4:signal:: deviceRemoved(device)
+
+      Emitted if a :class:`~udev.Device` is removed.
