@@ -11,7 +11,7 @@ with open('README.rst') as stream:
 
 setup(
     name='pyudev',
-    version='0.2',
+    version='0.3',
     url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
