@@ -30,7 +30,8 @@ context = udev.Context()
 # failures during test_device_property, and therefore they are masked and
 # shall be ignored for test runs.
 PROPERTIES_BLACKLIST = frozenset(
-    ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW'])
+    ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
+     'POWER_SUPPLY_CHARGE_NOW'])
 
 
 
