@@ -26,6 +26,14 @@ import udev
 context = udev.Context()
 
 
+# these are volatile, frequently changing properties, which lead to bogus
+# failures during test_device_property, and therefore they are masked and
+# shall be ignored for test runs.
+PROPERTIES_BLACKLIST = frozenset(
+    ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW'])
+
+
+
 def _read_udev_database():
     udevadm = subprocess.Popen(['udevadm', 'info', '--export-db'],
                                stdout=subprocess.PIPE)
@@ -41,6 +49,8 @@ def _read_udev_database():
             current_properties = devices.setdefault(value, {})
         elif type == 'E':
             property, value = value.split('=', 1)
+            if property in PROPERTIES_BLACKLIST:
+                continue
             current_properties[property] = value
     return devices
 
