@@ -1,9 +1,9 @@
 Welcome to pyudev's documentation!
 ==================================
 
-pyudev is a Python_ binding to libudev_, the hardware management library and
-service found in modern linux systems.  It is available under the same
-licence as the original library, which is the `GNU LGPL 2.1`_ (see
+pyudev is a Python_ and PyQt4_ binding to libudev_, the hardware management
+library and service found in modern linux systems.  It is available under
+the same licence as the original library, which is the `GNU LGPL 2.1`_ (see
 :doc:`licencing` for details).
 
 
@@ -71,6 +71,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 
 .. _`GNU LGPL 2.1`: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
+.. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
