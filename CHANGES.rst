@@ -1,5 +1,5 @@
-0.2 (in development)
-====================
+0.2 (Jun 28, 2010)
+==================
 
 - added :class:`udev.Monitor` to support event monitoring
 - added :meth:`udev.Device.asbool` and :meth:`udev.Device.asint`
