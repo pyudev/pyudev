@@ -122,8 +122,19 @@ plug the monitoring into the Qt event loop, use
 
    .. pyqt4:signal:: deviceAdded(device)
 
-      Emitted if a :class:`~udev.Device` is added.
+      Emitted if a :class:`~udev.Device` is added (e.g a USB device was
+      plugged).
 
    .. pyqt4:signal:: deviceRemoved(device)
 
-      Emitted if a :class:`~udev.Device` is removed.
+      Emitted if a :class:`~udev.Device` is removed (e.g. a USB device was
+      unplugged).
+
+   .. pyqt4:signal:: deviceChanged(device)
+
+      Emitted if a :class:`~udev.Device` was somehow changed (e.g. a change
+      of a property)
+
+   .. pyqt4:signal:: deviceMoved(device)
+
+      Emitted if a :class:`~udev.Device` was renamed, moved or re-parented.

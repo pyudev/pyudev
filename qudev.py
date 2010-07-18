@@ -48,6 +48,15 @@ class QUDevMonitorObserver(QObject):
     deviceAdded = pyqtSignal(udev.Device)
     #: emitted, if a device was removed
     deviceRemoved = pyqtSignal(udev.Device)
+    #: emitted, if a device was changed
+    deviceChanged = pyqtSignal(udev.Device)
+    #: emitted, if a device was moved
+    deviceMoved = pyqtSignal(udev.Device)
+
+    ACTION_SIGNAL_MAP = {
+        'add': deviceAdded, 'remove': deviceRemoved,
+        'change': deviceChanged, 'move': deviceMoved
+        }
 
 
     def __init__(self, monitor, parent=None):
@@ -75,7 +84,4 @@ class QUDevMonitorObserver(QObject):
         if event:
             action, device = event
             self.deviceEvent.emit(action, device)
-            if action == u'add':
-                self.deviceAdded.emit(device)
-            elif action == u'remove':
-                self.deviceRemoved.emit(device)
+            self.ACTION_SIGNAL_MAP[action].emit(device)
