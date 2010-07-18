@@ -31,6 +31,8 @@
 
    .. automethod:: match_toplevel
 
+   .. automethod:: match_children
+
    .. automethod:: __iter__
 
 
@@ -54,6 +56,8 @@
    .. autoattribute:: device_links
 
    .. autoattribute:: parent
+
+   .. autoattribute:: children
 
    .. automethod:: traverse
 

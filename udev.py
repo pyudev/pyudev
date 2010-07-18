@@ -264,6 +264,16 @@ class Enumerator(object):
         self._filters.append(lambda d: d.parent is None)
         return self
 
+    def match_children(self, device):
+        """
+        Include all *direct* children of the given ``device``.  A child is a
+        device, whose :attr:`Device.parent` points to ``device``.
+
+        Return the instance again.
+        """
+        self._filters.append(lambda d: d.parent == device)
+        return self
+
     def __iter__(self):
         """
         Iterate over all matching devices.
@@ -346,6 +356,23 @@ class Device(Mapping):
         # the parent device is not referenced, thus forcibly acquire a
         # reference
         return Device(self.context, libudev.udev_device_ref(parent))
+
+    @property
+    def children(self):
+        """
+        Yield all direct children of this device.
+
+        .. note::
+
+           As the underlying library does not provide any means to directly
+           query the children of a device, this property performs a linear
+           search through all devices.
+
+        Return an iterable yielding a :class:`Device` object for each direct
+        child of this device.
+        """
+        for device in self.context.list_devices().match_children(self):
+                yield device
 
     def traverse(self):
         """

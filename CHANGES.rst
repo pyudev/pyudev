@@ -4,6 +4,8 @@
 - added :meth:`udev.Enumerator.match_toplevel` to find top-level devices
 - ``>``, ``>=``, ``<`` or ``<=`` raise :exc:`~exceptions.TypeError` now, if
   used on :class:`udev.Device` objects.
+- added :meth:`udev.Enumerator.match_children` and
+  :attr:`udev.Device.children` to list direct children of a device
 
 
 0.2 (Jun 28, 2010)

@@ -196,6 +196,12 @@ def test_device_property(device, property, expected):
 
 
 @py.test.mark.device
+def test_device_children(device):
+    for child in device.children:
+        assert child.parent == device
+
+
+@py.test.mark.device
 @py.test.mark.operator
 def test_device_eq(device):
     assert device == device.device_path
