@@ -1,6 +1,8 @@
 0.3 (in development)
 ====================
 
+- added :meth:`udev.Enumerator.match_toplevel` to find top-level devices
+
 
 0.2 (Jun 28, 2010)
 ==================

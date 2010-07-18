@@ -216,6 +216,7 @@ class Enumerator(object):
             raise TypeError('Invalid context object')
         self.context = context
         self._enumerator = libudev.udev_enumerate_new(context._context)
+        self._filters = []
 
     def __del__(self):
         libudev.udev_enumerate_unref(self._enumerator)
@@ -253,6 +254,16 @@ class Enumerator(object):
                     _property_value_to_bytes(value))
         return self
 
+    def match_toplevel(self):
+        """
+        Include all devices, which are top level devices.  Top level devices
+        do not have a parent device (:attr:`Device.parent` returns ``None``).
+
+        Return the instance again.
+        """
+        self._filters.append(lambda d: d.parent is None)
+        return self
+
     def __iter__(self):
         """
         Iterate over all matching devices.
@@ -262,7 +273,9 @@ class Enumerator(object):
         _check_call(libudev.udev_enumerate_scan_devices, self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in _udev_list_iterate(entry):
-            yield Device.from_sys_path(self.context, name)
+            device = Device.from_sys_path(self.context, name)
+            if all(f(device) for f in self._filters):
+                yield device
 
 
 class Device(Mapping):
