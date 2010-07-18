@@ -706,12 +706,23 @@ class Monitor(object):
         Receive a single device from the monitor.
 
         The caller must make sure, that there are events available in the
-        event queue.  The call may block, until a device is available.
+        event queue.  The call blocks, until a device is available.
 
-        If a device was available, return ``(action, device)``.  ``action``
-        is a string describing the action (e.g. ``'add'``, ``'remove'``).
-        ``device`` is :class:`Device` object describing the device.  If no
-        device was available, return ``None``.
+        If a device was available, return ``(action, device)``.  ``device``
+        is :class:`Device` object describing the device.  ``action`` is a
+        string describing the action.  udev informs about the following
+        actions:
+
+        ``'add'``
+          A device has been added (e.g. a USB device was plugged in)
+        ``'remove'``
+          A device has been removed (e.g. a USB device was unplugged)
+        ``'change'``
+          Something about the device changed (e.g. a device property)
+        ``'move'``
+          The device was renamed, moved, or re-parented
+
+        If no device was available, return ``None``.
         """
         device_p = libudev.udev_monitor_receive_device(self._monitor)
         if not device_p:
