@@ -292,7 +292,9 @@ class Device(Mapping):
     attributes like the path inside ``sysfs``.
 
     :class:`Device` objects compare equal and unequal to other devices and
-    to strings (based on :attr:`device_path`).
+    to strings (based on :attr:`device_path`).  However, there is no
+    ordering on :class:`Device` objects, and the corresponding operators
+    ``>``, ``<``, ``<=`` and ``>=`` raise :exc:`~exceptions.TypeError`.
 
     .. warning::
 
@@ -498,6 +500,18 @@ class Device(Mapping):
             return self.device_path != other.device_path
         else:
             return self.device_path != other
+
+    def __gt__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __lt__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __le__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __ge__(self, other):
+        raise TypeError('Device not orderable')
 
 
 class Monitor(object):

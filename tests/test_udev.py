@@ -19,6 +19,7 @@
 import os
 import sys
 import subprocess
+import operator
 
 import py.test
 
@@ -212,8 +213,22 @@ def test_device_ne(device):
     assert device != device.parent
 
 
+def _assert_ordering(device, operator):
+    exc_info = py.test.raises(TypeError, lambda: operator(device, device))
+    assert str(exc_info.value) == 'Device not orderable'
+
+for operator in (operator.gt, operator.lt, operator.le, operator.ge):
+    @py.test.mark.device
+    @py.test.mark.operator
+    def foo(device):
+        _assert_ordering(device, operator)
+    foo.__name__ = 'test_device_{0}'.format(operator.__name__)
+    globals()[foo.__name__] = foo
+
+
 @py.test.mark.device
 def test_device_hash(device):
     assert hash(device) == hash(device.device_path)
     assert hash(device.parent) == hash(device.parent)
     assert hash(device.parent) != hash(device)
+
