@@ -259,6 +259,10 @@ class Enumerator(object):
         Include all devices, which are top level devices.  Top level devices
         do not have a parent device (:attr:`Device.parent` returns ``None``).
 
+        .. warning::
+
+           Unforunately this does not reliably return all top-level devices.
+
         Return the instance again.
         """
         self._filters.append(lambda d: d.parent is None)
