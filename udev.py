@@ -291,9 +291,18 @@ class Device(Mapping):
     Aside of the properties, a device also has a set of udev-specific
     attributes like the path inside ``sysfs``.
 
-    Devices can compare equal and unequal to other devices and to strings
-    (based on :attr:`device_path`).  Moreover devices are hashable.  Therefore
-    :class:`Device` objects can be used as keys in dictionaries and sets.
+    :class:`Device` objects compare equal and unequal to other devices and
+    to strings (based on :attr:`device_path`).
+
+    .. warning::
+
+       Do **never** use object identity (``is`` operator) to compare
+       :class:`Device` objects.  :mod:`udev` may create multiple
+       :class:`Device` objects for the same device.  Instead simply compare
+       devices by value using ``==`` or ``!=``.
+
+    :class:`Device` objects are hashable and can therefore be used as keys
+    in dictionaries and sets.
     """
 
     @classmethod
