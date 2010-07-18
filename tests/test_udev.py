@@ -67,6 +67,10 @@ def pytest_generate_tests(metafunc):
                     funcargs=dict(device=device, property=property,
                                   expected=value),
                     id='{0.device_path},{1}'.format(device, property))
+    elif 'device' in metafunc.funcargnames:
+        for device in context.list_devices():
+            metafunc.addcall(funcargs=dict(device=device),
+                             id='{0.device_path}'.format(device))
     elif 'sys_path' in metafunc.funcargnames:
         for devpath in database:
             sys_path = context.sys_path + devpath
@@ -188,3 +192,28 @@ def test_device_property(device, property, expected):
         assert _strip_devpath(device[property]) == _strip_devpath(expected)
     else:
         assert device[property] == expected
+
+
+@py.test.mark.device
+@py.test.mark.operator
+def test_device_eq(device):
+    assert device == device.device_path
+    assert device == device
+    assert device.parent == device.parent
+    assert not (device == device.parent)
+
+
+@py.test.mark.device
+@py.test.mark.operator
+def test_device_ne(device):
+    assert not (device != device.device_path)
+    assert not (device != device)
+    assert not (device.parent != device.parent)
+    assert device != device.parent
+
+
+@py.test.mark.device
+def test_device_hash(device):
+    assert hash(device) == hash(device.device_path)
+    assert hash(device.parent) == hash(device.parent)
+    assert hash(device.parent) != hash(device)
