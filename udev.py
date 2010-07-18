@@ -591,13 +591,14 @@ class Monitor(object):
         ``context`` is the :class:`Context` to use.  ``source`` is the event
         source.  As of now, two sources are available:
 
-        - ``'udev'`` (the default):  Events emitted after udev as registered
-          and configured the device.  This is the absolutely recommended
-          source for applications.
-        - ``'kernel'``:  Events emitted directly after the kernel has seen
-          the device.  The device has not yet been configured by udev and
-          might not be usable at all.  **Never** use this, unless you know
-          what you are doing.
+        ``'udev'`` (the default)
+          Events emitted after udev as registered and configured the device.
+          This is the absolutely recommended source for applications.
+
+        ``'kernel'``
+          Events emitted directly after the kernel has seen the device.  The
+          device has not yet been configured by udev and might not be usable
+          at all.  **Never** use this, unless you know what you are doing.
 
         Return a new :class:`Monitor` object, which is connected to the
         given source.  Raise :exc:`~exceptions.ValueError`, if an invalid
