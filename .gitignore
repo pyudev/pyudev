@@ -4,3 +4,4 @@ dist/*
 .ropeproject/*
 pyudev.egg-info/*
 doc/_build/*
+.tox/*
