@@ -1,5 +1,5 @@
-0.3 (in development)
-====================
+0.3 (Jul 28, 2010)
+==================
 
 - #1: Fixed documentation to reflect the actual behaviour of the underlying
   API
