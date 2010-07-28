@@ -187,6 +187,30 @@ def test_device_property(device, property, expected):
         assert device[property] == expected
 
 
+@py.test.mark.filter
+def test_combined_matches_of_same_type():
+    """
+    Test for behaviour as observed in #1
+    """
+    properties = ('DEVTYPE', 'ID_TYPE')
+    devices = context.list_devices()
+    for property in properties:
+        devices.match_property(property, 'disk')
+    for n, device in enumerate(devices, start=1):
+        assert any(device.get(p) == 'disk' for p in properties)
+    assert n > 0
+
+
+@py.test.mark.filter
+def test_combined_matches_of_different_types():
+    properties = ('DEVTYPE', 'ID_TYPE')
+    devices = context.list_devices().match_subsystem('input')
+    for property in properties:
+        devices.match_property(property, 'disk')
+    devices = list(devices)
+    assert not devices
+
+
 @py.test.mark.device
 def test_device_children(device):
     for child in device.children:

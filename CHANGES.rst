@@ -1,6 +1,8 @@
 0.3 (in development)
 ====================
 
+- #1: Fixed documentation to reflect the actual behaviour of the underlying
+  API
 - ``>``, ``>=``, ``<`` or ``<=`` raise :exc:`~exceptions.TypeError` now, if
   used on :class:`udev.Device` objects.
 - added :meth:`udev.Enumerator.match_children` and

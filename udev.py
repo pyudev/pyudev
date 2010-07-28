@@ -195,12 +195,18 @@ class Enumerator(object):
 
     Before iteration the device list can be filtered by subsystem or by
     property values using :meth:`match_subsystem` and
-    :meth:`match_property`.  All added filters must match for a device to be
-    included in the device list, when eventually iterating over this object.
-    The filter methods return the instance itself again, thus supporting
-    method chaining to apply many filters in a row.
+    :meth:`match_property`.  Multiple subsystem (property) filters are
+    combined using a logical OR, filters of different types are combined
+    using a logical AND.  The following filter for instance::
 
-    Once a filter was added, it cannot be removed.  Create a new object
+        devices.match_subsystem('block').match_property(
+            'ID_TYPE', 'disk').match_property('DEVTYPE', 'disk')
+
+    means the following::
+
+        subsystem == 'block' and (ID_TYPE == 'disk' or DEVTYPE == 'disk')
+
+    Once added, a filter cannot be removed anymore.  Create a new object
     instead.
     """
 
@@ -216,7 +222,7 @@ class Enumerator(object):
             raise TypeError('Invalid context object')
         self.context = context
         self._enumerator = libudev.udev_enumerate_new(context._context)
-        self._filters = []
+        self._parents = []
 
     def __del__(self):
         libudev.udev_enumerate_unref(self._enumerator)
@@ -261,7 +267,7 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        self._filters.append(lambda d: d.parent == device)
+        self._parents.append(device)
         return self
 
     def __iter__(self):
@@ -274,7 +280,8 @@ class Enumerator(object):
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in _udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)
-            if all(f(device) for f in self._filters):
+            if self._parents and any(device.parent == p for p
+                                     in self._parents):
                 yield device
 
 
