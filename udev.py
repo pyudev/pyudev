@@ -254,20 +254,6 @@ class Enumerator(object):
                     _property_value_to_bytes(value))
         return self
 
-    def match_toplevel(self):
-        """
-        Include all devices, which are top level devices.  Top level devices
-        do not have a parent device (:attr:`Device.parent` returns ``None``).
-
-        .. warning::
-
-           Unforunately this does not reliably return all top-level devices.
-
-        Return the instance again.
-        """
-        self._filters.append(lambda d: d.parent is None)
-        return self
-
     def match_children(self, device):
         """
         Include all *direct* children of the given ``device``.  A child is a

@@ -1,7 +1,6 @@
 0.3 (in development)
 ====================
 
-- added :meth:`udev.Enumerator.match_toplevel` to find top-level devices
 - ``>``, ``>=``, ``<`` or ``<=`` raise :exc:`~exceptions.TypeError` now, if
   used on :class:`udev.Device` objects.
 - added :meth:`udev.Enumerator.match_children` and

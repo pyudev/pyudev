@@ -29,8 +29,6 @@
 
    .. automethod:: match_property
 
-   .. automethod:: match_toplevel
-
    .. automethod:: match_children
 
    .. automethod:: __iter__

@@ -167,14 +167,6 @@ def test_match_property_bool():
     assert n > 0
 
 
-@py.test.mark.filter
-def test_match_toplevel():
-    devices = context.list_devices().match_toplevel()
-    for n, device in enumerate(devices, start=1):
-        assert device.parent is None
-    assert n > 0
-
-
 @py.test.mark.device
 def test_device_from_sys_path(sys_path):
     device = udev.Device.from_sys_path(context, sys_path)
