@@ -4,6 +4,7 @@
 
 from setuptools import setup
 
+import udev
 
 with open('README.rst') as stream:
     long_description = stream.read().decode('utf-8')
@@ -11,7 +12,7 @@ with open('README.rst') as stream:
 
 setup(
     name='pyudev',
-    version='0.3',
+    version=udev.__version__,
     url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
