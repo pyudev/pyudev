@@ -280,8 +280,8 @@ class Enumerator(object):
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in _udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)
-            if self._parents and any(device.parent == p for p
-                                     in self._parents):
+            if (not self._parents) or any(device.parent == p for p
+                                          in self._parents):
                 yield device
 
 
