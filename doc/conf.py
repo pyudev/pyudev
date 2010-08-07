@@ -10,7 +10,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx',
               'sphinxcontrib.pyqt4', 'sphinxcontrib.issuetracker']
 
 master_doc = 'index'
-exclude_patterns = ['_build/']
+exclude_patterns = ['_build/*']
 source_suffix = '.rst'
 
 project = u'pyudev'
