@@ -369,7 +369,7 @@ class Device(Mapping):
         child of this device.
         """
         for device in self.context.list_devices().match_children(self):
-                yield device
+            yield device
 
     def traverse(self):
         """
