@@ -19,9 +19,12 @@
 import sys
 import random
 import subprocess
+from functools import wraps
 from contextlib import contextmanager
+from subprocess import check_call
 
 import mock
+import py.test
 
 import udev
 
@@ -63,9 +66,36 @@ def patch_libudev(funcname):
         yield func
 
 
+def _need_privileges(func):
+    @wraps(func)
+    def wrapped(*args):
+        if not py.test.config.getvalue('allow_privileges'):
+            raise ValueError('missing privileges')
+        return func(*args)
+    return wrapped
+
+
+@_need_privileges
+def load_dummy():
+    """
+    Load the ``dummy`` module or raise :exc:`ValueError` if sudo are not
+    allowed.
+    """
+    check_call(['sudo', 'modprobe', 'dummy'])
+
+@_need_privileges
+def unload_dummy():
+    """
+    Unload the ``dummy`` module or raise :exc:`ValueError` if sudo are not
+    allowed.
+    """
+    check_call(['sudo', 'modprobe', '-r', 'dummy'])
+
+
 def pytest_namespace():
-    return dict(get_device_sample=get_device_sample,
-                patch_libudev=patch_libudev)
+    return dict((func.__name__, func) for func in
+                (get_device_sample, patch_libudev, load_dummy,
+                 unload_dummy))
 
 
 def pytest_addoption(parser):
@@ -76,6 +106,13 @@ def pytest_addoption(parser):
     parser.addoption('--device-sample-size', type='int', metavar='N',
                      help='Use a random sample of N elements (default: 10)',
                      default=10)
+    parser.addoption('--allow-privileges', action='store_true',
+                     help='Permit execution of tests, which require '
+                     'root privileges.  This affects all monitor tests, '
+                     'that need to load or unload modules to trigger udev '
+                     'events.  "sudo" will be used to execute privileged '
+                     'code, be sure to have proper privileges before '
+                     'enabling this option!', default=False)
 
 def pytest_configure(config):
     # these are volatile, frequently changing properties, which lead to

@@ -249,3 +249,24 @@ def test_receive_device_error_mock(monitor):
             error = exc_info.value
             assert error.errno == errno.ENOENT
             assert error.strerror == os.strerror(errno.ENOENT)
+
+
+@py.test.mark.skipif("not config.getvalue('allow_privileges')")
+@py.test.mark.privileged
+def test_receive_device(monitor):
+    # forcibly unload the dummy module to avoid hangs
+    py.test.unload_dummy()
+    monitor.filter_by('net')
+    monitor.enable_receiving()
+    # load the dummy device to trigger an add event
+    py.test.load_dummy()
+    action, device = monitor.receive_device()
+    assert action == 'add'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
+    # and unload again
+    py.test.unload_dummy()
+    action, device = monitor.receive_device()
+    assert action == 'remove'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
