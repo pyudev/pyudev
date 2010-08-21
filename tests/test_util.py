@@ -16,25 +16,34 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 import sys
+import os
+import errno
 
 import py.test
+from mock import Mock
 
 import udev
 
 
-def test__check_call_zero_result():
-    assert udev._check_call(lambda x: 0, 'hello') == 0
+def test__call_handle_error_return_no_error():
+    func = Mock(return_value=0)
+    udev._call_handle_error_return(func, 'spam', 'eggs')
+    assert func.called_with_args('spam', 'eggs')
 
+def test_call_handle_error_return_memory_error():
+    func = Mock(return_value=-errno.ENOMEM)
+    with py.test.raises(MemoryError):
+        udev._call_handle_error_return(func, 'spam', 'eggs')
+    assert func.called_with_args('spam', 'eggs')
 
-def test__check_call_nonzero_result():
-    py.test.raises(EnvironmentError, udev._check_call, lambda: -1)
-    py.test.raises(EnvironmentError, udev._check_call, lambda: 1)
-    py.test.raises(EnvironmentError, udev._check_call, lambda: 100)
-
-
-def test__check_call_invalid_args():
-    py.test.raises(TypeError, udev._check_call, lambda x: 0)
-    py.test.raises(TypeError, udev._check_call, lambda x: 0, 1, 2, 3)
+def test_call_handle_error_return_environment_error():
+    func = Mock(return_value=-errno.ENOENT)
+    with py.test.raises(EnvironmentError) as exc_info:
+        udev._call_handle_error_return(func, 'spam', 'eggs')
+    error = exc_info.value
+    assert error.errno == errno.ENOENT
+    assert error.strerror == os.strerror(errno.ENOENT)
+    assert func.called_with_args('spam', 'eggs')
 
 
 @py.test.mark.conversion

@@ -179,12 +179,22 @@ def _udev_list_iterate(entry):
         yield libudev.udev_list_entry_get_name(entry)
         entry = libudev.udev_list_entry_get_next(entry)
 
-def _check_call(func, *args):
-    res = func(*args)
-    if res != 0:
-        raise EnvironmentError(
-            '{0.__name__} returned error code {1}'.format(func, res))
-    return res
+def _call_handle_error_return(func, *args):
+    """
+    Call ``func`` with ``args``, and handle the return code.  If the return
+    code is non-null, it is interpreted as negative :mod:`errno` code.  In
+    case of :attr:`errno.ENOMEM`, :exc:`MemoryError` is raised, otherwise an
+    :exc:`EnvironmentError` with proper ``errno`` and ``strerror``
+    attributes is raised.
+    """
+    errorcode = func(*args)
+    if errorcode != 0:
+        # udev returns the *negative* errno code at this point
+        errno = -errorcode
+        if errno == ENOMEM:
+            raise MemoryError()
+        else:
+            raise EnvironmentError(errno, os.strerror(errno))
 
 
 class Enumerator(object):
@@ -238,8 +248,9 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        _check_call(libudev.udev_enumerate_add_match_subsystem,
-                    self._enumerator, _assert_bytes(subsystem))
+        _call_handle_error_return(
+            libudev.udev_enumerate_add_match_subsystem,
+            self._enumerator, _assert_bytes(subsystem))
         return self
 
     def match_property(self, property, value):
@@ -257,9 +268,10 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        _check_call(libudev.udev_enumerate_add_match_property,
-                    self._enumerator, _assert_bytes(property),
-                    _property_value_to_bytes(value))
+        _call_handle_error_return(
+            libudev.udev_enumerate_add_match_property,
+            self._enumerator, _assert_bytes(property),
+            _property_value_to_bytes(value))
         return self
 
     def match_children(self, device):
@@ -278,7 +290,8 @@ class Enumerator(object):
 
         Yield :class:`Device` objects.
         """
-        _check_call(libudev.udev_enumerate_scan_devices, self._enumerator)
+        _call_handle_error_return(
+            libudev.udev_enumerate_scan_devices, self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in _udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)
@@ -690,15 +703,9 @@ class Monitor(object):
         subsystem = _assert_bytes(subsystem)
         if device_type:
             device_type = _assert_bytes(device_type)
-        errorcode = libudev.udev_monitor_filter_add_match_subsystem_devtype(
+        _call_handle_error_return(
+            libudev.udev_monitor_filter_add_match_subsystem_devtype,
             self._monitor, subsystem, device_type)
-        if errorcode != 0:
-            # udev returns the *negative* errno code at this point
-            errno = -errorcode
-            if errno == ENOMEM:
-                raise MemoryError()
-            else:
-                raise EnvironmentError(errno, os.strerror(errno))
 
     def enable_receiving(self):
         """
