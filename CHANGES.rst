@@ -7,6 +7,8 @@
 - :exc:`EnvironmentError` exceptions raised by
   :meth:`udev.Monitor.enable_receiving` have proper ``errno``, ``strerror``
   and ``filename`` attributes now
+- The ``subsystem`` argument to :meth:`udev.Monitor.filter_by` is mandatory
+  now, as the underlying API requires it.
 
 
 0.3 (Jul 28, 2010)

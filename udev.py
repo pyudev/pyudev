@@ -667,32 +667,29 @@ class Monitor(object):
         """
         return libudev.udev_monitor_get_fd(self._monitor)
 
-    def filter_by(self, subsystem=None, device_type=None):
+    def filter_by(self, subsystem, device_type=None):
         """
         Filter incoming events.
 
-        ``subsystem`` can either be ``None`` to not filter against any
-        specific subsystem, or a byte or unicode string with the name of a
-        subsystem (e.g. ``'input'``).  In the latter case, only events
-        originating from the given subsystem pass the filter and are given
-        to the caller.
+        ``subsystem`` is a byte or unicode string with the name of a
+        subsystem (e.g. ``'input'``).  Only events originating from the
+        given subsystem pass the filter and are handed to the caller.
 
-        ``device_type`` can either be ``None`` to not filter against any
-        specific type of device, or a byte or unicode string specifying the
-        device type.  In the latter case, only events originating from
-        devices with the given type pass the filter and are given to the
-        caller.
+        If given, ``device_type`` is a byte or unicode string specifying the
+        device type.  Only devices with the given device type are propagated
+        to the caller.  If ``device_type`` is not given, no additional
+        filter for a specific device type is installed.
 
-        If both arguments are specified, only events from the given
-        subsystem *and* with the given device type are accepted.
+        These filters are executed inside the kernel, and client processes
+        will usually not be woken up for device, that do not match these
+        filters.
 
         This method must be called *before* :meth:`enable_receiving`.
 
         Raise :exc:`~exceptions.EnvironmentError`, if the filter could not
         be installed.
         """
-        if subsystem:
-            subsystem = _assert_bytes(subsystem)
+        subsystem = _assert_bytes(subsystem)
         if device_type:
             device_type = _assert_bytes(device_type)
         error = libudev.udev_monitor_filter_add_match_subsystem_devtype(
