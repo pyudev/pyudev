@@ -90,6 +90,7 @@
 """
 
 import sys
+import os
 import select
 from itertools import count
 from collections import Mapping
@@ -591,9 +592,10 @@ class Monitor(object):
     can then be passed to classes like ``QSocketNotifier`` from Qt4.
     """
 
-    def __init__(self, context, monitor_p):
+    def __init__(self, context, monitor_p, socket_path=None):
         self.context = context
         self._monitor = monitor_p
+        self._socket_path = socket_path
 
     def __del__(self):
         libudev.udev_monitor_unref(self._monitor)
@@ -654,7 +656,7 @@ class Monitor(object):
         if not monitor:
             raise EnvironmentError('Could not create monitor for socket: '
                                    '{0!r}'.format(socket_path))
-        return cls(context, monitor)
+        return cls(context, monitor, socket_path=socket_path)
 
     def fileno(self):
         """
@@ -713,8 +715,9 @@ class Monitor(object):
         """
         error = libudev.udev_monitor_enable_receiving(self._monitor)
         if error:
-            raise EnvironmentError('Could not put monitor into '
-                                   'receiving mode')
+            errno = _udev.get_udev_errno()
+            raise EnvironmentError(errno, os.strerror(errno),
+                                   self._socket_path)
 
     start = enable_receiving
 

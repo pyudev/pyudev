@@ -24,7 +24,7 @@
 """
 
 
-from ctypes import CDLL, Structure, POINTER, c_char_p, c_int
+from ctypes import CDLL, Structure, POINTER, c_char_p, c_int, get_errno
 from ctypes.util import find_library
 
 
@@ -123,12 +123,12 @@ SIGNATURES = {
 def load_udev_library():
     """
     Load the ``udev`` library and return a :class:`ctypes.CDLL` object for
-    it.
+    it.  The library has errno handling enabled.
 
     Important functions are given proper signatures and return types to
     support type checking and argument conversion.
     """
-    libudev = CDLL(find_library('udev'))
+    libudev = CDLL(find_library('udev'), use_errno=True)
     # context function signature
     for namespace, members in SIGNATURES.iteritems():
         for funcname, signature in members.iteritems():
@@ -139,3 +139,6 @@ def load_udev_library():
             func.restype = restype
     return libudev
 
+
+def get_udev_errno():
+    return get_errno()

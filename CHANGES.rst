@@ -4,6 +4,9 @@
 - :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` no,
   if no device was found at the given path.
 - Fixed :exc:`NameError` in :meth:`udev.Monitor.from_socket`
+- :exc:`EnvironmentError` exceptions raised by
+  :meth:`udev.Monitor.enable_receiving` have proper ``errno``, ``strerror``
+  and ``filename`` attributes now
 
 
 0.3 (Jul 28, 2010)
