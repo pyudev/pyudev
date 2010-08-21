@@ -19,6 +19,9 @@
 import sys
 import random
 import subprocess
+from contextlib import contextmanager
+
+import mock
 
 import udev
 
@@ -54,8 +57,15 @@ def get_device_sample(config):
         return random.sample(config.udev_database, actual_size)
 
 
+@contextmanager
+def patch_libudev(funcname):
+    with mock.patch('udev.libudev.{0}'.format(funcname)) as func:
+        yield func
+
+
 def pytest_namespace():
-    return dict(get_device_sample=get_device_sample)
+    return dict(get_device_sample=get_device_sample,
+                patch_libudev=patch_libudev)
 
 
 def pytest_addoption(parser):
@@ -139,3 +149,17 @@ def pytest_funcarg__device(request):
     sys_path = request.getfuncargvalue('sys_path')
     context = request.getfuncargvalue('context')
     return udev.Device.from_sys_path(context, sys_path)
+
+def pytest_funcarg__socket_path(request):
+    """
+    Return a socket path for :meth:`udev.Monitor.from_socket`.  The path is
+    unique for each test.
+    """
+    tmpdir = request.getfuncargvalue('tmpdir')
+    return tmpdir.join('monitor-socket')
+
+def pytest_funcarg__monitor(request):
+    """
+    Return a netlink monitor for udev source.
+    """
+    return udev.Monitor.from_netlink(request.getfuncargvalue('context'))
