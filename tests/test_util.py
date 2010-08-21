@@ -40,8 +40,15 @@ def test__check_call_invalid_args():
 @py.test.mark.conversion
 def test__assert_bytes():
     assert isinstance(udev._assert_bytes(u'hello world'), str)
+    assert udev._assert_bytes(u'hello world') == 'hello world'
     hello = b'hello world'
     assert udev._assert_bytes(hello) is hello
+
+
+@py.test.mark.conversion
+def test__assert_bytes_none():
+    with py.test.raises(AttributeError):
+        udev._assert_bytes(None)
 
 
 @py.test.mark.conversion
