@@ -57,12 +57,13 @@ def test_device_properties(device, properties):
 
 
 @py.test.mark.properties
-def test_device_devname(context, device, properties):
+def test_device_devname(context, device, all_properties):
     if 'DEVNAME' not in device:
         py.test.xfail('%r has no DEVNAME' % device)
     assert device['DEVNAME'].startswith(context.device_path)
     assert device['DEVNAME'] == os.path.join(context.device_path,
-                                             properties['DEVNAME'])
+                                             all_properties['DEVNAME'])
+
 
 @py.test.mark.properties
 def test_device_subsystem(device, properties):

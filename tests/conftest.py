@@ -85,9 +85,14 @@ def pytest_funcarg__context(request):
 def pytest_funcarg__device_path(request):
     return request.param
 
-def pytest_funcarg__properties(request):
+def pytest_funcarg__all_properties(request):
     device_path = request.getfuncargvalue('device_path')
     return dict(request.getfuncargvalue('database')[device_path])
+
+def pytest_funcarg__properties(request):
+    properties = request.getfuncargvalue('all_properties')
+    properties.pop('DEVNAME', None)
+    return properties
 
 def pytest_funcarg__sys_path(request):
     context = request.getfuncargvalue('context')
