@@ -40,7 +40,7 @@ def test__check_call_invalid_args():
 @py.test.mark.conversion
 def test__assert_bytes():
     assert isinstance(udev._assert_bytes(u'hello world'), str)
-    assert udev._assert_bytes(u'hello world') == 'hello world'
+    assert udev._assert_bytes(u'hello world') == b'hello world'
     hello = b'hello world'
     assert udev._assert_bytes(hello) is hello
 
@@ -61,10 +61,12 @@ def test__property_value_to_bytes_string():
 
 @py.test.mark.conversion
 def test__property_value_to_bytes_int():
-    assert udev._property_value_to_bytes(10000) == '10000'
-
+    assert udev._property_value_to_bytes(10000) == b'10000'
+    assert isinstance(udev._property_value_to_bytes(10000), str)
 
 @py.test.mark.conversion
 def test__property_value_to_bytes_bool():
     assert udev._property_value_to_bytes(True) == '1'
+    assert isinstance(udev._property_value_to_bytes(True), str)
     assert udev._property_value_to_bytes(False) == '0'
+    assert isinstance(udev._property_value_to_bytes(False), str)
