@@ -55,6 +55,10 @@ def test_device_devname(context, device, properties):
     assert device['DEVNAME'] == os.path.join(context.device_path,
                                              properties['DEVNAME'])
 
+@py.test.mark.properties
+def test_device_subsystem(device, properties):
+    assert device.subsystem == properties['SUBSYSTEM']
+
 
 def test_device_children(device):
     for child in device.children:
