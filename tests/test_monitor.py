@@ -47,15 +47,13 @@ def test_from_netlink_invalid_source(context):
 
 
 def _assert_from_netlink_called(context, *args):
-    # patch unref function, because we are not creating a real pointer here
-    with py.test.patch_libudev('udev_monitor_unref'):
-        with py.test.patch_libudev('udev_monitor_new_from_netlink') as func:
-            source = args[0] if args else 'udev'
-            func.return_value = mock.sentinel.pointer
-            monitor = Monitor.from_netlink(context, *args)
-            func.assert_called_with(context._context, source)
-            assert isinstance(func.call_args[0][1], str)
-            assert monitor._monitor is mock.sentinel.pointer
+    with py.test.patch_libudev('udev_monitor_new_from_netlink') as func:
+        source = args[0] if args else 'udev'
+        func.return_value = mock.sentinel.pointer
+        monitor = Monitor.from_netlink(context, *args)
+        func.assert_called_with(context._context, source)
+        assert isinstance(func.call_args[0][1], str)
+        assert monitor._monitor is mock.sentinel.pointer
 
 
 def test_from_netlink_source_udev(context):
@@ -91,15 +89,14 @@ def test_from_socket(context, socket_path):
 
 
 def test_from_socket_mock(context, socket_path):
-    with py.test.patch_libudev('udev_monitor_unref'):
-        with py.test.patch_libudev('udev_monitor_new_from_socket') as func:
-            func.return_value = mock.sentinel.pointer
-            monitor = Monitor.from_socket(context, str(socket_path))
-            func.assert_called_with(context._context, str(socket_path))
-            assert monitor._monitor is mock.sentinel.pointer
-            Monitor.from_socket(context, u'foobar')
-            func.assert_called_with(context._context, 'foobar')
-            assert isinstance(func.call_args[0][1], str)
+    with py.test.patch_libudev('udev_monitor_new_from_socket') as func:
+        func.return_value = mock.sentinel.pointer
+        monitor = Monitor.from_socket(context, str(socket_path))
+        func.assert_called_with(context._context, str(socket_path))
+        assert monitor._monitor is mock.sentinel.pointer
+        Monitor.from_socket(context, u'foobar')
+        func.assert_called_with(context._context, 'foobar')
+        assert isinstance(func.call_args[0][1], str)
 
 
 def test_fileno(monitor):
