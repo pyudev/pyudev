@@ -652,7 +652,8 @@ class Monitor(object):
         monitor = libudev.udev_monitor_new_from_socket(
             context._context, socket_path)
         if not monitor:
-            raise EnvironmentError('Could not create udev monitor')
+            raise EnvironmentError('Could not create monitor for socket: '
+                                   '{0!r}'.format(socket_path))
         return cls(context, monitor)
 
     def fileno(self):
