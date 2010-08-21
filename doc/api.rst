@@ -37,6 +37,10 @@
 :class:`Device` – accessing device information
 ----------------------------------------------
 
+.. autoclass:: NoSuchDeviceError
+
+   .. autoattribute:: sys_path
+
 .. autoclass:: Device
 
    .. automethod:: from_sys_path

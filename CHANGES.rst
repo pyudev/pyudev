@@ -1,6 +1,9 @@
 0.4 (in development)
 ====================
 
+- :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` no,
+  if no device was found at the given path.
+
 
 0.3 (Jul 28, 2010)
 ==================

@@ -21,7 +21,7 @@ import operator
 
 import py.test
 
-from udev import Device
+from udev import Device, NoSuchDeviceError
 
 
 def pytest_generate_tests(metafunc):
@@ -37,6 +37,15 @@ def test_device_from_sys_path(context, sys_path, device_path):
     assert device is not None
     assert device.sys_path == sys_path
     assert device.device_path == device_path
+
+
+def test_device_from_sys_path_no_such_device(context):
+    sys_path = 'there_will_not_be_such_a_device'
+    with py.test.raises(NoSuchDeviceError) as exc_info:
+        Device.from_sys_path(context, sys_path)
+    error = exc_info.value
+    assert error.sys_path == sys_path
+    assert str(error) == 'No such device: {0!r}'.format(sys_path)
 
 
 @py.test.mark.properties
