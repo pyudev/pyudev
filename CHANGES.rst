@@ -6,9 +6,10 @@
 - :meth:`udev.Monitor.receive_device` raises :exc:`EnvironmentError` now, if
   libudev did not return a device object, but a null pointer.
 - Fixed :exc:`NameError` in :meth:`udev.Monitor.from_socket`
-- :exc:`EnvironmentError` exceptions raised by
-  :meth:`udev.Monitor.enable_receiving` have proper ``errno``, ``strerror``
-  and ``filename`` attributes now
+- :mod:`udev` interprets libudev error codes whereever possible now.
+  Consequently :exc:`EnvironmentError` exceptions raised by :mod:`udev`
+  classes mostly have proper ``errno``, ``strerror`` and ``filename``
+  attributes now.
 - The ``subsystem`` argument to :meth:`udev.Monitor.filter_by` is mandatory
   now, as the underlying API requires it.
 
