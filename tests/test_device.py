@@ -65,6 +65,14 @@ def test_device_children(device):
         assert child.parent == device
 
 
+def test_device_traverse(device):
+    child = device
+    for parent in device.traverse():
+        assert parent == child.parent
+        assert child in parent.children
+        child = parent
+
+
 @py.test.mark.operator
 def test_device_eq(device):
     assert device == device.device_path
