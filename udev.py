@@ -742,11 +742,15 @@ class Monitor(object):
         ``'move'``
           The device was renamed, moved, or re-parented
 
-        If no device was available, return ``None``.
+        Raise :exc:`EnvironmentError`, if no device could be read.
         """
         device_p = libudev.udev_monitor_receive_device(self._monitor)
         if not device_p:
-            return None
+            errno = _udev.get_udev_errno()
+            if errno == 0:
+                raise EnvironmentError('Could not receive device')
+            else:
+                raise EnvironmentError(errno, os.strerror(errno))
         action = libudev.udev_device_get_action(device_p).decode(
             sys.getfilesystemencoding())
         return action, Device(self.context, device_p)

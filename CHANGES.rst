@@ -3,6 +3,8 @@
 
 - :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` no,
   if no device was found at the given path.
+- :meth:`udev.Monitor.receive_device` raises :exc:`EnvironmentError` now, if
+  libudev did not return a device object, but a null pointer.
 - Fixed :exc:`NameError` in :meth:`udev.Monitor.from_socket`
 - :exc:`EnvironmentError` exceptions raised by
   :meth:`udev.Monitor.enable_receiving` have proper ``errno``, ``strerror``
