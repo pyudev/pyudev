@@ -76,30 +76,64 @@ def pytest_configure(config):
 
 
 def pytest_funcarg__database(request):
+    """
+    The complete udev database parsed from the output of ``udevadm info
+    --export-db``.
+
+    Return a dictionary, mapping the devpath of a device *without* sysfs
+    mountpoint to a dictionary of properties of the device.
+    """
     return request.config.udev_database
 
 
 def pytest_funcarg__context(request):
+    """
+    Return a useable :class:`udev.Context` object.  The context is cached
+    with session scope.
+    """
     return request.cached_setup(setup=udev.Context, scope='session')
 
 def pytest_funcarg__device_path(request):
+    """
+    Return a device path as string.
+
+    The device path must be available as ``request.param``.
+    """
     return request.param
 
 def pytest_funcarg__all_properties(request):
+    """
+    Get all properties from the exported database (as returned by the
+    ``database`` funcarg) of the device pointed to by the ``device_path``
+    funcarg.
+    """
     device_path = request.getfuncargvalue('device_path')
     return dict(request.getfuncargvalue('database')[device_path])
 
 def pytest_funcarg__properties(request):
+    """
+    Same as the ``all_properties`` funcarg, but with the special ``DEVNAME``
+    property removed.
+    """
     properties = request.getfuncargvalue('all_properties')
     properties.pop('DEVNAME', None)
     return properties
 
 def pytest_funcarg__sys_path(request):
+    """
+    Return the sys_path including the sysfs mountpoint for the device path
+    returned by the ``device_path`` funcarg.
+    """
     context = request.getfuncargvalue('context')
     device_path = request.getfuncargvalue('device_path')
     return context.sys_path + device_path
 
 def pytest_funcarg__device(request):
+    """
+    Create and return a :class:`udev.Device` object for the sys_path
+    returned by the ``sys_path`` funcarg, and the context from the
+    ``context`` funcarg.
+    """
     sys_path = request.getfuncargvalue('sys_path')
     context = request.getfuncargvalue('context')
     return udev.Device.from_sys_path(context, sys_path)
