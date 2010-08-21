@@ -16,82 +16,45 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-import subprocess
+import os
 import operator
 
 import py.test
 
-from udev import Context, Device
-
-# these are volatile, frequently changing properties, which lead to bogus
-# failures during test_device_property, and therefore they are masked and
-# shall be ignored for test runs.
-PROPERTIES_BLACKLIST = frozenset(
-    ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
-     'POWER_SUPPLY_CHARGE_NOW'])
-
-
-def _read_udev_database():
-    udevadm = subprocess.Popen(['udevadm', 'info', '--export-db'],
-                               stdout=subprocess.PIPE)
-    database = udevadm.communicate()[0].splitlines()
-    devices = {}
-    current_properties = None
-    for line in database:
-        line = line.strip()
-        if not line:
-            continue
-        type, value = line.split(': ', 1)
-        if type == 'P':
-            current_properties = devices.setdefault(value, {})
-        elif type == 'E':
-            property, value = value.split('=', 1)
-            if property in PROPERTIES_BLACKLIST:
-                continue
-            current_properties[property] = value
-    return devices
+from udev import Device
 
 
 def pytest_generate_tests(metafunc):
-    database = _read_udev_database()
-    context = Context()
-    if metafunc.function is test_device_property:
-        devices = context.list_devices()
-        for device in devices:
-            properties = database[device.device_path]
-            for property, value in properties.iteritems():
-                metafunc.addcall(
-                    funcargs=dict(device=device, property=property,
-                                  expected=value),
-                    id='{0.device_path},{1}'.format(device, property))
-    elif 'device' in metafunc.funcargnames:
-        for device in context.list_devices():
-            metafunc.addcall(funcargs=dict(device=device),
-                             id='{0.device_path}'.format(device))
-    elif 'sys_path' in metafunc.funcargnames:
-        for devpath in database:
-            sys_path = context.sys_path + devpath
-            metafunc.addcall(funcargs=dict(sys_path=sys_path),
-                              id=devpath)
+    args = metafunc.funcargnames
+    if 'device_path' in args or 'device' in args:
+        devices = py.test.get_device_sample(metafunc.config)
+        for device_path in devices:
+            metafunc.addcall(id=device_path, param=device_path)
 
 
-def test_device_from_sys_path(sys_path, context):
+def test_device_from_sys_path(context, sys_path, device_path):
     device = Device.from_sys_path(context, sys_path)
     assert device is not None
     assert device.sys_path == sys_path
-    assert device.device_path == sys_path[len(context.sys_path):]
+    assert device.device_path == device_path
 
 
 @py.test.mark.properties
-def test_device_property(device, property, expected):
-    if property == 'DEVNAME':
-        def _strip_devpath(v):
-            if v.startswith(device.context.device_path):
-                return v[len(device.context.device_path):].lstrip('/')
-            return v
-        assert _strip_devpath(device[property]) == _strip_devpath(expected)
-    else:
-        assert device[property] == expected
+def test_device_properties(device, properties):
+    properties.pop('DEVNAME', None)
+    for n, property in enumerate(properties, start=1):
+        assert device[property] == properties[property]
+    assert n > 0
+
+
+@py.test.mark.properties
+def test_device_devname(context, device, properties):
+    if 'DEVNAME' not in device:
+        py.test.xfail('%r has no DEVNAME' % device)
+    assert device['DEVNAME'].startswith(context.device_path)
+    assert device['DEVNAME'] == os.path.join(context.device_path,
+                                             properties['DEVNAME'])
+
 
 def test_device_children(device):
     for child in device.children:

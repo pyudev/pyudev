@@ -24,4 +24,3 @@ def test_context_syspath(context):
 def test_context_devpath(context):
     assert isinstance(context.device_path, unicode)
     assert context.device_path == u'/dev'
-
