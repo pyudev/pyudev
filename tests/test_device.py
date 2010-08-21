@@ -57,6 +57,36 @@ def test_device_properties(device, properties):
 
 
 @py.test.mark.properties
+def test_device_asint(device, properties):
+    for n, property in enumerate(properties, start=1):
+        value = properties[property]
+        try:
+            value = int(value)
+        except ValueError:
+            with py.test.raises(ValueError):
+                device.asint(property)
+        else:
+            assert device.asint(property) == value
+    assert n > 0
+
+
+@py.test.mark.properties
+def test_device_asbool(device, properties):
+    for n, property in enumerate(properties, start=1):
+        value = properties[property]
+        if value == '1':
+            assert device.asbool(property)
+        elif value == '0':
+            assert not device.asbool(property)
+        else:
+            with py.test.raises(ValueError) as exc_info:
+                device.asbool(property)
+            message = 'Invalid value for boolean property: {0!r}'
+            assert str(exc_info.value) == message.format(value)
+    assert n > 0
+
+
+@py.test.mark.properties
 def test_device_devname(context, device, all_properties):
     if 'DEVNAME' not in device:
         py.test.xfail('%r has no DEVNAME' % device)
