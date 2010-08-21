@@ -650,7 +650,7 @@ class Monitor(object):
         """
         socket_path = _assert_bytes(socket_path)
         monitor = libudev.udev_monitor_new_from_socket(
-            context._context, source)
+            context._context, socket_path)
         if not monitor:
             raise EnvironmentError('Could not create udev monitor')
         return cls(context, monitor)
