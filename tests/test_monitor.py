@@ -270,3 +270,23 @@ def test_receive_device(monitor):
     assert action == 'remove'
     assert device.subsystem == 'net'
     assert device.device_path == '/devices/virtual/net/dummy0'
+
+
+@py.test.mark.skipif("not config.getvalue('allow_privileges')")
+@py.test.mark.privileged
+def test_iter(monitor):
+    py.test.unload_dummy()
+    monitor.filter_by('net')
+    monitor.enable_receiving()
+    py.test.load_dummy()
+    iterator = iter(monitor)
+    action, device = next(iterator)
+    assert action == 'add'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
+    py.test.unload_dummy()
+    action, device = next(iterator)
+    assert action == 'remove'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
+    iterator.close()
