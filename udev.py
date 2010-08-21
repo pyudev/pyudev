@@ -529,7 +529,7 @@ class Device(Mapping):
         value = self[property]
         if value not in ('1', '0'):
             raise ValueError('Invalid value for boolean property: '
-                             '{!r}'.format(value))
+                             '{0!r}'.format(value))
         return value == '1'
 
     def __hash__(self):
