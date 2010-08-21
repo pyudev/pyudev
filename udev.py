@@ -92,6 +92,7 @@
 import sys
 import os
 import select
+import errno
 from itertools import count
 from collections import Mapping
 from contextlib import closing
@@ -685,17 +686,18 @@ class Monitor(object):
         filters.
 
         This method must be called *before* :meth:`enable_receiving`.
-
-        Raise :exc:`~exceptions.EnvironmentError`, if the filter could not
-        be installed.
         """
         subsystem = _assert_bytes(subsystem)
         if device_type:
             device_type = _assert_bytes(device_type)
-        error = libudev.udev_monitor_filter_add_match_subsystem_devtype(
+        errorcode = libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self._monitor, subsystem, device_type)
-        if error:
-            raise EnvironmentError('Could not install filter on monitor')
+        if errorcode != 0:
+            # udev returns the *negative* errno code at this point
+            if -errorcode == errno.ENOMEM:
+                raise MemoryError()
+            else:
+                raise EnvironmentError(-errorcode, os.strerror(-errorcode))
 
     def enable_receiving(self):
         """
