@@ -16,6 +16,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+import sys
 import random
 import subprocess
 
@@ -33,6 +34,7 @@ def _read_udev_database(properties_blacklist):
         if not line:
             continue
         type, value = line.split(': ', 1)
+        value = value.decode(sys.getfilesystemencoding())
         if type == 'P':
             current_properties = devices.setdefault(value, {})
         elif type == 'E':
