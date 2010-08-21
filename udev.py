@@ -92,7 +92,7 @@
 import sys
 import os
 import select
-import errno
+from errno import ENOMEM
 from itertools import count
 from collections import Mapping
 from contextlib import closing
@@ -694,10 +694,11 @@ class Monitor(object):
             self._monitor, subsystem, device_type)
         if errorcode != 0:
             # udev returns the *negative* errno code at this point
-            if -errorcode == errno.ENOMEM:
+            errno = -errorcode
+            if errno == ENOMEM:
                 raise MemoryError()
             else:
-                raise EnvironmentError(-errorcode, os.strerror(-errorcode))
+                raise EnvironmentError(errno, os.strerror(errno))
 
     def enable_receiving(self):
         """
