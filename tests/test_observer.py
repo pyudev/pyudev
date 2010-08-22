@@ -38,7 +38,7 @@ def test_fake_monitor(fake_monitor, platform_device):
         assert device == platform_device
 
 
-def test_observer(action, fake_monitor, platform_device):
+def _trigger_observer(action, monitor, action_trigger):
     QtCore = py.test.importorskip('PyQt4.QtCore')
 
     from qudev import QUDevMonitorObserver
@@ -59,7 +59,7 @@ def test_observer(action, fake_monitor, platform_device):
     action_slot = Mock(side_effect=_quit_when_done)
 
     # create the observer and connect the dummies
-    observer = QUDevMonitorObserver(fake_monitor)
+    observer = QUDevMonitorObserver(monitor)
     observer.deviceEvent.connect(event_slot)
     signal_map = {'add': observer.deviceAdded,
                   'remove': observer.deviceRemoved,
@@ -68,13 +68,39 @@ def test_observer(action, fake_monitor, platform_device):
     signal_map[action].connect(action_slot)
 
     # trigger the action, once the event loop is running
-    QtCore.QTimer.singleShot(
-        0, lambda: fake_monitor.trigger_action(action))
+    QtCore.QTimer.singleShot(0, action_trigger)
 
     # make sure, that the event loop really exits, even in case of an
     # exception in any python slot
-    QtCore.QTimer.singleShot(1000, app.quit)
+    QtCore.QTimer.singleShot(5000, app.quit)
     app.exec_()
+    return event_slot, action_slot
+
+
+def test_observer_fake(action, fake_monitor, platform_device):
+    event_slot, action_slot = _trigger_observer(
+        action, fake_monitor, lambda: fake_monitor.trigger_action(action))
     # check, that both slots were called
     event_slot.assert_called_with(action, platform_device)
     action_slot.assert_called_with(platform_device)
+
+
+@py.test.mark.skipif("not config.getvalue('allow_privileges')")
+@py.test.mark.privileged
+def test_observer(monitor):
+    py.test.unload_dummy()
+    monitor.filter_by('net')
+    monitor.enable_receiving()
+    event_slot, action_slot = _trigger_observer(
+        'add', monitor, py.test.load_dummy)
+    action, device = event_slot.call_args[0]
+    assert action == 'add'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
+    event_slot, action_slot = _trigger_observer(
+        'remove', monitor, py.test.unload_dummy)
+    action, device = event_slot.call_args[0]
+    assert action == 'remove'
+    assert device.subsystem == 'net'
+    assert device.device_path == '/devices/virtual/net/dummy0'
+
