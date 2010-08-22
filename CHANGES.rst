@@ -22,6 +22,7 @@ Fixed issues
   now, as the underlying API requires it.
 - Fixed possible memory leak:  :class:`udev.Device` now delete the
   underlying libudev object, when garbage-collected
+- Fixed broken signal emitting in :class:`qudev.QUDevMonitorObserver`
 
 
 0.3 (Jul 28, 2010)
