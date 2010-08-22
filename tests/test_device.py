@@ -141,6 +141,7 @@ for operator in (operator.gt, operator.lt, operator.le, operator.ge):
     globals()[foo.__name__] = foo
 
 
+@py.test.mark.operator
 def test_device_hash(device):
     assert hash(device) == hash(device.device_path)
     assert hash(device.parent) == hash(device.parent)
