@@ -39,13 +39,6 @@ u'"PS/2 Mouse"'
 
 Please read the :doc:`API documentation <api>` for detailed information.
 
-.. note::
-
-   All documentation on this page refers to the current development state of
-   the version |version| series, *not* to the latest release in this series.
-   You may notice slight differences to the |release| release.  Please refer
-   to the :doc:`changelog <changes>` to identify these differences.
-
 
 Contribution and Development
 ----------------------------
