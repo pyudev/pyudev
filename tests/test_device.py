@@ -135,8 +135,8 @@ def _assert_ordering(device, operator):
 
 for operator in (operator.gt, operator.lt, operator.le, operator.ge):
     @py.test.mark.operator
-    def foo(device):
-        _assert_ordering(device, operator)
+    def foo(platform_device):
+        _assert_ordering(platform_device, operator)
     foo.__name__ = 'test_device_{0}'.format(operator.__name__)
     globals()[foo.__name__] = foo
 
