@@ -19,6 +19,7 @@
 import sys
 import random
 import subprocess
+import socket
 from functools import wraps
 from contextlib import contextmanager
 from subprocess import check_call
@@ -27,6 +28,52 @@ import mock
 import py.test
 
 import udev
+
+
+class FakeMonitor(object):
+    """
+    A dummy udev.Monitor class, which allows clients to trigger arbitrary
+    events, emitting clearly defined device objects.
+    """
+
+    def __init__(self, device_to_emit):
+        self.client, self.server = socket.socketpair(
+            socket.AF_UNIX, socket.SOCK_DGRAM)
+        self.device_to_emit = device_to_emit
+
+    def trigger_action(self, action):
+        """
+        Trigger the given ``action`` on clients of this monitor.
+        """
+        with self.server.makefile('w') as stream:
+            stream.write(action)
+            stream.write('\n')
+            stream.flush()
+
+    def fileno(self):
+        return self.client.fileno()
+
+    def enable_receiving(self):
+        pass
+
+    def filter_by(self, *args):
+        pass
+
+    start = enable_receiving
+
+    def receive_device(self):
+        with self.client.makefile('r') as stream:
+            action = stream.readline().strip()
+            return action, self.device_to_emit
+
+    def close(self):
+        """
+        Close sockets acquired by this monitor.
+        """
+        try:
+            self.client.close()
+        finally:
+            self.server.close()
 
 
 def _read_udev_database(properties_blacklist):
@@ -187,6 +234,15 @@ def pytest_funcarg__device(request):
     context = request.getfuncargvalue('context')
     return udev.Device.from_sys_path(context, sys_path)
 
+def pytest_funcarg__platform_device(request):
+    """
+    Return the platform device at ``/sys/devices/platform``.  This device
+    object exists on all systems, and is therefore suited to for testing
+    purposes.
+    """
+    context = request.getfuncargvalue('context')
+    return udev.Device.from_sys_path(context, '/sys/devices/platform')
+
 def pytest_funcarg__socket_path(request):
     """
     Return a socket path for :meth:`udev.Monitor.from_socket`.  The path is
@@ -200,3 +256,11 @@ def pytest_funcarg__monitor(request):
     Return a netlink monitor for udev source.
     """
     return udev.Monitor.from_netlink(request.getfuncargvalue('context'))
+
+def pytest_funcarg__fake_monitor(request):
+    """
+    Return a FakeMonitor, which emits the platform device as returned by
+    the ``platform_device`` funcarg on all triggered actions.
+    """
+    return FakeMonitor(request.getfuncargvalue('platform_device'))
+
