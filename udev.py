@@ -375,6 +375,9 @@ class Device(Mapping):
         self.context = context
         self._device = _device
 
+    def __del__(self):
+        libudev.udev_device_unref(self._device)
+
     def __repr__(self):
         return 'Device({0.sys_path!r})'.format(self)
 
