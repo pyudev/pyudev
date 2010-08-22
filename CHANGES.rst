@@ -4,7 +4,7 @@
 API changes
 -----------
 
-- :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` no,
+- :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` now,
   if no device was found at the given path.
 - :meth:`udev.Monitor.receive_device` raises
   :exc:`~exceptions.EnvironmentError` now, if libudev did not return a
