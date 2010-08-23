@@ -31,8 +31,8 @@ class Monitor(object):
     """
     Monitor udev events:
 
-    >>> context = Context()
-    >>> monitor = Monitor.from_netlink(context)
+    >>> context = pyudev.Context()
+    >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> for action, device in monitor:
     ...     print action, device

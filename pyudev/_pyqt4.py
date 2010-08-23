@@ -35,12 +35,10 @@ class QUDevMonitorObserver(QObject):
     Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
     events:
 
-    >>> from pyudev import Context
-    >>> from pyudev.pyqt4 import QUDevMonitorObserver
-    >>> context = Context()
-    >>> monitor = Monitor.from_netlink(context)
+    >>> context = pyudev.Context()
+    >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
-    >>> observer = QUDevMonitorObserver(monitor)
+    >>> observer = pyudev.pyqt4.QUDevMonitorObserver(monitor)
     >>> observer.deviceAdded.connect(
     ...     lambda device: print('{0!r} added'.format(device)))
     >>> monitor.start()

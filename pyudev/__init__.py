@@ -26,10 +26,11 @@
     Usage
     -----
 
-    The central class is the :class:`Context`.  An instance of this class is
-    mandatory to use any function of this library:
+    First import :mod:`pyudev` and create a :class:`Context` object.  This
+    object is mandatory to use this library:
 
-    >>> context = Context()
+    >>> import pyudev
+    >>> context = pyudev.Context()
 
     A :class:`Context` instance provides access to some basic udev
     properties:
@@ -76,18 +77,11 @@
     You can not only list existing devices, you can also monitor the device
     list for changes using the :class:`Monitor` class:
 
-    >>> monitor = Monitor.from_netlink(context)
+    >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> for action, device in monitor:
     ...     if action == 'add':
     ...         print device, 'added'
-
-
-    Remarks
-    -------
-
-    If imported with wildcard (``from udev import *``), only :class:`Device`
-    and :class:`Context` will be imported.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """

@@ -236,7 +236,7 @@ class Device(Mapping):
         Create a device from a device ``path``.  The ``path`` may or may not
         start with the ``sysfs`` mount point:
 
-        >>> context = Context()
+        >>> context = pyudev.Context()
         >>> Device.from_path(context, '/devices/platform')
         Device(u'/sys/devices/platform')
         >>> Device.from_path(context, '/sys/devices/platform')
@@ -257,7 +257,7 @@ class Device(Mapping):
         """
         Create a new device from a given ``sys_path``:
 
-        >>> context = Context()
+        >>> context = pyudev.Context()
         >>> Device.from_path(context, '/sys/devices/platform')
         Device(u'/sys/devices/platform')
 
