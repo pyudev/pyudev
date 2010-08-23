@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,10 +16,10 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    qudev
-    =====
+    pyudev.pyqt4
+    ============
 
-    PyQt4 binding for :mod:`udev`.
+    PyQt4 binding for :mod:`pyudev`.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
@@ -26,14 +27,17 @@
 
 from PyQt4.QtCore import QSocketNotifier, QObject, pyqtSignal
 
-import udev
+from pyudev._core import Device
 
 
 class QUDevMonitorObserver(QObject):
     """
-    Observe a :class:`udev.Monitor` and emit Qt signals upon device events:
+    Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
+    events:
 
-    >>> context.Context()
+    >>> from pyudev import Context
+    >>> from pyudev.pyqt4 import QUDevMonitorObserver
+    >>> context = Context()
     >>> monitor = Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> observer = QUDevMonitorObserver(monitor)
@@ -43,20 +47,20 @@ class QUDevMonitorObserver(QObject):
     """
 
     #: emitted upon arbitrary device events
-    deviceEvent = pyqtSignal(unicode, udev.Device)
+    deviceEvent = pyqtSignal(unicode, Device)
     #: emitted, if a device was added
-    deviceAdded = pyqtSignal(udev.Device)
+    deviceAdded = pyqtSignal(Device)
     #: emitted, if a device was removed
-    deviceRemoved = pyqtSignal(udev.Device)
+    deviceRemoved = pyqtSignal(Device)
     #: emitted, if a device was changed
-    deviceChanged = pyqtSignal(udev.Device)
+    deviceChanged = pyqtSignal(Device)
     #: emitted, if a device was moved
-    deviceMoved = pyqtSignal(udev.Device)
+    deviceMoved = pyqtSignal(Device)
 
 
     def __init__(self, monitor, parent=None):
         """
-        Observe the given ``monitor`` (a :class:`udev.Monitor`):
+        Observe the given ``monitor`` (a :class:`pyudev.Monitor`):
 
         ``parent`` is the parent QObject of this object.  It is passed
         unchanged to the inherited constructor of QObject.

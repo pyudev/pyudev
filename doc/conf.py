@@ -2,7 +2,7 @@
 
 import sys, os
 
-import udev
+import pyudev
 
 needs_sphinx = '1.0'
 
@@ -15,8 +15,8 @@ source_suffix = '.rst'
 
 project = u'pyudev'
 copyright = u'2010, Sebastian Wiesner'
-version = '.'.join(udev.__version__.split('.')[:2])
-release = udev.__version__
+version = '.'.join(pyudev.__version__.split('.')[:2])
+release = pyudev.__version__
 
 html_theme = 'default'
 html_static_path = []

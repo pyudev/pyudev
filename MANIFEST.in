@@ -1,4 +1,5 @@
 include *.py
+recursive-include pyudev/ *.py
 recursive-include doc/ *.rst *.py Makefile
 recursive-include tests/ *.py
 prune doc/_build/

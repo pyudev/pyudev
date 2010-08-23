@@ -14,12 +14,14 @@ Installation
 ============
 
 The binding is implemented in pure Python atop of ctypes_ and contains no
-native code.  The only requirement is Python 2.6 or newer (Python 3.x is not
-supported as of now).  Installation is therefore rather simple, just run::
+native code.  The only requirements are Python 2.6 or newer (Python 3.x is
+not supported as of now) and apipkg_.  Installation is rather simple, just
+run::
 
    python setup.py install
 
-To load the module, libudev must be available.
+apipkg_ will be installed automatically.  To load the module, libudev must
+be available.
 
 
 Issues and Feedback
@@ -44,7 +46,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _website: http://packages.python.org/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
+.. _apipkg: http://pypi.python.org/pypi/apipkg/
 .. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues
 .. _GitHub: http://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
-

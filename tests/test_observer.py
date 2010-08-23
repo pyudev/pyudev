@@ -41,7 +41,7 @@ def test_fake_monitor(fake_monitor, platform_device):
 def _trigger_observer(action, monitor, action_trigger):
     QtCore = py.test.importorskip('PyQt4.QtCore')
 
-    from qudev import QUDevMonitorObserver
+    from pyudev.pyqt4 import QUDevMonitorObserver
 
     # our event loop
     app = QtCore.QCoreApplication([])

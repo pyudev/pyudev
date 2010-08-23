@@ -25,8 +25,7 @@ import errno
 import py.test
 import mock
 
-import udev
-from udev import Monitor, Device
+from pyudev import Monitor, Device
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -201,7 +200,7 @@ def test_enable_receiving_mock(monitor):
 
 def test_enable_receiving_error_mock(context, monitor, socket_path):
     with py.test.patch_libudev('udev_monitor_enable_receiving') as func:
-        with mock.patch('_udev.get_udev_errno') as get_errno:
+        with mock.patch('pyudev._monitor.get_libudev_errno') as get_errno:
             get_errno.return_value = errno.ENOENT
             func.return_value = 1
             with py.test.raises(EnvironmentError) as exc_info:
@@ -255,7 +254,7 @@ def test_receive_device_mock(monitor):
 
 def test_receive_device_error_mock(monitor):
     with py.test.patch_libudev('udev_monitor_receive_device') as func:
-        with mock.patch('_udev.get_udev_errno') as errorfunc:
+        with mock.patch('pyudev._monitor.get_libudev_errno') as errorfunc:
             func.return_value = None
             errorfunc.return_value = 0
             with py.test.raises(EnvironmentError) as exc_info:

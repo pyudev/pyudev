@@ -27,12 +27,12 @@ from subprocess import check_call
 import mock
 import py.test
 
-import udev
+import pyudev
 
 
 class FakeMonitor(object):
     """
-    A dummy udev.Monitor class, which allows clients to trigger arbitrary
+    A dummy pyudev.Monitor class, which allows clients to trigger arbitrary
     events, emitting clearly defined device objects.
     """
 
@@ -109,7 +109,7 @@ def get_device_sample(config):
 
 @contextmanager
 def patch_libudev(funcname):
-    with mock.patch('udev.libudev.{0}'.format(funcname)) as func:
+    with mock.patch('pyudev._libudev.libudev.{0}'.format(funcname)) as func:
         yield func
 
 
@@ -184,10 +184,10 @@ def pytest_funcarg__database(request):
 
 def pytest_funcarg__context(request):
     """
-    Return a useable :class:`udev.Context` object.  The context is cached
+    Return a useable :class:`pyudev.Context` object.  The context is cached
     with session scope.
     """
-    return request.cached_setup(setup=udev.Context, scope='session')
+    return request.cached_setup(setup=pyudev.Context, scope='session')
 
 def pytest_funcarg__device_path(request):
     """
@@ -226,13 +226,13 @@ def pytest_funcarg__sys_path(request):
 
 def pytest_funcarg__device(request):
     """
-    Create and return a :class:`udev.Device` object for the sys_path
+    Create and return a :class:`pyudev.Device` object for the sys_path
     returned by the ``sys_path`` funcarg, and the context from the
     ``context`` funcarg.
     """
     sys_path = request.getfuncargvalue('sys_path')
     context = request.getfuncargvalue('context')
-    return udev.Device.from_sys_path(context, sys_path)
+    return pyudev.Device.from_sys_path(context, sys_path)
 
 def pytest_funcarg__platform_device(request):
     """
@@ -241,12 +241,12 @@ def pytest_funcarg__platform_device(request):
     purposes.
     """
     context = request.getfuncargvalue('context')
-    return udev.Device.from_sys_path(context, '/sys/devices/platform')
+    return pyudev.Device.from_sys_path(context, '/sys/devices/platform')
 
 def pytest_funcarg__socket_path(request):
     """
-    Return a socket path for :meth:`udev.Monitor.from_socket`.  The path is
-    unique for each test.
+    Return a socket path for :meth:`pyudev.Monitor.from_socket`.  The path
+    is unique for each test.
     """
     tmpdir = request.getfuncargvalue('tmpdir')
     return tmpdir.join('monitor-socket')
@@ -255,7 +255,7 @@ def pytest_funcarg__monitor(request):
     """
     Return a netlink monitor for udev source.
     """
-    return udev.Monitor.from_netlink(request.getfuncargvalue('context'))
+    return pyudev.Monitor.from_netlink(request.getfuncargvalue('context'))
 
 def pytest_funcarg__fake_monitor(request):
     """

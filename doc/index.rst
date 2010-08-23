@@ -15,10 +15,13 @@ Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
 pyudev is built atop of ctypes_ and does not contain any native code.  The
-only requirement is Python 2.6 or newer (Python 3.x is not supported as of
-now).  Installation is therefore rather simple, just run::
+only requirements are Python 2.6 or newer (Python 3.x is not supported as of
+now) and apipkg_.  Installation is rather simple, just run::
 
    pip install pyudev
+
+apipkg_ will be installed automatically.  To load the module, libudev must
+be available.
 
 
 Documentation
@@ -26,7 +29,7 @@ Documentation
 
 Usage of pyudev is rather simple:
 
->>> from udev import Context
+>>> from pyudev import Context
 >>> context = Context()
 >>> devices = context.list_devices()
 >>> for device in devices.match_subsystem('input').match_property('ID_INPUT_MOUSE', True):
@@ -68,6 +71,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
+.. _apipkg: http://pypi.python.org/pypi/apipkg/
 .. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues
 .. _GitHub: http://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
@@ -80,5 +84,3 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
    api
    licencing
    changes
-
-

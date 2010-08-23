@@ -4,25 +4,27 @@
 API changes
 -----------
 
-- :meth:`udev.Device.from_sys_path` raises :exc:`udev.NoSuchDeviceError` now,
-  if no device was found at the given path.
-- :meth:`udev.Monitor.receive_device` raises
+- #3: Renamed :mod:`udev` to :mod:`pyudev`
+- #3: Renamed :mod:`qudev` to :mod:`pyudev.pyqt4`
+- :meth:`pyudev.Device.from_sys_path` raises :exc:`pyudev.NoSuchDeviceError`
+  now, if no device was found at the given path.
+- :meth:`pyudev.Monitor.receive_device` raises
   :exc:`~exceptions.EnvironmentError` now, if libudev did not return a
   device object, but a null pointer.
-- :mod:`udev` interprets libudev error codes whereever possible now.
+- :mod:`pyudev` interprets libudev error codes whereever possible now.
   Consequently :exc:`~exceptions.EnvironmentError` exceptions raised by
-  :mod:`udev` classes mostly have proper ``errno``, ``strerror`` and
+  :mod:`pyudev` classes mostly have proper ``errno``, ``strerror`` and
   ``filename`` attributes now.
 
 Fixed issues
 ------------
 
-- Fixed :exc:`~exceptions.NameError` in :meth:`udev.Monitor.from_socket`
-- The ``subsystem`` argument to :meth:`udev.Monitor.filter_by` is mandatory
+- Fixed :exc:`~exceptions.NameError` in :meth:`pyudev.Monitor.from_socket`
+- The ``subsystem`` argument to :meth:`pyudev.Monitor.filter_by` is mandatory
   now, as the underlying API requires it.
-- Fixed possible memory leak:  :class:`udev.Device` now delete the
+- Fixed possible memory leak:  :class:`pyudev.Device` now delete the
   underlying libudev object, when garbage-collected
-- Fixed broken signal emitting in :class:`qudev.QUDevMonitorObserver`
+- Fixed broken signal emitting in :class:`pyudev.pyqt4.QUDevMonitorObserver`
 
 
 0.3 (Jul 28, 2010)

@@ -21,7 +21,7 @@ import operator
 
 import py.test
 
-from udev import Device, NoSuchDeviceError
+from pyudev import Device, NoSuchDeviceError
 
 
 def pytest_generate_tests(metafunc):

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
-import udev
+import pyudev
 
 with open('README.rst') as stream:
     long_description = stream.read().decode('utf-8')
@@ -12,7 +12,7 @@ with open('README.rst') as stream:
 
 setup(
     name='pyudev',
-    version=udev.__version__,
+    version=pyudev.__version__,
     url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
@@ -30,5 +30,6 @@ setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    py_modules=['udev', '_udev', 'qudev'],
+    install_requires=['apipkg>=1.0b6'],
+    packages=find_packages(),
     )
