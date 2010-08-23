@@ -4,6 +4,8 @@
 API changes
 -----------
 
+- Preferred import scheme is ``import pyudev`` now, all library classes will
+  be available under the ``pyudev`` namespace then.
 - #3: Renamed :mod:`udev` to :mod:`pyudev`
 - #3: Renamed :mod:`qudev` to :mod:`pyudev.pyqt4`
 - Added :meth:`pyudev.Device.from_path`
