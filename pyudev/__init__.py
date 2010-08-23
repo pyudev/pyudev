@@ -32,6 +32,20 @@
     >>> import pyudev
     >>> context = pyudev.Context()
 
+    .. note::
+
+       ``import pyudev`` is the preferred way to load :mod:`pyudev`. All
+       classes and sub-modules are available directly in the :mod:`pyudev`
+       namespace, so you can just do:
+
+       >>> import pyudev
+       >>> observer = pyudev.pyqt4.QUDevMonitorObserver(monitor)
+
+       Thanks to apipkg_ this just works :). The ``pyqt4`` module is
+       lazy-loaded automatically without any additional imports.
+
+       .. _apipkg: http://pypi.python.org/pypi/apipkg/
+
     A :class:`Context` instance provides access to some basic udev
     properties:
 
