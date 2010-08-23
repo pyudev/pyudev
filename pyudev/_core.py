@@ -232,7 +232,11 @@ class Device(Mapping):
     @classmethod
     def from_sys_path(cls, context, sys_path):
         """
-        Create a new device from a given ``sys_path``.
+        Create a new device from a given ``sys_path``:
+
+        >>> context = Context()
+        >>> Device.from_path(context, '/sys/devices/platform')
+        Device(u'/sys/devices/platform')
 
         ``context`` is the :class:`Context` in which to search the device.
         ``sys_path`` is a unicode or byte string containing the path of the
