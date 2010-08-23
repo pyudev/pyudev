@@ -23,7 +23,7 @@
 :class:`Enumerator` – listing devices
 -------------------------------------
 
-.. autoclass:: Enumerator
+.. autoclass:: Enumerator()
 
    .. automethod:: match_subsystem
 
@@ -41,7 +41,7 @@
 
    .. autoattribute:: sys_path
 
-.. autoclass:: Device
+.. autoclass:: Device()
 
    .. automethod:: from_sys_path
 
@@ -77,7 +77,7 @@
 :class:`Monitor` – monitor devices
 ----------------------------------
 
-.. autoclass:: Monitor
+.. autoclass:: Monitor()
 
    .. automethod:: from_netlink
 
