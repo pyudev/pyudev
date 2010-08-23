@@ -39,6 +39,20 @@ def test_device_from_sys_path(context, sys_path, device_path):
     assert device.device_path == device_path
 
 
+def test_device_from_path(context, device_path, sys_path):
+    device = Device.from_path(context, device_path)
+    assert device is not None
+    assert device.sys_path == sys_path
+    assert device.device_path == device_path
+    assert device == Device.from_sys_path(context, sys_path)
+    assert device == Device.from_path(context, sys_path)
+
+
+def test_device_from_path_strips_leading_slash(context):
+    assert Device.from_path(context, 'devices/platform') == \
+           Device.from_path(context, '/devices/platform')
+
+
 def test_device_from_sys_path_no_such_device(context):
     sys_path = 'there_will_not_be_such_a_device'
     with py.test.raises(NoSuchDeviceError) as exc_info:

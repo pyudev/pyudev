@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import sys
+import os
 from itertools import count
 from collections import Mapping
 
@@ -228,6 +229,28 @@ class Device(Mapping):
     :class:`Device` objects are hashable and can therefore be used as keys
     in dictionaries and sets.
     """
+
+    @classmethod
+    def from_path(cls, context, path):
+        """
+        Create a device from a device ``path``.  The ``path`` may or may not
+        start with the ``sysfs`` mount point:
+
+        >>> context = Context()
+        >>> Device.from_path(context, '/devices/platform')
+        Device(u'/sys/devices/platform')
+        >>> Device.from_path(context, '/sys/devices/platform')
+        Device(u'/sys/devices/platform')
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``path`` is a device path as unicode or byte string.
+
+        Return a :class:`Device` object for the device.  Raise
+        :exc:`NoSuchDeviceError`, if no device was found for ``path``.
+        """
+        if not path.startswith(context.sys_path):
+            path = os.path.join(context.sys_path, path.lstrip(os.sep))
+        return cls.from_sys_path(context, path)
 
     @classmethod
     def from_sys_path(cls, context, sys_path):

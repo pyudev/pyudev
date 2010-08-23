@@ -6,6 +6,7 @@ API changes
 
 - #3: Renamed :mod:`udev` to :mod:`pyudev`
 - #3: Renamed :mod:`qudev` to :mod:`pyudev.pyqt4`
+- Added :meth:`pyudev.Device.from_path`
 - :meth:`pyudev.Device.from_sys_path` raises :exc:`pyudev.NoSuchDeviceError`
   now, if no device was found at the given path.
 - :meth:`pyudev.Monitor.receive_device` raises

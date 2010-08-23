@@ -43,6 +43,8 @@
 
 .. autoclass:: Device()
 
+   .. automethod:: from_path
+
    .. automethod:: from_sys_path
 
    .. autoattribute:: sys_path
