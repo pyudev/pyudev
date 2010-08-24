@@ -83,11 +83,10 @@ def _read_udev_database(properties_blacklist):
     devices = {}
     current_properties = None
     for line in database:
-        line = line.strip()
+        line = line.strip().decode(sys.getfilesystemencoding())
         if not line:
             continue
         type, value = line.split(': ', 1)
-        value = value.decode(sys.getfilesystemencoding())
         if type == 'P':
             current_properties = devices.setdefault(value, {})
         elif type == 'E':
