@@ -85,7 +85,6 @@ def test_observer_fake(action, fake_monitor, platform_device):
     action_slot.assert_called_with(platform_device)
 
 
-@py.test.mark.skipif("not config.getvalue('allow_privileges')")
 @py.test.mark.privileged
 def test_observer(monitor):
     py.test.unload_dummy()
