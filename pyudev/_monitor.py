@@ -35,7 +35,7 @@ class Monitor(object):
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> for action, device in monitor:
-    ...     print action, device
+    ...     print('{0}: {1}'.format(action, device))
     ...
 
     A :class:`Monitor` objects connects to the udev daemon and listens for

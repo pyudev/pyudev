@@ -95,7 +95,7 @@
     >>> monitor.filter_by(subsystem='input')
     >>> for action, device in monitor:
     ...     if action == 'add':
-    ...         print device, 'added'
+    ...         print('{0!r} added'.format(device))
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """

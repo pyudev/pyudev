@@ -39,8 +39,9 @@ class QUDevMonitorObserver(QObject):
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> observer = pyudev.pyqt4.QUDevMonitorObserver(monitor)
-    >>> observer.deviceAdded.connect(
-    ...     lambda device: print('{0!r} added'.format(device)))
+    >>> def device_connected(device):
+    ...     print('{0!r} added'.format(device))
+    >>> observer.deviceAdded.connect(device_connected)
     >>> monitor.start()
     """
 
