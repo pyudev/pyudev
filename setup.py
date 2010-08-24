@@ -1,13 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
+if sys.version_info[0] < 3:
+    from codecs import open
+    extra_arguments = {}
+else:
+    extra_arguments = dict(use_2to3=True)
 
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    import distribute_setup
+    distribute_setup.use_setuptools()
+    from setuptools import setup, find_packages
 
 import pyudev
 
-with open('README.rst') as stream:
-    long_description = stream.read().decode('utf-8')
+with open('README.rst', encoding='utf-8') as stream:
+    long_description = stream.read()
 
 
 setup(
@@ -32,4 +43,5 @@ setup(
         ],
     install_requires=['apipkg>=1.0b6'],
     packages=find_packages(),
+    **extra_arguments
     )
