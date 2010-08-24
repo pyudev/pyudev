@@ -39,6 +39,19 @@ class FakeMonitor(object):
     def __init__(self, device_to_emit):
         self.client, self.server = socket.socketpair(
             socket.AF_UNIX, socket.SOCK_DGRAM)
+        if sys.version_info[0] >= 3:
+            # in python 3 sockets returned by socketpair() lack the
+            # ".makefile()" method, which is required by this class.  Work
+            # around this limitation by wrapping these sockets in real
+            # socket objects.
+            import os
+            def _wrap_socket(sock):
+                wrapped = socket.socket(sock.family, sock.type,
+                                        fileno=os.dup(sock.fileno()))
+                sock.close()
+                return wrapped
+            self.client, self.server = (_wrap_socket(self.client),
+                                        _wrap_socket(self.server))
         self.device_to_emit = device_to_emit
 
     def trigger_action(self, action):
