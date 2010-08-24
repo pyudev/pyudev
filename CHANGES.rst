@@ -1,6 +1,8 @@
 0.5 (in development)
 ====================
 
+- Support for Python 3
+
 
 0.4 (Aug 23, 2010)
 ==================
