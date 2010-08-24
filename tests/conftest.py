@@ -138,10 +138,22 @@ def unload_dummy():
     check_call(['sudo', 'modprobe', '-r', 'dummy'])
 
 
+def is_unicode_string(value):
+    """
+    Return ``True``, if ``value`` is of a real unicode string type
+    (``unicode`` in python 2, ``str`` in python 3), ``False`` otherwise.
+    """
+    if sys.version_info[0] >= 3:
+        unicode_type = str
+    else:
+        unicode_type = unicode
+    return isinstance(value, unicode_type)
+
+
 def pytest_namespace():
     return dict((func.__name__, func) for func in
                 (get_device_sample, patch_libudev, load_dummy,
-                 unload_dummy))
+                 unload_dummy, is_unicode_string))
 
 
 def pytest_addoption(parser):

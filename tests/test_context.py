@@ -16,11 +16,16 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from __future__ import unicode_literals
+
+import py.test
+
+
 def test_context_syspath(context):
-    assert isinstance(context.sys_path, unicode)
-    assert context.sys_path == u'/sys'
+    assert py.test.is_unicode_string(context.sys_path)
+    assert context.sys_path == '/sys'
 
 
 def test_context_devpath(context):
-    assert isinstance(context.device_path, unicode)
-    assert context.device_path == u'/dev'
+    assert py.test.is_unicode_string(context.device_path)
+    assert context.device_path == '/dev'
