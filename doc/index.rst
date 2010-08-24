@@ -15,8 +15,8 @@ Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
 pyudev is built atop of ctypes_ and does not contain any native code.  The
-only requirements are Python 2.6 or newer (Python 3.x is not supported as of
-now) and apipkg_.  Installation is rather simple, just run::
+only requirements are Python 2.6 or newer (including Python 3) and apipkg_.
+Installation is rather simple, just run::
 
    pip install pyudev
 

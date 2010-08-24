@@ -14,9 +14,8 @@ Installation
 ============
 
 The binding is implemented in pure Python atop of ctypes_ and contains no
-native code.  The only requirements are Python 2.6 or newer (Python 3.x is
-not supported as of now) and apipkg_.  Installation is rather simple, just
-run::
+native code.  The only requirements are Python 2.6 or newer (including
+Python 3) and apipkg_.  Installation is rather simple, just run::
 
    python setup.py install
 
