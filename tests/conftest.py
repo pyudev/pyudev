@@ -104,7 +104,7 @@ def get_device_sample(config):
     else:
         device_sample_size = config.getvalue('device_sample_size')
         actual_size = min(device_sample_size, len(config.udev_database))
-        return random.sample(config.udev_database, actual_size)
+        return random.sample(list(config.udev_database), actual_size)
 
 
 @contextmanager
