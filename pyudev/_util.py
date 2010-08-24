@@ -25,19 +25,19 @@ from pyudev._libudev import libudev
 
 
 def assert_bytes(value):
-    if not isinstance(value, str):
+    if not isinstance(value, bytes):
         value = value.encode(sys.getfilesystemencoding())
     return value
 
 def property_value_to_bytes(value):
-    if isinstance(value, str):
+    # udev represents boolean values as 1 or 0, therefore an explicit
+    # conversion to int is required for boolean values
+    if isinstance(value, bool):
+        value = int(value)
+    if isinstance(value, bytes):
         return value
-    elif isinstance(value, unicode):
-        return value.encode(sys.getfilesystemencoding())
-    elif isinstance(value, int):
-        return str(int(value))
     else:
-        return str(value)
+        return unicode(value).encode(sys.getfilesystemencoding())
 
 def udev_list_iterate(entry):
     while entry:

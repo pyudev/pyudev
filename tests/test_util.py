@@ -15,6 +15,8 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+from __future__ import unicode_literals
+
 import sys
 import os
 import errno
@@ -48,8 +50,8 @@ def test_call_handle_error_return_environment_error():
 
 @py.test.mark.conversion
 def test_assert_bytes():
-    assert isinstance(_util.assert_bytes(u'hello world'), str)
-    assert _util.assert_bytes(u'hello world') == b'hello world'
+    assert isinstance(_util.assert_bytes('hello world'), bytes)
+    assert _util.assert_bytes('hello world') == b'hello world'
     hello = b'hello world'
     assert _util.assert_bytes(hello) is hello
 
@@ -62,20 +64,20 @@ def test_assert_bytes_none():
 
 @py.test.mark.conversion
 def test_property_value_to_bytes_string():
-    hello = u'hello world'.encode(sys.getfilesystemencoding())
+    hello = 'hello world'.encode(sys.getfilesystemencoding())
     assert _util.property_value_to_bytes(hello) is hello
-    assert isinstance(_util.property_value_to_bytes(u'hello world'), str)
-    assert _util.property_value_to_bytes(u'hello world') == hello
+    assert isinstance(_util.property_value_to_bytes('hello world'), bytes)
+    assert _util.property_value_to_bytes('hello world') == hello
 
 
 @py.test.mark.conversion
 def test_property_value_to_bytes_int():
     assert _util.property_value_to_bytes(10000) == b'10000'
-    assert isinstance(_util.property_value_to_bytes(10000), str)
+    assert isinstance(_util.property_value_to_bytes(10000), bytes)
 
 @py.test.mark.conversion
 def test_property_value_to_bytes_bool():
-    assert _util.property_value_to_bytes(True) == '1'
-    assert isinstance(_util.property_value_to_bytes(True), str)
-    assert _util.property_value_to_bytes(False) == '0'
-    assert isinstance(_util.property_value_to_bytes(False), str)
+    assert _util.property_value_to_bytes(True) == b'1'
+    assert isinstance(_util.property_value_to_bytes(True), bytes)
+    assert _util.property_value_to_bytes(False) == b'0'
+    assert isinstance(_util.property_value_to_bytes(False), bytes)
