@@ -71,8 +71,8 @@ class Monitor(object):
         """
         Create a monitor by connecting to the kernel daemon through netlink.
 
-        ``context`` is the :class:`Context` to use.  ``source`` is the event
-        source.  As of now, two sources are available:
+        ``context`` is the :class:`Context` to use.  ``source`` is a string,
+        describing the event source.  Two sources are available:
 
         ``'udev'`` (the default)
           Events emitted after udev as registered and configured the device.
@@ -116,9 +116,8 @@ class Monitor(object):
         given socket.  Raise :exc:`~exceptions.EnvironmentError`, if the
         creation of the monitor failed.
         """
-        socket_path = assert_bytes(socket_path)
         monitor = libudev.udev_monitor_new_from_socket(
-            context._context, socket_path)
+            context._context, assert_bytes(socket_path))
         if not monitor:
             raise EnvironmentError('Could not create monitor for socket: '
                                    '{0!r}'.format(socket_path))

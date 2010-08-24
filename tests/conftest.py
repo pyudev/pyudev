@@ -116,7 +116,7 @@ def _need_privileges(func):
     @wraps(func)
     def wrapped(*args):
         if not py.test.config.getvalue('allow_privileges'):
-            raise ValueError('missing privileges')
+            py.test.skip('privileges disabled')
         return func(*args)
     return wrapped
 
