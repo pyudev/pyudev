@@ -30,6 +30,9 @@ def pytest_generate_tests(metafunc):
         devices = py.test.get_device_sample(metafunc.config)
         for device_path in devices:
             metafunc.addcall(id=device_path, param=device_path)
+    elif 'operator' in args:
+        for op in (operator.gt, operator.lt, operator.le, operator.ge):
+            metafunc.addcall(funcargs=dict(operator=op), id=op.__name__)
 
 
 def test_device_from_sys_path(context, sys_path, device_path):
@@ -143,16 +146,11 @@ def test_device_ne(device):
     assert device != device.parent
 
 
-def _assert_ordering(device, operator):
-    exc_info = py.test.raises(TypeError, lambda: operator(device, device))
+@py.test.mark.operator
+def test_device_ordering(platform_device, operator):
+    with py.test.raises(TypeError) as exc_info:
+        operator(platform_device, platform_device)
     assert str(exc_info.value) == 'Device not orderable'
-
-for operator in (operator.gt, operator.lt, operator.le, operator.ge):
-    @py.test.mark.operator
-    def foo(platform_device):
-        _assert_ordering(platform_device, operator)
-    foo.__name__ = 'test_device_{0}'.format(operator.__name__)
-    globals()[foo.__name__] = foo
 
 
 @py.test.mark.operator
