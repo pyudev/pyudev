@@ -200,7 +200,8 @@ class Monitor(object):
         ``'move'``
           The device was renamed, moved, or re-parented
 
-        Raise :exc:`EnvironmentError`, if no device could be read.
+        Raise :exc:`~exceptions.EnvironmentError`, if no device could be
+        read.
         """
         device_p = libudev.udev_monitor_receive_device(self._monitor)
         if not device_p:
