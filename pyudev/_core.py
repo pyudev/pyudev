@@ -336,8 +336,8 @@ class Device(Mapping):
     @property
     def sys_path(self):
         """
-        Absolute path of this device in ``sysfs`` including the mount point
-        as unicode string.
+        Absolute path of this device in ``sysfs`` including the ``sysfs``
+        mount point as unicode string.
         """
         return libudev.udev_device_get_syspath(self._device).decode(
             sys.getfilesystemencoding())
@@ -348,8 +348,9 @@ class Device(Mapping):
         Kernel device path as unicode string.  This path uniquely identifies
         a single device.
 
-        Unlike :attr:`sys_path`, this path does not contain the mount point.
-        However, the path is absolute and starts with a slash ``'/'``.
+        Unlike :attr:`sys_path`, this path does not contain the ``sysfs``
+        mount point.  However, the path is absolute and starts with a slash
+        ``'/'``.
         """
         return libudev.udev_device_get_devpath(self._device).decode(
             sys.getfilesystemencoding())
@@ -382,8 +383,15 @@ class Device(Mapping):
     @property
     def device_links(self):
         """
-        The device file links in the device directory, which point to this
-        device as a list of unicode strings.
+        An iterator, which yields the device file links pointing to this
+        device as unicode strings.
+
+        UDev can create symlinks to the original device file inside the
+        device directory (see :attr:`Context.device_path`).  This is often
+        used to assign a constant, fixed device file name to devices like
+        removeable media, which technically do not have a constant device
+        file name.  The property provides access to all such symlinks, which
+        were created by UDev for this device.
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
         for name in udev_list_iterate(entry):
@@ -392,7 +400,9 @@ class Device(Mapping):
     def __iter__(self):
         """
         Iterate over the names of all properties defined for this device.
-        Property names are unicode strings.
+
+        Return a generator yielding the names of all properties of this
+        device as unicode strings.
         """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         for name in udev_list_iterate(entry):
@@ -400,7 +410,7 @@ class Device(Mapping):
 
     def __len__(self):
         """
-        Return the amount of properties defined for this device.
+        Return the amount of properties defined for this device as integer.
         """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         counter = count()
@@ -443,15 +453,17 @@ class Device(Mapping):
         """
         Get the given ``property`` from this device as boolean.
 
+        A boolean property has either a value of ``'1'`` or of ``'0'``,
+        where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
+        other value causes a :exc:`~exceptions.ValueError` to be raised.
+
         ``property`` is a unicode or byte string containing the name of the
         property.
 
-        Return the property value as boolean.  A property value of ``'1'``
-        is considered ``True``, a property value of ``'0'`` is considered
-        ``False``, any other property value raises a
-        :exc:`~exceptions.ValueError`.  Raise a
-        :exc:`~exceptions.ValueError`, if the property value cannot be
-        converted to an integer.
+        Return ``True``, if the property value is ``'1'`` and ``False``, if
+        the property value is ``'0'``.  Any other value raises a
+        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
+        if the given property is not defined for this device.
         """
         value = self[property]
         if value not in ('1', '0'):
