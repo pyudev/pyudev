@@ -374,8 +374,14 @@ class Device(Mapping):
     @property
     def device_node(self):
         """
-        Absolute path to the device node inside the device directory
-        (including the device directory) as unicode string.
+        Absolute path to the device node of this device as unicode string.
+        The path includes the device directory (see
+        :attr:`Context.device_path`).
+
+        This path always points to the actual device node associated with
+        this device, and never to any symbolic links to this device node.
+        See :attr:`device_links` to get a list of symbolic links to this
+        device node.
         """
         return libudev.udev_device_get_devnode(self._device).decode(
             sys.getfilesystemencoding())
@@ -383,15 +389,18 @@ class Device(Mapping):
     @property
     def device_links(self):
         """
-        An iterator, which yields the device file links pointing to this
-        device as unicode strings.
+        An iterator, which yields the absolute paths (including the device
+        directory, see :attr:`Context.device_path`) of all symbolic links
+        pointing to the :attr:`device_node` of this device.  The paths are
+        unicode strings.
 
-        UDev can create symlinks to the original device file inside the
-        device directory (see :attr:`Context.device_path`).  This is often
-        used to assign a constant, fixed device file name to devices like
+        UDev can create symlinks to the original device node (see
+        :attr:`device_node`) inside the device directory.  This is often
+        used to assign a constant, fixed device node to devices like
         removeable media, which technically do not have a constant device
-        file name.  The property provides access to all such symlinks, which
-        were created by UDev for this device.
+        node, or to map a single device into multiple device hierarchies.
+        The property provides access to all such symbolic links, which were
+        created by UDev for this device.
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
         for name in udev_list_iterate(entry):
