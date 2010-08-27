@@ -187,8 +187,8 @@ class Monitor(object):
         event queue.  The call blocks, until a device is available.
 
         If a device was available, return ``(action, device)``.  ``device``
-        is :class:`Device` object describing the device.  ``action`` is a
-        string describing the action.  udev informs about the following
+        is the :class:`Device` object describing the device.  ``action`` is
+        a string describing the action.  udev informs about the following
         actions:
 
         ``'add'``
