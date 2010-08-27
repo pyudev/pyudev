@@ -2,6 +2,7 @@
 ====================
 
 - Support for Python 3
+- Improved and extended documentation at some points
 
 
 0.4 (Aug 23, 2010)
