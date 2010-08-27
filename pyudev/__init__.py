@@ -85,8 +85,8 @@
     dictionary methods to access device information.
 
     Aside of dictionary access, some special properties are available, that
-    provide access to udev attributes of the device (like its path in
-    ``sysfs``).
+    provide access to udev properties and attributes of the device (like its
+    path in ``sysfs``).
 
     You can not only list existing devices, you can also monitor the device
     list for changes using the :class:`Monitor` class:
