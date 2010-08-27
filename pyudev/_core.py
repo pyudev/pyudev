@@ -408,14 +408,22 @@ class Device(Mapping):
 
     def get_sysattr(self, attribute):
         """
-        Get the value of the given system attribute for this device (these appear
-        as ATTR{x}=y in udevadm info, where x is the attribute name and y is
-        the value returned by this method.
+        Get the given system ``attribute`` for this device.
+        
+        ``attribute`` is a unicode or byte string containing the name of the
+        system attribute
+        
+        Return the system attribute value as unicode string, or raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device.
+        
+        System attributes appear as ATTR{x}=y in udevadm info, where x
+        is the attribute name and y is the value returned by this method.
         """
         value = libudev.udev_device_get_sysattr_value(
             self._device, assert_bytes(attribute))
         if value is None:
-            raise KeyError('No such property: {0}'.format(property))
+            raise KeyError('No such attribute: {0}'.format(attribute))
         return value.decode(sys.getfilesystemencoding())
 
     def __iter__(self):
