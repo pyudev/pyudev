@@ -44,6 +44,12 @@
        Thanks to apipkg_ this just works :). The ``pyqt4`` module is
        lazy-loaded automatically without any additional imports.
 
+       However, it is considered good style to add an additional ``import
+       pyudev.pyqt4`` at the top of the file to all other imports, if a
+       module really requires the ``pyqt4`` submodule.  This groups all
+       dependencies at a single point, making them clear and easy to spot
+       and thus increases the readability of the code.
+
        .. _apipkg: http://pypi.python.org/pypi/apipkg/
 
     A :class:`Context` instance provides access to some basic udev
