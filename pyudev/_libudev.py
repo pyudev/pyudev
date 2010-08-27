@@ -107,6 +107,7 @@ SIGNATURES = {
         get_sysname=([udev_device_p], c_char_p),
         get_devnode=([udev_device_p], c_char_p),
         get_property_value=([udev_device_p, c_char_p], c_char_p),
+        get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
         get_action=([udev_device_p], c_char_p),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p)),

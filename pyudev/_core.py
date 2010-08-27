@@ -406,6 +406,18 @@ class Device(Mapping):
         for name in udev_list_iterate(entry):
             yield name.decode(sys.getfilesystemencoding())
 
+    def get_sysattr(self, attribute):
+        """
+        Get the value of the given system attribute for this device (these appear
+        as ATTR{x}=y in udevadm info, where x is the attribute name and y is
+        the value returned by this method.
+        """
+        value = libudev.udev_device_get_sysattr_value(
+            self._device, assert_bytes(attribute))
+        if value is None:
+            raise KeyError('No such property: {0}'.format(property))
+        return value.decode(sys.getfilesystemencoding())
+
     def __iter__(self):
         """
         Iterate over the names of all properties defined for this device.
