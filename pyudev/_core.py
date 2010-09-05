@@ -612,3 +612,35 @@ class Attributes(Mapping):
         content of the attribute cannot be decoded into a unicode string.
         """
         return self[attribute].decode(sys.getfilesystemencoding())
+
+    def asint(self, attribute):
+        """
+        Get the given ``attribute`` as integer.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return the attribute value as integer. Raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device, or a :exc:`~exceptions.ValueError`, if the
+        attribute value cannot be converted to an integer.
+        """
+        return int(self.asstring(attribute))
+
+    def asbool(self, attribute):
+        """
+        Get the given ``attribute`` from this device as boolean.
+
+        A boolean attribute has either a value of ``'1'`` or of ``'0'``,
+        where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
+        other value causes a :exc:`~exceptions.ValueError` to be raised.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return ``True``, if the attribute value is ``'1'`` and ``False``, if
+        the attribute value is ``'0'``.  Any other value raises a
+        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
+        if the given attribute is not defined for this device.
+        """
+        return string_to_bool(self.asstring(attribute))

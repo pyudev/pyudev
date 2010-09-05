@@ -91,6 +91,10 @@
 
    .. automethod:: asstring
 
+   .. automethod:: asint
+
+   .. automethod:: asbool
+
 
 :class:`Monitor` – monitor devices
 ----------------------------------

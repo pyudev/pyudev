@@ -138,6 +138,30 @@ def test_attributes_asstring(device, attributes):
         assert device.attributes.asstring(attribute) == value
 
 
+def test_attributes_asint(device, attributes):
+    for attribute, value in attributes.items():
+        try:
+            value = int(value)
+        except ValueError:
+            with py.test.raises(ValueError):
+                device.attributes.asint(attribute)
+        else:
+            assert device.attributes.asint(attribute) == value
+
+
+def test_attributes_asbool(device, attributes):
+    for attribute, value in attributes.items():
+        if value == '1':
+            assert device.attributes.asbool(attribute)
+        elif value == '0':
+            assert not device.attributes.asbool(attribute)
+        else:
+            with py.test.raises(ValueError) as exc_info:
+                device.attributes.asbool(attribute)
+            message = 'Not a boolean value: {0!r}'
+            assert str(exc_info.value) == message.format(value)
+
+
 @py.test.mark.properties
 def test_device_devname(context, device, all_properties):
     if 'DEVNAME' not in device:
