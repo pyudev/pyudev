@@ -111,6 +111,8 @@ def _read_udev_database(properties_blacklist):
 
 
 def get_device_sample(config):
+    if config.getvalue('device'):
+        return [config.getvalue('device')]
     if config.getvalue('all_devices'):
         return config.udev_database
     else:
@@ -174,6 +176,9 @@ def pytest_addoption(parser):
                      help='Run device tests against *all* devices in the '
                      'database.  By default, only a random sample will be '
                      'checked.', default=False)
+    parser.addoption('--device', metavar='DEVICE',
+                     help='Run the device tests only against the given '
+                     'DEVICE', default=None)
     parser.addoption('--device-sample-size', type='int', metavar='N',
                      help='Use a random sample of N elements (default: 10)',
                      default=10)
