@@ -223,7 +223,7 @@ class Device(Mapping):
     .. warning::
 
        Do **never** use object identity (``is`` operator) to compare
-       :class:`Device` objects.  :mod:`udev` may create multiple
+       :class:`Device` objects.  :mod:`pyudev` may create multiple
        :class:`Device` objects for the same device.  Instead simply compare
        devices by value using ``==`` or ``!=``.
 
