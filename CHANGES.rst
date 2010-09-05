@@ -2,6 +2,9 @@
 ====================
 
 - Support for Python 3
+- #6: Added :attr:`pyudev.Device.attributes` and :class:`pyudev.Attributes`
+  to access the attributes of a device (thanks to Daniel Lazzari for his
+  efforts)
 - Improved and extended documentation at some points
 
 

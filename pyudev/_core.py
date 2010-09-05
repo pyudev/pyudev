@@ -26,7 +26,8 @@ from collections import Mapping
 
 from pyudev._libudev import libudev
 from pyudev._util import (assert_bytes, property_value_to_bytes,
-                          call_handle_error_return, udev_list_iterate)
+                          call_handle_error_return, udev_list_iterate,
+                          string_to_bool)
 
 
 class Context(object):
@@ -283,6 +284,7 @@ class Device(Mapping):
     def __init__(self, context, _device):
         self.context = context
         self._device = _device
+        self._attributes = Attributes(self)
 
     def __del__(self):
         libudev.udev_device_unref(self._device)
@@ -406,6 +408,23 @@ class Device(Mapping):
         for name in udev_list_iterate(entry):
             yield name.decode(sys.getfilesystemencoding())
 
+    @property
+    def attributes(self):
+        """
+        The system attributes of this device as read-only
+        :class:`Attributes` mapping.
+
+        System attributes are basically normal files inside the the device
+        directory.  These files contain all sorts of information about the
+        device, which may not be reflected by properties.  These attributes
+        are commonly used for matching in udev rules, and can be printed
+        using ``udevadm info --attribute-walk``.
+
+        The values of these attributes are not always proper strings, and
+        can contain arbitrary bytes.
+        """
+        return self._attributes
+
     def __iter__(self):
         """
         Iterate over the names of all properties defined for this device.
@@ -474,11 +493,7 @@ class Device(Mapping):
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
         """
-        value = self[property]
-        if value not in ('1', '0'):
-            raise ValueError('Invalid value for boolean property: '
-                             '{0!r}'.format(value))
-        return value == '1'
+        return string_to_bool(self[property])
 
     def __hash__(self):
         return hash(self.device_path)
@@ -506,3 +521,126 @@ class Device(Mapping):
 
     def __ge__(self, other):
         raise TypeError('Device not orderable')
+
+
+def _is_attribute_file(filepath):
+    """
+    Check, if ``filepath`` points to a valid udev attribute filename.
+
+    Implementation is stolen from udev source code, ``print_all_attributes``
+    in ``udev/udevadm-info.c``.  It excludes hidden files (starting with a
+    dot), the special files ``dev`` and ``uevent`` and links.
+
+    Return ``True``, if ``filepath`` refers to an attribute, ``False``
+    otherwise.
+    """
+    filename = os.path.basename(filepath)
+    return not (filename.startswith('.') or
+                filename in ('dev', 'uevent') or
+                os.path.islink(filepath))
+
+
+class Attributes(Mapping):
+    """
+    A mapping which holds udev attributes for :class:`Device` objects.
+
+    This class subclasses the ``Mapping`` ABC, providing a read-only
+    dictionary mapping attribute names to the corresponding values.
+    Therefore all well-known dicitionary methods and operators
+    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
+    attributes.
+    """
+
+    def __init__(self, device):
+        self.device = device
+
+    @property
+    def _attribute_files(self):
+        sys_path = self.device.sys_path
+        return [fn for fn in os.listdir(sys_path) if
+                _is_attribute_file(os.path.join(sys_path, fn)) and
+                fn in self]
+
+    def __len__(self):
+        """
+        Return the amount of attributes defined.
+        """
+        return len(self._attribute_files)
+
+    def __iter__(self):
+        """
+        Iterate over all attributes defined.
+
+        Yield each attribute name as unicode string.
+        """
+        return iter(self._attribute_files)
+
+    def __contains__(self, attribute):
+        return libudev.udev_device_get_sysattr_value(
+            self.device._device, assert_bytes(attribute)) is not None
+
+    def __getitem__(self, attribute):
+        """
+        Get the given system ``attribute`` for the device.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        system attribute.
+
+        Return the attribute value as byte string, or raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device.
+        """
+        value = libudev.udev_device_get_sysattr_value(
+            self.device._device, assert_bytes(attribute))
+        if value is None:
+            raise KeyError('No such attribute: {0}'.format(attribute))
+        return value
+
+    def asstring(self, attribute):
+        """
+        Get the given ``atribute`` for the device as unicode string.
+
+        Depending on the content of the attribute, this may or may not work.
+        Be prepared to catch :exc:`~exceptions.UnicodeDecodeError`.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return the attribute value as byte string.  Raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
+        content of the attribute cannot be decoded into a unicode string.
+        """
+        return self[attribute].decode(sys.getfilesystemencoding())
+
+    def asint(self, attribute):
+        """
+        Get the given ``attribute`` as integer.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return the attribute value as integer. Raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device, or a :exc:`~exceptions.ValueError`, if the
+        attribute value cannot be converted to an integer.
+        """
+        return int(self.asstring(attribute))
+
+    def asbool(self, attribute):
+        """
+        Get the given ``attribute`` from this device as boolean.
+
+        A boolean attribute has either a value of ``'1'`` or of ``'0'``,
+        where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
+        other value causes a :exc:`~exceptions.ValueError` to be raised.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return ``True``, if the attribute value is ``'1'`` and ``False``, if
+        the attribute value is ``'0'``.  Any other value raises a
+        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
+        if the given attribute is not defined for this device.
+        """
+        return string_to_bool(self.asstring(attribute))

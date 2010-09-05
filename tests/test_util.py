@@ -81,3 +81,20 @@ def test_property_value_to_bytes_bool():
     assert isinstance(_util.property_value_to_bytes(True), bytes)
     assert _util.property_value_to_bytes(False) == b'0'
     assert isinstance(_util.property_value_to_bytes(False), bytes)
+
+
+@py.test.mark.conversion
+def test_string_to_bool_true():
+    assert isinstance(_util.string_to_bool('1'), bool)
+    assert _util.string_to_bool('1')
+
+@py.test.mark.conversion
+def test_string_to_bool_false():
+    assert isinstance(_util.string_to_bool('0'), bool)
+    assert not _util.string_to_bool('0')
+
+@py.test.mark.conversion
+def test_string_to_bool_invalid_value():
+    with py.test.raises(ValueError) as exc_info:
+        _util.string_to_bool('foo')
+    assert str(exc_info.value) == 'Not a boolean value: {0!r}'.format('foo')

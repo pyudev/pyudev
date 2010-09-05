@@ -18,6 +18,8 @@
 
 import os
 import operator
+import sys
+from itertools import count
 
 import py.test
 
@@ -98,9 +100,66 @@ def test_device_asbool(device, properties):
         else:
             with py.test.raises(ValueError) as exc_info:
                 device.asbool(property)
-            message = 'Invalid value for boolean property: {0!r}'
+            message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
     assert n > 0
+
+
+def test_attributes_iter(device, attributes):
+    device_attributes = set(device.attributes)
+    for attribute in attributes:
+        assert attribute in device_attributes
+    assert all(py.test.is_unicode_string(a) for a in device_attributes)
+
+
+def test_attributes_len(device):
+    counter = count()
+    for _ in device.attributes:
+        next(counter)
+    assert len(device.attributes) == next(counter)
+
+
+def test_attributes_contains(device, attributes):
+    assert all(a in device.attributes for a in attributes)
+
+
+def test_attributes_getitem(device, attributes):
+    for attribute, value in attributes.items():
+        # device attributes *must* be bytes.
+        assert isinstance(device.attributes[attribute], bytes)
+        value = value.encode(sys.getfilesystemencoding())
+        assert device.attributes[attribute] == value
+
+
+def test_attributes_asstring(device, attributes):
+    for attribute, value in attributes.items():
+        assert py.test.is_unicode_string(
+            device.attributes.asstring(attribute))
+        assert device.attributes.asstring(attribute) == value
+
+
+def test_attributes_asint(device, attributes):
+    for attribute, value in attributes.items():
+        try:
+            value = int(value)
+        except ValueError:
+            with py.test.raises(ValueError):
+                device.attributes.asint(attribute)
+        else:
+            assert device.attributes.asint(attribute) == value
+
+
+def test_attributes_asbool(device, attributes):
+    for attribute, value in attributes.items():
+        if value == '1':
+            assert device.attributes.asbool(attribute)
+        elif value == '0':
+            assert not device.attributes.asbool(attribute)
+        else:
+            with py.test.raises(ValueError) as exc_info:
+                device.attributes.asbool(attribute)
+            message = 'Not a boolean value: {0!r}'
+            assert str(exc_info.value) == message.format(value)
 
 
 @py.test.mark.properties
