@@ -59,6 +59,8 @@
 
    .. autoattribute:: device_links
 
+   .. autoattribute:: attributes
+
    .. autoattribute:: parent
 
    .. autoattribute:: children
@@ -74,6 +76,20 @@
    .. automethod:: asint
 
    .. automethod:: asbool
+
+.. autoclass:: Attributes()
+
+   .. attribute:: device
+
+      The :class:`Device` to which these attributes belong.
+
+   .. automethod:: __iter__
+
+   .. automethod:: __len__
+
+   .. automethod:: __getitem__
+
+   .. automethod:: asstring
 
 
 :class:`Monitor` – monitor devices

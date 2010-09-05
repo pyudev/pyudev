@@ -119,6 +119,7 @@ apipkg.initpkg(
         __doc__='.:__doc__',
         Context='._core:Context',
         Device='._core:Device',
+        Attributes='._core:Attributes',
         NoSuchDeviceError='._core:NoSuchDeviceError',
         Monitor='._monitor:Monitor',
         Enumerator='._core:Enumerator',

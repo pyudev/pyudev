@@ -284,6 +284,7 @@ class Device(Mapping):
     def __init__(self, context, _device):
         self.context = context
         self._device = _device
+        self._attributes = Attributes(self)
 
     def __del__(self):
         libudev.udev_device_unref(self._device)
@@ -407,26 +408,22 @@ class Device(Mapping):
         for name in udev_list_iterate(entry):
             yield name.decode(sys.getfilesystemencoding())
 
-    def get_sysattr(self, attribute):
+    @property
+    def attributes(self):
         """
-        Get the given system ``attribute`` for this device.
+        The system attributes of this device as read-only
+        :class:`Attributes` mapping.
 
-        System attributes appear as ``ATTR{x}=y`` in ``udevadm info``
-        output, where ``x`` is the attribute name and ``y`` is the value
-        returned by this method.
+        System attributes are basically normal files inside the the device
+        directory.  These files contain all sorts of information about the
+        device, which may not be reflected by properties.  These attributes
+        are commonly used for matching in udev rules, and can be printed
+        using ``udevadm info --attribute-walk``.
 
-        ``attribute`` is a unicode or byte string containing the name of the
-        system attribute.
-
-        Return the system attribute value as unicode string, or raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device.
+        The values of these attributes are not always proper strings, and
+        can contain arbitrary bytes.
         """
-        value = libudev.udev_device_get_sysattr_value(
-            self._device, assert_bytes(attribute))
-        if value is None:
-            raise KeyError('No such attribute: {0}'.format(attribute))
-        return value.decode(sys.getfilesystemencoding())
+        return self._attributes
 
     def __iter__(self):
         """
@@ -524,3 +521,94 @@ class Device(Mapping):
 
     def __ge__(self, other):
         raise TypeError('Device not orderable')
+
+
+def _is_attribute_file(filepath):
+    """
+    Check, if ``filepath`` points to a valid udev attribute filename.
+
+    Implementation is stolen from udev source code, ``print_all_attributes``
+    in ``udev/udevadm-info.c``.  It excludes hidden files (starting with a
+    dot), the special files ``dev`` and ``uevent`` and links.
+
+    Return ``True``, if ``filepath`` refers to an attribute, ``False``
+    otherwise.
+    """
+    filename = os.path.basename(filepath)
+    return not (filename.startswith('.') or
+                filename in ('dev', 'uevent') or
+                os.path.islink(filepath))
+
+
+class Attributes(Mapping):
+    """
+    A mapping which holds udev attributes for :class:`Device` objects.
+
+    This class subclasses the ``Mapping`` ABC, providing a read-only
+    dictionary mapping attribute names to the corresponding values.
+    Therefore all well-known dicitionary methods and operators
+    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
+    attributes.
+    """
+
+    def __init__(self, device):
+        self.device = device
+
+    @property
+    def _attribute_files(self):
+        sys_path = self.device.sys_path
+        return [fn for fn in os.listdir(sys_path) if
+                _is_attribute_file(os.path.join(sys_path, fn)) and
+                fn in self]
+
+    def __len__(self):
+        """
+        Return the amount of attributes defined.
+        """
+        return len(self._attribute_files)
+
+    def __iter__(self):
+        """
+        Iterate over all attributes defined.
+
+        Yield each attribute name as unicode string.
+        """
+        return iter(self._attribute_files)
+
+    def __contains__(self, attribute):
+        return libudev.udev_device_get_sysattr_value(
+            self.device._device, assert_bytes(attribute)) is not None
+
+    def __getitem__(self, attribute):
+        """
+        Get the given system ``attribute`` for the device.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        system attribute.
+
+        Return the attribute value as byte string, or raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device.
+        """
+        value = libudev.udev_device_get_sysattr_value(
+            self.device._device, assert_bytes(attribute))
+        if value is None:
+            raise KeyError('No such attribute: {0}'.format(attribute))
+        return value
+
+    def asstring(self, attribute):
+        """
+        Get the given ``atribute`` for the device as unicode string.
+
+        Depending on the content of the attribute, this may or may not work.
+        Be prepared to catch :exc:`~exceptions.UnicodeDecodeError`.
+
+        ``attribute`` is a unicode or byte string containing the name of the
+        attribute.
+
+        Return the attribute value as byte string.  Raise a
+        :exc:`~exceptions.KeyError`, if the given attribute is not defined
+        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
+        content of the attribute cannot be decoded into a unicode string.
+        """
+        return self[attribute].decode(sys.getfilesystemencoding())

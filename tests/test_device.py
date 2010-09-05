@@ -18,6 +18,8 @@
 
 import os
 import operator
+import sys
+from itertools import count
 
 import py.test
 
@@ -101,6 +103,39 @@ def test_device_asbool(device, properties):
             message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
     assert n > 0
+
+
+def test_attributes_iter(device, attributes):
+    device_attributes = set(device.attributes)
+    for attribute in attributes:
+        assert attribute in device_attributes
+    assert all(py.test.is_unicode_string(a) for a in device_attributes)
+
+
+def test_attributes_len(device):
+    counter = count()
+    for _ in device.attributes:
+        next(counter)
+    assert len(device.attributes) == next(counter)
+
+
+def test_attributes_contains(device, attributes):
+    assert all(a in device.attributes for a in attributes)
+
+
+def test_attributes_getitem(device, attributes):
+    for attribute, value in attributes.items():
+        # device attributes *must* be bytes.
+        assert isinstance(device.attributes[attribute], bytes)
+        value = value.encode(sys.getfilesystemencoding())
+        assert device.attributes[attribute] == value
+
+
+def test_attributes_asstring(device, attributes):
+    for attribute, value in attributes.items():
+        assert py.test.is_unicode_string(
+            device.attributes.asstring(attribute))
+        assert device.attributes.asstring(attribute) == value
 
 
 @py.test.mark.properties

@@ -17,6 +17,7 @@
 
 
 import sys
+import re
 import random
 import subprocess
 import socket
@@ -110,6 +111,32 @@ def _read_udev_database(properties_blacklist):
     return devices
 
 
+def _get_device_attributes(device_path, attributes_blacklist):
+    udevadm = subprocess.Popen(
+        ['udevadm', 'info', '--attribute-walk', '--path', device_path],
+        stdout=subprocess.PIPE)
+    attribute_dump = udevadm.communicate()[0].splitlines()
+    if udevadm.returncode != 0:
+        raise IOError('could not read attributes')
+    attributes = {}
+    for line in attribute_dump:
+        line = line.strip().decode(sys.getfilesystemencoding())
+        if line.startswith('looking at parent device'):
+            # we don't continue with attributes of parent devices, we only
+            # want the attributes of the given device
+            break
+        if line.startswith('ATTR'):
+            name, value = line.split('==', 1)
+            # remove quotation marks from attribute value
+            value = value[1:-1]
+            # remove prefix from attribute name
+            name = re.search('{(.*)}', name).group(1)
+            if name in attributes_blacklist:
+                continue
+            attributes[name] = value
+    return attributes
+
+
 def get_device_sample(config):
     if config.getvalue('device'):
         return [config.getvalue('device')]
@@ -191,12 +218,15 @@ def pytest_addoption(parser):
                      'enabling this option!', default=False)
 
 def pytest_configure(config):
-    # these are volatile, frequently changing properties, which lead to
-    # bogus failures during test_device_property, and therefore they are
+    # these are volatile, frequently changing properties and attributes,
+    # which lead to bogus failures during tests, and therefore they are
     # masked and shall be ignored for test runs.
     config.properties_backlist = frozenset(
         ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
          'POWER_SUPPLY_CHARGE_NOW'])
+    config.attributes_blacklist = frozenset(
+        ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
+         'urbnum'])
     config.udev_database = _read_udev_database(config.properties_backlist)
 
 
@@ -243,6 +273,11 @@ def pytest_funcarg__properties(request):
     properties = request.getfuncargvalue('all_properties')
     properties.pop('DEVNAME', None)
     return properties
+
+def pytest_funcarg__attributes(request):
+    device_path = request.getfuncargvalue('device_path')
+    return _get_device_attributes(
+        device_path, request.config.attributes_blacklist)
 
 def pytest_funcarg__sys_path(request):
     """
