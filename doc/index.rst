@@ -20,8 +20,8 @@ Installation is rather simple, just run::
 
    pip install pyudev
 
-apipkg_ will be installed automatically.  To load the module, libudev must
-be available.
+apipkg_ will be installed automatically.  Additionally libudev must be
+available at runtime in order to import :mod:`pyudev`.
 
 
 Documentation

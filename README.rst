@@ -19,8 +19,8 @@ Python 3) and apipkg_.  Installation is rather simple, just run::
 
    python setup.py install
 
-apipkg_ will be installed automatically.  To load the module, libudev must
-be available.
+apipkg_ will be installed automatically.   Additionally libudev must be
+available at runtime in order to ``import pyudev``.
 
 
 Issues and Feedback
