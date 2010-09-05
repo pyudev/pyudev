@@ -5,6 +5,8 @@
 - #6: Added :attr:`pyudev.Device.attributes` and :class:`pyudev.Attributes`
   to access the attributes of a device (thanks to Daniel Lazzari for his
   efforts)
+- #7: :attr:`Device.context` and :attr:`Monitor.context` are part of the
+  public API now
 - Improved and extended documentation at some points
 
 
