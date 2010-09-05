@@ -189,10 +189,10 @@ def pytest_configure(config):
     # these are volatile, frequently changing properties, which lead to
     # bogus failures during test_device_property, and therefore they are
     # masked and shall be ignored for test runs.
-    config.properties_backlist = frozenset(
+    config.properties_blacklist = frozenset(
         ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
          'POWER_SUPPLY_CHARGE_NOW'])
-    config.udev_database = _read_udev_database(config.properties_backlist)
+    config.udev_database = _read_udev_database(config.properties_blacklist)
 
 
 def pytest_funcarg__database(request):
