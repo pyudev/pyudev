@@ -26,7 +26,8 @@ from collections import Mapping
 
 from pyudev._libudev import libudev
 from pyudev._util import (assert_bytes, property_value_to_bytes,
-                          call_handle_error_return, udev_list_iterate)
+                          call_handle_error_return, udev_list_iterate,
+                          string_to_bool)
 
 
 class Context(object):
@@ -495,11 +496,7 @@ class Device(Mapping):
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
         """
-        value = self[property]
-        if value not in ('1', '0'):
-            raise ValueError('Invalid value for boolean property: '
-                             '{0!r}'.format(value))
-        return value == '1'
+        return string_to_bool(self[property])
 
     def __hash__(self):
         return hash(self.device_path)

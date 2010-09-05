@@ -98,7 +98,7 @@ def test_device_asbool(device, properties):
         else:
             with py.test.raises(ValueError) as exc_info:
                 device.asbool(property)
-            message = 'Invalid value for boolean property: {0!r}'
+            message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
     assert n > 0
 

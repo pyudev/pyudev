@@ -39,6 +39,11 @@ def property_value_to_bytes(value):
     else:
         return unicode(value).encode(sys.getfilesystemencoding())
 
+def string_to_bool(value):
+    if value not in ('1', '0'):
+        raise ValueError('Not a boolean value: {0!r}'.format(value))
+    return value == '1'
+
 def udev_list_iterate(entry):
     while entry:
         yield libudev.udev_list_entry_get_name(entry)
