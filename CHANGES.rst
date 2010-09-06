@@ -1,6 +1,9 @@
 0.5 (in development)
 ====================
 
+New features
+------------
+
 - Support for Python 3
 - #6: Added :attr:`pyudev.Device.attributes` and :class:`pyudev.Attributes`
   to access the attributes of a device (thanks to Daniel Lazzari for his
@@ -8,8 +11,25 @@
 - #7: :attr:`pyudev.Device.context` and :attr:`pyudev.Monitor.context` are
   part of the public API now
 - #9: Added :attr:`pyudev.Device.driver` to access the driver name
+
+API changes
+-----------
+
+- Renamed :exc:`pyudev.NoSuchDeviceError` to
+  :exc:`pyudev.DeviceNotFoundError`
+- :meth:`pyudev.Device.from_sys_path` raises
+  :exc:`pyudev.DeviceNotFoundAtPathError` now, which derives from
+  :exc:`pyudev.DeviceNotFoundError`
+
+Fixed issues
+------------
+
 - #13: Fixed :exc:`~exceptions.AttributeError` in
   :attr:`pyudev.Device.device_node`
+
+Other changes
+-------------
+
 - Improved and extended documentation at some points
 
 

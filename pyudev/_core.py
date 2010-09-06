@@ -184,22 +184,33 @@ class Enumerator(object):
                 yield device
 
 
-class NoSuchDeviceError(LookupError):
+class DeviceNotFoundError(LookupError):
     """
-    An error indicating that no :class:`Device` was found for a specific
-    path.
+    An error indicating that no :class:`Device` was found.
+
+    .. versionchanged:: 0.5
+       Renamed from ``NoSuchDeviceError`` to its current name.
+    """
+
+
+class DeviceNotFoundAtPathError(DeviceNotFoundError):
+    """
+    An :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    found at a given path.
     """
 
     def __init__(self, sys_path):
-        LookupError.__init__(self, sys_path)
+        DeviceNotFoundError.__init__(self, sys_path)
 
     @property
     def sys_path(self):
-        """The path that caused this error"""
+        """
+        The path that caused this error as string.
+        """
         return self.args[0]
 
     def __str__(self):
-        return 'No such device: {0!r}'.format(self.sys_path)
+        return 'No device at {0!r}'.format(self.sys_path)
 
 
 class Device(Mapping):
@@ -247,7 +258,7 @@ class Device(Mapping):
         ``path`` is a device path as unicode or byte string.
 
         Return a :class:`Device` object for the device.  Raise
-        :exc:`NoSuchDeviceError`, if no device was found for ``path``.
+        :exc:`DeviceNotFoundAtPathError`, if no device was found for ``path``.
         """
         if not path.startswith(context.sys_path):
             path = os.path.join(context.sys_path, path.lstrip(os.sep))
@@ -267,18 +278,21 @@ class Device(Mapping):
         device inside ``sysfs`` with the mount point included.
 
         Return a :class:`Device` object for the device.  Raise
-        :exc:`NoSuchDeviceError`, if no device was found for ``sys_path``.
+        :exc:`DeviceNotFoundAtPathError`, if no device was found for ``sys_path``.
 
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
            no device was found for ``sys_path``
+        .. versionchanged:: 0.5
+           Raise :exc:`DeviceNotFoundAtPathError` instead of
+           :exc:`NoSuchDeviceError`
         """
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
         device = libudev.udev_device_new_from_syspath(
             context._context, assert_bytes(sys_path))
         if not device:
-            raise NoSuchDeviceError(sys_path)
+            raise DeviceNotFoundAtPathError(sys_path)
         return cls(context, device)
 
     def __init__(self, context, _device):

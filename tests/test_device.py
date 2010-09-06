@@ -23,7 +23,7 @@ from itertools import count
 
 import py.test
 
-from pyudev import Device, NoSuchDeviceError
+from pyudev import Device, DeviceNotFoundAtPathError
 
 
 def pytest_generate_tests(metafunc):
@@ -58,13 +58,13 @@ def test_device_from_path_strips_leading_slash(context):
            Device.from_path(context, '/devices/platform')
 
 
-def test_device_from_sys_path_no_such_device(context):
+def test_device_from_sys_path_device_not_found(context):
     sys_path = 'there_will_not_be_such_a_device'
-    with py.test.raises(NoSuchDeviceError) as exc_info:
+    with py.test.raises(DeviceNotFoundAtPathError) as exc_info:
         Device.from_sys_path(context, sys_path)
     error = exc_info.value
     assert error.sys_path == sys_path
-    assert str(error) == 'No such device: {0!r}'.format(sys_path)
+    assert str(error) == 'No device at {0!r}'.format(sys_path)
 
 
 @py.test.mark.properties

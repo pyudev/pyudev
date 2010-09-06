@@ -122,7 +122,8 @@ apipkg.initpkg(
         Context='._core:Context',
         Device='._core:Device',
         Attributes='._core:Attributes',
-        NoSuchDeviceError='._core:NoSuchDeviceError',
+        DeviceNotFoundError='._core:DeviceNotFoundError',
+        DeviceNotFoundAtPathError='._core:DeviceNotFoundAtPathError',
         Monitor='._monitor:Monitor',
         Enumerator='._core:Enumerator',
         pyqt4=dict(
