@@ -21,7 +21,9 @@
     pyudev
     ======
 
-    A binding to ``libudev``.
+    A binding to libudev_.
+
+    .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 
     Usage
     -----
