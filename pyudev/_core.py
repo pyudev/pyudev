@@ -374,6 +374,16 @@ class Device(Mapping):
             sys.getfilesystemencoding())
 
     @property
+    def driver(self):
+        """
+        The driver name as unicode string, or ``None``, if there is no
+        driver for this device.
+        """
+        driver = libudev.udev_device_get_driver(self._device)
+        if driver:
+            return driver.decode(sys.getfilesystemencoding())
+
+    @property
     def device_node(self):
         """
         Absolute path to the device node of this device as unicode string.

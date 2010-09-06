@@ -7,6 +7,7 @@
   efforts)
 - #7: :attr:`Device.context` and :attr:`Monitor.context` are part of the
   public API now
+- #9: Added :attr:`pyudev.Device.driver` to access the driver name
 - Improved and extended documentation at some points
 
 

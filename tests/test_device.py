@@ -176,6 +176,15 @@ def test_device_subsystem(device, properties):
     assert device.subsystem == properties['SUBSYSTEM']
 
 
+@py.test.mark.properties
+def test_device_driver(device, properties):
+    if 'DRIVER' in properties:
+        assert device.driver == properties['DRIVER']
+        assert py.test.is_unicode_string(device.driver)
+    else:
+        assert device.driver is None
+
+
 def test_device_children(device):
     for child in device.children:
         assert child.parent == device

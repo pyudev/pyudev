@@ -59,6 +59,8 @@
 
    .. autoattribute:: subsystem
 
+   .. autoattribute:: driver
+
    .. autoattribute:: device_node
 
    .. autoattribute:: device_links
