@@ -33,6 +33,7 @@ Other changes
 -------------
 
 - Improved and extended documentation at some points
+- Added more tests
 
 
 0.4 (Aug 23, 2010)
