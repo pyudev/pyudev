@@ -275,6 +275,10 @@ def pytest_funcarg__properties(request):
     return properties
 
 def pytest_funcarg__attributes(request):
+    """
+    Return a dictionary of all attributes for the device pointed to by the
+    ``device_path`` funcarg.
+    """
     device_path = request.getfuncargvalue('device_path')
     return _get_device_attributes(
         device_path, request.config.attributes_blacklist)
