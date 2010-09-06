@@ -174,6 +174,7 @@ def test_device_devname(context, device, all_properties):
 @py.test.mark.properties
 def test_device_subsystem(device, properties):
     assert device.subsystem == properties['SUBSYSTEM']
+    assert py.test.is_unicode_string(device.subsystem)
 
 
 @py.test.mark.properties
