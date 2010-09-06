@@ -386,17 +386,18 @@ class Device(Mapping):
     @property
     def device_node(self):
         """
-        Absolute path to the device node of this device as unicode string.
-        The path includes the device directory (see
-        :attr:`Context.device_path`).
+        Absolute path to the device node of this device as unicode string or
+        ``None``, if this device doesn't have a device node.  The path
+        includes the device directory (see :attr:`Context.device_path`).
 
         This path always points to the actual device node associated with
         this device, and never to any symbolic links to this device node.
         See :attr:`device_links` to get a list of symbolic links to this
         device node.
         """
-        return libudev.udev_device_get_devnode(self._device).decode(
-            sys.getfilesystemencoding())
+        node = libudev.udev_device_get_devnode(self._device)
+        if node:
+            return node.decode(sys.getfilesystemencoding())
 
     @property
     def device_links(self):

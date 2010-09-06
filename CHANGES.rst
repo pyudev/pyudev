@@ -8,6 +8,8 @@
 - #7: :attr:`pyudev.Device.context` and :attr:`pyudev.Monitor.context` are
   part of the public API now
 - #9: Added :attr:`pyudev.Device.driver` to access the driver name
+- #13: Fixed :exc:`~exceptions.AttributeError` in
+  :attr:`pyudev.Device.device_node`
 - Improved and extended documentation at some points
 
 
