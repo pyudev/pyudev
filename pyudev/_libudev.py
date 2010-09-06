@@ -100,6 +100,8 @@ SIGNATURES = {
         ref=([udev_device_p], udev_device_p),
         unref=([udev_device_p], None),
         new_from_syspath=([udev_p, c_char_p], udev_device_p),
+        new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
+                                    udev_device_p),
         get_parent=([udev_device_p], udev_device_p),
         get_devpath=([udev_device_p], c_char_p),
         get_subsystem=([udev_device_p], c_char_p),

@@ -11,6 +11,8 @@ New features
 - #7: :attr:`pyudev.Device.context` and :attr:`pyudev.Monitor.context` are
   part of the public API now
 - #9: Added :attr:`pyudev.Device.driver` to access the driver name
+- #12: Added :meth:`pyudev.Device.from_name` to construct devices from
+  subsystem and sys name
 
 API changes
 -----------

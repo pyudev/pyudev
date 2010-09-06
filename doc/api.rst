@@ -42,11 +42,16 @@
 .. autoclass:: DeviceNotFoundAtPathError
    :members:
 
+.. autoclass:: DeviceNotFoundByNameError
+   :members:
+
 .. autoclass:: Device()
 
    .. automethod:: from_path
 
    .. automethod:: from_sys_path
+
+   .. automethod:: from_name
 
    .. attribute:: context
 

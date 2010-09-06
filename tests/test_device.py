@@ -23,7 +23,8 @@ from itertools import count
 
 import py.test
 
-from pyudev import Device, DeviceNotFoundAtPathError
+from pyudev import (Device,
+                    DeviceNotFoundAtPathError, DeviceNotFoundByNameError)
 
 
 def pytest_generate_tests(metafunc):
@@ -65,6 +66,32 @@ def test_device_from_sys_path_device_not_found(context):
     error = exc_info.value
     assert error.sys_path == sys_path
     assert str(error) == 'No device at {0!r}'.format(sys_path)
+
+
+def test_device_from_name(context, device):
+    new_device = Device.from_name(context, device.subsystem,
+                                  device.sys_name)
+    assert new_device == device
+
+
+def test_device_from_name_no_device_in_existing_subsystem(context):
+    with py.test.raises(DeviceNotFoundByNameError) as exc_info:
+        Device.from_name(context, 'block', 'foobar')
+    error = exc_info.value
+    assert error.subsystem == 'block'
+    assert error.sys_name == 'foobar'
+    assert str(error) == 'No device {0!r} in {1!r}'.format(
+        error.sys_name, error.subsystem)
+
+
+def test_device_from_name_nonexisting_subsystem(context):
+    with py.test.raises(DeviceNotFoundByNameError) as exc_info:
+        Device.from_name(context, 'no_such_subsystem', 'foobar')
+    error = exc_info.value
+    assert error.subsystem == 'no_such_subsystem'
+    assert error.sys_name == 'foobar'
+    assert str(error) == 'No device {0!r} in {1!r}'.format(
+        error.sys_name, error.subsystem)
 
 
 @py.test.mark.properties

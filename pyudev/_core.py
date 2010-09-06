@@ -213,6 +213,33 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
         return 'No device at {0!r}'.format(self.sys_path)
 
 
+class DeviceNotFoundByNameError(DeviceNotFoundError):
+    """
+    An :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    found with a given name.
+    """
+
+    def __init__(self, subsystem, sys_name):
+        DeviceNotFoundError.__init__(self, subsystem, sys_name)
+
+    @property
+    def subsystem(self):
+        """
+        The subsystem that caused this error as string.
+        """
+        return self.args[0]
+
+    @property
+    def sys_name(self):
+        """
+        The sys name that caused this error as string.
+        """
+        return self.args[1]
+
+    def __str__(self):
+        return 'No device {0.sys_name!r} in {0.subsystem!r}'.format(self)
+
+
 class Device(Mapping):
     """
     A single device with attached attributes and properties.
@@ -293,6 +320,34 @@ class Device(Mapping):
             context._context, assert_bytes(sys_path))
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
+        return cls(context, device)
+
+    @classmethod
+    def from_name(cls, context, subsystem, sys_name):
+        """
+        Create a new device from a given ``subsystem`` and a given ``sys_name``:
+
+        >>> context = pyudev.Context()
+        >>> sda = pyudev.Device.from_name(context, 'block', 'sda')
+        >>> sda
+        Device(u'/sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda')
+        >>> sda == pyudev.Device.from_path(context, '/block/sda')
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``subsystem`` and ``sys_name`` are byte or unicode strings, which
+        denote the subsystem and the name of the device to create.
+
+        Return a :class:`Device` object for the device.  Raise
+        :exc:`DeviceNotFoundByNameError`, if no device was found with the
+        given name.
+        """
+        if not isinstance(context, Context):
+            raise TypeError('Invalid context object')
+        device = libudev.udev_device_new_from_subsystem_sysname(
+            context._context, assert_bytes(subsystem),
+            assert_bytes(sys_name))
+        if not device:
+            raise DeviceNotFoundByNameError(subsystem, sys_name)
         return cls(context, device)
 
     def __init__(self, context, _device):
