@@ -137,6 +137,23 @@ def _get_device_attributes(device_path, attributes_blacklist):
     return attributes
 
 
+def _query_device(device_path, query_type):
+    if query_type not in ('symlink', 'name'):
+        raise ValueError(query_type)
+    udevadm = subprocess.Popen(
+        ['udevadm', 'info', '--path', device_path, '--query', query_type],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    query_result = udevadm.communicate()[0].strip().decode(
+        sys.getfilesystemencoding())
+    if not query_result:
+        return None
+    else:
+        if query_type == 'symlink':
+            return query_result.split()
+        else:
+            return query_result
+
+
 def get_device_sample(config):
     if config.getvalue('device'):
         return [config.getvalue('device')]
@@ -282,6 +299,14 @@ def pytest_funcarg__attributes(request):
     device_path = request.getfuncargvalue('device_path')
     return _get_device_attributes(
         device_path, request.config.attributes_blacklist)
+
+def pytest_funcarg__device_node(request):
+    """
+    Return the name of the device node for the device pointed to by the
+    ``device_path`` funcarg.
+    """
+    device_path = request.getfuncargvalue('device_path')
+    return _query_device(device_path, 'name')
 
 def pytest_funcarg__sys_path(request):
     """

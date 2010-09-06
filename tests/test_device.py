@@ -184,6 +184,16 @@ def test_device_sys_name(device):
 
 
 @py.test.mark.properties
+def test_device_node(context, device, device_node):
+    if device_node:
+        assert device.device_node == os.path.join(context.device_path,
+                                                  device_node)
+        assert py.test.is_unicode_string(device.device_node)
+    else:
+        assert device.device_node is None
+
+
+@py.test.mark.properties
 def test_device_driver(device, properties):
     if 'DRIVER' in properties:
         assert device.driver == properties['DRIVER']
