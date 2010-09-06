@@ -194,6 +194,13 @@ def test_device_node(context, device, device_node):
 
 
 @py.test.mark.properties
+def test_device_links(context, device, device_links):
+    assert sorted(device.device_links) == sorted(
+        os.path.join(context.device_path, l) for l in device_links)
+    assert all(py.test.is_unicode_string(l) for l in device.device_links)
+
+
+@py.test.mark.properties
 def test_device_driver(device, properties):
     if 'DRIVER' in properties:
         assert device.driver == properties['DRIVER']

@@ -145,13 +145,10 @@ def _query_device(device_path, query_type):
         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     query_result = udevadm.communicate()[0].strip().decode(
         sys.getfilesystemencoding())
-    if not query_result:
-        return None
+    if query_type == 'symlink':
+        return query_result.split()
     else:
-        if query_type == 'symlink':
-            return query_result.split()
-        else:
-            return query_result
+        return query_result or None
 
 
 def get_device_sample(config):
@@ -307,6 +304,14 @@ def pytest_funcarg__device_node(request):
     """
     device_path = request.getfuncargvalue('device_path')
     return _query_device(device_path, 'name')
+
+def pytest_funcarg__device_links(request):
+    """
+    Return a list of symlink to the device node (``device_node`` funcarg)
+    for the device pointed to by the ``device_path`` funcarg.
+    """
+    device_path = request.getfuncargvalue('device_path')
+    return _query_device(device_path, 'symlink')
 
 def pytest_funcarg__sys_path(request):
     """
