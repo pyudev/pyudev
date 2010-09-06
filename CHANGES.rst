@@ -5,8 +5,8 @@
 - #6: Added :attr:`pyudev.Device.attributes` and :class:`pyudev.Attributes`
   to access the attributes of a device (thanks to Daniel Lazzari for his
   efforts)
-- #7: :attr:`Device.context` and :attr:`Monitor.context` are part of the
-  public API now
+- #7: :attr:`pyudev.Device.context` and :attr:`pyudev.Monitor.context` are
+  part of the public API now
 - #9: Added :attr:`pyudev.Device.driver` to access the driver name
 - Improved and extended documentation at some points
 
