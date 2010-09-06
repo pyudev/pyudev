@@ -178,6 +178,12 @@ def test_device_subsystem(device, properties):
 
 
 @py.test.mark.properties
+def test_device_sys_name(device):
+    assert device.sys_name == os.path.basename(device.device_path)
+    assert py.test.is_unicode_string(device.sys_name)
+
+
+@py.test.mark.properties
 def test_device_driver(device, properties):
     if 'DRIVER' in properties:
         assert device.driver == properties['DRIVER']
