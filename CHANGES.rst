@@ -67,7 +67,7 @@ Fixed issues
 - Fixed :exc:`~exceptions.NameError` in :meth:`pyudev.Monitor.from_socket`
 - The ``subsystem`` argument to :meth:`pyudev.Monitor.filter_by` is mandatory
   now, as the underlying API requires it.
-- Fixed possible memory leak:  :class:`pyudev.Device` now delete the
+- Fixed possible memory leak:  :class:`pyudev.Device` objects now delete the
   underlying libudev object, when garbage-collected
 - Fixed broken signal emitting in :class:`pyudev.pyqt4.QUDevMonitorObserver`
 
