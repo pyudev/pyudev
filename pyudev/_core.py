@@ -158,6 +158,19 @@ class Enumerator(object):
             property_value_to_bytes(value))
         return self
 
+    def match_tag(self, tag):
+        """
+        Include all devices, which have the given ``tag`` attached.
+
+        ``tag`` is a byte or unicode string containing the tag name.
+
+        Return the instance again.
+        """
+        call_handle_error_return(
+            libudev.udev_enumerate_add_match_tag,
+            self._enumerator, assert_bytes(tag))
+        return self
+
     def match_children(self, device):
         """
         Include all *direct* children of the given ``device``.  A child is a
@@ -504,6 +517,15 @@ class Device(Mapping):
         can contain arbitrary bytes.
         """
         return self._attributes
+
+    @property
+    def tags(self):
+        """
+        An iterator, which yields all attached tags as unicode strings.
+        """
+        entry = libudev.udev_device_get_tags_list_entry(self._device)
+        for tag in udev_list_iterate(entry):
+            yield tag.decode(sys.getfilesystemencoding())
 
     def __iter__(self):
         """

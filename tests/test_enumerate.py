@@ -44,6 +44,10 @@ def test_match_property_bool(context):
     assert n > 0
 
 
+def test_match_tags(context):
+    raise NotImplementedError()
+
+
 def test_combined_matches_of_same_type(context):
     """
     Test for behaviour as observed in #1

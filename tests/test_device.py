@@ -227,6 +227,10 @@ def test_device_links(context, device, device_links):
     assert all(py.test.is_unicode_string(l) for l in device.device_links)
 
 
+def test_device_tags():
+    raise NotImplementedError()
+
+
 @py.test.mark.properties
 def test_device_driver(device, properties):
     if 'DRIVER' in properties:

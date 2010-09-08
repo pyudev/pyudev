@@ -29,6 +29,8 @@
 
    .. automethod:: match_property
 
+   .. automethod:: match_tag
+
    .. automethod:: match_children
 
    .. automethod:: __iter__
@@ -72,6 +74,8 @@
    .. autoattribute:: device_links
 
    .. autoattribute:: attributes
+
+   .. autoattribute:: tags
 
    .. autoattribute:: parent
 
