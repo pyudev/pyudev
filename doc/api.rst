@@ -148,6 +148,7 @@ plug the monitoring into the Qt event loop, use
 :class:`QUDevMonitorObserver`:
 
 .. autoclass:: QUDevMonitorObserver
+   :show-inheritance:
 
    .. automethod:: __init__
 

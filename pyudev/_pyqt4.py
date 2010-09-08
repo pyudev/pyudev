@@ -43,6 +43,8 @@ class QUDevMonitorObserver(QObject):
     ...     print('{0!r} added'.format(device))
     >>> observer.deviceAdded.connect(device_connected)
     >>> monitor.start()
+
+    This class is a child of :class:`~PyQt4.QtCore.QObject`.
     """
 
     #: emitted upon arbitrary device events
@@ -61,8 +63,9 @@ class QUDevMonitorObserver(QObject):
         """
         Observe the given ``monitor`` (a :class:`pyudev.Monitor`):
 
-        ``parent`` is the parent QObject of this object.  It is passed
-        unchanged to the inherited constructor of QObject.
+        ``parent`` is the parent :class:`~PyQt4.QtCore.QObject` of this
+        object.  It is passed unchanged to the inherited constructor of
+        :class:`~PyQt4.QtCore.QObject`.
         """
         QObject.__init__(self, parent)
         self.monitor = monitor
