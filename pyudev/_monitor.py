@@ -54,8 +54,9 @@ class Monitor(object):
     to the caller.  Iteration is a blocking operation and does not integrate
     into external event loops.  If such integration is required, you can
     explicitly enable the monitor (see :meth:`enable_receiving`), and then
-    retrieve a file description using :meth:`fileno`.  This file descriptor
-    can then be passed to classes like ``QSocketNotifier`` from Qt4.
+    retrieve a file descriptor using :meth:`fileno`.  This file descriptor
+    can then be passed to classes like
+    :class:`~PyQt4.QtCore.QSocketNotifier` from Qt4.
     """
 
     def __init__(self, context, monitor_p, socket_path=None):
