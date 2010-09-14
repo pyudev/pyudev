@@ -43,14 +43,29 @@ u'"PS/2 Mouse"'
 Please read the :doc:`API documentation <api>` for detailed information.
 
 
+Feedback and Questions
+----------------------
+
+There is a mailing list at pyudev@librelist.com (hosted by `librelist.com`_)
+for user questions and development discussion around pyudev.  To subscribe
+to this list, just send a mail to pyudev@librelist.com and reply to the
+configuration mail.  The original mail is ditched.
+
+To unsubscribe, send a mail to pyudev-unsubscribe@librelist.com and reply to
+the configuration email.
+
+Older discussions are available in the `list archives`_.
+
+
 Contribution and Development
 ----------------------------
 
 Please report issues and feature requests to the `issue tracker`_
-[#issues]_.
+[#issues]_.  Development discussions are located on the mailing list (see
+above).
 
-Development happens on GitHub_.  The complete source code is available in a
-git_ repository::
+Development itself happens on GitHub_.  The complete source code is
+available in a git_ repository::
 
    git clone git://github.com/lunaryorn/pyudev.git
 
@@ -72,6 +87,8 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _apipkg: http://pypi.python.org/pypi/apipkg/
+.. _`librelist.com`: http://librelist.com/
+.. _`list archives`: http://librelist.com/browser/pyudev/
 .. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues
 .. _GitHub: http://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/

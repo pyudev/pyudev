@@ -26,7 +26,13 @@ available at runtime in order to ``import pyudev``.
 Issues and Feedback
 ===================
 
-Please report issues, proposals or enhancements to the `issue tracker`_.
+There is a mailing list at pyudev@librelist.com for user questions and
+development discussions around pyudev.  To subscribe to this list, just send
+a mail to pyudev@librelist.com and reply to the configuration mail.  The
+original mail is ditched.
+
+Issues or enhancement proposals should be reported to the `issue tracker`_.
+Thank you.
 
 
 Development
