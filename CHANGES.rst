@@ -1,6 +1,11 @@
 0.6 (in development)
 ====================
 
+Other changes
+-------------
+
+- Fixed licence headers in source files
+
 
 0.5 (Sep 06, 2010)
 ==================
