@@ -27,22 +27,20 @@
     Usage
     -----
 
+    The library context
+    ^^^^^^^^^^^^^^^^^^^
+
     First import :mod:`pyudev` and create a :class:`Context` object.  This
     object is mandatory to use this library:
 
     >>> import pyudev
     >>> context = pyudev.Context()
 
-    A :class:`Context` instance provides access to some basic udev
-    properties:
+    Listing devices
+    ^^^^^^^^^^^^^^^
 
-    >>> context.device_path
-    u'/dev'
-    >>> context.sys_path
-    u'/sys'
-
-    But most importantly, the context provides access to the list of all
-    available devices through :meth:`Context.list_devices`:
+    The :class:`Context` provides access to the list of all devices through
+    :meth:`Context.list_devices`:
 
     >>> devices = context.list_devices()
 
@@ -66,23 +64,69 @@
     u'"Broadcom Corp"'
     u'"PS/2 Mouse"'
 
-    :class:`Device` implements the ``Mapping`` ABC, and thus behaves like a
-    read-only dictionary, mapping the names of udev properties to the
-    corresponding values.  This means, that you can use the well-known
-    dictionary methods to access device information.
+    Monitoring devices
+    ^^^^^^^^^^^^^^^^^^
 
-    Aside of dictionary access, some special properties are available, that
-    provide access to udev properties and attributes of the device (like its
-    path in ``sysfs``).
-
-    You can not only list existing devices, you can also monitor the device
-    list for changes using the :class:`Monitor` class:
+    Alternatively you can monitor the device tree for changes instead of
+    listing all devices using the :class:`Monitor` class:
 
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> for action, device in monitor:
     ...     if action == 'add':
     ...         print('{0!r} added'.format(device))
+
+    Accessing devices directly
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    If you are interested in a specific device, whose name or whose path is
+    known to you, you can construct a :class:`Device` object directly,
+    either with from a device path:
+
+    >>> platform_device = pyudev.Device.from_path(
+    ...     context, '/sys/devices/platform')
+    >>> platform_device
+    Device(u'/sys/devices/platform')
+    >>> platform_device.sys_name
+    u'platform'
+
+    Or from a subsystem and a device name:
+
+    >>> sda = pyudev.Device.from_name(context, 'block', 'sda')
+    >>> sda.subsystem
+    u'block'
+    >>> sda.sys_name
+    u'sda'
+
+    Device information
+    ^^^^^^^^^^^^^^^^^^
+
+    In either case, you get :class:`Device` objects, which are really the
+    central objects in pyudev, because they give access to everything you
+    ever wanted to know about devices.
+
+    The :class:`Device` class implements the ``Mapping`` ABC, and thus
+    behaves like a read-only dictionary.  It maps the names of general UDev
+    properties to the corresponding values.  You can use all the well-known
+    dictionary methods to access device information.
+
+    Aside of dictionary access, some special properties are available, that
+    provide access to udev properties and attributes of the device (like its
+    path in ``sysfs``, which is available through
+    :attr:`Device.device_path`).
+
+    One important property is :attr:`Device.attributes`, which gives you a
+    dictionary containing the system attributes of the device.  A system
+    attribute is basically just a file inside the device directory.  These
+    attributes contain device-specific information about the device (in
+    contrast to the general UDev properties).
+
+    Toolkit integration
+    ^^^^^^^^^^^^^^^^^^^
+
+    pyudev provides classes, which integrate monitoring into the event loop
+    of GUI toolkits.  Currently, only PyQt4 is supported through
+    :class:`~pyudev.pyqt4.QUDevMonitorObserver`.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
