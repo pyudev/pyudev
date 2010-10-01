@@ -332,8 +332,6 @@ class Device(Mapping):
            Raise :exc:`DeviceNotFoundAtPathError` instead of
            :exc:`NoSuchDeviceError`
         """
-        if not isinstance(context, Context):
-            raise TypeError('Invalid context object')
         device = libudev.udev_device_new_from_syspath(
             context._context, assert_bytes(sys_path))
         if not device:
@@ -359,8 +357,6 @@ class Device(Mapping):
         :exc:`DeviceNotFoundByNameError`, if no device was found with the
         given name.
         """
-        if not isinstance(context, Context):
-            raise TypeError('Invalid context object')
         device = libudev.udev_device_new_from_subsystem_sysname(
             context._context, assert_bytes(subsystem),
             assert_bytes(sys_name))
