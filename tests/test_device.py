@@ -94,6 +94,10 @@ def test_device_from_name_nonexisting_subsystem(context):
         error.sys_name, error.subsystem)
 
 
+def test_device_from_environment(context):
+    raise NotImplementedError()
+
+
 @py.test.mark.properties
 def test_device_properties(device, properties):
     properties.pop('DEVNAME', None)

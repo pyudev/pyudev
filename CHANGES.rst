@@ -6,6 +6,8 @@ New features
 
 - #8: Added :attr:`pyudev.Device.tags` and
   :meth:`pyudev.Enumerator.match_tag` to support device tags
+- #11: Added :meth:`pyudev.Device.from_environment` to create devices from
+  process environment (for use in udev rules)
 
 Other changes
 -------------

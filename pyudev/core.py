@@ -32,7 +32,7 @@ from pyudev._util import (assert_bytes, property_value_to_bytes,
 __all__ = [
     'Context', 'Enumerator', 'Device', 'Attributes',
     'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
-    'DeviceNotFoundByNameError']
+    'DeviceNotFoundByNameError', 'DeviceNotFoundInEnvironmentError']
 
 
 class Context(object):
@@ -258,6 +258,16 @@ class DeviceNotFoundByNameError(DeviceNotFoundError):
         return 'No device {0.sys_name!r} in {0.subsystem!r}'.format(self)
 
 
+class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
+    """
+    An :exc:`DeviceNotFoundError` indicating, that no :class:`Device` could
+    be constructed from the process environment.
+    """
+
+    def __str__(self):
+        return 'No device found in environment'
+
+
 class Device(Mapping):
     """
     A single device with attached attributes and properties.
@@ -362,6 +372,28 @@ class Device(Mapping):
             assert_bytes(sys_name))
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
+        return cls(context, device)
+
+    @classmethod
+    def from_environment(cls, context):
+        """
+        Create a new device from the process environment (as in
+        :data:`os.environ`).
+
+        This only works reliable, if the current process is called from an
+        udev rule, and is usually used for tools executed from ``IMPORT=``
+        rules.  Use this method to create device objects in Python scripts
+        called from udev rules.
+
+        ``context`` is the library :class:`Context`.
+
+        Return a :class:`Device` object constructed from the environment.
+        Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
+        created from the environment.
+        """
+        device = libudev.udev_device_new_from_environment(context._context)
+        if not device:
+            raise DeviceNotFoundInEnvironmentError()
         return cls(context, device)
 
     def __init__(self, context, _device):

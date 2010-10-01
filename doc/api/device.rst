@@ -11,6 +11,8 @@
 
    .. automethod:: from_name
 
+   .. automethod:: from_environment
+
    .. attribute:: context
 
       The :class:`Context` to which this device is bound.
@@ -77,4 +79,7 @@ Exceptions
    :members:
 
 .. autoclass:: DeviceNotFoundByNameError
+   :members:
+
+.. autoclass:: DeviceNotFoundInEnvironmentError
    :members:
