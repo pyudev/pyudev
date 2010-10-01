@@ -31,6 +31,8 @@
 
    .. autoattribute:: attributes
 
+   .. autoattribute:: tags
+
    .. autoattribute:: parent
 
    .. autoattribute:: children

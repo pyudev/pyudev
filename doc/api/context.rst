@@ -19,6 +19,8 @@
 
    .. automethod:: match_property
 
+   .. automethod:: match_tag
+
    .. automethod:: match_children
 
    .. automethod:: __iter__

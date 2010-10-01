@@ -87,6 +87,7 @@ SIGNATURES = {
         unref=([udev_enumerate_p], None),
         add_match_subsystem=([udev_enumerate_p, c_char_p], int),
         add_match_property=([udev_enumerate_p, c_char_p, c_char_p], int),
+        add_match_tag=([udev_enumerate_p, c_char_p], int),
         scan_devices=([udev_enumerate_p], int),
         get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
     # list entries
@@ -112,6 +113,7 @@ SIGNATURES = {
         get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
         get_action=([udev_device_p], c_char_p),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
+        get_tags_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p)),
     # monitoring
     'udev_monitor': dict(

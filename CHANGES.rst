@@ -1,6 +1,12 @@
 0.6 (in development)
 ====================
 
+New features
+------------
+
+- #8: Added :attr:`pyudev.Device.tags` and
+  :meth:`pyudev.Enumerator.match_tag` to support device tags
+
 Other changes
 -------------
 
