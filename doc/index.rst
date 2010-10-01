@@ -42,7 +42,8 @@ u'"Logitech USB-PS/2 Optical Mouse"'
 u'"Broadcom Corp"'
 u'"PS/2 Mouse"'
 
-Please read the :doc:`API documentation <api>` for detailed information.
+Please read the :doc:`API documentation <api/index>` for detailed
+information.
 
 
 Feedback and Questions
@@ -99,6 +100,6 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. toctree::
    :hidden:
 
-   api
+   api/index
    licencing
    changes
