@@ -41,7 +41,6 @@ setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    install_requires=['apipkg>=1.0b6'],
     packages=find_packages(),
     **extra_arguments
     )

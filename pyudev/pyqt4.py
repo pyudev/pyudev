@@ -27,7 +27,7 @@
 
 from PyQt4.QtCore import QSocketNotifier, QObject, pyqtSignal
 
-from pyudev._core import Device
+from pyudev.core import Device
 
 
 class QUDevMonitorObserver(QObject):

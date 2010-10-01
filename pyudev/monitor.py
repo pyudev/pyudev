@@ -23,7 +23,10 @@ from contextlib import closing
 from pyudev._libudev import libudev, get_libudev_errno
 from pyudev._util import assert_bytes, call_handle_error_return
 
-from pyudev._core import Device
+from pyudev.core import Device
+
+
+__all__ = ['Monitor']
 
 
 class Monitor(object):

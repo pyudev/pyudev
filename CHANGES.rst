@@ -4,7 +4,12 @@
 Other changes
 -------------
 
+- #14: Removed apipkg_ dependency.  Changes the :mod:`pyudev` namespace,
+  consequently ``pyudev.pyqt4.QUDevMonitorObserver`` requires prior ``import
+  pyudev.pyqt4`` now.
 - Fixed licence headers in source files
+
+.. _apipkg: http://pypi.python.org/pypi/apipkg/
 
 
 0.5 (Sep 06, 2010)

@@ -14,14 +14,16 @@ The current release is pyudev |release|, available in the `Python Package
 Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
-pyudev is built atop of ctypes_ and does not contain any native code.  The
-only requirements are Python 2.6 or newer (including Python 3) and apipkg_.
+The binding is implemented in pure Python atop of ctypes_, contains no
+native code and has no dependencies.  The only requirement is Python 2.6 or
+newer, Python 3 is supported as well.
+
 Installation is rather simple, just run::
 
    pip install pyudev
 
-apipkg_ will be installed automatically.  Additionally libudev must be
-available at runtime in order to import :mod:`pyudev`.
+Additionally libudev must be available at runtime in order to import
+:mod:`pyudev`.
 
 
 Documentation
@@ -86,7 +88,6 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
-.. _apipkg: http://pypi.python.org/pypi/apipkg/
 .. _`librelist.com`: http://librelist.com/
 .. _`list archives`: http://librelist.com/browser/pyudev/
 .. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues

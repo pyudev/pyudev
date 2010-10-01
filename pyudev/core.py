@@ -29,6 +29,12 @@ from pyudev._util import (assert_bytes, property_value_to_bytes,
                           string_to_bool)
 
 
+__all__ = [
+    'Context', 'Enumerator', 'Device', 'Attributes',
+    'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
+    'DeviceNotFoundByNameError']
+
+
 class Context(object):
     """
     The udev context.
