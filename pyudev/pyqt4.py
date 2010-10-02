@@ -27,10 +27,11 @@
 
 from PyQt4.QtCore import QSocketNotifier, QObject, pyqtSignal
 
+from pyudev._qt_base import QUDevMonitorObserverMixin
 from pyudev.core import Device
 
 
-class QUDevMonitorObserver(QObject):
+class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
     """
     Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
     events:
@@ -68,26 +69,4 @@ class QUDevMonitorObserver(QObject):
         :class:`~PyQt4.QtCore.QObject`.
         """
         QObject.__init__(self, parent)
-        self.monitor = monitor
-        self.notifier = QSocketNotifier(
-            monitor.fileno(), QSocketNotifier.Read, self)
-        self.notifier.activated[int].connect(self._process_udev_event)
-        self._action_signal_map = {
-            'add': self.deviceAdded, 'remove': self.deviceRemoved,
-            'change': self.deviceChanged, 'move': self.deviceMoved,
-        }
-
-
-    def _process_udev_event(self):
-        """
-        Attempt to receive a single device event from the monitor, process
-        the event and emit corresponding signals.
-
-        Called by :class:`~PyQt4.QtCore.QSocketNotifier`, if data is
-        available on the udev monitoring socket.
-        """
-        event = self.monitor.receive_device()
-        if event:
-            action, device = event
-            self.deviceEvent.emit(action, device)
-            self._action_signal_map[action].emit(device)
+        self._setup_notifier(monitor, QSocketNotifier)
