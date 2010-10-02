@@ -20,13 +20,26 @@
 # DEALINGS IN THE SOFTWARE.
 
 
+"""
+    bootstrap_native_bindings
+    =========================
+
+    Bootstrapping script for native bindings used during pyudev tests.
+
+    This code is executed from *inside* the virtual environment created by
+    tox and must therefore run on Python 2 *as well* as on Python 3.
+
+    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+"""
+
+
+
 import sys
 import os
 import errno
 import posixpath
 import subprocess
 import logging
-from urlparse import urljoin
 from optparse import OptionParser
 from collections import namedtuple
 
@@ -135,15 +148,15 @@ def have_pyqt4_qtcore(expected_version):
 
 
 
-RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/'
+RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
     SourcePackage('sip', '4.11.1', SipBuild,
-                  urljoin(RIVERBANK_DOWNLOAD_URL,
-                          'sip4/{name}-{version}.tar.gz')),
+                  RIVERBANK_DOWNLOAD_URL.format(
+                      'sip4/{name}-{version}.tar.gz')),
     SourcePackage('PyQt-x11-gpl', '4.7.7', PyQtBuild,
-                  urljoin(RIVERBANK_DOWNLOAD_URL,
-                          'PyQt4/{name}-{version}.tar.gz'))]
+                  RIVERBANK_DOWNLOAD_URL.format(
+                      'PyQt4/{name}-{version}.tar.gz'))]
 
 
 def ensuredirs(*directories):
