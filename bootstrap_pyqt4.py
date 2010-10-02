@@ -25,89 +25,157 @@ import os
 import errno
 import posixpath
 import subprocess
+import logging
+from urlparse import urljoin
 from optparse import OptionParser
+from collections import namedtuple
 
 
-SIP_VERSION = '4.11.1'
-PYQT4_VERSION = '4.7.6'
+class SubprocessMixin(object):
+    def _check_call(self, command, **options):
+        self.log.debug('calling %r with options %r', command, options)
+        subprocess.check_call(command, **options)
 
 
-class BuildEnvironment(object):
-    def __init__(self, download_directory, build_directory):
-        self.download_directory = download_directory
-        self.build_directory = build_directory
-        try:
-            os.makedirs(self.build_directory)
-        except EnvironmentError as error:
-            if error.errno != errno.EEXIST:
-                raise
+TAR_FILTERS = {'.gz': '-z', '.bz2': '-j'}
 
-    def download(self, url):
-        filename = posixpath.basename(url)
-        destination = os.path.join(self.download_directory, filename)
-        if not os.path.isfile(destination):
-            subprocess.check_call(['curl', '-o', destination, url])
-        return destination
+class SourcePackage(namedtuple(
+    '_SourcePackage', 'name version buildtype url_template'),
+                    SubprocessMixin):
 
-    def extract_source_archive(self, archive):
-        subprocess.check_call(['tar', 'xzf', archive, '-C',
-                               self.build_directory])
+    log = logging.getLogger('bootstrap.source')
+
+    @property
+    def url(self):
+        return self.url_template.format(**self._asdict())
+
+    def download(self, target_directory):
+        filename = posixpath.basename(self.url)
+        target = os.path.join(target_directory, filename)
+        if not os.path.isfile(target):
+            self.log.info('downloading %s to %s', self.url, target)
+            self._check_call(['wget', '-O', target, self.url])
+        else:
+            self.log.info('skipping %s, already downloaded')
+        return target
+
+    def make_build(self, download_directory, target_directory):
+        archive = self.download(download_directory)
+        ext = os.path.splitext(archive)[1]
+        self.log.info('extracting %s to %s', archive, target_directory)
+        self._check_call(['tar', '-x', TAR_FILTERS[ext], '-f',
+                          archive, '-C', target_directory])
+        return self.buildtype(os.path.join(
+            target_directory, '{0.name}-{0.version}'.format(self)))
+
+    def build(self, download_directory, target_directory):
+        self.make_build(download_directory, target_directory).run()
 
 
-def have_pyqt4_qtcore():
+class Build(SubprocessMixin):
+    def __init__(self, source_directory):
+        self.log = logging.getLogger('bootstrap.builder')
+        self.source_directory = source_directory
+
+    @property
+    def build_directory(self):
+        return self.source_directory
+
+    def initialize(self):
+        pass
+
+    def configure(self):
+        pass
+
+    def build(self):
+        self.log.info('building in %s', self.build_directory)
+        self._check_call(['make'], cwd=self.build_directory)
+
+    def install(self):
+        self.log.info('installing from %s', self.build_directory)
+        self._check_call(['make', 'install'],
+                         cwd=self.build_directory)
+
+    def run(self):
+        self.initialize()
+        self.configure()
+        self.build()
+        self.install()
+
+    def __call__(self):
+        self.run()
+
+
+class SipBuild(Build):
+
+    configure_options = [
+        '--incdir', os.path.join(sys.prefix, 'include', 'sip')]
+
+    def configure(self):
+        self.log.info('configuring in %s with %r', self.build_directory,
+                      self.configure_options)
+        cmd = [sys.executable, 'configure.py']
+        cmd.extend(self.configure_options)
+        self._check_call(cmd, cwd=self.build_directory)
+
+
+class PyQtBuild(SipBuild):
+    configure_options = ['--confirm-license', '--concatenate',
+                         '--enable', 'QtCore',
+                         '--no-designer-plugin', '--no-sip-files',
+                         '--no-qsci-api']
+
+
+def have_pyqt4_qtcore(expected_version):
     try:
         QtCore = __import__('PyQt4.QtCore', globals(), locals(), ['QtCore'])
-        return QtCore.PYQT_VERSION_STR == PYQT4_VERSION
+        return QtCore.PYQT_VERSION_STR == expected_version
     except ImportError:
         return False
 
 
-def configure_directory(directory, *opts):
-    cmd = [sys.executable, 'configure.py']
-    cmd.extend(opts)
-    subprocess.check_call(cmd, cwd=directory)
+
+RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/'
+
+PYQT4_SOURCES = [
+    SourcePackage('sip', '4.11.1', SipBuild,
+                  urljoin(RIVERBANK_DOWNLOAD_URL,
+                          'sip4/{name}-{version}.tar.gz')),
+    SourcePackage('PyQt-x11-gpl', '4.7.7', PyQtBuild,
+                  urljoin(RIVERBANK_DOWNLOAD_URL,
+                          'PyQt4/{name}-{version}.tar.gz'))]
 
 
-def make_install(directory):
-    subprocess.check_call(['make'], cwd=directory)
-    subprocess.check_call(['make', 'install'], cwd=directory)
+def ensuredirs(*directories):
+    for directory in directories:
+        try:
+            os.makedirs(directory)
+        except EnvironmentError as error:
+            if error.errno != errno.EEXIST:
+                raise
 
 
-def install_sip(env):
-    url = 'http://www.riverbankcomputing.com/static/Downloads/sip4/sip-{0}.tar.gz'
-    source_archive = env.download(url.format(SIP_VERSION))
-    env.extract_source_archive(source_archive)
-    build_directory = os.path.join(env.build_directory,
-                                   'sip-{0}'.format(SIP_VERSION))
-    configure_directory(
-        build_directory, '--incdir',
-        os.path.join(sys.prefix, 'include', 'sip'))
-    make_install(build_directory)
-
-
-def install_pyqt4_qtcore(env):
-    url = 'http://www.riverbankcomputing.com/static/Downloads/PyQt4/PyQt-x11-gpl-{0}.tar.gz'
-    source_archive = env.download(url.format(PYQT4_VERSION))
-    env.extract_source_archive(source_archive)
-    build_directory = os.path.join(env.build_directory,
-                                   'PyQt-x11-gpl-{0}'.format(PYQT4_VERSION))
-    configure_directory(
-        build_directory, '--confirm-license', '--concatenate',
-        '--enable', 'QtCore', '--no-designer-plugin', '--no-sip-files',
-        '--no-qsci-api')
-    make_install(build_directory)
+def build_all(sources, download_directory, build_directory):
+    for source in sources:
+        source.build(download_directory, build_directory)
 
 
 def main():
     parser = OptionParser(usage='%prog download_directory build_directory')
+    parser.add_option('--debug', action='store_const', dest='loglevel',
+                      const=logging.DEBUG)
+    parser.add_option('--verbose', action='store_const', dest='loglevel',
+                      const=logging.INFO)
+    parser.set_defaults(loglevel=logging.WARN)
     opts, args = parser.parse_args()
     if len(args) != 2:
         parser.error('missing arguments')
+    logging.basicConfig(level=opts.loglevel)
+
     download_directory, build_directory = args
-    env = BuildEnvironment(download_directory, build_directory)
-    if not have_pyqt4_qtcore():
-        install_sip(env)
-        install_pyqt4_qtcore(env)
+    ensuredirs(download_directory, build_directory)
+    if not have_pyqt4_qtcore(PYQT4_SOURCES[1].version):
+        build_all(PYQT4_SOURCES, download_directory, build_directory)
 
 
 if __name__ == '__main__':
