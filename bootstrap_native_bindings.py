@@ -66,8 +66,13 @@ class SourcePackage(namedtuple(
         filename = posixpath.basename(self.url)
         target = os.path.join(target_directory, filename)
         if not os.path.isfile(target):
-            self.log.info('downloading %s to %s', self.url, target)
-            self._check_call(['wget', '-O', target, self.url])
+            try:
+                self.log.info('downloading %s to %s', self.url, target)
+                self._check_call(['wget', '-O', target, self.url])
+            except subprocess.CalledProcessError:
+                if os.path.isfile(target):
+                    os.unlink(target)
+                raise
         else:
             self.log.info('skipping %s, already downloaded')
         return target
