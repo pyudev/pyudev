@@ -50,6 +50,15 @@ class SubprocessMixin(object):
         subprocess.check_call(command, **options)
 
 
+def ensuredirs(*directories):
+    for directory in directories:
+        try:
+            os.makedirs(directory)
+        except EnvironmentError as error:
+            if error.errno != errno.EEXIST:
+                raise
+
+
 TAR_FILTERS = {'.gz': '-z', '.bz2': '-j'}
 
 class SourcePackage(namedtuple(
@@ -74,7 +83,7 @@ class SourcePackage(namedtuple(
                     os.unlink(target)
                 raise
         else:
-            self.log.info('skipping %s, already downloaded')
+            self.log.info('skipping %s, already downloaded', self.url)
         return target
 
     def make_build(self, download_directory, target_directory):
@@ -144,13 +153,21 @@ class PyQtBuild(SipBuild):
                          '--no-qsci-api']
 
 
-def have_pyqt4_qtcore(expected_version):
-    try:
-        QtCore = __import__('PyQt4.QtCore', globals(), locals(), ['QtCore'])
-        return QtCore.PYQT_VERSION_STR == expected_version
-    except ImportError:
-        return False
+class CMakeBuild(Build):
 
+     @property
+     def build_directory(self):
+         return os.path.join(self.source_directory, 'build')
+
+     def initialize(self):
+         self.log.info('creating build directory')
+         ensuredirs(self.build_directory)
+
+     def configure(self):
+         self.log.info('configuring in %s', self.build_directory)
+         cmd = ['cmake', '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix),
+                '-DCMAKE_BUILD_TYPE=RelWithDebInfo', self.source_directory]
+         self._check_call(cmd, cwd=self.build_directory)
 
 
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
@@ -163,19 +180,39 @@ PYQT4_SOURCES = [
                   RIVERBANK_DOWNLOAD_URL.format(
                       'PyQt4/{name}-{version}.tar.gz'))]
 
+PYSIDE_DOWNLOAD_URL = 'http://www.pyside.org/files/{0}'
 
-def ensuredirs(*directories):
-    for directory in directories:
-        try:
-            os.makedirs(directory)
-        except EnvironmentError as error:
-            if error.errno != errno.EEXIST:
-                raise
+PYSIDE_SOURCES = [
+    SourcePackage('apiextractor', '0.8.0', CMakeBuild,
+                  PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
+    SourcePackage('generatorrunner', '0.6.1', CMakeBuild,
+                  PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
+    SourcePackage('shiboken', '0.5.0', CMakeBuild,
+                  PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
+    SourcePackage('pyside', 'qt4.6+0.4.1', CMakeBuild,
+                  PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
+    ]
 
 
 def build_all(sources, download_directory, build_directory):
     for source in sources:
         source.build(download_directory, build_directory)
+
+
+def have_pyqt4_qtcore(expected_version):
+    try:
+        QtCore = __import__('PyQt4.QtCore', globals(), locals(), ['QtCore'])
+        return QtCore.PYQT_VERSION_STR == expected_version
+    except ImportError:
+        return False
+
+
+def have_pyside_qtcore():
+    try:
+        QtCore = __import__('PySide.QtCore', globals(), locals(), ['QtCore'])
+        return True
+    except ImportError:
+        return False
 
 
 def main():
@@ -194,6 +231,14 @@ def main():
     ensuredirs(download_directory, build_directory)
     if not have_pyqt4_qtcore(PYQT4_SOURCES[1].version):
         build_all(PYQT4_SOURCES, download_directory, build_directory)
+
+    if sys.version_info[0] < 3 and not have_pyside_qtcore():
+        lib_paths = os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep)
+        lib_paths.insert(0, os.path.join(sys.prefix, 'lib'))
+        lib_path = os.pathsep.join(lib_paths)
+        logging.info('setting library path to %r', lib_path)
+        os.environ['LD_LIBRARY_PATH'] = lib_path
+        build_all(PYSIDE_SOURCES, download_directory, build_directory)
 
 
 if __name__ == '__main__':
