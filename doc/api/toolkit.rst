@@ -1,21 +1,36 @@
 Toolkit integration
 ===================
 
-:mod:`pyudev.pyqt4` – Py4Qt integration
----------------------------------------
+Qt integration
+--------------
 
-.. module:: pyudev.pyqt4
-   :platform: Linux
-   :synopsis: PyQt4 binding to :mod:`pyudev`
+To plug monitoring with :class:`pyudev.Monitor` into the Qt event loop, so
+that Qt signals are asynchronously emitted upon events,
+:class:`QUDevMonitorObserver` is provided:
 
-If you already have an existing context or monitor object and simply want to
-plug the monitoring into the Qt event loop, use
-:class:`QUDevMonitorObserver`:
+.. class:: QUDevMonitorObserver
 
-.. autoclass:: QUDevMonitorObserver
-   :show-inheritance:
+   Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
+   events:
 
-   .. automethod:: __init__
+   >>> context = pyudev.Context()
+   >>> monitor = pyudev.Monitor.from_netlink(context)
+   >>> monitor.filter_by(subsystem='input')
+   >>> observer = QUDevMonitorObserver(monitor)
+   >>> def device_connected(device):
+   ...     print('{0!r} added'.format(device))
+   >>> observer.deviceAdded.connect(device_connected)
+   >>> monitor.start()
+
+   This class is a child of :class:`QtCore.QObject`.
+
+   .. method:: __init__(monitor, parent=None)
+
+      Observe the given ``monitor`` (a :class:`pyudev.Monitor`).
+
+      ``parent`` is the parent :class:`~QtCore.QObject` of this object.  It
+      is passed straight to the inherited constructor of
+      :class:`~QtCore.QObject`.
 
    .. pyqt4:signal:: deviceEvent(action, device)
 
@@ -45,3 +60,45 @@ plug the monitoring into the Qt event loop, use
 
       Emitted if a :class:`~pyudev.Device` was renamed, moved or
       re-parented.
+
+
+Currently there are two different, incompatible bindings to Qt4:
+
+PyQt4_
+   Older, more mature, but developed by a 3rd party (Riverbank computing)
+   and distributed under the GPL (though with some exceptions for other free
+   software licences)
+
+PySide_
+   Developed by Nokia as alternative to PyQt4_ and distributed under the
+   less restrictive LGPL, however not yet as mature and feature-rich as
+   PyQt4_.
+
+For both of these bindings a :class:`QUDevMonitorObserver` implementation is
+provided, each in a separate module:
+
+:mod:`pyudev.pyqt4`
+^^^^^^^^^^^^^^^^^^^
+
+.. module:: pyudev.pyqt4
+   :platform: Linux
+   :synopsis: PyQt4_ binding to :mod:`pyudev`
+
+.. class:: QUDevMonitorObserver
+
+   A :class:`QUDevMonitorObserver` implementation for PyQt4_
+
+:mod:`pyudev.pyside`
+^^^^^^^^^^^^^^^^^^^^
+
+.. module:: pyudev.pyside
+   :platform: Linux
+   :synopsis: PySide_ binding to :mod:`pyudev`
+
+.. class:: QUDevMonitorObserver
+
+   A :class:`QUDevMonitorObserver` implementation for PySide_
+
+
+.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
+.. _PySide: http://www.pyside.org
