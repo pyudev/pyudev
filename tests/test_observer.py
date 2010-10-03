@@ -46,8 +46,8 @@ def pytest_generate_tests(metafunc):
             if 'action' in metafunc.funcargnames:
                 for action in ACTIONS:
                     funcargs.update(action=action)
-                    id += ',' + action
-                    metafunc.addcall(funcargs=funcargs, id=id)
+                    metafunc.addcall(funcargs=funcargs,
+                                     id=id + ',' + action)
             else:
                 metafunc.addcall(funcargs=funcargs, id=id)
 
