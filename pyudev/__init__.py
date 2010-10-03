@@ -133,7 +133,7 @@
 from __future__ import absolute_import
 
 
-__version__ = '0.6'
+__version__ = '0.7'
 __all__ = ['Context', 'Device']
 
 
