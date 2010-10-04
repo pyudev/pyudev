@@ -78,7 +78,7 @@ class SourcePackage(namedtuple(
             try:
                 self.log.info('downloading %s to %s', self.url, target)
                 self._check_call(['wget', '-O', target, self.url])
-            except subprocess.CalledProcessError:
+            except:
                 if os.path.isfile(target):
                     os.unlink(target)
                 raise
