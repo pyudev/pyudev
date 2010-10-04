@@ -155,6 +155,8 @@ class PyQtBuild(SipBuild):
 
 class CMakeBuild(Build):
 
+    configure_options = []
+
     @property
     def build_directory(self):
         return os.path.join(self.source_directory, 'build')
@@ -166,7 +168,9 @@ class CMakeBuild(Build):
     def configure(self):
         self.log.info('configuring in %s', self.build_directory)
         cmd = ['cmake', '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix),
-               '-DCMAKE_BUILD_TYPE=RelWithDebInfo', source_directory]
+               '-DCMAKE_BUILD_TYPE=RelWithDebInfo']
+        cmd.extend(self.configure_options)
+        cmd.append(os.path.abspath(self.source_directory))
         self._check_call(cmd, cwd=self.build_directory)
 
 
