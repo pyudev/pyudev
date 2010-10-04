@@ -155,19 +155,19 @@ class PyQtBuild(SipBuild):
 
 class CMakeBuild(Build):
 
-     @property
-     def build_directory(self):
-         return os.path.join(self.source_directory, 'build')
+    @property
+    def build_directory(self):
+        return os.path.join(self.source_directory, 'build')
 
-     def initialize(self):
-         self.log.info('creating build directory')
-         ensuredirs(self.build_directory)
+    def initialize(self):
+        self.log.info('creating build directory')
+        ensuredirs(self.build_directory)
 
-     def configure(self):
-         self.log.info('configuring in %s', self.build_directory)
-         cmd = ['cmake', '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix),
-                '-DCMAKE_BUILD_TYPE=RelWithDebInfo', self.source_directory]
-         self._check_call(cmd, cwd=self.build_directory)
+    def configure(self):
+        self.log.info('configuring in %s', self.build_directory)
+        cmd = ['cmake', '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix),
+               '-DCMAKE_BUILD_TYPE=RelWithDebInfo', source_directory]
+        self._check_call(cmd, cwd=self.build_directory)
 
 
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
