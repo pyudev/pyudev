@@ -174,6 +174,15 @@ class CMakeBuild(Build):
         self._check_call(cmd, cwd=self.build_directory)
 
 
+class PySideBuild(CMakeBuild):
+    configure_options = [
+        '-DDISABLE_{0}=ON'.format(mod) for mod in
+        ('QtGui', 'QtMultimedia', 'QtNetwork', 'QtOpenGL', 'QtScript',
+         'QtScriptTools', 'QtSql', 'QtSvg', 'QtWebKit', 'QtXml',
+         'QtXmlPatterns', 'QtDeclarative', 'phonon', 'QtUiTools', 'QtHelp',
+         'QtTest')]
+
+
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
@@ -193,7 +202,7 @@ PYSIDE_SOURCES = [
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
     SourcePackage('shiboken', '0.5.0', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('pyside', 'qt4.6+0.4.1', CMakeBuild,
+    SourcePackage('pyside', 'qt4.6+0.4.1', PySideBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
     ]
 
