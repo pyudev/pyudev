@@ -213,7 +213,7 @@ class DeviceNotFoundError(LookupError):
 
 class DeviceNotFoundAtPathError(DeviceNotFoundError):
     """
-    An :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
     found at a given path.
     """
 
@@ -233,7 +233,7 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
 
 class DeviceNotFoundByNameError(DeviceNotFoundError):
     """
-    An :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
     found with a given name.
     """
 
@@ -260,7 +260,7 @@ class DeviceNotFoundByNameError(DeviceNotFoundError):
 
 class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
     """
-    An :exc:`DeviceNotFoundError` indicating, that no :class:`Device` could
+    A :exc:`DeviceNotFoundError` indicating, that no :class:`Device` could
     be constructed from the process environment.
     """
 
