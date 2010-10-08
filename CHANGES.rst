@@ -1,6 +1,12 @@
 0.7 (in development)
 ====================
 
+New features
+------------
+
+- #15: Added :mod:`pyudev.glib.GUDevMonitorObserver` for Glib and Gtk
+  support
+
 
 0.6 (Oct 03, 2010)
 ==================
