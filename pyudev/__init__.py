@@ -125,7 +125,7 @@
     ^^^^^^^^^^^^^^^^^^^
 
     pyudev provides classes, which integrate monitoring into the event loop
-    of GUI toolkits.  Currently, only PyQt4 and PySide are supported.
+    of GUI toolkits.  Currently, PyQt4, PySide and pygobject are supported.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
