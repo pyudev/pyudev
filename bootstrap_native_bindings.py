@@ -59,8 +59,6 @@ def ensuredirs(*directories):
                 raise
 
 
-TAR_FILTERS = {'.gz': '-z', '.bz2': '-j'}
-
 class SourcePackage(namedtuple(
     '_SourcePackage', 'name version buildtype url_template'),
                     SubprocessMixin):
@@ -90,8 +88,8 @@ class SourcePackage(namedtuple(
         archive = self.download(download_directory)
         ext = os.path.splitext(archive)[1]
         self.log.info('extracting %s to %s', archive, target_directory)
-        self._check_call(['tar', '-x', TAR_FILTERS[ext], '-f',
-                          archive, '-C', target_directory])
+        self._check_call(['tar', '-x', '-a', archive,
+                          '-C', target_directory])
         return self.buildtype(os.path.join(
             target_directory, '{0.name}-{0.version}'.format(self)))
 
