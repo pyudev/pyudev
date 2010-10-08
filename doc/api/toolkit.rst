@@ -38,7 +38,7 @@ that Qt signals are asynchronously emitted upon events,
       containing the action name, and ``device`` is the
       :class:`~pyudev.Device` object describing the device.
 
-      The arguments of this signal are basically the return value of
+      Basically the arguments of this signal are simply the return value of
       :meth:`~pyudev.Monitor.receive_device`
 
    .. pyqt4:signal:: deviceAdded(device)
