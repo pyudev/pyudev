@@ -25,7 +25,7 @@ html_domain_indices = ['py-modindex']
 intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
 
 issuetracker = 'github'
-issuetracker_user = u'lunaryorn'
+issuetracker_user = 'lunaryorn'
 
 
 def setup(app):
