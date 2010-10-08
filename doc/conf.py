@@ -20,6 +20,7 @@ release = pyudev.__version__
 
 html_theme = 'default'
 html_static_path = []
+html_domain_indices = ['py-modindex']
 
 intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
 
