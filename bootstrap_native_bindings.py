@@ -183,6 +183,17 @@ class PySideBuild(CMakeBuild):
          'QtTest')]
 
 
+class AutotoolsBuild(Build):
+    configure_options = ['--prefix', sys.prefix]
+
+    def configure(self):
+        self.log.info('configuring %s with %r', self.build_directory,
+                      self.configure_options)
+        cmd = ['./configure']
+        cmd.extend(self.configure_options)
+        self._check_call(cmd, cwd=self.build_directory)
+
+
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
@@ -206,6 +217,13 @@ PYSIDE_SOURCES = [
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
     ]
 
+GNOME_DOWNLOAD_URL = 'http://ftp.gnome.org/pub/GNOME/sources/{0}'
+
+GOBJECT_SOURCES = [
+    SourcePackage('pygobject', '2.26.0', AutotoolsBuild,
+                  GNOME_DOWNLOAD_URL.format(
+                      '{name}/2.26/{name}-{version}.tar.bz2'))]
+
 
 def build_all(sources, download_directory, build_directory):
     for source in sources:
@@ -228,6 +246,15 @@ def have_pyside_qtcore():
         return False
 
 
+def have_gobject():
+    for lib in ('glib', 'gobject'):
+        try:
+            __import__(lib)
+        except ImportError:
+            return False
+    return True
+
+
 def main():
     parser = OptionParser(usage='%prog download_directory build_directory')
     parser.add_option('--debug', action='store_const', dest='loglevel',
@@ -242,16 +269,23 @@ def main():
 
     download_directory, build_directory = args
     ensuredirs(download_directory, build_directory)
+
     if not have_pyqt4_qtcore(PYQT4_SOURCES[1].version):
         build_all(PYQT4_SOURCES, download_directory, build_directory)
 
-    if sys.version_info[0] < 3 and not have_pyside_qtcore():
-        lib_paths = os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep)
-        lib_paths.insert(0, os.path.join(sys.prefix, 'lib'))
-        lib_path = os.pathsep.join(lib_paths)
-        logging.info('setting library path to %r', lib_path)
-        os.environ['LD_LIBRARY_PATH'] = lib_path
-        build_all(PYSIDE_SOURCES, download_directory, build_directory)
+    if sys.version_info[0] < 3:
+        # pyside and pygobject are not available for python 3 yet
+        if not have_pyside_qtcore():
+            lib_paths = os.environ.get(
+                'LD_LIBRARY_PATH', '').split(os.pathsep)
+            lib_paths.insert(0, os.path.join(sys.prefix, 'lib'))
+            lib_path = os.pathsep.join(lib_paths)
+            logging.info('setting library path to %r', lib_path)
+            os.environ['LD_LIBRARY_PATH'] = lib_path
+            build_all(PYSIDE_SOURCES, download_directory, build_directory)
+
+        if not have_gobject():
+            build_all(GOBJECT_SOURCES, download_directory, build_directory)
 
 
 if __name__ == '__main__':
