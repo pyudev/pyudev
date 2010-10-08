@@ -82,7 +82,7 @@ provided, each in a separate module:
 
 .. module:: pyudev.pyqt4
    :platform: Linux
-   :synopsis: PyQt4_ binding to :mod:`pyudev`
+   :synopsis: PyQt4_ integration
 
 .. class:: QUDevMonitorObserver
 
@@ -93,7 +93,7 @@ provided, each in a separate module:
 
 .. module:: pyudev.pyside
    :platform: Linux
-   :synopsis: PySide_ binding to :mod:`pyudev`
+   :synopsis: PySide_ integration
 
 .. class:: QUDevMonitorObserver
 
@@ -105,7 +105,7 @@ provided, each in a separate module:
 
 .. module:: pyudev.glib
    :platform: Linux
-   :synopsis: Glib binding to :mod:`pyudev`
+   :synopsis: Glib integration
 
 A :class:`pyudev.Monitor` can also be plugged into a :class:`glib.MainLoop`
 using :class:`pyudev.glib.GUDevMonitorObserver`.
