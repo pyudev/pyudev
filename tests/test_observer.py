@@ -15,28 +15,81 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+from itertools import count
+from functools import partial
 
 import py.test
 from mock import Mock
 
 
-class Binding(object):
+class BaseBinding(object):
+    def _import_binding(self):
+        name = self.name.lower()
+        return __import__('pyudev.{0}'.format(name), None, None, [name])
+
+    def trigger_observer(self, action, monitor, action_trigger):
+        mainloop = self.create_mainloop()
+
+        signal_counter = count(1)
+
+        def _quit_when_done(*args, **kwargs):
+            value = next(signal_counter)
+            if value >= 2:
+                self.quit_mainloop(mainloop)
+
+        # slot dummies
+        event_slot = Mock(side_effect=_quit_when_done)
+        action_slots = {action: Mock(side_effect=_quit_when_done)}
+
+        observer = self.observer_class(monitor)
+        self.connect_signals(observer, event_slot, action_slots)
+
+        self.single_shot(0, action_trigger)
+        self.single_shot(5000, partial(self.quit_mainloop, mainloop))
+        self.run_mainloop(mainloop)
+        return event_slot, action_slots
+
+
+class Qt4Binding(BaseBinding):
+
     def __init__(self, bindingname):
         self.name = bindingname
 
     @property
     def observer_class(self):
-        name = self.name.lower()
-        binding = __import__('pyudev.{0}'.format(name), None, None, [name])
-        return binding.QUDevMonitorObserver
+        return self._import_binding().QUDevMonitorObserver
 
-    @property
-    def qtcore(self):
-        return py.test.importorskip('{0}.QtCore'.format(self.name))
+    def import_or_skip(self):
+        self.qtcore = py.test.importorskip('{0}.QtCore'.format(self.name))
+
+    def create_mainloop(self):
+        app = self.qtcore.QCoreApplication.instance()
+        if not app:
+            app = self.qtcore.QCoreApplication([])
+        return app
+
+    def quit_mainloop(self, app):
+        app.quit()
+
+    def run_mainloop(self, app):
+        app.exec_()
+
+    def connect_signals(self, observer, event_slot, action_slots):
+        observer.deviceEvent.connect(event_slot)
+        signal_map = {'add': observer.deviceAdded,
+                      'remove': observer.deviceRemoved,
+                      'change': observer.deviceChanged,
+                      'move': observer.deviceMoved}
+        for action, slot in action_slots.items():
+            signal_map[action].connect(slot)
+
+    def single_shot(self, timeout, callback):
+        self.qtcore.QTimer.singleShot(timeout, callback)
 
 
-BINDINGS = [Binding('PyQt4'), Binding('PySide')]
+BINDINGS = [Qt4Binding('PyQt4'), Qt4Binding('PySide')]
 ACTIONS = ('add', 'remove', 'change', 'move')
+
 
 def pytest_generate_tests(metafunc):
     if 'binding' in metafunc.funcargnames:
@@ -63,69 +116,29 @@ def test_fake_monitor(fake_monitor, platform_device):
         assert device == platform_device
 
 
-def _trigger_observer(binding, action, monitor, action_trigger):
-    # try to get an existing event loop, if there is one, or otherwise
-    # create a new one
-    app = binding.qtcore.QCoreApplication.instance()
-    if not app:
-        app = binding.qtcore.QCoreApplication([])
-
-    # counts, how many signals were already emitted.  Used to exit the event
-    # loop, once all expected signals were emitted
-    signal_counter = binding.qtcore.QSemaphore(2)
-
-    def _quit_when_done(*args, **kwargs):
-        signal_counter.acquire()
-        if signal_counter.available() == 0:
-            # we got all expected signals, so jump out of event loop to
-            # continue sequential test running
-            binding.qtcore.QCoreApplication.instance().quit()
-
-    # slot dummies
-    event_slot = Mock(side_effect=_quit_when_done)
-    action_slot = Mock(side_effect=_quit_when_done)
-
-    # create the observer and connect the dummies
-    observer = binding.observer_class(monitor)
-    observer.deviceEvent.connect(event_slot)
-    signal_map = {'add': observer.deviceAdded,
-                  'remove': observer.deviceRemoved,
-                  'change': observer.deviceChanged,
-                  'move': observer.deviceMoved}
-    signal_map[action].connect(action_slot)
-
-    # trigger the action, once the event loop is running
-    binding.qtcore.QTimer.singleShot(0, action_trigger)
-
-    # make sure, that the event loop really exits, even in case of an
-    # exception in any python slot
-    binding.qtcore.QTimer.singleShot(5000, app.quit)
-    app.exec_()
-    return event_slot, action_slot
-
-
 def test_observer_fake(binding, action, fake_monitor, platform_device):
-    event_slot, action_slot = _trigger_observer(
-        binding, action, fake_monitor,
-        lambda: fake_monitor.trigger_action(action))
+    binding.import_or_skip()
+    event_slot, action_slots = binding.trigger_observer(
+        action, fake_monitor, lambda: fake_monitor.trigger_action(action))
     # check, that both slots were called
     event_slot.assert_called_with(action, platform_device)
-    action_slot.assert_called_with(platform_device)
+    action_slots.pop(action).assert_called_with(platform_device)
 
 
 @py.test.mark.privileged
 def test_observer(binding, monitor):
+    binding.import_or_skip()
     py.test.unload_dummy()
     monitor.filter_by('net')
     monitor.enable_receiving()
-    event_slot, action_slot = _trigger_observer(
-        binding, 'add', monitor, py.test.load_dummy)
+    event_slot, action_slot = binding.trigger_observer(
+        'add', monitor, py.test.load_dummy)
     action, device = event_slot.call_args[0]
     assert action == 'add'
     assert device.subsystem == 'net'
     assert device.device_path == '/devices/virtual/net/dummy0'
-    event_slot, action_slot = _trigger_observer(
-        binding, 'remove', monitor, py.test.unload_dummy)
+    event_slot, action_slot = binding.trigger_observer(
+        'remove', monitor, py.test.unload_dummy)
     action, device = event_slot.call_args[0]
     assert action == 'remove'
     assert device.subsystem == 'net'
