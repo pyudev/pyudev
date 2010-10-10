@@ -93,6 +93,8 @@ provided, each in a separate module:
    :platform: Linux
    :synopsis: PyQt4_ integration
 
+To use this module, :mod:`PyQt4.QtCore` from PyQt4_ must be available.
+
 .. class:: QUDevMonitorObserver
 
    A :class:`QUDevMonitorObserver` implementation for PyQt4_
@@ -103,6 +105,8 @@ provided, each in a separate module:
 .. module:: pyudev.pyside
    :platform: Linux
    :synopsis: PySide_ integration
+
+To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 
 .. class:: QUDevMonitorObserver
 
@@ -119,6 +123,8 @@ provided, each in a separate module:
 A :class:`pyudev.Monitor` can also be plugged into a :class:`glib.MainLoop`
 using :class:`pyudev.glib.GUDevMonitorObserver`.
 
+To use this module, :mod:`glib` and :mod:`gobject` from PyGObject_ must be
+available.  PyGtk is not required.
 
 .. autoclass:: GUDevMonitorObserver
 
@@ -168,3 +174,4 @@ Signals
 
 .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
 .. _PySide: http://www.pyside.org
+.. _PyGObject: http://www.pygtk.org/

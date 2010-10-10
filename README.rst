@@ -13,16 +13,18 @@ Refer to the website_ for detailed information and API documentation.
 Installation
 ============
 
-The binding is implemented in pure Python atop of ctypes_, contains no
+The basic binding is implemented in pure Python atop of ctypes_, contains no
 native code and has no dependencies.  The only requirement is Python 2.6 or
-newer, Python 3 is supported as well.
+newer, Python 3 is supported as well.  Morever, ``libudev`` must be
+available at runtime to ``import pyudev``.
+
+The toolkit integration modules in ``pyudev.pyqt4``, ``pyudev.pyside`` and
+``pyudev.glib`` require some libraries from the corresponding toolkit.
+Refer to the documentation of these modules for a more precise description.
 
 Installation is rather simple, just run::
 
    python setup.py install
-
-Additionally libudev must be available at runtime in order to ``import
-pyudev``.
 
 
 Issues and Feedback

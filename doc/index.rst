@@ -14,16 +14,19 @@ The current release is pyudev |release|, available in the `Python Package
 Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
-The binding is implemented in pure Python atop of ctypes_, contains no
+The basic binding is implemented in pure Python atop of ctypes_, contains no
 native code and has no dependencies.  The only requirement is Python 2.6 or
-newer, Python 3 is supported as well.
+newer, Python 3 is supported as well.  Morever, ``libudev`` must be
+available at runtime to ``import pyudev``.
+
+The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`
+and :mod:`pyudev.glib` require some libraries from the corresponding
+toolkit.  Refer to the documentation of these modules for a more precise
+description.
 
 Installation is rather simple, just run::
 
    pip install pyudev
-
-Additionally libudev must be available at runtime in order to import
-:mod:`pyudev`.
 
 
 Documentation
