@@ -23,10 +23,6 @@ from mock import Mock
 
 
 class BaseBinding(object):
-    def _import_binding(self):
-        name = self.name.lower()
-        return __import__('pyudev.{0}'.format(name), None, None, [name])
-
     def trigger_observer(self, action, monitor, action_trigger):
         mainloop = self.create_mainloop()
 
@@ -40,8 +36,7 @@ class BaseBinding(object):
         # slot dummies
         event_slot = Mock(side_effect=_quit_when_done)
         action_slots = {action: Mock(side_effect=_quit_when_done)}
-
-        observer = self.observer_class(monitor)
+        observer = self.create_observer(monitor)
         self.connect_signals(observer, event_slot, action_slots)
 
         self.single_shot(0, action_trigger)
@@ -56,9 +51,13 @@ class Qt4Binding(BaseBinding):
     def __init__(self, bindingname):
         self.name = bindingname
 
-    @property
-    def observer_class(self):
-        return self._import_binding().QUDevMonitorObserver
+    def create_observer(self, monitor):
+        name = self.name.lower()
+        mod = __import__('pyudev.{0}'.format(name), None, None, [name])
+        observer = mod.QUDevMonitorObserver(monitor)
+        assert observer.monitor is monitor
+        assert isinstance(observer.notifier, self.qtcore.QSocketNotifier)
+        return observer
 
     def import_or_skip(self):
         self.qtcore = py.test.importorskip('{0}.QtCore'.format(self.name))
@@ -97,9 +96,12 @@ class GlibBinding(BaseBinding):
     def __init__(self):
         self.event_sources = []
 
-    @property
-    def observer_class(self):
-        return self._import_binding().GUDevMonitorObserver
+    def create_observer(self, monitor):
+        from pyudev.glib import GUDevMonitorObserver
+        observer = GUDevMonitorObserver(monitor)
+        assert observer.monitor is monitor
+        assert isinstance(observer.event_source, int)
+        return observer
 
     def import_or_skip(self):
         self.glib = py.test.importorskip('glib')

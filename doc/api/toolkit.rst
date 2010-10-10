@@ -32,6 +32,15 @@ that Qt signals are asynchronously emitted upon events,
       is passed straight to the inherited constructor of
       :class:`~QtCore.QObject`.
 
+   .. attribute:: monitor
+
+      The :class:`~pyudev.Monitor` observed by this object.
+
+   .. attribute:: notifier
+
+      The underlying :class:`QtCore.QSocketNotifier` used to watch the
+      :attr:`monitor`
+
    .. pyqt4:signal:: deviceEvent(action, device)
 
       Emitted upon any device event.  ``action`` is a unicode string
@@ -113,10 +122,14 @@ using :class:`pyudev.glib.GUDevMonitorObserver`.
 
 .. autoclass:: GUDevMonitorObserver
 
+   .. attribute:: monitor
+
+      The :class:`~pyudev.Monitor` observed by this object.
+
    .. attribute:: event_source
 
-      The event source, which represents the watch on the monitor (as
-      returned by :func:`glib.io_add_watch`).  Can be passed to
+      The event source, which represents the watch on the :attr:`monitor`
+      (as returned by :func:`glib.io_add_watch`).  Can be passed to
       :func:`glib.source_remove` to stop observing the monitor.
 
 Signals
