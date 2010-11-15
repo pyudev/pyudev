@@ -2,6 +2,10 @@
 
 import sys, os
 
+doc_directory = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.normpath(
+    os.path.join(doc_directory, os.pardir)))
+
 import pyudev
 
 needs_sphinx = '1.0'
