@@ -94,10 +94,10 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _`librelist.com`: http://librelist.com/
 .. _`list archives`: http://librelist.com/browser/pyudev/
-.. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues
-.. _GitHub: http://github.com/lunaryorn/pyudev
+.. _`issue tracker`: https://github.com/lunaryorn/pyudev/issues
+.. _GitHub: https://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
-.. _changesets: http://github.com/lunaryorn/pyudev/commits/master
+.. _changesets: https://github.com/lunaryorn/pyudev/commits/master
 
 
 .. toctree::
