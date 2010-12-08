@@ -41,7 +41,10 @@ that Qt signals are asynchronously emitted upon events,
       The underlying :class:`QtCore.QSocketNotifier` used to watch the
       :attr:`monitor`
 
-   .. pyqt4:signal:: deviceEvent(action, device)
+Signals
+^^^^^^^
+
+   .. method:: deviceEvent(action, device)
 
       Emitted upon any device event.  ``action`` is a unicode string
       containing the action name, and ``device`` is the
@@ -50,22 +53,22 @@ that Qt signals are asynchronously emitted upon events,
       Basically the arguments of this signal are simply the return value of
       :meth:`~pyudev.Monitor.receive_device`
 
-   .. pyqt4:signal:: deviceAdded(device)
+   .. method:: deviceAdded(device)
 
       Emitted if a :class:`~pyudev.Device` is added (e.g a USB device was
       plugged).
 
-   .. pyqt4:signal:: deviceRemoved(device)
+   .. method:: deviceRemoved(device)
 
       Emitted if a :class:`~pyudev.Device` is removed (e.g. a USB device was
       unplugged).
 
-   .. pyqt4:signal:: deviceChanged(device)
+   .. method:: deviceChanged(device)
 
       Emitted if a :class:`~pyudev.Device` was somehow changed (e.g. a
       change of a property)
 
-   .. pyqt4:signal:: deviceMoved(device)
+   .. method:: deviceMoved(device)
 
       Emitted if a :class:`~pyudev.Device` was renamed, moved or
       re-parented.

@@ -121,8 +121,8 @@ Fixed issues
   used on :class:`udev.Device` objects.
 - added :meth:`udev.Enumerator.match_children` and
   :attr:`udev.Device.children` to list direct children of a device
-- added :pyqt4:signal:`qudev.QUDevMonitorObserver.deviceChanged` and
-  :pyqt4:signal:`qudev.QUDevMonitorObserver.deviceMoved`
+- added :meth:`qudev.QUDevMonitorObserver.deviceChanged` and
+  :meth:`qudev.QUDevMonitorObserver.deviceMoved`
 
 
 0.2 (Jun 28, 2010)

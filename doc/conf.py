@@ -11,7 +11,7 @@ import pyudev
 needs_sphinx = '1.0'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx',
-              'sphinxcontrib.pyqt4', 'sphinxcontrib.issuetracker']
+              'sphinxcontrib.issuetracker']
 
 master_doc = 'index'
 exclude_patterns = ['_build/*']
