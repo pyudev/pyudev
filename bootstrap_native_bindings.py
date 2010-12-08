@@ -152,7 +152,7 @@ class PyQtBuild(SipBuild):
 
 class CMakeBuild(Build):
 
-    configure_options = []
+    configure_options = ['-DBUILD_TESTS=OFF']
 
     @property
     def build_directory(self):
@@ -172,7 +172,7 @@ class CMakeBuild(Build):
 
 
 class PySideBuild(CMakeBuild):
-    configure_options = [
+    configure_options = CMakeBuild.configure_options + [
         '-DDISABLE_{0}=ON'.format(mod) for mod in
         ('QtGui', 'QtMultimedia', 'QtNetwork', 'QtOpenGL', 'QtScript',
          'QtScriptTools', 'QtSql', 'QtSvg', 'QtWebKit', 'QtXml',
