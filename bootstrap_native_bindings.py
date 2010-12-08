@@ -86,7 +86,6 @@ class SourcePackage(namedtuple(
 
     def make_build(self, download_directory, target_directory):
         archive = self.download(download_directory)
-        ext = os.path.splitext(archive)[1]
         self.log.info('extracting %s to %s', archive, target_directory)
         self._check_call(['tar', '-x', '-a', '-f', archive,
                           '-C', target_directory])
@@ -238,7 +237,7 @@ def have_pyqt4_qtcore(expected_version):
 
 def have_pyside_qtcore():
     try:
-        QtCore = __import__('PySide.QtCore', globals(), locals(), ['QtCore'])
+        __import__('PySide.QtCore', globals(), locals(), ['QtCore'])
         return True
     except ImportError:
         return False
