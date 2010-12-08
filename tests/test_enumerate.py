@@ -16,6 +16,9 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+import pytest
+
+
 def test_match_subsystem(context):
     devices = context.list_devices().match_subsystem('input')
     for n, device in enumerate(devices, start=1):
@@ -68,3 +71,19 @@ def test_combined_matches_of_different_types(context):
         devices.match_property(property, 'disk')
     devices = list(devices)
     assert not devices
+
+
+def test_match(context):
+    devices = context.list_devices().match(
+        subsystem='input', ID_INPUT_KEY=True)
+    for n, device in enumerate(devices, start=1):
+        assert device.subsystem == 'input'
+        assert device['ID_INPUT_KEY'] == '1'
+
+
+@pytest.mark.match
+def test_list_devices(context):
+    devices = context.list_devices(subsystem='input', ID_INPUT_KEY=True)
+    for n, device in enumerate(devices, start=1):
+        assert device.subsystem == 'input'
+        assert device['ID_INPUT_KEY'] == '1'

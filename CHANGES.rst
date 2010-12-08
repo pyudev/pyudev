@@ -1,6 +1,13 @@
 0.8 (in development)
 ====================
 
+New features
+------------
+
+- #16: Added :meth:`pyudev.Enumerator.match` to simplify device filtering
+- Added keyword arguments to :meth:`pyudev.Context.list_devices()` to simplify
+  device filtering
+
 
 0.7 (Nov 15, 2010)
 ==================

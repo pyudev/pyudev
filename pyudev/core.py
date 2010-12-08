@@ -75,15 +75,22 @@ class Context(object):
         return libudev.udev_get_dev_path(self._context).decode(
             sys.getfilesystemencoding())
 
-    def list_devices(self):
+    def list_devices(self, **kwargs):
         """
         List all available devices.
+
+        The arguments of this method are the same as for
+        :meth:`Enumerator.match()`.  In fact, the arguments are simply passed
+        straight to method :meth:`~Enumerator.match()`.
 
         This function creates and returns an :class:`Enumerator` object,
         that can be used to filter the list of devices, and eventually
         retrieve :class:`Device` objects representing matching devices.
+
+        .. versionchanged:: 0.8
+           Accept keyword arguments now to easy matching
         """
-        return Enumerator(self)
+        return Enumerator(self).match(**kwargs)
 
 
 class Enumerator(object):
@@ -127,6 +134,35 @@ class Enumerator(object):
 
     def __del__(self):
         libudev.udev_enumerate_unref(self._enumerator)
+
+    def match(self, **kwargs):
+        """
+        Include devices according to the rules defined by the keyword
+        arguments.  These keyword arguments are interpreted as follows:
+
+        - The value for the keyword argument ``subsystem`` is forwarded to
+          :meth:`match_subsystem()`.
+        - The value for the keyword argument ``tag`` is forwared to
+          :meth:`match_tag()`
+        - All other keyword arguments are forwareded one by one to
+          :meth:`match_property()`.  The keyword argument itself is interpreted
+          as property name, the value of the keyword argument as the property
+          value.
+
+        All keyword arguments are optional, calling this method without no
+        arguments at all is simply a noop.
+
+        Return the instance again.
+        """
+        subsystem = kwargs.pop('subsystem', None)
+        if subsystem is not None:
+            self.match_subsystem(subsystem)
+        tag = kwargs.pop('tag', None)
+        if tag is not None:
+            self.match_tag(tag)
+        for property, value in kwargs.iteritems():
+            self.match_property(property, value)
+        return self
 
     def match_subsystem(self, subsystem):
         """

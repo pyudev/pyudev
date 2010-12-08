@@ -44,16 +44,14 @@
 
     >>> devices = context.list_devices()
 
-    ``devices`` is an instance of :class:`Enumerator`.  This class provides
-    some methods to filter the list of devices.  You can filter by specific
-    subsystems and by properties.  For instance, the following code only
-    matches all mouse devices:
+    You can filter the devices by specific subsystems or properties.  For
+    instance, the following code only matches all mouse devices:
 
-    >>> devices = devices.match_subsystem('input').match_property(
-    ...     'ID_INPUT_MOUSE', True)
+    >>> devices = context.list_devices(subsystem='input', ID_INPUT_MOUSE=True)
 
-    Once the (optional) filters are applied, you can iterate over
-    ``devices``.  This yields :class:`Device` objects, which provide various
+    In both cases ``devices`` is an instance of :class:`Enumerator`.  When
+    iterated over, this class yields :class:`Device` objects, representing
+    those devices, which match the filters.  :class:`Device` provide various
     attributes to access information:
 
     >>> for device in devices:

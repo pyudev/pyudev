@@ -15,6 +15,8 @@
 
 .. autoclass:: Enumerator()
 
+   .. automethod:: match
+
    .. automethod:: match_subsystem
 
    .. automethod:: match_property

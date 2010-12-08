@@ -36,8 +36,7 @@ Usage of pyudev is rather simple:
 
 >>> from pyudev import Context
 >>> context = Context()
->>> devices = context.list_devices()
->>> for device in devices.match_subsystem('input').match_property('ID_INPUT_MOUSE', True):
+>>> for device in context.list_devices(subsystem='input', ID_INPUT_MOUSE=True):
 ...     if device.sys_name.startswith('event'):
 ...         device.parent['NAME']
 ...
