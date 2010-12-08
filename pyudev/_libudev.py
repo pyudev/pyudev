@@ -155,5 +155,3 @@ libudev = load_udev_library()
 
 def get_libudev_errno():
     return get_errno()
-
-
