@@ -41,8 +41,9 @@ that Qt signals are asynchronously emitted upon events,
       The underlying :class:`QtCore.QSocketNotifier` used to watch the
       :attr:`monitor`
 
-Signals
-^^^^^^^
+   .. rubric:: Signals
+
+   This class defines the following Qt signals:
 
    .. method:: deviceEvent(action, device)
 
@@ -141,8 +142,9 @@ available.  PyGtk is not required.
       (as returned by :func:`glib.io_add_watch`).  Can be passed to
       :func:`glib.source_remove` to stop observing the monitor.
 
-Signals
-^^^^^^^
+   .. rubric:: Signals
+
+   This class defines the following GObject signals:
 
    .. method:: device-event(observer, action, device)
 
