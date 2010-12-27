@@ -273,10 +273,15 @@ def have_pyside_qtcore():
         return False
 
 
-def have_gobject():
-    for lib in ('glib', 'gobject'):
+def have_gobject(expected_version):
+    expected_version = tuple(map(int, expected_version.split('.')[:3]))
+    for libname in ('glib', 'gobject'):
         try:
-            import_string(lib)
+            lib = import_string(libname)
+            version_attr = 'py{0}_version'.format(libname)
+            lib_version = getattr(lib, version_attr)
+            if lib_version < expected_version:
+                return False
         except ImportError:
             return False
     return True
@@ -311,7 +316,7 @@ def main():
             os.environ['LD_LIBRARY_PATH'] = lib_path
             build_all(PYSIDE_SOURCES, download_directory, build_directory)
 
-        if not have_gobject():
+        if not have_gobject(GOBJECT_SOURCES[0].version):
             build_all(GOBJECT_SOURCES, download_directory, build_directory)
 
 
