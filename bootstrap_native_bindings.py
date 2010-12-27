@@ -227,9 +227,39 @@ def build_all(sources, download_directory, build_directory):
         source.build(download_directory, build_directory)
 
 
+def import_string(import_name, silent=False):
+    """
+    Import an object based on a string given by ``import_name``.  An import
+    path can be specified either in dotted notation
+    (``'xml.sax.saxutils.escape'``) or with a colon as object delimiter
+    (``'xml.sax.saxutils:escape'``).
+
+    Return the imported object.  If the import or the attribute access fails
+    and ``silent`` is ``True``, ``None`` will be returned.  Otherwise
+    :exc:`~exceptions.ImportError` or :exc:`~exceptions.AttributeError` will
+    be raised.
+
+    This function was shamelessly stolen from Werkzeug_.  Thanks to Armin
+    Ronacher.
+
+    .. _werkzeug: http://werkzeug.pocoo.org
+    """
+    try:
+        if ':' in import_name:
+            module, obj = import_name.split(':', 1)
+        elif '.' in import_name:
+            module, obj = import_name.rsplit('.', 1)
+        else:
+            return __import__(import_name)
+        return getattr(__import__(module, None, None, [obj]), obj)
+    except (ImportError, AttributeError):
+        if not silent:
+            raise
+
+
 def have_pyqt4_qtcore(expected_version):
     try:
-        QtCore = __import__('PyQt4.QtCore', globals(), locals(), ['QtCore'])
+        QtCore = import_string('PyQt4.QtCore')
         return QtCore.PYQT_VERSION_STR == expected_version
     except ImportError:
         return False
@@ -237,7 +267,7 @@ def have_pyqt4_qtcore(expected_version):
 
 def have_pyside_qtcore():
     try:
-        __import__('PySide.QtCore', globals(), locals(), ['QtCore'])
+        QtCore = import_string('PySide.QtCore')
         return True
     except ImportError:
         return False
@@ -246,7 +276,7 @@ def have_pyside_qtcore():
 def have_gobject():
     for lib in ('glib', 'gobject'):
         try:
-            __import__(lib)
+            import_string(lib)
         except ImportError:
             return False
     return True
