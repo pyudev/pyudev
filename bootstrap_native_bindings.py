@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
 
@@ -296,27 +297,6 @@ def have_gobject(expected_version):
     return True
 
 
-def update_library_path():
-    lib_paths = os.environ.get('LD_LIBRARY_PATH', '').split(os.pathsep)
-    environment_lib_directory = os.path.join(sys.prefix, 'lib')
-    if environment_lib_directory not in lib_paths:
-        # update the library to include the environments library and re-execute ourself
-        lib_paths.insert(0, environment_lib_directory)
-        lib_path = os.pathsep.join(lib_paths)
-        logging.info('setting library path to %r', lib_path)
-        os.environ['LD_LIBRARY_PATH'] = lib_path
-        return True
-    return False
-
-
-def reexecute_script():
-    command = [sys.executable, __file__]
-    args = sys.argv[1:]
-    command.extend(args)
-    logging.info('reexecuting %r', command)
-    os.execv(command[0], command)
-
-
 def main():
     parser = OptionParser(usage='%prog download_directory build_directory')
     parser.add_option('--debug', action='store_const', dest='loglevel',
@@ -328,9 +308,6 @@ def main():
     if len(args) != 2:
         parser.error('missing arguments')
     logging.basicConfig(level=opts.loglevel)
-
-    if update_library_path():
-        reexecute_script()
 
     download_directory, build_directory = args
     ensuredirs(download_directory, build_directory)
