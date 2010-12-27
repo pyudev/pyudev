@@ -267,7 +267,7 @@ def have_pyqt4_qtcore(expected_version):
 
 def have_pyside_qtcore():
     try:
-        QtCore = import_string('PySide.QtCore')
+        import_string('PySide.QtCore')
         return True
     except ImportError:
         return False
