@@ -258,31 +258,41 @@ def import_string(import_name, silent=False):
 
 
 def have_pyqt4_qtcore(expected_version):
+    log = logging.getLogger('pyqt4')
     try:
         QtCore = import_string('PyQt4.QtCore')
+        log.info('excepted version %s, actual version %s',
+                 expected_version, QtCore.PYQT_VERSION_STR)
         return QtCore.PYQT_VERSION_STR == expected_version
     except ImportError:
+        log.exception('QtCore not found')
         return False
 
 
 def have_pyside_qtcore():
+    log = logging.getLogger('pyside')
     try:
         import_string('PySide.QtCore')
         return True
     except ImportError:
+        log.exception('QtCore not found')
         return False
 
 
 def have_gobject(expected_version):
+    log = logging.getLogger('pygobject')
     expected_version = tuple(map(int, expected_version.split('.')[:3]))
     for libname in ('glib', 'gobject'):
         try:
             lib = import_string(libname)
             version_attr = 'py{0}_version'.format(libname)
             lib_version = getattr(lib, version_attr)
+            log.info('%s: expected version %s, actual version %s',
+                     libname, expected_version, lib_version)
             if lib_version < expected_version:
                 return False
         except ImportError:
+            log.exception('%s not found', libname)
             return False
     return True
 
