@@ -16,6 +16,16 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+"""
+    pyudev.core
+    ===========
+
+    Core types and function of :mod:`pyudev`.
+
+    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+"""
+
+
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
