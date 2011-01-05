@@ -19,7 +19,13 @@
     pyudev.pygtk
     ============
 
-    PyGtk binding for :mod:`pyudev`.
+    A :class:`pyudev.Monitor` can also be plugged into a :class:`glib.MainLoop`
+    using :class:`pyudev.glib.GUDevMonitorObserver`.
+
+    To use this module, :mod:`glib` and :mod:`gobject` from PyGObject_ must be
+    available.  PyGtk is not required.
+
+    .. _PyGObject: http://www.pygtk.org/
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """

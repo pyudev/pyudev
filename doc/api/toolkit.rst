@@ -120,15 +120,10 @@ To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 :mod:`pyudev.glib` – Glib and Gtk integration
 ---------------------------------------------
 
-.. module:: pyudev.glib
+.. automodule:: pyudev.glib
    :platform: Linux
    :synopsis: Glib integration
 
-A :class:`pyudev.Monitor` can also be plugged into a :class:`glib.MainLoop`
-using :class:`pyudev.glib.GUDevMonitorObserver`.
-
-To use this module, :mod:`glib` and :mod:`gobject` from PyGObject_ must be
-available.  PyGtk is not required.
 
 .. autoclass:: GUDevMonitorObserver
 
@@ -179,4 +174,3 @@ available.  PyGtk is not required.
 
 .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
 .. _PySide: http://www.pyside.org
-.. _PyGObject: http://www.pygtk.org/
