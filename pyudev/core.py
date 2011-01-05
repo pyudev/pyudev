@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -18,15 +18,14 @@
 
 from __future__ import absolute_import
 
-import sys
 import os
 from itertools import count
 from collections import Mapping
 
 from pyudev._libudev import libudev
-from pyudev._util import (assert_bytes, property_value_to_bytes,
-                          call_handle_error_return, udev_list_iterate,
-                          string_to_bool)
+from pyudev._util import (assert_unicode, assert_bytes,
+                          property_value_to_bytes, string_to_bool,
+                          call_handle_error_return, udev_list_iterate)
 
 
 __all__ = [
@@ -62,8 +61,7 @@ class Context(object):
         The mount point can be overwritten using the environment variable
         :envvar:`SYSFS_PATH`.  Use this for testing purposes.
         """
-        return libudev.udev_get_sys_path(self._context).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_get_sys_path(self._context))
 
     @property
     def device_path(self):
@@ -72,8 +70,7 @@ class Context(object):
 
         This can be overridden in the udev configuration.
         """
-        return libudev.udev_get_dev_path(self._context).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_get_dev_path(self._context))
 
     def list_devices(self, **kwargs):
         """
@@ -492,8 +489,7 @@ class Device(Mapping):
         Absolute path of this device in ``sysfs`` including the ``sysfs``
         mount point as unicode string.
         """
-        return libudev.udev_device_get_syspath(self._device).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_device_get_syspath(self._device))
 
     @property
     def device_path(self):
@@ -505,24 +501,21 @@ class Device(Mapping):
         mount point.  However, the path is absolute and starts with a slash
         ``'/'``.
         """
-        return libudev.udev_device_get_devpath(self._device).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_device_get_devpath(self._device))
 
     @property
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
         """
-        return libudev.udev_device_get_subsystem(self._device).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_device_get_subsystem(self._device))
 
     @property
     def sys_name(self):
         """
         Device file name inside ``sysfs`` as unicode string.
         """
-        return libudev.udev_device_get_sysname(self._device).decode(
-            sys.getfilesystemencoding())
+        return assert_unicode(libudev.udev_device_get_sysname(self._device))
 
     @property
     def driver(self):
@@ -532,7 +525,7 @@ class Device(Mapping):
         """
         driver = libudev.udev_device_get_driver(self._device)
         if driver:
-            return driver.decode(sys.getfilesystemencoding())
+            return assert_unicode(driver)
 
     @property
     def device_node(self):
@@ -548,7 +541,7 @@ class Device(Mapping):
         """
         node = libudev.udev_device_get_devnode(self._device)
         if node:
-            return node.decode(sys.getfilesystemencoding())
+            return assert_unicode(node)
 
     @property
     def device_links(self):
@@ -568,7 +561,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
         for name in udev_list_iterate(entry):
-            yield name.decode(sys.getfilesystemencoding())
+            yield assert_unicode(name)
 
     @property
     def attributes(self):
@@ -594,7 +587,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_tags_list_entry(self._device)
         for tag in udev_list_iterate(entry):
-            yield tag.decode(sys.getfilesystemencoding())
+            yield assert_unicode(tag)
 
     def __iter__(self):
         """
@@ -605,7 +598,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         for name in udev_list_iterate(entry):
-            yield name.decode(sys.getfilesystemencoding())
+            yield assert_unicode(name)
 
     def __len__(self):
         """
@@ -632,7 +625,7 @@ class Device(Mapping):
             self._device, assert_bytes(property))
         if value is None:
             raise KeyError('No such property: {0}'.format(property))
-        return value.decode(sys.getfilesystemencoding())
+        return assert_unicode(value)
 
     def asint(self, property):
         """
@@ -782,7 +775,7 @@ class Attributes(Mapping):
         for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
-        return self[attribute].decode(sys.getfilesystemencoding())
+        return assert_unicode(self[attribute])
 
     def asint(self, attribute):
         """

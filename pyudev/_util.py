@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -27,6 +27,12 @@ def assert_bytes(value):
     if not isinstance(value, bytes):
         value = value.encode(sys.getfilesystemencoding())
     return value
+
+def assert_unicode(value):
+    if not isinstance(value, unicode):
+        value = value.decode(sys.getfilesystemencoding())
+    return value
+
 
 def property_value_to_bytes(value):
     # udev represents boolean values as 1 or 0, therefore an explicit

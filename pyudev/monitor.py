@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -15,13 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-import sys
 import os
 import select
 from contextlib import closing
 
 from pyudev._libudev import libudev, get_libudev_errno
-from pyudev._util import assert_bytes, call_handle_error_return
+from pyudev._util import assert_bytes, assert_unicode, call_handle_error_return
 
 from pyudev.core import Device
 
@@ -214,8 +213,7 @@ class Monitor(object):
                 raise EnvironmentError('Could not receive device')
             else:
                 raise EnvironmentError(errno, os.strerror(errno))
-        action = libudev.udev_device_get_action(device_p).decode(
-            sys.getfilesystemencoding())
+        action = assert_unicode(libudev.udev_device_get_action(device_p))
         return action, Device(self.context, device_p)
 
     def __iter__(self):

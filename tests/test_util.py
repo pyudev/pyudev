@@ -63,6 +63,20 @@ def test_assert_bytes_none():
 
 
 @pytest.mark.conversion
+def test_assert_unicode():
+    assert pytest.is_unicode_string(_util.assert_unicode(b'hello world'))
+    assert _util.assert_unicode(b'hello world') == 'hello world'
+    hello = 'hello world'
+    assert _util.assert_unicode(hello) is hello
+
+
+@pytest.mark.conversion
+def test_assert_unicode_none():
+    with pytest.raises(AttributeError):
+        _util.assert_unicode(None)
+
+
+@pytest.mark.conversion
 def test_property_value_to_bytes_string():
     hello = 'hello world'.encode(sys.getfilesystemencoding())
     assert _util.property_value_to_bytes(hello) is hello
