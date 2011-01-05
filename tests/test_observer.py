@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -18,7 +18,7 @@
 from itertools import count
 from functools import partial
 
-import py.test
+import pytest
 from mock import Mock
 
 
@@ -60,7 +60,7 @@ class Qt4Binding(BaseBinding):
         return observer
 
     def import_or_skip(self):
-        self.qtcore = py.test.importorskip('{0}.QtCore'.format(self.name))
+        self.qtcore = pytest.importorskip('{0}.QtCore'.format(self.name))
 
     def create_mainloop(self):
         app = self.qtcore.QCoreApplication.instance()
@@ -104,8 +104,8 @@ class GlibBinding(BaseBinding):
         return observer
 
     def import_or_skip(self):
-        self.glib = py.test.importorskip('glib')
-        py.test.importorskip('gobject')
+        self.glib = pytest.importorskip('glib')
+        pytest.importorskip('gobject')
 
     def create_mainloop(self):
         return self.glib.MainLoop()
@@ -186,20 +186,20 @@ def test_observer_fake(binding, action, fake_monitor, platform_device):
     action_slots.pop(action).assert_called_with(platform_device)
 
 
-@py.test.mark.privileged
+@pytest.mark.privileged
 def test_observer(binding, monitor):
     binding.import_or_skip()
-    py.test.unload_dummy()
+    pytest.unload_dummy()
     monitor.filter_by('net')
     monitor.enable_receiving()
     event_slot, action_slot = binding.trigger_observer(
-        'add', monitor, py.test.load_dummy)
+        'add', monitor, pytest.load_dummy)
     action, device = event_slot.call_args[0]
     assert action == 'add'
     assert device.subsystem == 'net'
     assert device.device_path == '/devices/virtual/net/dummy0'
     event_slot, action_slot = binding.trigger_observer(
-        'remove', monitor, py.test.unload_dummy)
+        'remove', monitor, pytest.unload_dummy)
     action, device = event_slot.call_args[0]
     assert action == 'remove'
     assert device.subsystem == 'net'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -26,7 +26,7 @@ from contextlib import contextmanager
 from subprocess import check_call
 
 import mock
-import py.test
+import pytest
 
 import pyudev
 
@@ -171,8 +171,8 @@ def patch_libudev(funcname):
 def _need_privileges(func):
     @wraps(func)
     def wrapped(*args):
-        if not py.test.config.getvalue('allow_privileges'):
-            py.test.skip('privileges disabled')
+        if not pytest.config.getvalue('allow_privileges'):
+            pytest.skip('privileges disabled')
         return func(*args)
     return wrapped
 

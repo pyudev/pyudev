@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -18,14 +18,14 @@
 
 from __future__ import unicode_literals
 
-import py.test
+import pytest
 
 
 def test_context_syspath(context):
-    assert py.test.is_unicode_string(context.sys_path)
+    assert pytest.is_unicode_string(context.sys_path)
     assert context.sys_path == '/sys'
 
 
 def test_context_devpath(context):
-    assert py.test.is_unicode_string(context.device_path)
+    assert pytest.is_unicode_string(context.device_path)
     assert context.device_path == '/dev'

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -21,7 +21,7 @@ import operator
 import sys
 from itertools import count
 
-import py.test
+import pytest
 
 from pyudev import (Device,
                     DeviceNotFoundAtPathError, DeviceNotFoundByNameError)
@@ -30,7 +30,7 @@ from pyudev import (Device,
 def pytest_generate_tests(metafunc):
     args = metafunc.funcargnames
     if 'device_path' in args or 'device' in args:
-        devices = py.test.get_device_sample(metafunc.config)
+        devices = pytest.get_device_sample(metafunc.config)
         for device_path in devices:
             metafunc.addcall(id=device_path, param=device_path)
     elif 'operator' in args:
@@ -61,7 +61,7 @@ def test_device_from_path_strips_leading_slash(context):
 
 def test_device_from_sys_path_device_not_found(context):
     sys_path = 'there_will_not_be_such_a_device'
-    with py.test.raises(DeviceNotFoundAtPathError) as exc_info:
+    with pytest.raises(DeviceNotFoundAtPathError) as exc_info:
         Device.from_sys_path(context, sys_path)
     error = exc_info.value
     assert error.sys_path == sys_path
@@ -75,7 +75,7 @@ def test_device_from_name(context, device):
 
 
 def test_device_from_name_no_device_in_existing_subsystem(context):
-    with py.test.raises(DeviceNotFoundByNameError) as exc_info:
+    with pytest.raises(DeviceNotFoundByNameError) as exc_info:
         Device.from_name(context, 'block', 'foobar')
     error = exc_info.value
     assert error.subsystem == 'block'
@@ -85,7 +85,7 @@ def test_device_from_name_no_device_in_existing_subsystem(context):
 
 
 def test_device_from_name_nonexisting_subsystem(context):
-    with py.test.raises(DeviceNotFoundByNameError) as exc_info:
+    with pytest.raises(DeviceNotFoundByNameError) as exc_info:
         Device.from_name(context, 'no_such_subsystem', 'foobar')
     error = exc_info.value
     assert error.subsystem == 'no_such_subsystem'
@@ -98,7 +98,7 @@ def test_device_from_environment(context):
     raise NotImplementedError()
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_properties(device, properties):
     properties.pop('DEVNAME', None)
     for n, property in enumerate(properties, start=1):
@@ -106,21 +106,21 @@ def test_device_properties(device, properties):
     assert n > 0
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_asint(device, properties):
     for n, property in enumerate(properties, start=1):
         value = properties[property]
         try:
             value = int(value)
         except ValueError:
-            with py.test.raises(ValueError):
+            with pytest.raises(ValueError):
                 device.asint(property)
         else:
             assert device.asint(property) == value
     assert n > 0
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_asbool(device, properties):
     for n, property in enumerate(properties, start=1):
         value = properties[property]
@@ -129,7 +129,7 @@ def test_device_asbool(device, properties):
         elif value == '0':
             assert not device.asbool(property)
         else:
-            with py.test.raises(ValueError) as exc_info:
+            with pytest.raises(ValueError) as exc_info:
                 device.asbool(property)
             message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
@@ -140,7 +140,7 @@ def test_attributes_iter(device, attributes):
     device_attributes = set(device.attributes)
     for attribute in attributes:
         assert attribute in device_attributes
-    assert all(py.test.is_unicode_string(a) for a in device_attributes)
+    assert all(pytest.is_unicode_string(a) for a in device_attributes)
 
 
 def test_attributes_len(device):
@@ -164,7 +164,7 @@ def test_attributes_getitem(device, attributes):
 
 def test_attributes_asstring(device, attributes):
     for attribute, value in attributes.items():
-        assert py.test.is_unicode_string(
+        assert pytest.is_unicode_string(
             device.attributes.asstring(attribute))
         assert device.attributes.asstring(attribute) == value
 
@@ -174,7 +174,7 @@ def test_attributes_asint(device, attributes):
         try:
             value = int(value)
         except ValueError:
-            with py.test.raises(ValueError):
+            with pytest.raises(ValueError):
                 device.attributes.asint(attribute)
         else:
             assert device.attributes.asint(attribute) == value
@@ -187,59 +187,59 @@ def test_attributes_asbool(device, attributes):
         elif value == '0':
             assert not device.attributes.asbool(attribute)
         else:
-            with py.test.raises(ValueError) as exc_info:
+            with pytest.raises(ValueError) as exc_info:
                 device.attributes.asbool(attribute)
             message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_devname(context, device, all_properties):
     if 'DEVNAME' not in device:
-        py.test.xfail('%r has no DEVNAME' % device)
+        pytest.xfail('%r has no DEVNAME' % device)
     assert device['DEVNAME'].startswith(context.device_path)
     assert device['DEVNAME'] == os.path.join(context.device_path,
                                              all_properties['DEVNAME'])
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_subsystem(device, properties):
     assert device.subsystem == properties['SUBSYSTEM']
-    assert py.test.is_unicode_string(device.subsystem)
+    assert pytest.is_unicode_string(device.subsystem)
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_sys_name(device):
     assert device.sys_name == os.path.basename(device.device_path)
-    assert py.test.is_unicode_string(device.sys_name)
+    assert pytest.is_unicode_string(device.sys_name)
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_node(context, device, device_node):
     if device_node:
         assert device.device_node == os.path.join(context.device_path,
                                                   device_node)
-        assert py.test.is_unicode_string(device.device_node)
+        assert pytest.is_unicode_string(device.device_node)
     else:
         assert device.device_node is None
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_links(context, device, device_links):
     assert sorted(device.device_links) == sorted(
         os.path.join(context.device_path, l) for l in device_links)
-    assert all(py.test.is_unicode_string(l) for l in device.device_links)
+    assert all(pytest.is_unicode_string(l) for l in device.device_links)
 
 
 def test_device_tags():
     raise NotImplementedError()
 
 
-@py.test.mark.properties
+@pytest.mark.properties
 def test_device_driver(device, properties):
     if 'DRIVER' in properties:
         assert device.driver == properties['DRIVER']
-        assert py.test.is_unicode_string(device.driver)
+        assert pytest.is_unicode_string(device.driver)
     else:
         assert device.driver is None
 
@@ -257,7 +257,7 @@ def test_device_traverse(device):
         child = parent
 
 
-@py.test.mark.operator
+@pytest.mark.operator
 def test_device_eq(device):
     assert device == device.device_path
     assert device == device
@@ -265,7 +265,7 @@ def test_device_eq(device):
     assert not (device == device.parent)
 
 
-@py.test.mark.operator
+@pytest.mark.operator
 def test_device_ne(device):
     assert not (device != device.device_path)
     assert not (device != device)
@@ -273,14 +273,14 @@ def test_device_ne(device):
     assert device != device.parent
 
 
-@py.test.mark.operator
+@pytest.mark.operator
 def test_device_ordering(platform_device, operator):
-    with py.test.raises(TypeError) as exc_info:
+    with pytest.raises(TypeError) as exc_info:
         operator(platform_device, platform_device)
     assert str(exc_info.value) == 'Device not orderable'
 
 
-@py.test.mark.operator
+@pytest.mark.operator
 def test_device_hash(device):
     assert hash(device) == hash(device.device_path)
     assert hash(device.parent) == hash(device.parent)
