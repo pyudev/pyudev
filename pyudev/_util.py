@@ -29,9 +29,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import os
 import sys
-from errno import ENOMEM
 
 from pyudev._libudev import libudev
 
@@ -105,21 +103,3 @@ def udev_list_iterate(entry):
     while entry:
         yield libudev.udev_list_entry_get_name(entry)
         entry = libudev.udev_list_entry_get_next(entry)
-
-
-def call_handle_error_return(func, *args):
-    """
-    Call ``func`` with ``args``, and handle the return code.  If the return
-    code is non-null, it is interpreted as negative :mod:`errno` code.  In
-    case of :attr:`errno.ENOMEM`, :exc:`MemoryError` is raised, otherwise an
-    :exc:`EnvironmentError` with proper ``errno`` and ``strerror``
-    attributes is raised.
-    """
-    errorcode = func(*args)
-    if errorcode != 0:
-        # udev returns the *negative* errno code at this point
-        errno = -errorcode
-        if errno == ENOMEM:
-            raise MemoryError()
-        else:
-            raise EnvironmentError(errno, os.strerror(errno))

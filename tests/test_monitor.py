@@ -141,25 +141,6 @@ def test_filter_by_subsystem_dev_type_mock(monitor):
         assert isinstance(func.call_args[0][2], bytes)
 
 
-def test_filter_by_memory_error_mock(monitor):
-    epic_func_name = 'udev_monitor_filter_add_match_subsystem_devtype'
-    with pytest.patch_libudev(epic_func_name) as func:
-        func.return_value = -errno.ENOMEM
-        with pytest.raises(MemoryError):
-            monitor.filter_by('input')
-
-
-def test_filter_by_environment_error_mock(monitor):
-    epic_func_name = 'udev_monitor_filter_add_match_subsystem_devtype'
-    with pytest.patch_libudev(epic_func_name) as func:
-        func.return_value = -errno.ENOENT
-        with pytest.raises(EnvironmentError) as exc_info:
-            monitor.filter_by('input')
-        error = exc_info.value
-        assert error.errno == errno.ENOENT
-        assert error.strerror == os.strerror(errno.ENOENT)
-
-
 def test_enable_receiving_netlink_kernel_source(context):
     monitor = Monitor.from_netlink(context, source='kernel')
     monitor.enable_receiving()

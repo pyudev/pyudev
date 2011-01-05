@@ -35,9 +35,8 @@ from itertools import count
 from collections import Mapping
 
 from pyudev._libudev import libudev
-from pyudev._util import (assert_unicode, assert_bytes,
-                          property_value_to_bytes, string_to_bool,
-                          call_handle_error_return, udev_list_iterate)
+from pyudev._util import (assert_unicode, assert_bytes, udev_list_iterate,
+                          property_value_to_bytes, string_to_bool)
 
 
 __all__ = [
@@ -214,8 +213,7 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        call_handle_error_return(
-            libudev.udev_enumerate_add_match_subsystem,
+        libudev.udev_enumerate_add_match_subsystem(
             self._enumerator, assert_bytes(subsystem))
         return self
 
@@ -234,8 +232,7 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        call_handle_error_return(
-            libudev.udev_enumerate_add_match_property,
+        libudev.udev_enumerate_add_match_property(
             self._enumerator, assert_bytes(property),
             property_value_to_bytes(value))
         return self
@@ -248,9 +245,8 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        call_handle_error_return(
-            libudev.udev_enumerate_add_match_tag,
-            self._enumerator, assert_bytes(tag))
+        libudev.udev_enumerate_add_match_tag(self._enumerator,
+                                             assert_bytes(tag))
         return self
 
     def match_children(self, device):
@@ -269,8 +265,7 @@ class Enumerator(object):
 
         Yield :class:`Device` objects.
         """
-        call_handle_error_return(
-            libudev.udev_enumerate_scan_devices, self._enumerator)
+        libudev.udev_enumerate_scan_devices(self._enumerator)
         entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
         for name in udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)

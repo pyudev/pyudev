@@ -19,34 +19,10 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
-import os
-import errno
 
 import pytest
-from mock import Mock
 
 from pyudev import _util
-
-
-def test_call_handle_error_return_no_error():
-    func = Mock(return_value=0)
-    _util.call_handle_error_return(func, 'spam', 'eggs')
-    assert func.called_with_args('spam', 'eggs')
-
-def test_call_handle_error_return_memory_error():
-    func = Mock(return_value=-errno.ENOMEM)
-    with pytest.raises(MemoryError):
-        _util.call_handle_error_return(func, 'spam', 'eggs')
-    assert func.called_with_args('spam', 'eggs')
-
-def test_call_handle_error_return_environment_error():
-    func = Mock(return_value=-errno.ENOENT)
-    with pytest.raises(EnvironmentError) as exc_info:
-        _util.call_handle_error_return(func, 'spam', 'eggs')
-    error = exc_info.value
-    assert error.errno == errno.ENOENT
-    assert error.strerror == os.strerror(errno.ENOENT)
-    assert func.called_with_args('spam', 'eggs')
 
 
 @pytest.mark.conversion

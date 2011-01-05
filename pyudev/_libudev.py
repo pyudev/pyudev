@@ -30,6 +30,8 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import os
+from errno import ENOMEM
 from ctypes import CDLL, Structure, POINTER, c_char_p, c_int, get_errno
 from ctypes.util import find_library
 
@@ -133,6 +135,29 @@ SIGNATURES = {
     }
 
 
+def check_negative_errorcode(result, func, *args):
+    """
+    Check if ``result`` is ``0``.  If so, return normally.  Otherwise interpret
+    ``result`` as negative error code, and raise
+    :exc:`~exceptions.MemoryError`, if ``result`` is ``-ENOMEM``, or
+    :exc:`~exceptions.EnvironmentError` in any other case.
+    """
+    if result != 0:
+        # udev returns the *negative* errno code at this point
+        errorcode = -result
+        if errorcode == ENOMEM:
+            raise MemoryError()
+        else:
+            raise EnvironmentError(errorcode, os.strerror(errorcode))
+
+
+ERROR_CHECKERS = dict(
+    udev_enumerate_add_match_subsystem=check_negative_errorcode,
+    udev_enumerate_add_match_property=check_negative_errorcode,
+    udev_enumerate_add_match_tag=check_negative_errorcode,
+    udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode)
+
+
 def load_udev_library():
     """
     Load the ``udev`` library and return a :class:`ctypes.CDLL` object for
@@ -150,6 +175,9 @@ def load_udev_library():
             argtypes, restype = signature
             func.argtypes = argtypes
             func.restype = restype
+            errorchecker = ERROR_CHECKERS.get(funcname)
+            if errorchecker:
+                func.errcheck = errorchecker
     return libudev
 
 

@@ -34,7 +34,7 @@ import select
 from contextlib import closing
 
 from pyudev._libudev import libudev, get_libudev_errno
-from pyudev._util import assert_bytes, assert_unicode, call_handle_error_return
+from pyudev._util import assert_bytes, assert_unicode
 
 from pyudev.core import Device
 
@@ -171,8 +171,7 @@ class Monitor(object):
         subsystem = assert_bytes(subsystem)
         if device_type:
             device_type = assert_bytes(device_type)
-        call_handle_error_return(
-            libudev.udev_monitor_filter_add_match_subsystem_devtype,
+        libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self._monitor, subsystem, device_type)
 
     def enable_receiving(self):
