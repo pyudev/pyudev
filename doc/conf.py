@@ -53,4 +53,4 @@ issuetracker_user = 'lunaryorn'
 
 def setup(app):
     from sphinx.ext.autodoc import cut_lines
-    app.connect('autodoc-process-docstring', cut_lines(2, what=['module']))
+    app.connect(b'autodoc-process-docstring', cut_lines(2, what=['module']))
