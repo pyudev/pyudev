@@ -37,7 +37,7 @@ exclude_patterns = ['_build/*']
 source_suffix = '.rst'
 
 project = u'pyudev'
-copyright = u'2010, Sebastian Wiesner'
+copyright = u'2010, 2011 Sebastian Wiesner'
 version = '.'.join(pyudev.__version__.split('.')[:2])
 release = pyudev.__version__
 
