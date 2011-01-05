@@ -127,7 +127,7 @@ class Context(object):
         retrieve :class:`Device` objects representing matching devices.
 
         .. versionchanged:: 0.8
-           Accept keyword arguments now to easy matching
+           Accept keyword arguments now for easy matching
         """
         return Enumerator(self).match(**kwargs)
 
