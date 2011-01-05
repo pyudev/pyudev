@@ -110,6 +110,8 @@ To use this module, :mod:`PyQt4.QtCore` from PyQt4_ must be available.
    :platform: Linux
    :synopsis: PySide_ integration
 
+.. versionadded:: 0.6
+
 To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 
 .. class:: QUDevMonitorObserver
@@ -123,7 +125,6 @@ To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 .. automodule:: pyudev.glib
    :platform: Linux
    :synopsis: Glib integration
-
 
 .. autoclass:: GUDevMonitorObserver
 

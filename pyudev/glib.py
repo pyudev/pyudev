@@ -28,6 +28,7 @@
     .. _PyGObject: http://www.pygtk.org/
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+    .. versionadded:: 0.7
 """
 
 

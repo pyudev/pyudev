@@ -17,6 +17,8 @@
 
       The :class:`Context` to which this device is bound.
 
+      .. versionadded:: 0.5
+
    .. autoattribute:: sys_path
 
    .. autoattribute:: sys_name

@@ -67,6 +67,8 @@ def udev_version():
     :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
     not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
     ``udevadm`` returned a non-zero exit code.
+
+    .. versionadded:: 0.8
     """
     command = ['udevadm', '--version']
     udevadm = Popen(command, stdout=PIPE)
@@ -389,6 +391,8 @@ class Device(Mapping):
 
         Return a :class:`Device` object for the device.  Raise
         :exc:`DeviceNotFoundAtPathError`, if no device was found for ``path``.
+
+        .. versionadded:: 0.4
         """
         if not path.startswith(context.sys_path):
             path = os.path.join(context.sys_path, path.lstrip(os.sep))
@@ -441,6 +445,8 @@ class Device(Mapping):
         Return a :class:`Device` object for the device.  Raise
         :exc:`DeviceNotFoundByNameError`, if no device was found with the
         given name.
+
+        .. versionadded:: 0.5
         """
         device = libudev.udev_device_new_from_subsystem_sysname(
             context._context, assert_bytes(subsystem),
@@ -465,6 +471,8 @@ class Device(Mapping):
         Return a :class:`Device` object constructed from the environment.
         Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
         created from the environment.
+
+        .. versionadded:: 0.6
         """
         device = libudev.udev_device_new_from_environment(context._context)
         if not device:
@@ -564,6 +572,8 @@ class Device(Mapping):
         """
         The driver name as unicode string, or ``None``, if there is no
         driver for this device.
+
+        .. versionadded:: 0.5
         """
         driver = libudev.udev_device_get_driver(self._device)
         if driver:
@@ -619,6 +629,8 @@ class Device(Mapping):
 
         The values of these attributes are not always proper strings, and
         can contain arbitrary bytes.
+
+        .. versionadded:: 0.5
         """
         return self._attributes
 
@@ -626,6 +638,8 @@ class Device(Mapping):
     def tags(self):
         """
         An iterator, which yields all attached tags as unicode strings.
+
+        .. versionadded:: 0.6
         """
         entry = libudev.udev_device_get_tags_list_entry(self._device)
         for tag in udev_list_iterate(entry):
@@ -755,6 +769,8 @@ class Attributes(Mapping):
     Therefore all well-known dicitionary methods and operators
     (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
     attributes.
+
+    .. versionadded:: 0.5
     """
 
     def __init__(self, device):

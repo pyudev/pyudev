@@ -13,6 +13,8 @@
 
       The :class:`Context` to which this monitor is bound.
 
+      .. versionadded:: 0.5
+
    .. automethod:: fileno
 
    .. automethod:: filter_by

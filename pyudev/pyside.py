@@ -22,6 +22,7 @@
     PySide binding for :mod:`pyudev`.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+    .. versionaddedd:: 0.6
 """
 
 
