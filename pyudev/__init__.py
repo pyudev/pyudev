@@ -27,14 +27,26 @@
     Usage
     -----
 
+    To use :mod:`pyudev`, simply import it:
+
+    >>> import pyudev
+    >>> pyudev.__version__
+    '0.8'
+    >>> pyudev.udev_version()
+    165
+
+    With the exception of the toolkit integration all classes and functions are
+    available in the top-level namespace of :mod:`pyudev`.
+
     The library context
     ^^^^^^^^^^^^^^^^^^^
 
-    First import :mod:`pyudev` and create a :class:`Context` object.  This
-    object is mandatory to use this library:
+    To use these classes and functions, a :class:`Context` object is required:
 
-    >>> import pyudev
     >>> context = pyudev.Context()
+
+    You can see this object as some kind of connection to the udev database,
+    through which the contents of this database can be queried.
 
     Listing devices
     ^^^^^^^^^^^^^^^

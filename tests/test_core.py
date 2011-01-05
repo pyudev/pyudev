@@ -22,6 +22,16 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 
 
+from pyudev import udev_version
+
+
+def test_udev_version():
+    assert isinstance(udev_version(), int)
+    # just to make sure, that udev versioning works.  pyudev itself is
+    # compatible with earlier versions of pyudev.
+    assert udev_version() > 160
+
+
 def test_context_syspath(context):
     assert pytest.is_unicode_string(context.sys_path)
     assert context.sys_path == '/sys'

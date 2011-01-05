@@ -30,6 +30,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
+from subprocess import Popen, PIPE, CalledProcessError
 from itertools import count
 from collections import Mapping
 
@@ -40,9 +41,39 @@ from pyudev._util import (assert_unicode, assert_bytes,
 
 
 __all__ = [
-    'Context', 'Enumerator', 'Device', 'Attributes',
+    'udev_version', 'Context', 'Enumerator', 'Device', 'Attributes',
     'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
     'DeviceNotFoundByNameError', 'DeviceNotFoundInEnvironmentError']
+
+
+def udev_version():
+    """
+    Get the version of the underlying udev library.
+
+    udev doesn't use a standard major-minor versioning scheme, but instead
+    labels releases with a single consecutive number.  Consequently, the
+    version number returned by this function is a single integer, and not a
+    tuple (like for instance the interpreter version in
+    :data:`sys.version_info`).
+
+    As libudev itself does not provide a function to query the version number,
+    this function calls the ``udevadm`` utilitiy, so be prepared to catch
+    :exc:`~exceptions.EnvironmentError` and
+    :exc:`~subprocess.CalledProcessError` if you call this function.
+
+    Return the version number as single integer.  Raise
+    :exc:`~exceptions.ValueError`, if the version number retrieved from udev
+    could not be converted to an integer.  Raise
+    :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
+    not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
+    ``udevadm`` returned a non-zero exit code.
+    """
+    command = ['udevadm', '--version']
+    udevadm = Popen(command, stdout=PIPE)
+    stdout = assert_unicode(udevadm.communicate()[0]).strip()
+    if udevadm.returncode != 0:
+        raise CalledProcessError(0, command)
+    return int(stdout)
 
 
 class Context(object):

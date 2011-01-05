@@ -33,3 +33,6 @@ Other attributes
 
       version = tuple(map(int, pyudev.__version__.split('.')[:2]))
       assert version >= (0, 8)
+
+
+.. autofunction:: udev_version()
