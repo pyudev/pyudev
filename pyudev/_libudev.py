@@ -88,10 +88,10 @@ SIGNATURES = {
         new=([udev_p], udev_enumerate_p),
         ref=([udev_enumerate_p], udev_enumerate_p),
         unref=([udev_enumerate_p], None),
-        add_match_subsystem=([udev_enumerate_p, c_char_p], int),
-        add_match_property=([udev_enumerate_p, c_char_p, c_char_p], int),
-        add_match_tag=([udev_enumerate_p, c_char_p], int),
-        scan_devices=([udev_enumerate_p], int),
+        add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
+        add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+        add_match_tag=([udev_enumerate_p, c_char_p], c_int),
+        scan_devices=([udev_enumerate_p], c_int),
         get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
     # list entries
     'udev_list_entry': dict(
