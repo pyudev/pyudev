@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (c) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -32,9 +32,11 @@
 """
 
 
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
+
 import sys
 import os
-
 
 
 def update_library_path():

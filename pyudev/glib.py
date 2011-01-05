@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -24,10 +24,12 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
-# need absolute imports to import the glib binding module and not this
-# module itself in the next lines
-from __future__ import absolute_import
 
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
+
+# thanks to absolute imports, this really imports the glib binding and not this
+# module again
 import glib
 import gobject
 
@@ -56,16 +58,17 @@ class GUDevMonitorObserver(gobject.GObject):
         'change': 'device-changed', 'move': 'device-moved'}
 
     __gsignals__ = {
-        'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                         (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        'device-added': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                         (gobject.TYPE_PYOBJECT,)),
-        'device-removed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                           (gobject.TYPE_PYOBJECT,)),
-        'device-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                           (gobject.TYPE_PYOBJECT,)),
-        'device-moved': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                         (gobject.TYPE_PYOBJECT,)),
+        # glib apparently expects byte-strings as signal names
+        b'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                          (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
+        b'device-added': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                          (gobject.TYPE_PYOBJECT,)),
+        b'device-removed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                            (gobject.TYPE_PYOBJECT,)),
+        b'device-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                            (gobject.TYPE_PYOBJECT,)),
+        b'device-moved': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                          (gobject.TYPE_PYOBJECT,)),
         }
 
     def __init__(self, monitor):

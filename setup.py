@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
+
 import sys
 if sys.version_info[0] < 3:
     from codecs import open

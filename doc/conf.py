@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
+
 import sys, os
 
 doc_directory = os.path.dirname(os.path.abspath(__file__))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright (c) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (c) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,9 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
+
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
 
 import sys
 import os
@@ -251,6 +254,9 @@ def import_string(import_name, silent=False):
             module, obj = import_name.rsplit('.', 1)
         else:
             return __import__(import_name)
+        # to make things run on python 2 and python 3
+        obj = str(obj)
+        module = str(module)
         return getattr(__import__(module, None, None, [obj]), obj)
     except (ImportError, AttributeError):
         if not silent:

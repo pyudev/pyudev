@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -24,6 +24,10 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
+
+
+from __future__ import (print_function, division, unicode_literals,
+                        absolute_import)
 
 
 class QUDevMonitorObserverMixin(object):
