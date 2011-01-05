@@ -79,7 +79,8 @@ def property_value_to_bytes(value):
     if isinstance(value, bytes):
         return value
     else:
-        return unicode(value).encode(sys.getfilesystemencoding())
+        return assert_bytes(unicode(value))
+
 
 def string_to_bool(value):
     """
