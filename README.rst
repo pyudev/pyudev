@@ -49,13 +49,13 @@ git_ repository::
 
 Feel free to fork the repository.  Pull requests and patches are welcome!
 
-.. _`GNU LGPL 2.1`: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+.. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _website: http://packages.python.org/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
-.. _`issue tracker`: http://github.com/lunaryorn/pyudev/issues
+.. _issue tracker: http://github.com/lunaryorn/pyudev/issues
 .. _GitHub: http://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/

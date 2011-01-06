@@ -88,16 +88,16 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
    output from the programs, or a code example demonstrating the issue.
 
 
-.. _`GNU LGPL 2.1`: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+.. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
-.. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
+.. _Python Package Index: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
-.. _`librelist.com`: http://librelist.com/
-.. _`list archives`: http://librelist.com/browser/pyudev/
-.. _`issue tracker`: https://github.com/lunaryorn/pyudev/issues
+.. _librelist.com: http://librelist.com/
+.. _list archives: http://librelist.com/browser/pyudev/
+.. _issue tracker: https://github.com/lunaryorn/pyudev/issues
 .. _GitHub: https://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
 .. _changesets: https://github.com/lunaryorn/pyudev/commits/master
