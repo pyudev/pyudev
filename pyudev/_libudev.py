@@ -169,13 +169,13 @@ def load_udev_library():
     libudev = CDLL(find_library('udev'), use_errno=True)
     # context function signature
     for namespace, members in SIGNATURES.items():
-        for funcname, signature in members.items():
-            funcname = '{0}_{1}'.format(namespace, funcname)
-            func = getattr(libudev, funcname)
-            argtypes, restype = signature
+        for funcname in members:
+            fullname = '{0}_{1}'.format(namespace, funcname)
+            func = getattr(libudev, fullname)
+            argtypes, restype = members[funcname]
             func.argtypes = argtypes
             func.restype = restype
-            errorchecker = ERROR_CHECKERS.get(funcname)
+            errorchecker = ERROR_CHECKERS.get(fullname)
             if errorchecker:
                 func.errcheck = errorchecker
     return libudev
