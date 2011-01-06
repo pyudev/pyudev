@@ -13,7 +13,9 @@ New features
 
   - :attr:`pyudev.Device.is_initialized`,
   - :attr:`pyudev.Device.time_since_initialized` and
-  - :meth:`pyudev.Enumerator.match_is_initialized`.
+  - :meth:`pyudev.Enumerator.match_is_initialized`
+
+- Fixed support for earlier releases of udev
 
 
 0.7 (Nov 15, 2010)
