@@ -245,6 +245,8 @@ class Enumerator(object):
         ``tag`` is a byte or unicode string containing the tag name.
 
         Return the instance again.
+
+        .. versionadded:: 0.6
         """
         libudev.udev_enumerate_add_match_tag(self._enumerator,
                                              assert_bytes(tag))
