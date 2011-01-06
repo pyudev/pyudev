@@ -266,7 +266,7 @@ class Enumerator(object):
 
         Return the instance again.
 
-        .. seealso:: :attr:`pyudev.Device.is_initialized`
+        .. seealso:: :attr:`Device.is_initialized`
 
         .. versionadded:: 0.8
 

@@ -72,7 +72,7 @@ class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
 
     def __init__(self, monitor, parent=None):
         """
-        Observe the given ``monitor`` (a :class:`pyudev.Monitor`):
+        Observe the given ``monitor`` (a :class:`~pyudev.Monitor`):
 
         ``parent`` is the parent :class:`~PySide.QtCore.QObject` of this
         object.  It is passed unchanged to the inherited constructor of
