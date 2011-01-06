@@ -33,6 +33,10 @@
 
    .. autoattribute:: device_links
 
+   .. autoattribute:: is_initialized
+
+   .. autoattribute:: time_since_initialized
+
    .. autoattribute:: attributes
 
    .. autoattribute:: tags

@@ -208,10 +208,29 @@ def is_unicode_string(value):
     return isinstance(value, unicode_type)
 
 
+def check_udev_version(version_spec):
+    """
+    Decorator to check the udev version.
+
+    ``version_spec`` is a string containing a comparison operator and the right
+    hand sight operand of this comparison, like ``'>= 165'``.  The left hand
+    side is automatically provided by the current udev version.
+
+    If the udev version matches the spec, the test is run.  Otherwise the test
+    is skipped.
+    """
+    expr_template = 'not ({0} {1})'
+    actual_version = pyudev.udev_version()
+    expr = expr_template.format(actual_version, version_spec)
+    reason = 'udev version mismatch: {0} required, {1} found'.format(
+        version_spec, actual_version)
+    return pytest.mark.skipif(str(expr), reason=reason)
+
+
 def pytest_namespace():
     return dict((func.__name__, func) for func in
                 (get_device_sample, patch_libudev, load_dummy,
-                 unload_dummy, is_unicode_string))
+                 unload_dummy, is_unicode_string, check_udev_version))
 
 
 def pytest_addoption(parser):

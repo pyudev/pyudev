@@ -33,6 +33,7 @@ import os
 from subprocess import Popen, PIPE, CalledProcessError
 from itertools import count
 from collections import Mapping
+from datetime import timedelta
 
 from pyudev._libudev import libudev
 from pyudev._util import (assert_unicode, assert_bytes, udev_list_iterate,
@@ -247,6 +248,25 @@ class Enumerator(object):
         """
         libudev.udev_enumerate_add_match_tag(self._enumerator,
                                              assert_bytes(tag))
+        return self
+
+    def match_is_initialized(self):
+        """
+        Include only devices, which are initialized.
+
+        Initialized devices have properly set device node permissions and
+        context, and are (in case of network devices) fully renamed.
+
+        Currently this will not affect devices which do not have device nodes
+        and are not network interfaces.
+
+        Return the instance again.
+
+        .. seealso:: :attr:`pyudev.Device.is_initialized`
+
+        .. versionadded:: 0.8
+        """
+        libudev.udev_enumerate_add_match_is_initialized(self._enumerator)
         return self
 
     def match_children(self, device):
@@ -589,6 +609,44 @@ class Device(Mapping):
         node = libudev.udev_device_get_devnode(self._device)
         if node:
             return assert_unicode(node)
+
+    @property
+    def is_initialized(self):
+        """
+        ``True``, if the device is initialized, ``False`` otherwise.
+
+        A device is initialized, if udev has already handled this device and
+        has set up device node permissions and context, or renamed a network
+        device.
+
+        Consequently, this property is only implemented for devices with a
+        device node or for network devices.  On all other devices this property
+        is always ``True``.
+
+        It is *not* recommended, that you use uninitialized devices.
+
+        .. seealso:: :attr:`time_since_initialized`
+
+        .. versionadded:: 0.8
+        """
+        return bool(libudev.udev_device_get_is_initialized(self._device))
+
+    @property
+    def time_since_initialized(self):
+        """
+        The time elapsed since initialization as :class:`~datetime.timedelta`.
+
+        This property is only implemented on devices, which need to store
+        properties in the udev database.  On all other devices this property is
+        simply zero :class:`~datetime.timedelta`.
+
+        .. seealso:: :attr:`is_initialized`
+
+        .. versionadded:: 0.8
+        """
+        microseconds = libudev.udev_device_get_usec_since_initialized(
+            self._device)
+        return timedelta(microseconds=microseconds)
 
     @property
     def device_links(self):

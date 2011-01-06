@@ -9,6 +9,11 @@ New features
   device filtering
 - #18: Added :func:`pyudev.udev_version()` to query the version of the
   underlying udev library
+- #17: Added support for initialization status, by
+
+  - :attr:`pyudev.Device.is_initialized`,
+  - :attr:`pyudev.Device.time_since_initialized` and
+  - :meth:`pyudev.Enumerator.match_is_initialized`.
 
 
 0.7 (Nov 15, 2010)

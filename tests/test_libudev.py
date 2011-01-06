@@ -51,9 +51,25 @@ def pytest_funcarg__errcheck(request):
     return binding.ERROR_CHECKERS.get(funcname)
 
 
-def test_signatures(funcname, restype, argtypes, errcheck):
+@pytest.check_udev_version('>= 165')
+def test_presence(funcname):
     assert hasattr(libudev, funcname)
-    func = getattr(libudev, funcname)
+
+
+def test_signatures(funcname, restype, argtypes, errcheck):
+    func = getattr(libudev, funcname, None)
+    if not func:
+        pytest.skip('{0} not available'.format(funcname))
     assert func.restype == restype
     assert func.argtypes == argtypes
     assert func.errcheck == errcheck
+
+
+UDEV_165_ADDITIONS = ['udev_device_get_is_initialized',
+                      'udev_device_get_usec_since_initialized',
+                      'udev_enumerate_add_match_is_initialized']
+
+@pytest.check_udev_version('< 165')
+def test_missing_functions():
+    for function in UDEV_165_ADDITIONS:
+        assert not hasattr(libudev, function)

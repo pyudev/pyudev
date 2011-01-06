@@ -23,6 +23,7 @@ import os
 import operator
 import sys
 from itertools import count
+from datetime import timedelta
 
 import pytest
 
@@ -232,6 +233,25 @@ def test_device_links(context, device, device_links):
     assert sorted(device.device_links) == sorted(
         os.path.join(context.device_path, l) for l in device_links)
     assert all(pytest.is_unicode_string(l) for l in device.device_links)
+
+
+@pytest.mark.properties
+def test_device_is_initialized(device):
+    assert isinstance(device.is_initialized, bool)
+    with pytest.patch_libudev('udev_device_get_is_initialized') as func:
+        func.return_value = True
+        assert device.is_initialized
+        assert func.called
+
+
+@pytest.mark.properties
+def test_device_time_since_initialized(device):
+    assert isinstance(device.time_since_initialized, timedelta)
+    funcname = 'udev_device_get_usec_since_initialized'
+    with pytest.patch_libudev(funcname) as func:
+        func.return_value = 100
+        assert device.time_since_initialized.microseconds == 100
+        assert func.called
 
 
 def test_device_tags():

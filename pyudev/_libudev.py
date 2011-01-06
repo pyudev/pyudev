@@ -32,7 +32,8 @@ from __future__ import (print_function, division, unicode_literals,
 
 import os
 from errno import ENOMEM
-from ctypes import CDLL, Structure, POINTER, c_char_p, c_int, get_errno
+from ctypes import (CDLL, Structure, POINTER, get_errno,
+                    c_char_p, c_int, c_ulonglong)
 from ctypes.util import find_library
 
 
@@ -93,6 +94,7 @@ SIGNATURES = {
         add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
         add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
         add_match_tag=([udev_enumerate_p, c_char_p], c_int),
+        add_match_is_initialized=([udev_enumerate_p], c_int),
         scan_devices=([udev_enumerate_p], c_int),
         get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
     # list entries
@@ -118,6 +120,8 @@ SIGNATURES = {
         get_property_value=([udev_device_p, c_char_p], c_char_p),
         get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
         get_action=([udev_device_p], c_char_p),
+        get_is_initialized=([udev_device_p], c_int),
+        get_usec_since_initialized=([udev_device_p], c_ulonglong),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
         get_tags_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p)),
@@ -155,6 +159,7 @@ ERROR_CHECKERS = dict(
     udev_enumerate_add_match_subsystem=check_negative_errorcode,
     udev_enumerate_add_match_property=check_negative_errorcode,
     udev_enumerate_add_match_tag=check_negative_errorcode,
+    udev_enumerate_add_match_is_initialized=check_negative_errorcode,
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode)
 
 
