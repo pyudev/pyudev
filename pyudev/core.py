@@ -247,6 +247,8 @@ class Enumerator(object):
         Return the instance again.
 
         .. versionadded:: 0.6
+
+        .. udevminversion:: 154
         """
         libudev.udev_enumerate_add_match_tag(self._enumerator,
                                              assert_bytes(tag))
@@ -267,6 +269,8 @@ class Enumerator(object):
         .. seealso:: :attr:`pyudev.Device.is_initialized`
 
         .. versionadded:: 0.8
+
+        .. udevminversion:: 165
         """
         libudev.udev_enumerate_add_match_is_initialized(self._enumerator)
         return self
@@ -490,6 +494,8 @@ class Device(Mapping):
         created from the environment.
 
         .. versionadded:: 0.6
+
+        .. udevminversion:: 152
         """
         device = libudev.udev_device_new_from_environment(context._context)
         if not device:
@@ -630,6 +636,8 @@ class Device(Mapping):
         .. seealso:: :attr:`time_since_initialized`
 
         .. versionadded:: 0.8
+
+        .. udevminversion:: 165
         """
         return bool(libudev.udev_device_get_is_initialized(self._device))
 
@@ -645,6 +653,8 @@ class Device(Mapping):
         .. seealso:: :attr:`is_initialized`
 
         .. versionadded:: 0.8
+
+        .. udevminversion:: 165
         """
         microseconds = libudev.udev_device_get_usec_since_initialized(
             self._device)
@@ -695,6 +705,8 @@ class Device(Mapping):
         An iterator, which yields all attached tags as unicode strings.
 
         .. versionadded:: 0.6
+
+        .. udevminversion:: 154
         """
         entry = libudev.udev_device_get_tags_list_entry(self._device)
         for tag in udev_list_iterate(entry):

@@ -15,9 +15,11 @@ Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
 The basic binding is implemented in pure Python atop of ctypes_, contains no
-native code and has no dependencies.  The only requirement is Python 2.6 or
-newer, Python 3 is supported as well.  Morever, ``libudev`` must be
-available at runtime to ``import pyudev``.
+native code and has no dependencies.  The only requirement are Python 2.6 or
+newer (Python 3 is supported as well) and of course udev_.  pyudev is tested
+against udev_ 151 and newer, older versions of udev_ may or may not work.  If
+pyudev doesn't work with your udev_ version, please report an issue (see
+:ref:`contribution`).
 
 The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`
 and :mod:`pyudev.glib` require some libraries from the corresponding
@@ -61,6 +63,7 @@ the configuration email.
 
 Older discussions are available in the `list archives`_.
 
+.. _contribution:
 
 Contribution and Development
 ----------------------------
@@ -89,6 +92,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _Python: http://www.python.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
+.. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _`Python Package Index`: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _`librelist.com`: http://librelist.com/

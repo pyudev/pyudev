@@ -21,6 +21,9 @@ from __future__ import (print_function, division, unicode_literals,
 
 import sys, os
 
+from docutils import nodes
+from docutils.parsers.rst import Directive
+
 doc_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.normpath(
     os.path.join(doc_directory, os.pardir)))
@@ -51,6 +54,25 @@ issuetracker = 'github'
 issuetracker_user = 'lunaryorn'
 
 
+class UDevMinimumVersion(Directive):
+    """
+    Directive to document the minimum udev version to use an attribute or
+    method
+    """
+    has_content = False
+    required_arguments = 1
+    option_spec = {}
+
+    def run(self):
+        version = self.arguments[0]
+        node = nodes.emphasis()
+        node['classes'].append('udev-min-version')
+        text = nodes.Text('Needs at least udev version {0}.'.format(version))
+        node.append(text)
+        return [node]
+
+
 def setup(app):
     from sphinx.ext.autodoc import cut_lines
     app.connect(b'autodoc-process-docstring', cut_lines(2, what=['module']))
+    app.add_directive('udevminversion', UDevMinimumVersion)

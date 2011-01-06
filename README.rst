@@ -14,9 +14,9 @@ Installation
 ============
 
 The basic binding is implemented in pure Python atop of ctypes_, contains no
-native code and has no dependencies.  The only requirement is Python 2.6 or
-newer, Python 3 is supported as well.  Morever, ``libudev`` must be
-available at runtime to ``import pyudev``.
+native code and has no dependencies.  The only requirements are Python 2.6 or
+newer (Python 3 is supported as well) and of course udev_.  pyudev is tested
+against udev_ 151 and newer, older versions of udev_ may or may not work.
 
 The toolkit integration modules in ``pyudev.pyqt4``, ``pyudev.pyside`` and
 ``pyudev.glib`` require some libraries from the corresponding toolkit.
@@ -52,6 +52,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _`GNU LGPL 2.1`: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
+.. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _website: http://packages.python.org/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html

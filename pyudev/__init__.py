@@ -137,6 +137,27 @@
     pyudev provides classes, which integrate monitoring into the event loop
     of GUI toolkits.  Currently, PyQt4, PySide and pygobject are supported.
 
+
+    A note on versioning
+    ====================
+
+    :mod:`pyudev` tries to provide all features of recent udev versions, while
+    maintaining compatibility with older versions.  This means, that some
+    attributes of :mod:`pyudev` classes are not available, if udev is too old.
+    Whenever this is the case, the minimum version of udev required to use the
+    attribute is described in the documentation, see for instance
+    :attr:`Device.is_initialized`.
+
+    You can use :func:`udev_version()` to check the version of udev and see, if
+    it is recent enough for your needs:
+
+    >>> if pyudev.udev_version() < 165:
+    ...     print('udev is somewhat older here')
+    ... else:
+    ...     print('udev is quite up to date here')
+    ...
+    udev is quite up to date here
+
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
 
