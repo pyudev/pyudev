@@ -257,6 +257,7 @@ def test_device_time_since_initialized(device):
         assert func.called
 
 
+@pytest.check_udev_version('>= 154')
 def test_device_tags():
     raise NotImplementedError()
 
