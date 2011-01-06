@@ -54,6 +54,7 @@ def test_match_tags(context):
     raise NotImplementedError()
 
 
+@pytest.check_udev_version('>= 165')
 def test_match_is_initialized(context):
     funcname = 'udev_enumerate_add_match_is_initialized'
     with pytest.patch_libudev(funcname) as func:

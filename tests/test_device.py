@@ -235,6 +235,7 @@ def test_device_links(context, device, device_links):
     assert all(pytest.is_unicode_string(l) for l in device.device_links)
 
 
+@pytest.check_udev_version('>= 165')
 @pytest.mark.properties
 def test_device_is_initialized(device):
     assert isinstance(device.is_initialized, bool)
@@ -244,6 +245,7 @@ def test_device_is_initialized(device):
         assert func.called
 
 
+@pytest.check_udev_version('>= 165')
 @pytest.mark.properties
 def test_device_time_since_initialized(device):
     assert isinstance(device.time_since_initialized, timedelta)
