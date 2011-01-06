@@ -26,6 +26,17 @@ from pyudev import _libudev as binding
 libudev = binding.libudev
 
 
+# new functions added in specific libudev versions
+UDEV_ADDITIONS = {
+    152: ['udev_new_from_environment'],
+    154: ['udev_device_get_tags_list_entry',
+          'udev_enumerate_add_match_tag'],
+    165: ['udev_device_get_is_initialized',
+          'udev_device_get_usec_since_initialized',
+          'udev_enumerate_add_match_is_initialized']
+    }
+
+
 def pytest_generate_tests(metafunc):
     if 'funcname' in metafunc.funcargnames:
         for namespace, members in binding.SIGNATURES.items():
@@ -33,6 +44,13 @@ def pytest_generate_tests(metafunc):
                 full_name = '{0}_{1}'.format(namespace, funcname)
                 metafunc.addcall(param=(namespace, funcname), id=full_name,
                                  funcargs=dict(funcname=full_name))
+    if metafunc.function.__name__ == 'test_missing_functions':
+        for version, functions in UDEV_ADDITIONS.items():
+            for function in functions:
+                funcargs = dict(version=version, missing_function=function)
+                id = 'version {0}, {1}'.format(version, function)
+                metafunc.addcall(funcargs=funcargs, id=id)
+
 
 def pytest_funcarg__signature(request):
     namespace, name = request.param
@@ -65,11 +83,8 @@ def test_signatures(funcname, restype, argtypes, errcheck):
     assert func.errcheck == errcheck
 
 
-UDEV_165_ADDITIONS = ['udev_device_get_is_initialized',
-                      'udev_device_get_usec_since_initialized',
-                      'udev_enumerate_add_match_is_initialized']
-
-@pytest.check_udev_version('< 165')
-def test_missing_functions():
-    for function in UDEV_165_ADDITIONS:
-        assert not hasattr(libudev, function)
+def test_missing_functions(version, missing_function):
+    if pytest.config.udev_version >= version:
+        pytest.skip('{0} already exists in {1}'.format(
+            missing_function, pytest.config.udev_version))
+    assert not hasattr(libudev, missing_function)

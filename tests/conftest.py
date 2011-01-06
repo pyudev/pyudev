@@ -263,6 +263,7 @@ def pytest_configure(config):
         ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
          'urbnum'])
     config.udev_database = _read_udev_database(config.properties_blacklist)
+    config.udev_version = pyudev.udev_version()
 
 
 def pytest_funcarg__database(request):

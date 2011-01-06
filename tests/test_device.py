@@ -98,6 +98,7 @@ def test_device_from_name_nonexisting_subsystem(context):
         error.sys_name, error.subsystem)
 
 
+@pytest.check_udev_version('>= 152')
 def test_device_from_environment(context):
     raise NotImplementedError()
 
