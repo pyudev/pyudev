@@ -176,13 +176,14 @@ def load_udev_library():
     for namespace, members in SIGNATURES.items():
         for funcname in members:
             fullname = '{0}_{1}'.format(namespace, funcname)
-            func = getattr(libudev, fullname)
-            argtypes, restype = members[funcname]
-            func.argtypes = argtypes
-            func.restype = restype
-            errorchecker = ERROR_CHECKERS.get(fullname)
-            if errorchecker:
-                func.errcheck = errorchecker
+            func = getattr(libudev, fullname, None)
+            if func:
+                argtypes, restype = members[funcname]
+                func.argtypes = argtypes
+                func.restype = restype
+                errorchecker = ERROR_CHECKERS.get(fullname)
+                if errorchecker:
+                    func.errcheck = errorchecker
     return libudev
 
 
