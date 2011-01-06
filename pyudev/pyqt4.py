@@ -19,7 +19,13 @@
     pyudev.pyqt4
     ============
 
-    PyQt4 binding for :mod:`pyudev`.
+    Provide :class:`~pyudev.pyqt4.QUDevMonitorObserver` to integrate a
+    :class:`~pyudev.Monitor` into the Qt event loop in applications using the
+    PyQt4_ binding to Qt.
+
+    To use this module, :mod:`PyQt4.QtCore` from PyQt4_ must be available.
+
+    .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """

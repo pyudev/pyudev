@@ -93,11 +93,9 @@ provided, each in a separate module:
 :mod:`pyudev.pyqt4`
 ^^^^^^^^^^^^^^^^^^^
 
-.. module:: pyudev.pyqt4
+.. automodule:: pyudev.pyqt4
    :platform: Linux
-   :synopsis: PyQt4_ integration
-
-To use this module, :mod:`PyQt4.QtCore` from PyQt4_ must be available.
+   :synopsis: PyQt4 integration
 
 .. class:: QUDevMonitorObserver
 
@@ -106,13 +104,9 @@ To use this module, :mod:`PyQt4.QtCore` from PyQt4_ must be available.
 :mod:`pyudev.pyside`
 ^^^^^^^^^^^^^^^^^^^^
 
-.. module:: pyudev.pyside
+.. automodule:: pyudev.pyside
    :platform: Linux
-   :synopsis: PySide_ integration
-
-.. versionadded:: 0.6
-
-To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
+   :synopsis: PySide integration
 
 .. class:: QUDevMonitorObserver
 
@@ -171,7 +165,3 @@ To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 
       Emitted if a :class:`~pyudev.Device` was renamed, moved or
       re-parented.
-
-
-.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
-.. _PySide: http://www.pyside.org
