@@ -94,6 +94,7 @@ SIGNATURES = {
         add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
         add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
         add_match_tag=([udev_enumerate_p, c_char_p], c_int),
+        add_match_sysname=([udev_enumerate_p, c_char_p], c_int),
         add_match_is_initialized=([udev_enumerate_p], c_int),
         scan_devices=([udev_enumerate_p], c_int),
         get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
@@ -159,6 +160,7 @@ ERROR_CHECKERS = dict(
     udev_enumerate_add_match_subsystem=check_negative_errorcode,
     udev_enumerate_add_match_property=check_negative_errorcode,
     udev_enumerate_add_match_tag=check_negative_errorcode,
+    udev_enumerate_add_match_sysname=check_negative_errorcode,
     udev_enumerate_add_match_is_initialized=check_negative_errorcode,
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode)
 

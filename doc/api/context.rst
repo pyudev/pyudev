@@ -19,6 +19,8 @@
 
    .. automethod:: match_subsystem
 
+   .. automethod:: match_sys_name
+
    .. automethod:: match_property
 
    .. automethod:: match_tag

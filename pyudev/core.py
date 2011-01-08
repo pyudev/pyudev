@@ -183,6 +183,8 @@ class Enumerator(object):
 
         - The value for the keyword argument ``subsystem`` is forwarded to
           :meth:`match_subsystem()`.
+        - The value for the keyword argument ``sys_name`` is forwared to
+          :meth:`match_sys_name()`.
         - The value for the keyword argument ``tag`` is forwared to
           :meth:`match_tag()`
         - All other keyword arguments are forwareded one by one to
@@ -200,6 +202,9 @@ class Enumerator(object):
         subsystem = kwargs.pop('subsystem', None)
         if subsystem is not None:
             self.match_subsystem(subsystem)
+        sys_name = kwargs.pop('sys_name', None)
+        if sys_name is not None:
+            self.match_sys_name(sys_name)
         tag = kwargs.pop('tag', None)
         if tag is not None:
             self.match_tag(tag)
@@ -218,6 +223,20 @@ class Enumerator(object):
         """
         libudev.udev_enumerate_add_match_subsystem(
             self._enumerator, assert_bytes(subsystem))
+        return self
+
+    def match_sys_name(self, sys_name):
+        """
+        Include all devices with the given name.
+
+        ``sys_name`` is a byte or unicode string containing the device name.
+
+        Return the instance again.
+
+        .. versionadded:: 0.8
+        """
+        libudev.udev_enumerate_add_match_sysname(self._enumerator,
+                                                 assert_bytes(sys_name))
         return self
 
     def match_property(self, property, value):

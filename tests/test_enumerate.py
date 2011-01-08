@@ -29,6 +29,13 @@ def test_match_subsystem(context):
     assert n > 0
 
 
+def test_match_sys_name(context):
+    devices = context.list_devices().match_sys_name('sda')
+    for n, device in enumerate(devices, start=1):
+        assert device.sys_name == 'sda'
+    assert n > 0
+
+
 def test_match_property_string(context):
     devices = context.list_devices().match_property('DRIVER', 'usb')
     for n, device in enumerate(devices, start=1):
@@ -87,15 +94,20 @@ def test_combined_matches_of_different_types(context):
 
 def test_match(context):
     devices = context.list_devices().match(
-        subsystem='input', ID_INPUT_KEY=True)
+        subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0')
     for n, device in enumerate(devices, start=1):
         assert device.subsystem == 'input'
-        assert device['ID_INPUT_KEY'] == '1'
+        assert device['ID_INPUT_MOUSE'] == '1'
+        assert device.sys_name == 'mouse0'
+    assert n > 0
 
 
 @pytest.mark.match
 def test_list_devices(context):
-    devices = context.list_devices(subsystem='input', ID_INPUT_KEY=True)
+    devices = context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
+                                   sys_name='mouse0')
     for n, device in enumerate(devices, start=1):
         assert device.subsystem == 'input'
-        assert device['ID_INPUT_KEY'] == '1'
+        assert device['ID_INPUT_MOUSE'] == '1'
+        assert device.sys_name == 'mouse0'
+    assert n > 0

@@ -7,6 +7,7 @@ New features
 - #16: Added :meth:`pyudev.Enumerator.match` to simplify device filtering
 - Added keyword arguments to :meth:`pyudev.Context.list_devices()` to simplify
   device filtering
+- #19: Added :meth:`pyudev.Enumerator.match_sys_name` to match device names
 - #18: Added :func:`pyudev.udev_version()` to query the version of the
   underlying udev library
 - #17: Added support for initialization status, by
