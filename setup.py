@@ -46,7 +46,7 @@ setup(
     author_email='lunaryorn@googlemail.com',
     description='A libudev binding',
     long_description=long_description,
-    platforms='Linux',
+    platforms=['Linux'],
     license='MIT/X11',
     classifiers=[
         'Development Status :: 4 - Beta',
