@@ -139,7 +139,7 @@
 
 
     A note on versioning
-    ====================
+    --------------------
 
     :mod:`pyudev` tries to provide all features of recent udev versions, while
     maintaining compatibility with older versions.  This means, that some
