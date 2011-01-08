@@ -17,9 +17,6 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
-
 import sys
 if sys.version_info[0] < 3:
     from codecs import open
@@ -43,7 +40,7 @@ with open('README.rst', encoding='utf-8') as stream:
 
 setup(
     name='pyudev',
-    version=pyudev.__version__,
+    version=str(pyudev.__version__),
     url='http://packages.python.org/pyudev',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
