@@ -451,7 +451,8 @@ class Device(Mapping):
     @classmethod
     def from_name(cls, context, subsystem, sys_name):
         """
-        Create a new device from a given ``subsystem`` and a given ``sys_name``:
+        Create a new device from a given ``subsystem`` and a given
+        ``sys_name``:
 
         >>> context = pyudev.Context()
         >>> sda = pyudev.Device.from_name(context, 'block', 'sda')
@@ -464,8 +465,8 @@ class Device(Mapping):
         denote the subsystem and the name of the device to create.
 
         Return a :class:`Device` object for the device.  Raise
-        :exc:`DeviceNotFoundByNameError`, if no device was found with the
-        given name.
+        :exc:`DeviceNotFoundByNameError`, if no device was found with the given
+        name.
 
         .. versionadded:: 0.5
         """
