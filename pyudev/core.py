@@ -194,6 +194,8 @@ class Enumerator(object):
         arguments at all is simply a noop.
 
         Return the instance again.
+
+        .. versionadded:: 0.8
         """
         subsystem = kwargs.pop('subsystem', None)
         if subsystem is not None:
