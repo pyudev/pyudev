@@ -275,11 +275,14 @@ def have_pyqt4_qtcore(expected_version):
         return False
 
 
-def have_pyside_qtcore():
+def have_pyside_qtcore(expected_version):
     log = logging.getLogger('pyside')
     try:
         import_string('PySide.QtCore')
-        return True
+        PySide = import_string('PySide')
+        log.info('excepted version %s, actual version %s',
+                 expected_version, PySide.__version__)
+        return PySide.__version__ == expected_version
     except ImportError:
         log.exception('QtCore not found')
         return False
@@ -323,7 +326,7 @@ def main():
 
     if sys.version_info[0] < 3:
         # pyside and pygobject are not available for python 3 yet
-        if not have_pyside_qtcore():
+        if not have_pyside_qtcore(PYSIDE_SOURCES[3].version.split('+')[1]):
             build_all(PYSIDE_SOURCES, download_directory, build_directory)
 
         if not have_gobject(GOBJECT_SOURCES[0].version):
