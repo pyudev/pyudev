@@ -318,19 +318,22 @@ def main():
         parser.error('missing arguments')
     logging.basicConfig(level=opts.loglevel)
 
-    download_directory, build_directory = args
-    ensuredirs(download_directory, build_directory)
+    try:
+        download_directory, build_directory = args
+        ensuredirs(download_directory, build_directory)
 
-    if not have_pyqt4_qtcore(PYQT4_SOURCES[1].version):
-        build_all(PYQT4_SOURCES, download_directory, build_directory)
+        if not have_pyqt4_qtcore(PYQT4_SOURCES[1].version):
+            build_all(PYQT4_SOURCES, download_directory, build_directory)
 
-    if sys.version_info[0] < 3:
-        # pyside and pygobject are not available for python 3 yet
-        if not have_pyside_qtcore(PYSIDE_SOURCES[3].version.split('+')[1]):
-            build_all(PYSIDE_SOURCES, download_directory, build_directory)
+        if sys.version_info[0] < 3:
+            # pyside and pygobject are not available for python 3 yet
+            if not have_pyside_qtcore(PYSIDE_SOURCES[3].version.split('+')[1]):
+                build_all(PYSIDE_SOURCES, download_directory, build_directory)
 
-        if not have_gobject(GOBJECT_SOURCES[0].version):
-            build_all(GOBJECT_SOURCES, download_directory, build_directory)
+            if not have_gobject(GOBJECT_SOURCES[0].version):
+                build_all(GOBJECT_SOURCES, download_directory, build_directory)
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == '__main__':
