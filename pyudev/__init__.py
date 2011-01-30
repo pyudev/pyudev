@@ -63,8 +63,8 @@
 
     In both cases ``devices`` is an instance of :class:`Enumerator`.  When
     iterated over, this class yields :class:`Device` objects, representing
-    those devices, which match the filters.  :class:`Device` provide various
-    attributes to access information:
+    those devices, which match the filters.  :class:`Device` objects provide
+    various attributes to access information:
 
     >>> for device in devices:
     ...     if device.sys_name.startswith('event'):
@@ -77,8 +77,8 @@
     Monitoring devices
     ^^^^^^^^^^^^^^^^^^
 
-    Alternatively you can monitor the device tree for changes instead of
-    listing all devices using the :class:`Monitor` class:
+    Instead of listing devices, you can monitor the device tree for changes
+    using the :class:`Monitor` class:
 
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
