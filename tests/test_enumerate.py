@@ -19,7 +19,13 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+from contextlib import nested
+from functools import partial
+
 import pytest
+import mock
+
+from pyudev import Enumerator
 
 
 def test_match_subsystem(context):
@@ -114,6 +120,33 @@ def test_match(context):
     assert n > 0
 
 
+def test_match_passthrough(context):
+    """
+    Test pass-through of all keyword arguments
+    """
+    enumerator = context.list_devices()
+    patch_enum = partial(mock.patch.object, enumerator, mocksignature=True)
+    with nested(patch_enum('match_subsystem'),
+                patch_enum('match_sys_name'),
+                patch_enum('match_tag'),
+                patch_enum('match_property')) as (match_subsystem,
+                                                  match_sys_name,
+                                                  match_tag,
+                                                  match_property):
+        enumerator.match(subsystem=mock.sentinel.subsystem,
+                         sys_name=mock.sentinel.sys_name,
+                         tag=mock.sentinel.tag,
+                         prop1=mock.sentinel.prop1,
+                         prop2=mock.sentinel.prop2)
+        match_subsystem.assert_called_with(mock.sentinel.subsystem)
+        match_sys_name.assert_called_with(mock.sentinel.sys_name)
+        match_tag.assert_called_with(mock.sentinel.tag)
+        assert match_property.call_count == 2
+        positional_args = [args for args, _ in match_property.call_args_list]
+        assert ('prop1', mock.sentinel.prop1) in positional_args
+        assert ('prop2', mock.sentinel.prop2) in positional_args
+
+
 @pytest.mark.match
 def test_list_devices(context):
     devices = context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
@@ -123,3 +156,19 @@ def test_list_devices(context):
         assert device['ID_INPUT_MOUSE'] == '1'
         assert device.sys_name == 'mouse0'
     assert n > 0
+
+
+@pytest.mark.match
+def test_list_devices_passthrough(context):
+    with mock.patch_object(Enumerator, 'match') as match:
+        context.list_devices(subsystem=mock.sentinel.subsystem,
+                             sys_name=mock.sentinel.sys_name,
+                             tag=mock.sentinel.tag,
+                             prop1=mock.sentinel.prop1,
+                             prop2=mock.sentinel.prop2)
+        match.assert_called_with(
+            subsystem=mock.sentinel.subsystem,
+            sys_name=mock.sentinel.sys_name,
+            tag=mock.sentinel.tag,
+            prop1=mock.sentinel.prop1,
+            prop2=mock.sentinel.prop2)
