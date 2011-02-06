@@ -36,8 +36,9 @@ from collections import Mapping
 from datetime import timedelta
 
 from pyudev._libudev import libudev
-from pyudev._util import (assert_unicode, assert_bytes, udev_list_iterate,
-                          property_value_to_bytes, string_to_bool)
+from pyudev._util import (ensure_unicode_string, ensure_byte_string,
+                          udev_list_iterate, property_value_to_bytes,
+                          string_to_bool)
 
 
 __all__ = [
@@ -72,7 +73,7 @@ def udev_version():
     """
     command = ['udevadm', '--version']
     udevadm = Popen(command, stdout=PIPE)
-    stdout = assert_unicode(udevadm.communicate()[0]).strip()
+    stdout = ensure_unicode_string(udevadm.communicate()[0]).strip()
     if udevadm.returncode != 0:
         raise CalledProcessError(0, command)
     return int(stdout)
@@ -105,7 +106,7 @@ class Context(object):
         The mount point can be overwritten using the environment variable
         :envvar:`SYSFS_PATH`.  Use this for testing purposes.
         """
-        return assert_unicode(libudev.udev_get_sys_path(self._context))
+        return ensure_unicode_string(libudev.udev_get_sys_path(self._context))
 
     @property
     def device_path(self):
@@ -114,7 +115,7 @@ class Context(object):
 
         This can be overridden in the udev configuration.
         """
-        return assert_unicode(libudev.udev_get_dev_path(self._context))
+        return ensure_unicode_string(libudev.udev_get_dev_path(self._context))
 
     def list_devices(self, **kwargs):
         """
@@ -222,7 +223,7 @@ class Enumerator(object):
         Return the instance again.
         """
         libudev.udev_enumerate_add_match_subsystem(
-            self._enumerator, assert_bytes(subsystem))
+            self._enumerator, ensure_byte_string(subsystem))
         return self
 
     def match_sys_name(self, sys_name):
@@ -236,7 +237,7 @@ class Enumerator(object):
         .. versionadded:: 0.8
         """
         libudev.udev_enumerate_add_match_sysname(self._enumerator,
-                                                 assert_bytes(sys_name))
+                                                 ensure_byte_string(sys_name))
         return self
 
     def match_property(self, property, value):
@@ -255,7 +256,7 @@ class Enumerator(object):
         Return the instance again.
         """
         libudev.udev_enumerate_add_match_property(
-            self._enumerator, assert_bytes(property),
+            self._enumerator, ensure_byte_string(property),
             property_value_to_bytes(value))
         return self
 
@@ -272,7 +273,7 @@ class Enumerator(object):
         .. udevminversion:: 154
         """
         libudev.udev_enumerate_add_match_tag(self._enumerator,
-                                             assert_bytes(tag))
+                                             ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):
@@ -464,7 +465,7 @@ class Device(Mapping):
            :exc:`NoSuchDeviceError`
         """
         device = libudev.udev_device_new_from_syspath(
-            context._context, assert_bytes(sys_path))
+            context._context, ensure_byte_string(sys_path))
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
         return cls(context, device)
@@ -492,8 +493,8 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         device = libudev.udev_device_new_from_subsystem_sysname(
-            context._context, assert_bytes(subsystem),
-            assert_bytes(sys_name))
+            context._context, ensure_byte_string(subsystem),
+            ensure_byte_string(sys_name))
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
         return cls(context, device)
@@ -584,7 +585,8 @@ class Device(Mapping):
         Absolute path of this device in ``sysfs`` including the ``sysfs``
         mount point as unicode string.
         """
-        return assert_unicode(libudev.udev_device_get_syspath(self._device))
+        return ensure_unicode_string(
+            libudev.udev_device_get_syspath(self._device))
 
     @property
     def device_path(self):
@@ -596,21 +598,24 @@ class Device(Mapping):
         mount point.  However, the path is absolute and starts with a slash
         ``'/'``.
         """
-        return assert_unicode(libudev.udev_device_get_devpath(self._device))
+        return ensure_unicode_string(
+            libudev.udev_device_get_devpath(self._device))
 
     @property
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
         """
-        return assert_unicode(libudev.udev_device_get_subsystem(self._device))
+        return ensure_unicode_string(
+            libudev.udev_device_get_subsystem(self._device))
 
     @property
     def sys_name(self):
         """
         Device file name inside ``sysfs`` as unicode string.
         """
-        return assert_unicode(libudev.udev_device_get_sysname(self._device))
+        return ensure_unicode_string(
+            libudev.udev_device_get_sysname(self._device))
 
     @property
     def driver(self):
@@ -622,7 +627,7 @@ class Device(Mapping):
         """
         driver = libudev.udev_device_get_driver(self._device)
         if driver:
-            return assert_unicode(driver)
+            return ensure_unicode_string(driver)
 
     @property
     def device_node(self):
@@ -638,7 +643,7 @@ class Device(Mapping):
         """
         node = libudev.udev_device_get_devnode(self._device)
         if node:
-            return assert_unicode(node)
+            return ensure_unicode_string(node)
 
     @property
     def is_initialized(self):
@@ -700,7 +705,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_devlinks_list_entry(self._device)
         for name in udev_list_iterate(entry):
-            yield assert_unicode(name)
+            yield ensure_unicode_string(name)
 
     @property
     def attributes(self):
@@ -732,7 +737,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_tags_list_entry(self._device)
         for tag in udev_list_iterate(entry):
-            yield assert_unicode(tag)
+            yield ensure_unicode_string(tag)
 
     def __iter__(self):
         """
@@ -743,7 +748,7 @@ class Device(Mapping):
         """
         entry = libudev.udev_device_get_properties_list_entry(self._device)
         for name in udev_list_iterate(entry):
-            yield assert_unicode(name)
+            yield ensure_unicode_string(name)
 
     def __len__(self):
         """
@@ -767,10 +772,10 @@ class Device(Mapping):
         for this device.
         """
         value = libudev.udev_device_get_property_value(
-            self._device, assert_bytes(property))
+            self._device, ensure_byte_string(property))
         if value is None:
             raise KeyError('No such property: {0}'.format(property))
-        return assert_unicode(value)
+        return ensure_unicode_string(value)
 
     def asint(self, property):
         """
@@ -888,7 +893,7 @@ class Attributes(Mapping):
 
     def __contains__(self, attribute):
         return libudev.udev_device_get_sysattr_value(
-            self.device._device, assert_bytes(attribute)) is not None
+            self.device._device, ensure_byte_string(attribute)) is not None
 
     def __getitem__(self, attribute):
         """
@@ -902,7 +907,7 @@ class Attributes(Mapping):
         for this device.
         """
         value = libudev.udev_device_get_sysattr_value(
-            self.device._device, assert_bytes(attribute))
+            self.device._device, ensure_byte_string(attribute))
         if value is None:
             raise KeyError('No such attribute: {0}'.format(attribute))
         return value
@@ -922,7 +927,7 @@ class Attributes(Mapping):
         for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
-        return assert_unicode(self[attribute])
+        return ensure_unicode_string(self[attribute])
 
     def asint(self, attribute):
         """

@@ -26,31 +26,32 @@ from pyudev import _util
 
 
 @pytest.mark.conversion
-def test_assert_bytes():
-    assert isinstance(_util.assert_bytes('hello world'), bytes)
-    assert _util.assert_bytes('hello world') == b'hello world'
+def test_ensure_byte_string():
+    assert isinstance(_util.ensure_byte_string('hello world'), bytes)
+    assert _util.ensure_byte_string('hello world') == b'hello world'
     hello = b'hello world'
-    assert _util.assert_bytes(hello) is hello
+    assert _util.ensure_byte_string(hello) is hello
 
 
 @pytest.mark.conversion
-def test_assert_bytes_none():
+def test_ensure_byte_string_none():
     with pytest.raises(AttributeError):
-        _util.assert_bytes(None)
+        _util.ensure_byte_string(None)
 
 
 @pytest.mark.conversion
-def test_assert_unicode():
-    assert pytest.is_unicode_string(_util.assert_unicode(b'hello world'))
-    assert _util.assert_unicode(b'hello world') == 'hello world'
+def test_ensure_unicode_string():
+    assert pytest.is_unicode_string(
+        _util.ensure_unicode_string(b'hello world'))
+    assert _util.ensure_unicode_string(b'hello world') == 'hello world'
     hello = 'hello world'
-    assert _util.assert_unicode(hello) is hello
+    assert _util.ensure_unicode_string(hello) is hello
 
 
 @pytest.mark.conversion
-def test_assert_unicode_none():
+def test_ensure_unicode_string_none():
     with pytest.raises(AttributeError):
-        _util.assert_unicode(None)
+        _util.ensure_unicode_string(None)
 
 
 @pytest.mark.conversion

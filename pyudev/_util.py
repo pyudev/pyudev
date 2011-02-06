@@ -34,7 +34,7 @@ import sys
 from pyudev._libudev import libudev
 
 
-def assert_bytes(value):
+def ensure_byte_string(value):
     """
     Return the given ``value`` as bytestring.
 
@@ -47,7 +47,7 @@ def assert_bytes(value):
     return value
 
 
-def assert_unicode(value):
+def ensure_unicode_string(value):
     """
     Return the given ``value`` as unicode string.
 
@@ -68,7 +68,7 @@ def property_value_to_bytes(value):
     If ``value`` is a boolean object, it is converted to ``'1'`` or ``'0'``,
     depending on whether ``value`` is ``True`` or ``False``.  If ``value`` is a
     byte string already, it is returned unchanged.  Anything else is simply
-    converted to a unicode string, and then passed to :func:`assert_bytes`.
+    converted to a unicode string, and then passed to :func:`ensure_byte_string`.
     """
     # udev represents boolean values as 1 or 0, therefore an explicit
     # conversion to int is required for boolean values
@@ -77,7 +77,7 @@ def property_value_to_bytes(value):
     if isinstance(value, bytes):
         return value
     else:
-        return assert_bytes(unicode(value))
+        return ensure_byte_string(unicode(value))
 
 
 def string_to_bool(value):

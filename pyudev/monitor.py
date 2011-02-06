@@ -34,7 +34,7 @@ import select
 from contextlib import closing
 
 from pyudev._libudev import libudev, get_libudev_errno
-from pyudev._util import assert_bytes, assert_unicode
+from pyudev._util import ensure_byte_string, ensure_unicode_string
 
 from pyudev.core import Device
 
@@ -108,7 +108,7 @@ class Monitor(object):
         if source not in ('kernel', 'udev'):
             raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
                              'or "kernel"'.format(source))
-        source = assert_bytes(source)
+        source = ensure_byte_string(source)
         monitor = libudev.udev_monitor_new_from_netlink(
             context._context, source)
         if not monitor:
@@ -134,7 +134,7 @@ class Monitor(object):
         creation of the monitor failed.
         """
         monitor = libudev.udev_monitor_new_from_socket(
-            context._context, assert_bytes(socket_path))
+            context._context, ensure_byte_string(socket_path))
         if not monitor:
             raise EnvironmentError('Could not create monitor for socket: '
                                    '{0!r}'.format(socket_path))
@@ -168,9 +168,9 @@ class Monitor(object):
 
         This method must be called *before* :meth:`enable_receiving`.
         """
-        subsystem = assert_bytes(subsystem)
+        subsystem = ensure_byte_string(subsystem)
         if device_type:
-            device_type = assert_bytes(device_type)
+            device_type = ensure_byte_string(device_type)
         libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self._monitor, subsystem, device_type)
 
@@ -226,7 +226,8 @@ class Monitor(object):
                 raise EnvironmentError('Could not receive device')
             else:
                 raise EnvironmentError(errno, os.strerror(errno))
-        action = assert_unicode(libudev.udev_device_get_action(device_p))
+        action = ensure_unicode_string(
+            libudev.udev_device_get_action(device_p))
         return action, Device(self.context, device_p)
 
     def __iter__(self):
