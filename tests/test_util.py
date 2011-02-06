@@ -89,3 +89,31 @@ def test_string_to_bool_invalid_value():
     with pytest.raises(ValueError) as exc_info:
         _util.string_to_bool('foo')
     assert str(exc_info.value) == 'Not a boolean value: {0!r}'.format('foo')
+
+
+def test_udev_list_iterate_no_entry():
+    assert not list(_util.udev_list_iterate(None))
+
+
+def test_udev_list_iterate_mock():
+    test_list = iter(['spam', 'eggs', 'foo', 'bar'])
+
+    def next_entry(entry):
+        try:
+            return next(test_list)
+        except StopIteration:
+            return None
+    def name(entry):
+        if entry:
+            return entry
+        else:
+            pytest.fail('empty entry!')
+
+    get_next = 'udev_list_entry_get_next'
+    get_name = 'udev_list_entry_get_name'
+    with pytest.patch_libudev(get_name) as get_name:
+        get_name.side_effect = name
+        with pytest.patch_libudev(get_next) as get_next:
+            get_next.side_effect = next_entry
+            items = list(_util.udev_list_iterate(next(test_list)))
+            assert items == ['spam', 'eggs', 'foo', 'bar']
