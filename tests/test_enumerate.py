@@ -63,6 +63,7 @@ def test_match_property_bool(context):
     assert n > 0
 
 
+@pytest.check_udev_version('>= 154')
 def test_match_tags_mock(context):
     add_match_tag = 'udev_enumerate_add_match_tag'
     enumerator = context.list_devices()

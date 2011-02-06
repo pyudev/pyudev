@@ -263,6 +263,7 @@ def test_device_time_since_initialized(device):
         usec_since_init.assert_called_with(device._device)
 
 
+@pytest.check_udev_version('>= 154')
 def test_device_tags_mock(device):
     tags_list = iter([b'spam', b'eggs', b'foo', b'bar'])
 
