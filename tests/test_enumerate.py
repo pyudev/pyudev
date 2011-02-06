@@ -57,8 +57,20 @@ def test_match_property_bool(context):
     assert n > 0
 
 
+def test_match_tags_mock(context):
+    add_match_tag = 'udev_enumerate_add_match_tag'
+    enumerator = context.list_devices()
+    with pytest.patch_libudev(add_match_tag) as add_match_tag:
+        retval = enumerator.match_tag('spam')
+        assert retval is enumerator
+        add_match_tag.assert_called_with(enumerator._enumerator, b'spam')
+        args, _ = add_match_tag.call_args
+        assert isinstance(args[1], bytes)
+
+
+@pytest.mark.xfail
 @pytest.check_udev_version('>= 154')
-def test_match_tags(context):
+def test_match_tags():
     raise NotImplementedError()
 
 
