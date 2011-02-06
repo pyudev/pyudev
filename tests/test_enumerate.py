@@ -82,10 +82,10 @@ def test_match_tags():
 
 @pytest.check_udev_version('>= 165')
 def test_match_is_initialized(context):
-    funcname = 'udev_enumerate_add_match_is_initialized'
-    with pytest.patch_libudev(funcname) as func:
+    match_is_initialized = 'udev_enumerate_add_match_is_initialized'
+    with pytest.patch_libudev(match_is_initialized) as match_is_initialized:
         context.list_devices().match_is_initialized()
-        assert func.called
+        assert match_is_initialized.called
 
 
 def test_combined_matches_of_same_type(context):

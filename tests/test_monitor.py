@@ -23,6 +23,7 @@ import sys
 import os
 import socket
 import errno
+from contextlib import nested
 
 import pytest
 import mock
@@ -45,12 +46,13 @@ def test_from_netlink_invalid_source(context):
 
 
 def _assert_from_netlink_called(context, *args):
-    with pytest.patch_libudev('udev_monitor_new_from_netlink') as func:
+    new_from_netlink = 'udev_monitor_new_from_netlink'
+    with pytest.patch_libudev(new_from_netlink) as new_from_netlink:
         source = args[0].encode('ascii') if args else b'udev'
-        func.return_value = mock.sentinel.pointer
+        new_from_netlink.return_value = mock.sentinel.pointer
         monitor = Monitor.from_netlink(context, *args)
-        func.assert_called_with(context._context, source)
-        assert isinstance(func.call_args[0][1], bytes)
+        new_from_netlink.assert_called_with(context._context, source)
+        assert isinstance(new_from_netlink.call_args[0][1], bytes)
         assert monitor._monitor is mock.sentinel.pointer
 
 
@@ -81,15 +83,17 @@ def test_from_socket(context, socket_path):
 
 
 def test_from_socket_mock(context, socket_path):
-    with pytest.patch_libudev('udev_monitor_new_from_socket') as func:
-        func.return_value = mock.sentinel.pointer
-        monitor = Monitor.from_socket(context, str(socket_path))
-        func.assert_called_with(context._context, str(socket_path).encode(
-            sys.getfilesystemencoding()))
+    socket_path = str(socket_path)
+    new_from_socket = 'udev_monitor_new_from_socket'
+    with pytest.patch_libudev(new_from_socket) as new_from_socket:
+        new_from_socket.return_value = mock.sentinel.pointer
+        monitor = Monitor.from_socket(context, socket_path)
+        new_from_socket.assert_called_with(
+            context._context, socket_path.encode(sys.getfilesystemencoding()))
         assert monitor._monitor is mock.sentinel.pointer
         Monitor.from_socket(context, 'foobar')
-        func.assert_called_with(context._context, b'foobar')
-        assert isinstance(func.call_args[0][1], bytes)
+        new_from_socket.assert_called_with(context._context, b'foobar')
+        assert isinstance(new_from_socket.call_args[0][1], bytes)
 
 
 def test_fileno(monitor):
@@ -98,10 +102,11 @@ def test_fileno(monitor):
 
 
 def test_fileno_mock(monitor):
-    with pytest.patch_libudev('udev_monitor_get_fd') as func:
-        func.return_value = mock.sentinel.fileno
+    get_fd = 'udev_monitor_get_fd'
+    with pytest.patch_libudev(get_fd) as get_fd:
+        get_fd.return_value = mock.sentinel.fileno
         assert monitor.fileno() is mock.sentinel.fileno
-        func.assert_called_with(monitor._monitor)
+        get_fd.assert_called_with(monitor._monitor)
 
 
 def test_filter_by_no_subsystem(monitor):
@@ -115,14 +120,14 @@ def test_filter_by_subsystem_no_dev_type(monitor):
 
 
 def test_filter_by_subsystem_no_dev_type_mock(monitor):
-    epic_func_name = 'udev_monitor_filter_add_match_subsystem_devtype'
-    with pytest.patch_libudev(epic_func_name) as func:
-        func.return_value = 0
+    add_match = 'udev_monitor_filter_add_match_subsystem_devtype'
+    with pytest.patch_libudev(add_match) as add_match:
+        add_match.return_value = 0
         monitor.filter_by(b'input')
-        func.assert_called_with(monitor._monitor, b'input', None)
+        add_match.assert_called_with(monitor._monitor, b'input', None)
         monitor.filter_by('input')
-        func.assert_called_with(monitor._monitor, b'input', None)
-        assert isinstance(func.call_args[0][1], bytes)
+        add_match.assert_called_with(monitor._monitor, b'input', None)
+        assert isinstance(add_match.call_args[0][1], bytes)
 
 
 def test_filter_by_subsystem_dev_type(monitor):
@@ -131,14 +136,16 @@ def test_filter_by_subsystem_dev_type(monitor):
 
 
 def test_filter_by_subsystem_dev_type_mock(monitor):
-    epic_func_name = 'udev_monitor_filter_add_match_subsystem_devtype'
-    with pytest.patch_libudev(epic_func_name) as func:
-        func.return_value = 0
+    add_match = 'udev_monitor_filter_add_match_subsystem_devtype'
+    with pytest.patch_libudev(add_match) as add_match:
+        add_match.return_value = 0
         monitor.filter_by(b'input', b'usb_interface')
-        func.assert_called_with(monitor._monitor, b'input', b'usb_interface')
+        add_match.assert_called_with(
+            monitor._monitor, b'input', b'usb_interface')
         monitor.filter_by('input', 'usb_interface')
-        func.assert_called_with(monitor._monitor, b'input', b'usb_interface')
-        assert isinstance(func.call_args[0][2], bytes)
+        add_match.assert_called_with(
+            monitor._monitor, b'input', b'usb_interface')
+        assert isinstance(add_match.call_args[0][2], bytes)
 
 
 def test_enable_receiving_netlink_kernel_source(context):
@@ -177,10 +184,12 @@ def test_enable_receiving_mock(monitor):
 
 
 def test_enable_receiving_error_mock(context, monitor, socket_path):
-    with pytest.patch_libudev('udev_monitor_enable_receiving') as func:
-        with mock.patch('pyudev.monitor.get_libudev_errno') as get_errno:
+    enable_receiving = 'udev_monitor_enable_receiving'
+    get_errno = 'pyudev.monitor.get_libudev_errno'
+    with nested(pytest.patch_libudev(enable_receiving),
+                mock.patch(get_errno)) as (enable_receiving, get_errno):
             get_errno.return_value = errno.ENOENT
-            func.return_value = 1
+            enable_receiving.return_value = 1
             with pytest.raises(EnvironmentError) as exc_info:
                 monitor.enable_receiving()
             error = exc_info.value
@@ -215,34 +224,39 @@ def test_receive_device(monitor):
 
 
 def test_receive_device_mock(monitor):
-    with pytest.patch_libudev('udev_monitor_receive_device') as func:
-        with pytest.patch_libudev('udev_device_get_action') as actfunc:
-            func.return_value = mock.sentinel.pointer
-            actfunc.return_value = b'action'
-            action, device = monitor.receive_device()
-            assert action == 'action'
-            assert pytest.is_unicode_string(action)
-            assert isinstance(device, Device)
-            assert device.context is monitor.context
-            assert device._device is mock.sentinel.pointer
-            actfunc.assert_called_with(mock.sentinel.pointer)
-            func.assert_called_with(monitor._monitor)
+    receive_device = 'udev_monitor_receive_device'
+    get_action = 'udev_device_get_action'
+    with nested(pytest.patch_libudev(receive_device),
+                pytest.patch_libudev(get_action)) as (receive_device,
+                                                      get_action):
+        receive_device.return_value = mock.sentinel.pointer
+        get_action.return_value = b'action'
+        action, device = monitor.receive_device()
+        assert action == 'action'
+        assert pytest.is_unicode_string(action)
+        assert isinstance(device, Device)
+        assert device.context is monitor.context
+        assert device._device is mock.sentinel.pointer
+        get_action.assert_called_with(mock.sentinel.pointer)
+        receive_device.assert_called_with(monitor._monitor)
 
 
 def test_receive_device_error_mock(monitor):
-    with pytest.patch_libudev('udev_monitor_receive_device') as func:
-        with mock.patch('pyudev.monitor.get_libudev_errno') as errorfunc:
-            func.return_value = None
-            errorfunc.return_value = 0
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.receive_device()
-            assert str(exc_info.value) == 'Could not receive device'
-            errorfunc.return_value = errno.ENOENT
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.receive_device()
-            error = exc_info.value
-            assert error.errno == errno.ENOENT
-            assert error.strerror == os.strerror(errno.ENOENT)
+    get_errno = 'pyudev.monitor.get_libudev_errno'
+    receive_device = 'udev_monitor_receive_device'
+    with nested(pytest.patch_libudev(receive_device),
+                mock.patch(get_errno)) as (receive_device, get_errno):
+        receive_device.return_value = None
+        get_errno.return_value = 0
+        with pytest.raises(EnvironmentError) as exc_info:
+            monitor.receive_device()
+        assert str(exc_info.value) == 'Could not receive device'
+        get_errno.return_value = errno.ENOENT
+        with pytest.raises(EnvironmentError) as exc_info:
+            monitor.receive_device()
+        error = exc_info.value
+        assert error.errno == errno.ENOENT
+        assert error.strerror == os.strerror(errno.ENOENT)
 
 
 @pytest.mark.privileged

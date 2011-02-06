@@ -22,6 +22,7 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import operator
 import sys
+from contextlib import nested
 from itertools import count
 from datetime import timedelta
 
@@ -244,21 +245,22 @@ def test_device_links(context, device, device_links):
 @pytest.mark.properties
 def test_device_is_initialized(device):
     assert isinstance(device.is_initialized, bool)
-    with pytest.patch_libudev('udev_device_get_is_initialized') as func:
-        func.return_value = True
+    get_is_initialized = 'udev_device_get_is_initialized'
+    with pytest.patch_libudev(get_is_initialized) as get_is_initialized:
+        get_is_initialized.return_value = True
         assert device.is_initialized
-        assert func.called
+        get_is_initialized.assert_called_with(device._device)
 
 
 @pytest.check_udev_version('>= 165')
 @pytest.mark.properties
 def test_device_time_since_initialized(device):
     assert isinstance(device.time_since_initialized, timedelta)
-    funcname = 'udev_device_get_usec_since_initialized'
-    with pytest.patch_libudev(funcname) as func:
-        func.return_value = 100
+    usec_since_init = 'udev_device_get_usec_since_initialized'
+    with pytest.patch_libudev(usec_since_init) as usec_since_init:
+        usec_since_init.return_value = 100
         assert device.time_since_initialized.microseconds == 100
-        assert func.called
+        usec_since_init.assert_called_with(device._device)
 
 
 def test_device_tags_mock(device):
@@ -278,16 +280,17 @@ def test_device_tags_mock(device):
     get_tags_list_entry = 'udev_device_get_tags_list_entry'
     get_next = 'udev_list_entry_get_next'
     get_name = 'udev_list_entry_get_name'
-    with pytest.patch_libudev(get_tags_list_entry) as get_tags_list_entry:
+    with nested(pytest.patch_libudev(get_tags_list_entry),
+                pytest.patch_libudev(get_name),
+                pytest.patch_libudev(get_next)) as (get_tags_list_entry,
+                                                    get_name, get_next):
         get_tags_list_entry.return_value = next(tags_list)
-        with pytest.patch_libudev(get_name) as get_name:
-            get_name.side_effect = name
-            with pytest.patch_libudev(get_next) as get_next:
-                get_next.side_effect = next_entry
+        get_name.side_effect = name
+        get_next.side_effect = next_entry
 
-                device_tags = list(device.tags)
-                assert device_tags == ['spam', 'eggs', 'foo', 'bar']
-                assert all(pytest.is_unicode_string(t) for t in device_tags)
+        device_tags = list(device.tags)
+        assert device_tags == ['spam', 'eggs', 'foo', 'bar']
+        assert all(pytest.is_unicode_string(t) for t in device_tags)
 
 
 @pytest.mark.xfail
