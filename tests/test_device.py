@@ -261,6 +261,36 @@ def test_device_time_since_initialized(device):
         assert func.called
 
 
+def test_device_tags_mock(device):
+    tags_list = iter([b'spam', b'eggs', b'foo', b'bar'])
+
+    def next_entry(entry):
+        try:
+            return next(tags_list)
+        except StopIteration:
+            return None
+    def name(entry):
+        if entry:
+            return entry
+        else:
+            pytest.fail('empty entry!')
+
+    get_tags_list_entry = 'udev_device_get_tags_list_entry'
+    get_next = 'udev_list_entry_get_next'
+    get_name = 'udev_list_entry_get_name'
+    with pytest.patch_libudev(get_tags_list_entry) as get_tags_list_entry:
+        get_tags_list_entry.return_value = next(tags_list)
+        with pytest.patch_libudev(get_name) as get_name:
+            get_name.side_effect = name
+            with pytest.patch_libudev(get_next) as get_next:
+                get_next.side_effect = next_entry
+
+                device_tags = list(device.tags)
+                assert device_tags == ['spam', 'eggs', 'foo', 'bar']
+                assert all(pytest.is_unicode_string(t) for t in device_tags)
+
+
+@pytest.mark.xfail
 @pytest.check_udev_version('>= 154')
 def test_device_tags():
     raise NotImplementedError()
