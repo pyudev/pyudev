@@ -28,7 +28,9 @@ from datetime import timedelta
 import pytest
 
 from pyudev import (Device,
-                    DeviceNotFoundAtPathError, DeviceNotFoundByNameError)
+                    DeviceNotFoundAtPathError,
+                    DeviceNotFoundByNameError,
+                    DeviceNotFoundInEnvironmentError)
 
 
 def pytest_generate_tests(metafunc):
@@ -100,7 +102,9 @@ def test_device_from_name_nonexisting_subsystem(context):
 
 @pytest.check_udev_version('>= 152')
 def test_device_from_environment(context):
-    raise NotImplementedError()
+    # there is no device in a standard environment
+    with pytest.raises(DeviceNotFoundInEnvironmentError):
+        Device.from_environment(context)
 
 
 @pytest.mark.properties
