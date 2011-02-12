@@ -111,15 +111,12 @@ def test_device_from_environment(context):
 
 @pytest.mark.properties
 def test_device_properties(device, properties):
-    properties.pop('DEVNAME', None)
-    for n, property in enumerate(properties, start=1):
-        assert device[property] == properties[property]
-    assert n > 0
+    assert all(device[p] == properties[p] for p in properties)
 
 
 @pytest.mark.properties
 def test_device_asint(device, properties):
-    for n, property in enumerate(properties, start=1):
+    for property in properties:
         value = properties[property]
         try:
             value = int(value)
@@ -128,12 +125,11 @@ def test_device_asint(device, properties):
                 device.asint(property)
         else:
             assert device.asint(property) == value
-    assert n > 0
 
 
 @pytest.mark.properties
 def test_device_asbool(device, properties):
-    for n, property in enumerate(properties, start=1):
+    for property in properties:
         value = properties[property]
         if value == '1':
             assert device.asbool(property)
@@ -144,13 +140,11 @@ def test_device_asbool(device, properties):
                 device.asbool(property)
             message = 'Not a boolean value: {0!r}'
             assert str(exc_info.value) == message.format(value)
-    assert n > 0
 
 
 def test_attributes_iter(device, attributes):
     device_attributes = set(device.attributes)
-    for attribute in attributes:
-        assert attribute in device_attributes
+    assert all(a in device_attributes for a in attributes)
     assert all(pytest.is_unicode_string(a) for a in device_attributes)
 
 
@@ -166,18 +160,16 @@ def test_attributes_contains(device, attributes):
 
 
 def test_attributes_getitem(device, attributes):
-    for attribute, value in attributes.items():
-        # device attributes *must* be bytes.
-        assert isinstance(device.attributes[attribute], bytes)
-        value = value.encode(sys.getfilesystemencoding())
-        assert device.attributes[attribute] == value
+    assert all(isinstance(device.attributes[a], bytes) for a in attributes)
+    assert all(device.attributes[a] == v.encode(sys.getfilesystemencoding())
+               for a, v in attributes.items())
 
 
 def test_attributes_asstring(device, attributes):
-    for attribute, value in attributes.items():
-        assert pytest.is_unicode_string(
-            device.attributes.asstring(attribute))
-        assert device.attributes.asstring(attribute) == value
+    assert all(pytest.is_unicode_string(device.attributes.asstring(a))
+               for a in attributes)
+    assert all(device.attributes.asstring(a) == v
+               for a, v in attributes.items())
 
 
 def test_attributes_asint(device, attributes):
