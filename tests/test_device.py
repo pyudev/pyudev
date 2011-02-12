@@ -287,7 +287,7 @@ def test_device_tags_mock(device):
         assert all(pytest.is_unicode_string(t) for t in device_tags)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail(reason='Not implemented')
 @pytest.check_udev_version('>= 154')
 def test_device_tags():
     raise NotImplementedError()

@@ -68,7 +68,7 @@ def test_match_tags_mock(context):
         assert isinstance(args[1], bytes)
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail(reason='Not implemented')
 @pytest.check_udev_version('>= 154')
 def test_match_tags():
     raise NotImplementedError()
