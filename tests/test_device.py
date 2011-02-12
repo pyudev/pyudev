@@ -198,11 +198,10 @@ def test_attributes_asbool(device, attributes):
 
 @pytest.mark.properties
 def test_device_devname(context, device, all_properties):
-    if 'DEVNAME' not in device:
+    if 'DEVNAME' not in all_properties:
         pytest.xfail('%r has no DEVNAME' % device)
-    assert device['DEVNAME'].startswith(context.device_path)
-    assert device['DEVNAME'] == os.path.join(context.device_path,
-                                             all_properties['DEVNAME'])
+    assert os.path.join(context.device_path, device['DEVNAME']) == \
+           os.path.join(context.device_path, all_properties['DEVNAME'])
 
 
 @pytest.mark.properties
