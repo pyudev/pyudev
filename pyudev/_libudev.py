@@ -112,6 +112,8 @@ SIGNATURES = {
                                     udev_device_p),
         new_from_environment=([udev_p], udev_device_p),
         get_parent=([udev_device_p], udev_device_p),
+        get_parent_with_subsystem_devtype=([udev_device_p, c_char_p, c_char_p],
+                                           udev_device_p),
         get_devpath=([udev_device_p], c_char_p),
         get_subsystem=([udev_device_p], c_char_p),
         get_syspath=([udev_device_p], c_char_p),

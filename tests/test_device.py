@@ -27,6 +27,7 @@ from itertools import count
 from datetime import timedelta
 
 import pytest
+import mock
 
 from pyudev import (Device,
                     DeviceNotFoundAtPathError,
@@ -320,6 +321,46 @@ def test_device_traverse(device):
         assert parent == child.parent
         assert child in parent.children
         child = parent
+
+
+def test_device_find_parent(device):
+    parent = device.find_parent(device.subsystem)
+    if not parent:
+        pytest.xfail('no parent within the same subsystem')
+    assert parent.subsystem == device.subsystem
+    assert parent in device.traverse()
+    assert device in parent.children
+
+
+def test_device_find_parent_no_devtype_mock(device):
+    get_parent = 'udev_device_get_parent_with_subsystem_devtype'
+    ref = 'udev_device_ref'
+    with nested(pytest.patch_libudev(get_parent),
+                pytest.patch_libudev(ref)) as (get_parent, ref):
+        get_parent.return_value = mock.sentinel.device
+        ref.return_value = mock.sentinel.referenced_device
+        parent = device.find_parent('subsystem')
+        get_parent.assert_called_with(device._device, 'subsystem', None)
+        ref.assert_called_with(mock.sentinel.device)
+        assert isinstance(get_parent.call_args[0][1], bytes)
+        assert isinstance(parent, Device)
+        assert parent._device is mock.sentinel.referenced_device
+
+
+def test_device_find_parent_with_devtype_mock(device):
+    get_parent = 'udev_device_get_parent_with_subsystem_devtype'
+    ref = 'udev_device_ref'
+    with nested(pytest.patch_libudev(get_parent),
+                pytest.patch_libudev(ref)) as (get_parent, ref):
+        get_parent.return_value = mock.sentinel.device
+        ref.return_value = mock.sentinel.referenced_device
+        parent = device.find_parent('subsystem', 'devtype')
+        get_parent.assert_called_with(device._device, 'subsystem', 'devtype')
+        ref.assert_called_with(mock.sentinel.device)
+        args = get_parent.call_args[0][1:]
+        assert all(isinstance(a, bytes) for a in args)
+        assert isinstance(parent, Device)
+        assert parent._device is mock.sentinel.referenced_device
 
 
 @pytest.mark.operator

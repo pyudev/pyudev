@@ -1,6 +1,8 @@
 0.9 (in development)
 ====================
 
+- #21: Added :meth:`Device.find_parent`
+
 
 0.8 (Jan 08, 2011)
 ==================

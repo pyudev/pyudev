@@ -47,6 +47,8 @@
 
    .. automethod:: traverse
 
+   .. automethod:: find_parent
+
    .. automethod:: __iter__
 
    .. automethod:: __len__
