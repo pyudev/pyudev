@@ -30,37 +30,30 @@ from pyudev import Enumerator
 
 def test_match_subsystem(context):
     devices = context.list_devices().match_subsystem('input')
-    for n, device in enumerate(devices, start=1):
-        assert device.subsystem == 'input'
-    assert n > 0
+    assert all(d.subsystem == 'input' for d in devices)
 
 
 def test_match_sys_name(context):
     devices = context.list_devices().match_sys_name('sda')
-    for n, device in enumerate(devices, start=1):
-        assert device.sys_name == 'sda'
-    assert n > 0
+    assert all(d.sys_name == 'sda' for d in devices)
 
 
 def test_match_property_string(context):
-    devices = context.list_devices().match_property('DRIVER', 'usb')
-    for n, device in enumerate(devices, start=1):
-        assert device['DRIVER'] == 'usb'
-    assert n > 0
+    devices = list(context.list_devices().match_property('DRIVER', 'usb'))
+    assert all(d['DRIVER'] == 'usb' for d in devices)
+    assert all(d.driver == 'usb' for d in devices)
 
 
 def test_match_property_int(context):
-    devices = context.list_devices().match_property('ID_INPUT_KEY', 1)
-    for n, device in enumerate(devices, start=1):
-        assert device['ID_INPUT_KEY'] == '1'
-    assert n > 0
+    devices = list(context.list_devices().match_property('ID_INPUT_KEY', 1))
+    assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
+    assert all(d.asint('ID_INPUT_KEY') == 1 for d in devices)
 
 
 def test_match_property_bool(context):
-    devices = context.list_devices().match_property('ID_INPUT_KEY', True)
-    for n, device in enumerate(devices, start=1):
-        assert device['ID_INPUT_KEY'] == '1'
-    assert n > 0
+    devices = list(context.list_devices().match_property('ID_INPUT_KEY', True))
+    assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
+    assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
 
 @pytest.check_udev_version('>= 154')
@@ -97,9 +90,7 @@ def test_combined_matches_of_same_type(context):
     devices = context.list_devices()
     for property in properties:
         devices.match_property(property, 'disk')
-    for n, device in enumerate(devices, start=1):
-        assert any(device.get(p) == 'disk' for p in properties)
-    assert n > 0
+    assert all(any(d.get(p) == 'disk' for p in properties) for d in devices)
 
 
 def test_combined_matches_of_different_types(context):
@@ -112,13 +103,11 @@ def test_combined_matches_of_different_types(context):
 
 
 def test_match(context):
-    devices = context.list_devices().match(
-        subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0')
-    for n, device in enumerate(devices, start=1):
-        assert device.subsystem == 'input'
-        assert device['ID_INPUT_MOUSE'] == '1'
-        assert device.sys_name == 'mouse0'
-    assert n > 0
+    devices = list(context.list_devices().match(
+        subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0'))
+    assert all(d.subsystem == 'input' for d in devices)
+    assert all(d.asbool('ID_INPUT_MOUSE') for d in devices)
+    assert all(d.sys_name == 'mouse0' for d in devices)
 
 
 def test_match_passthrough(context):
@@ -150,13 +139,11 @@ def test_match_passthrough(context):
 
 @pytest.mark.match
 def test_list_devices(context):
-    devices = context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
-                                   sys_name='mouse0')
-    for n, device in enumerate(devices, start=1):
-        assert device.subsystem == 'input'
-        assert device['ID_INPUT_MOUSE'] == '1'
-        assert device.sys_name == 'mouse0'
-    assert n > 0
+    devices = list(context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
+                                        sys_name='mouse0'))
+    assert all(d.subsystem == 'input' for d in devices)
+    assert all(d.asbool('ID_INPUT_MOUSE') for d in devices)
+    assert all(d.sys_name == 'mouse0' for d in devices)
 
 
 @pytest.mark.match
