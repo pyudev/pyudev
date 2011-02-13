@@ -120,18 +120,17 @@ class Monitor(object):
         """
         Connect to an arbitrary udev daemon using the given ``socket_path``.
 
-        ``context`` is the :class:`Context` to use. ``socket_path`` is a
-        byte or unicode string, pointing to an existing socket.  If the path
-        starts with a @, use an abstract namespace socket.  If
-        ``socket_path`` does not exist, fall back to an abstract namespace
-        socket.
+        ``context`` is the :class:`Context` to use. ``socket_path`` is a byte
+        or unicode string, pointing to an existing socket.  If the path starts
+        with a ``@``, use an abstract namespace socket.  If ``socket_path``
+        does not exist, fall back to an abstract namespace socket.
 
         The caller is responsible for permissions and cleanup of the socket
         file.
 
-        Return a new :class:`Monitor` object, which is connected to the
-        given socket.  Raise :exc:`~exceptions.EnvironmentError`, if the
-        creation of the monitor failed.
+        Return a new :class:`Monitor` object, which is connected to the given
+        socket.  Raise :exc:`~exceptions.EnvironmentError`, if the creation of
+        the monitor failed.
         """
         monitor = libudev.udev_monitor_new_from_socket(
             context._context, ensure_byte_string(socket_path))
