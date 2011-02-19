@@ -148,6 +148,21 @@ def test_filter_by_subsystem_dev_type_mock(monitor):
         assert isinstance(add_match.call_args[0][2], bytes)
 
 
+def test_filter_by_tag(monitor):
+    monitor.filter_by_tag('spam')
+
+
+def test_pytest_filter_by_tag_mock(monitor):
+    match_tag = 'udev_monitor_filter_add_match_tag'
+    with pytest.patch_libudev(match_tag) as match_tag:
+        match_tag.return_value = 0
+        monitor.filter_by_tag(b'spam')
+        match_tag.assert_called_with(monitor._monitor, b'spam')
+        monitor.filter_by_tag('eggs')
+        match_tag.assert_called_with(monitor._monitor, b'eggs')
+        assert isinstance(match_tag.call_args[0][1], bytes)
+
+
 def test_enable_receiving_netlink_kernel_source(context):
     monitor = Monitor.from_netlink(context, source='kernel')
     monitor.enable_receiving()

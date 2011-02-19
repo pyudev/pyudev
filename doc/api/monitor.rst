@@ -19,6 +19,8 @@
 
    .. automethod:: filter_by
 
+   .. automethod:: filter_by_tag
+
    .. automethod:: enable_receiving
 
    .. method:: start

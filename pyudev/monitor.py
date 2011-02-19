@@ -173,6 +173,27 @@ class Monitor(object):
         libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self._monitor, subsystem, device_type)
 
+    def filter_by_tag(self, tag):
+        """
+        Filter incoming events by the given ``tag``.
+
+        ``tag`` is a byte or unicode string with the name of a tag.  Only
+        events for devices which have this tag attached pass the filter and are
+        handed to the caller.
+
+        Like with :meth:`filter_by` this filter is also executed inside the
+        kernel, so that client processes are usually not woken up for devices
+        without the given ``tag``.
+
+        This method must be called *before* :meth:`enable_receiving`.
+
+        .. udevminversion:: 154
+
+        .. versionadded:: 0.9
+        """
+        libudev.udev_monitor_filter_add_match_tag(
+            self._monitor, ensure_byte_string(tag))
+
     def enable_receiving(self):
         """
         Switch the monitor into listing mode.

@@ -2,6 +2,7 @@
 ====================
 
 - #21: Added :meth:`Device.find_parent`
+- #22: Added :meth:`Monitor.filter_by_tag`
 
 
 0.8 (Jan 08, 2011)
