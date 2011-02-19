@@ -30,7 +30,8 @@ libudev = binding.libudev
 UDEV_ADDITIONS = {
     152: ['udev_new_from_environment'],
     154: ['udev_device_get_tags_list_entry',
-          'udev_enumerate_add_match_tag'],
+          'udev_enumerate_add_match_tag',
+          'udev_monitor_filter_add_match_tag'],
     165: ['udev_device_get_is_initialized',
           'udev_device_get_usec_since_initialized',
           'udev_enumerate_add_match_is_initialized']

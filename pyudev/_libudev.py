@@ -138,7 +138,8 @@ SIGNATURES = {
         get_fd=([udev_monitor_p], c_int),
         receive_device=([udev_monitor_p], udev_device_p),
         filter_add_match_subsystem_devtype=(
-            [udev_monitor_p, c_char_p, c_char_p], c_int))
+            [udev_monitor_p, c_char_p, c_char_p], c_int),
+        filter_add_match_tag=([udev_monitor_p, c_char_p], c_int))
     }
 
 
@@ -164,7 +165,8 @@ ERROR_CHECKERS = dict(
     udev_enumerate_add_match_tag=check_negative_errorcode,
     udev_enumerate_add_match_sysname=check_negative_errorcode,
     udev_enumerate_add_match_is_initialized=check_negative_errorcode,
-    udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode)
+    udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode,
+    udev_monitor_filter_add_match_tag=check_negative_errorcode)
 
 
 def load_udev_library():
