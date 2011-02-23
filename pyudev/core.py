@@ -117,6 +117,27 @@ class Context(object):
         """
         return ensure_unicode_string(libudev.udev_get_dev_path(self._context))
 
+    @property
+    def log_priority(self):
+        """
+        The logging priority of the interal logging facitility of udev as
+        integer with a standard :mod:`syslog` priority.  Assign to this
+        property to change the logging priority.
+
+        UDev uses the standard :mod:`syslog` priorities.  Constants for these
+        priorities are defined in the :mod:`syslog` module in the standard
+        library:
+
+        >>> import syslog
+        >>> context = pyudev.Context()
+        >>> context.log_priority = syslog.LOG_DEBUG
+        """
+        return libudev.udev_get_log_priority(self._context)
+
+    @log_priority.setter
+    def log_priority(self, value):
+        libudev.udev_set_log_priority(self._context, value)
+
     def list_devices(self, **kwargs):
         """
         List all available devices.

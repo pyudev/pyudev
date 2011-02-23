@@ -85,7 +85,9 @@ SIGNATURES = {
         unref=([udev_p], None),
         ref=([udev_p], udev_p),
         get_sys_path=([udev_p], c_char_p),
-        get_dev_path=([udev_p], c_char_p)),
+        get_dev_path=([udev_p], c_char_p),
+        get_log_priority=([udev_p], c_int),
+        set_log_priority=([udev_p, c_int], None)),
     # enumeration
     'udev_enumerate': dict(
         new=([udev_p], udev_enumerate_p),

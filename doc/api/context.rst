@@ -11,6 +11,8 @@
 
    .. autoattribute:: device_path
 
+   .. autoattribute:: log_priority
+
    .. automethod:: list_devices
 
 .. autoclass:: Enumerator()
