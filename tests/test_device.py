@@ -331,7 +331,7 @@ def test_device_find_parent_no_devtype_mock(device):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem')
-        get_parent.assert_called_with(device._device, 'subsystem', None)
+        get_parent.assert_called_with(device._device, b'subsystem', None)
         ref.assert_called_with(mock.sentinel.device)
         assert isinstance(get_parent.call_args[0][1], bytes)
         assert isinstance(parent, Device)
@@ -346,7 +346,7 @@ def test_device_find_parent_with_devtype_mock(device):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem', 'devtype')
-        get_parent.assert_called_with(device._device, 'subsystem', 'devtype')
+        get_parent.assert_called_with(device._device, b'subsystem', b'devtype')
         ref.assert_called_with(mock.sentinel.device)
         args = get_parent.call_args[0][1:]
         assert all(isinstance(a, bytes) for a in args)
