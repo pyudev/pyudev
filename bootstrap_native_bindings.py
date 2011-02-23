@@ -197,10 +197,10 @@ class AutotoolsBuild(Build):
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
-    SourcePackage('sip', '4.12', SipBuild,
+    SourcePackage('sip', '4.12.1', SipBuild,
                   RIVERBANK_DOWNLOAD_URL.format(
                       'sip4/{name}-{version}.tar.gz')),
-    SourcePackage('PyQt-x11-gpl', '4.8.2', PyQtBuild,
+    SourcePackage('PyQt-x11-gpl', '4.8.3', PyQtBuild,
                   RIVERBANK_DOWNLOAD_URL.format(
                       'PyQt4/{name}-{version}.tar.gz'))]
 
