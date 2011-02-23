@@ -148,10 +148,12 @@ def test_filter_by_subsystem_dev_type_mock(monitor):
         assert isinstance(add_match.call_args[0][2], bytes)
 
 
+@pytest.check_udev_version('>= 154')
 def test_filter_by_tag(monitor):
     monitor.filter_by_tag('spam')
 
 
+@pytest.check_udev_version('>= 154')
 def test_pytest_filter_by_tag_mock(monitor):
     match_tag = 'udev_monitor_filter_add_match_tag'
     with pytest.patch_libudev(match_tag) as match_tag:
