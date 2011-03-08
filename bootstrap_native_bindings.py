@@ -207,13 +207,13 @@ PYQT4_SOURCES = [
 PYSIDE_DOWNLOAD_URL = 'http://www.pyside.org/files/{0}'
 
 PYSIDE_SOURCES = [
-    SourcePackage('apiextractor', '0.9.2', CMakeBuild,
+    SourcePackage('apiextractor', '0.10.0', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('generatorrunner', '0.6.3', CMakeBuild,
+    SourcePackage('generatorrunner', '0.6.7', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('shiboken', '1.0.0~beta3', CMakeBuild,
+    SourcePackage('shiboken', '1.0.0', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('pyside', 'qt4.7+1.0.0~beta3', PySideBuild,
+    SourcePackage('pyside', 'qt4.7+1.0.0', PySideBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
     ]
 
