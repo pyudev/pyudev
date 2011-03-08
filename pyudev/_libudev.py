@@ -178,8 +178,13 @@ def load_udev_library():
 
     Important functions are given proper signatures and return types to
     support type checking and argument conversion.
+
+    Raise :exc:`~exceptions.ImportError`, if the udev library was not found.
     """
-    libudev = CDLL(find_library('udev'), use_errno=True)
+    udev_library_name = find_library('udev')
+    if not udev_library_name:
+        raise ImportError('No library named udev')
+    libudev = CDLL(udev_library_name, use_errno=True)
     # context function signature
     for namespace, members in SIGNATURES.items():
         for funcname in members:
