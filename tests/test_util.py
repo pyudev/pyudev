@@ -19,7 +19,6 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
-from contextlib import nested
 
 import pytest
 
@@ -113,8 +112,8 @@ def test_udev_list_iterate_mock():
 
     get_next = 'udev_list_entry_get_next'
     get_name = 'udev_list_entry_get_name'
-    with nested(pytest.patch_libudev(get_name),
-                pytest.patch_libudev(get_next)) as (get_name, get_next):
+    with pytest.nested(pytest.patch_libudev(get_name),
+                       pytest.patch_libudev(get_next)) as (get_name, get_next):
         get_name.side_effect = name
         get_next.side_effect = next_entry
         items = list(_util.udev_list_iterate(next(test_list)))

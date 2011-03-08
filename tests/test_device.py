@@ -22,7 +22,6 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import operator
 import sys
-from contextlib import nested
 from itertools import count
 from datetime import timedelta
 
@@ -273,10 +272,10 @@ def test_device_tags_mock(device):
     get_tags_list_entry = 'udev_device_get_tags_list_entry'
     get_next = 'udev_list_entry_get_next'
     get_name = 'udev_list_entry_get_name'
-    with nested(pytest.patch_libudev(get_tags_list_entry),
-                pytest.patch_libudev(get_name),
-                pytest.patch_libudev(get_next)) as (get_tags_list_entry,
-                                                    get_name, get_next):
+    with pytest.nested(pytest.patch_libudev(get_tags_list_entry),
+                       pytest.patch_libudev(get_name),
+                       pytest.patch_libudev(get_next)) as (get_tags_list_entry,
+                                                           get_name, get_next):
         get_tags_list_entry.return_value = next(tags_list)
         get_name.side_effect = name
         get_next.side_effect = next_entry
@@ -326,8 +325,8 @@ def test_device_find_parent(device):
 def test_device_find_parent_no_devtype_mock(device):
     get_parent = 'udev_device_get_parent_with_subsystem_devtype'
     ref = 'udev_device_ref'
-    with nested(pytest.patch_libudev(get_parent),
-                pytest.patch_libudev(ref)) as (get_parent, ref):
+    with pytest.nested(pytest.patch_libudev(get_parent),
+                       pytest.patch_libudev(ref)) as (get_parent, ref):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem')
@@ -341,8 +340,8 @@ def test_device_find_parent_no_devtype_mock(device):
 def test_device_find_parent_with_devtype_mock(device):
     get_parent = 'udev_device_get_parent_with_subsystem_devtype'
     ref = 'udev_device_ref'
-    with nested(pytest.patch_libudev(get_parent),
-                pytest.patch_libudev(ref)) as (get_parent, ref):
+    with pytest.nested(pytest.patch_libudev(get_parent),
+                       pytest.patch_libudev(ref)) as (get_parent, ref):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem', 'devtype')

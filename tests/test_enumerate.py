@@ -19,7 +19,6 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from contextlib import nested
 from functools import partial
 
 import pytest
@@ -116,13 +115,13 @@ def test_match_passthrough(context):
     """
     enumerator = context.list_devices()
     patch_enum = partial(mock.patch.object, enumerator, mocksignature=True)
-    with nested(patch_enum('match_subsystem'),
-                patch_enum('match_sys_name'),
-                patch_enum('match_tag'),
-                patch_enum('match_property')) as (match_subsystem,
-                                                  match_sys_name,
-                                                  match_tag,
-                                                  match_property):
+    with pytest.nested(patch_enum('match_subsystem'),
+                       patch_enum('match_sys_name'),
+                       patch_enum('match_tag'),
+                       patch_enum('match_property')) as (match_subsystem,
+                                                         match_sys_name,
+                                                         match_tag,
+                                                         match_property):
         enumerator.match(subsystem=mock.sentinel.subsystem,
                          sys_name=mock.sentinel.sys_name,
                          tag=mock.sentinel.tag,

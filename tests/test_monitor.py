@@ -23,7 +23,6 @@ import sys
 import os
 import socket
 import errno
-from contextlib import nested
 
 import pytest
 import mock
@@ -203,8 +202,8 @@ def test_enable_receiving_mock(monitor):
 def test_enable_receiving_error_mock(context, monitor, socket_path):
     enable_receiving = 'udev_monitor_enable_receiving'
     get_errno = 'pyudev.monitor.get_libudev_errno'
-    with nested(pytest.patch_libudev(enable_receiving),
-                mock.patch(get_errno)) as (enable_receiving, get_errno):
+    with pytest.nested(pytest.patch_libudev(enable_receiving),
+                       mock.patch(get_errno)) as (enable_receiving, get_errno):
             get_errno.return_value = errno.ENOENT
             enable_receiving.return_value = 1
             with pytest.raises(EnvironmentError) as exc_info:
@@ -243,9 +242,9 @@ def test_receive_device(monitor):
 def test_receive_device_mock(monitor):
     receive_device = 'udev_monitor_receive_device'
     get_action = 'udev_device_get_action'
-    with nested(pytest.patch_libudev(receive_device),
-                pytest.patch_libudev(get_action)) as (receive_device,
-                                                      get_action):
+    with pytest.nested(pytest.patch_libudev(receive_device),
+                       pytest.patch_libudev(get_action)) as (receive_device,
+                                                             get_action):
         receive_device.return_value = mock.sentinel.pointer
         get_action.return_value = b'action'
         action, device = monitor.receive_device()
@@ -261,8 +260,8 @@ def test_receive_device_mock(monitor):
 def test_receive_device_error_mock(monitor):
     get_errno = 'pyudev.monitor.get_libudev_errno'
     receive_device = 'udev_monitor_receive_device'
-    with nested(pytest.patch_libudev(receive_device),
-                mock.patch(get_errno)) as (receive_device, get_errno):
+    with pytest.nested(pytest.patch_libudev(receive_device),
+                       mock.patch(get_errno)) as (receive_device, get_errno):
         receive_device.return_value = None
         get_errno.return_value = 0
         with pytest.raises(EnvironmentError) as exc_info:

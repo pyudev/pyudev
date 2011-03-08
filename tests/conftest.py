@@ -26,11 +26,51 @@ import socket
 from functools import wraps
 from contextlib import contextmanager
 from subprocess import check_call
+if sys.version_info[:2] < (3, 2):
+    from contextlib import nested
 
 import mock
 import pytest
 
 import pyudev
+
+
+if sys.version_info[:2] >= (3, 2):
+    @contextmanager
+    def nested(*managers):
+        """
+        Copy of contextlib.nested from python 2.7 with slight adaptions to
+        Python 3.2 to use nested() on python 3.2 and thus retain backwards
+        compatibility with Python 2.6 (with doesn't support the new nesting
+        syntax), while being able to run the test suite on Python 3.2 as
+        well (which doesn't provide contextlib.nested anymore).
+        """
+        exits = []
+        vars = []
+        exc = None
+        try:
+            for mgr in managers:
+                exit = mgr.__exit__
+                enter = mgr.__enter__
+                vars.append(enter())
+                exits.append(exit)
+            yield vars
+        except BaseException as e:
+            exc = e
+        finally:
+            while exits:
+                exit = exits.pop()
+                try:
+                    if exc:
+                        args = (type(exc), exc, exc.__traceback__)
+                    else:
+                        args = (None, None, None)
+                    if exit(*args):
+                        exc = None
+                except BaseException as e:
+                    exc = e
+            if exc:
+                raise exc
 
 
 class FakeMonitor(object):
@@ -229,7 +269,7 @@ def check_udev_version(version_spec):
 
 def pytest_namespace():
     return dict((func.__name__, func) for func in
-                (get_device_sample, patch_libudev, load_dummy,
+                (get_device_sample, patch_libudev, load_dummy, nested,
                  unload_dummy, is_unicode_string, check_udev_version))
 
 
