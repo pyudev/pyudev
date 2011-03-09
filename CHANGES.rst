@@ -4,6 +4,7 @@
 - #21: Added :meth:`pyudev.Device.find_parent`
 - #22: Added :meth:`pyudev.Monitor.filter_by_tag`
 - Added :attr:`pyudev.Context.log_priority` to control internal UDev logging
+- Improve error reporting, if libudev is missing
 
 
 0.8 (Jan 08, 2011)
