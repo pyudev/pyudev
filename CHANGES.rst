@@ -1,5 +1,5 @@
-0.9 (in development)
-====================
+0.9 (Mar 09, 2011)
+==================
 
 - #21: Added :meth:`pyudev.Device.find_parent`
 - #22: Added :meth:`pyudev.Monitor.filter_by_tag`
