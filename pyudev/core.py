@@ -476,7 +476,8 @@ class Device(Mapping):
         device inside ``sysfs`` with the mount point included.
 
         Return a :class:`Device` object for the device.  Raise
-        :exc:`DeviceNotFoundAtPathError`, if no device was found for ``sys_path``.
+        :exc:`DeviceNotFoundAtPathError`, if no device was found for
+        ``sys_path``.
 
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if

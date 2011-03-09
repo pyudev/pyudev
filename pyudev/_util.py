@@ -68,7 +68,8 @@ def property_value_to_bytes(value):
     If ``value`` is a boolean object, it is converted to ``'1'`` or ``'0'``,
     depending on whether ``value`` is ``True`` or ``False``.  If ``value`` is a
     byte string already, it is returned unchanged.  Anything else is simply
-    converted to a unicode string, and then passed to :func:`ensure_byte_string`.
+    converted to a unicode string, and then passed to
+    :func:`ensure_byte_string`.
     """
     # udev represents boolean values as 1 or 0, therefore an explicit
     # conversion to int is required for boolean values

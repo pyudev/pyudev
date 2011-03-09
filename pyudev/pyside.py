@@ -69,7 +69,6 @@ class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
     #: emitted, if a device was moved
     deviceMoved = Signal(Device)
 
-
     def __init__(self, monitor, parent=None):
         """
         Observe the given ``monitor`` (a :class:`~pyudev.Monitor`):
