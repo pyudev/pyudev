@@ -57,13 +57,16 @@ def pytest_funcarg__signature(request):
     namespace, name = request.param
     return binding.SIGNATURES[namespace][name]
 
+
 def pytest_funcarg__argtypes(request):
     argtypes, _ = request.getfuncargvalue('signature')
     return argtypes
 
+
 def pytest_funcarg__restype(request):
     _, restype = request.getfuncargvalue('signature')
     return restype
+
 
 def pytest_funcarg__errcheck(request):
     funcname = request.getfuncargvalue('funcname')

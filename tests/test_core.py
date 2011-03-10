@@ -50,12 +50,14 @@ def test_context_log_priority_get(context):
     assert isinstance(context.log_priority, int)
     assert syslog.LOG_EMERG <= context.log_priority <= syslog.LOG_DEBUG
 
+
 def test_context_log_priority_get_mock(context):
     get_prio = 'udev_get_log_priority'
     with pytest.patch_libudev(get_prio) as get_prio:
         get_prio.return_value = mock.sentinel.log_priority
         assert context.log_priority is mock.sentinel.log_priority
         get_prio.assert_called_with(context._context)
+
 
 def test_context_log_priority_set_mock(context):
     set_prio = 'udev_set_log_priority'
@@ -64,10 +66,12 @@ def test_context_log_priority_set_mock(context):
         set_prio.assert_called_with(context._context,
                                     mock.sentinel.log_priority)
 
+
 def test_context_log_priority_roundtrip(context):
     old_priority = context.log_priority
-    available_levels = [l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG+1)
-                        if l != old_priority]
+    available_levels = [
+        l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)
+        if l != old_priority]
     new_priority = random.choice(available_levels)
     assert new_priority != old_priority
     try:

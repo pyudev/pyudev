@@ -207,4 +207,3 @@ def test_observer(binding, monitor):
     assert action == 'remove'
     assert device.subsystem == 'net'
     assert device.device_path == '/devices/virtual/net/dummy0'
-

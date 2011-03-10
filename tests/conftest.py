@@ -227,6 +227,7 @@ def load_dummy():
     """
     check_call(['sudo', 'modprobe', 'dummy'])
 
+
 @_need_privileges
 def unload_dummy():
     """
@@ -292,6 +293,7 @@ def pytest_addoption(parser):
                      'code, be sure to have proper privileges before '
                      'enabling this option!', default=False)
 
+
 def pytest_configure(config):
     # these are volatile, frequently changing properties and attributes,
     # which lead to bogus failures during tests, and therefore they are
@@ -324,6 +326,7 @@ def pytest_funcarg__context(request):
     """
     return request.cached_setup(setup=pyudev.Context, scope='session')
 
+
 def pytest_funcarg__device_path(request):
     """
     Return a device path as string.
@@ -331,6 +334,7 @@ def pytest_funcarg__device_path(request):
     The device path must be available as ``request.param``.
     """
     return request.param
+
 
 def pytest_funcarg__all_properties(request):
     """
@@ -341,6 +345,7 @@ def pytest_funcarg__all_properties(request):
     device_path = request.getfuncargvalue('device_path')
     return dict(request.getfuncargvalue('database')[device_path])
 
+
 def pytest_funcarg__properties(request):
     """
     Same as the ``all_properties`` funcarg, but with the special ``DEVNAME``
@@ -349,6 +354,7 @@ def pytest_funcarg__properties(request):
     properties = request.getfuncargvalue('all_properties')
     properties.pop('DEVNAME', None)
     return properties
+
 
 def pytest_funcarg__attributes(request):
     """
@@ -359,6 +365,7 @@ def pytest_funcarg__attributes(request):
     return _get_device_attributes(
         device_path, request.config.attributes_blacklist)
 
+
 def pytest_funcarg__device_node(request):
     """
     Return the name of the device node for the device pointed to by the
@@ -366,6 +373,7 @@ def pytest_funcarg__device_node(request):
     """
     device_path = request.getfuncargvalue('device_path')
     return _query_device(device_path, 'name')
+
 
 def pytest_funcarg__device_links(request):
     """
@@ -375,6 +383,7 @@ def pytest_funcarg__device_links(request):
     device_path = request.getfuncargvalue('device_path')
     return _query_device(device_path, 'symlink')
 
+
 def pytest_funcarg__sys_path(request):
     """
     Return the sys_path including the sysfs mountpoint for the device path
@@ -383,6 +392,7 @@ def pytest_funcarg__sys_path(request):
     context = request.getfuncargvalue('context')
     device_path = request.getfuncargvalue('device_path')
     return context.sys_path + device_path
+
 
 def pytest_funcarg__device(request):
     """
@@ -394,6 +404,7 @@ def pytest_funcarg__device(request):
     context = request.getfuncargvalue('context')
     return pyudev.Device.from_sys_path(context, sys_path)
 
+
 def pytest_funcarg__platform_device(request):
     """
     Return the platform device at ``/sys/devices/platform``.  This device
@@ -403,6 +414,7 @@ def pytest_funcarg__platform_device(request):
     context = request.getfuncargvalue('context')
     return pyudev.Device.from_sys_path(context, '/sys/devices/platform')
 
+
 def pytest_funcarg__socket_path(request):
     """
     Return a socket path for :meth:`pyudev.Monitor.from_socket`.  The path
@@ -411,11 +423,13 @@ def pytest_funcarg__socket_path(request):
     tmpdir = request.getfuncargvalue('tmpdir')
     return tmpdir.join('monitor-socket')
 
+
 def pytest_funcarg__monitor(request):
     """
     Return a netlink monitor for udev source.
     """
     return pyudev.Monitor.from_netlink(request.getfuncargvalue('context'))
+
 
 def pytest_funcarg__fake_monitor(request):
     """
@@ -423,4 +437,3 @@ def pytest_funcarg__fake_monitor(request):
     the ``platform_device`` funcarg on all triggered actions.
     """
     return FakeMonitor(request.getfuncargvalue('platform_device'))
-

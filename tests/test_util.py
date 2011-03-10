@@ -67,6 +67,7 @@ def test_property_value_to_bytes_int():
     assert _util.property_value_to_bytes(10000) == b'10000'
     assert isinstance(_util.property_value_to_bytes(10000), bytes)
 
+
 @pytest.mark.conversion
 def test_property_value_to_bytes_bool():
     assert _util.property_value_to_bytes(True) == b'1'
@@ -80,10 +81,12 @@ def test_string_to_bool_true():
     assert isinstance(_util.string_to_bool('1'), bool)
     assert _util.string_to_bool('1')
 
+
 @pytest.mark.conversion
 def test_string_to_bool_false():
     assert isinstance(_util.string_to_bool('0'), bool)
     assert not _util.string_to_bool('0')
+
 
 @pytest.mark.conversion
 def test_string_to_bool_invalid_value():
@@ -104,6 +107,7 @@ def test_udev_list_iterate_mock():
             return next(test_list)
         except StopIteration:
             return None
+
     def name(entry):
         if entry:
             return entry

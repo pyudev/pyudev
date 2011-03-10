@@ -263,6 +263,7 @@ def test_device_tags_mock(device):
             return next(tags_list)
         except StopIteration:
             return None
+
     def name(entry):
         if entry:
             return entry
