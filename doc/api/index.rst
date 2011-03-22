@@ -27,12 +27,15 @@ Other attributes
    ``major.minor.revision``.  As said, the ``revision`` part is optional and
    may not be present.
 
-   This attribute is mainly intended for display purposes, but should you
-   really need to check the version of :mod:`pyudev`, you can use something
-   like this::
+   This attribute is mainly intended for display purposes, use
+   :data:`__version_info__` to check the version of :mod:`pyudev` in source
+   code.
 
-      version = tuple(map(int, pyudev.__version__.split('.')[:2]))
-      assert version >= (0, 8)
+.. data:: __version_info__
 
+   The version of :mod:`pyudev` as tuple of integers.  This tuple contains a
+   major and a minor number, and optionally a revision number in the form
+   ``(major, minor, revision)``.  As said, the ``revision`` component is
+   optional and may not be present.
 
 .. autofunction:: udev_version()

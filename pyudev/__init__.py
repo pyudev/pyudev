@@ -166,6 +166,7 @@ from __future__ import (print_function, division, unicode_literals,
 
 
 __version__ = '0.10'
+__version_info__ = tuple(map(int, __version__.split('.')))
 __all__ = ['Context', 'Device']
 
 
