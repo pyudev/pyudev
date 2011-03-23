@@ -194,6 +194,10 @@ class AutotoolsBuild(Build):
         self._check_call(cmd, cwd=self.build_directory)
 
 
+class PyGObjectBuild(AutotoolsBuild):
+    configure_options = AutotoolsBuild.configure_options + ['--disable-cairo']
+
+
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
@@ -220,7 +224,7 @@ PYSIDE_SOURCES = [
 GNOME_DOWNLOAD_URL = 'http://ftp.gnome.org/pub/GNOME/sources/{0}'
 
 GOBJECT_SOURCES = [
-    SourcePackage('pygobject', '2.27.0', AutotoolsBuild,
+    SourcePackage('pygobject', '2.27.0', PyGObjectBuild,
                   GNOME_DOWNLOAD_URL.format(
                       '{name}/2.27/{name}-{version}.tar.bz2'))]
 
