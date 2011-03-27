@@ -380,6 +380,8 @@ class Device(Mapping):
         u'wlan0 - wlan'
         u'lo - ethernet'
         u'vboxnet0 - ethernet'
+
+        .. versionadded:: 0.10
         """
         device_type = libudev.udev_device_get_devtype(self)
         if device_type is not None:
