@@ -2,6 +2,9 @@
 =====================
 
 - Added :attr:`pyudev.Device.device_type`
+- :class:`pyudev.Context`, :class:`pyudev.Enumerator`, :class:`pyudev.Device`
+  and :class:`pyudev.Monitor` can now directly be passed to
+  :mod:`ctypes`-wrapped functions
 
 
 0.9 (Mar 09, 2011)

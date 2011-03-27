@@ -240,7 +240,7 @@ def test_device_is_initialized(device):
     with pytest.patch_libudev(get_is_initialized) as get_is_initialized:
         get_is_initialized.return_value = True
         assert device.is_initialized
-        get_is_initialized.assert_called_with(device._device)
+        get_is_initialized.assert_called_with(device)
 
 
 @pytest.check_udev_version('>= 165')
@@ -251,7 +251,7 @@ def test_device_time_since_initialized(device):
     with pytest.patch_libudev(usec_since_init) as usec_since_init:
         usec_since_init.return_value = 100
         assert device.time_since_initialized.microseconds == 100
-        usec_since_init.assert_called_with(device._device)
+        usec_since_init.assert_called_with(device)
 
 
 @pytest.check_udev_version('>= 154')
@@ -340,11 +340,11 @@ def test_device_find_parent_no_devtype_mock(device):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem')
-        get_parent.assert_called_with(device._device, b'subsystem', None)
+        get_parent.assert_called_with(device, b'subsystem', None)
         ref.assert_called_with(mock.sentinel.device)
         assert isinstance(get_parent.call_args[0][1], bytes)
         assert isinstance(parent, Device)
-        assert parent._device is mock.sentinel.referenced_device
+        assert parent._as_parameter_ is mock.sentinel.referenced_device
 
 
 def test_device_find_parent_with_devtype_mock(device):
@@ -355,12 +355,12 @@ def test_device_find_parent_with_devtype_mock(device):
         get_parent.return_value = mock.sentinel.device
         ref.return_value = mock.sentinel.referenced_device
         parent = device.find_parent('subsystem', 'devtype')
-        get_parent.assert_called_with(device._device, b'subsystem', b'devtype')
+        get_parent.assert_called_with(device, b'subsystem', b'devtype')
         ref.assert_called_with(mock.sentinel.device)
         args = get_parent.call_args[0][1:]
         assert all(isinstance(a, bytes) for a in args)
         assert isinstance(parent, Device)
-        assert parent._device is mock.sentinel.referenced_device
+        assert parent._as_parameter_ is mock.sentinel.referenced_device
 
 
 @pytest.mark.operator

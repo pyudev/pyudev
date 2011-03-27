@@ -50,16 +50,16 @@ def _assert_from_netlink_called(context, *args):
         source = args[0].encode('ascii') if args else b'udev'
         new_from_netlink.return_value = mock.sentinel.pointer
         monitor = Monitor.from_netlink(context, *args)
-        new_from_netlink.assert_called_with(context._context, source)
+        new_from_netlink.assert_called_with(context, source)
         assert isinstance(new_from_netlink.call_args[0][1], bytes)
-        assert monitor._monitor is mock.sentinel.pointer
+        assert monitor._as_parameter_ is mock.sentinel.pointer
 
 
 def test_from_netlink_source_udev(context):
     monitor = Monitor.from_netlink(context)
-    assert monitor._monitor
+    assert monitor._as_parameter_
     monitor = Monitor.from_netlink(context, source='udev')
-    assert monitor._monitor
+    assert monitor._as_parameter_
 
 
 def test_from_netlink_source_udev_mock(context):
@@ -69,7 +69,7 @@ def test_from_netlink_source_udev_mock(context):
 
 def test_from_netlink_source_kernel(context):
     monitor = Monitor.from_netlink(context, source='kernel')
-    assert monitor._monitor
+    assert monitor._as_parameter_
 
 
 def test_from_netlink_source_kernel_mock(context):
@@ -78,7 +78,7 @@ def test_from_netlink_source_kernel_mock(context):
 
 def test_from_socket(context, socket_path):
     monitor = Monitor.from_socket(context, str(socket_path))
-    assert monitor._monitor
+    assert monitor._as_parameter_
 
 
 def test_from_socket_mock(context, socket_path):
@@ -88,10 +88,10 @@ def test_from_socket_mock(context, socket_path):
         new_from_socket.return_value = mock.sentinel.pointer
         monitor = Monitor.from_socket(context, socket_path)
         new_from_socket.assert_called_with(
-            context._context, socket_path.encode(sys.getfilesystemencoding()))
-        assert monitor._monitor is mock.sentinel.pointer
+            context, socket_path.encode(sys.getfilesystemencoding()))
+        assert monitor._as_parameter_ is mock.sentinel.pointer
         Monitor.from_socket(context, 'foobar')
-        new_from_socket.assert_called_with(context._context, b'foobar')
+        new_from_socket.assert_called_with(context, b'foobar')
         assert isinstance(new_from_socket.call_args[0][1], bytes)
 
 
@@ -105,7 +105,7 @@ def test_fileno_mock(monitor):
     with pytest.patch_libudev(get_fd) as get_fd:
         get_fd.return_value = mock.sentinel.fileno
         assert monitor.fileno() is mock.sentinel.fileno
-        get_fd.assert_called_with(monitor._monitor)
+        get_fd.assert_called_with(monitor)
 
 
 def test_filter_by_no_subsystem(monitor):
@@ -123,9 +123,9 @@ def test_filter_by_subsystem_no_dev_type_mock(monitor):
     with pytest.patch_libudev(add_match) as add_match:
         add_match.return_value = 0
         monitor.filter_by(b'input')
-        add_match.assert_called_with(monitor._monitor, b'input', None)
+        add_match.assert_called_with(monitor, b'input', None)
         monitor.filter_by('input')
-        add_match.assert_called_with(monitor._monitor, b'input', None)
+        add_match.assert_called_with(monitor, b'input', None)
         assert isinstance(add_match.call_args[0][1], bytes)
 
 
@@ -139,11 +139,9 @@ def test_filter_by_subsystem_dev_type_mock(monitor):
     with pytest.patch_libudev(add_match) as add_match:
         add_match.return_value = 0
         monitor.filter_by(b'input', b'usb_interface')
-        add_match.assert_called_with(
-            monitor._monitor, b'input', b'usb_interface')
+        add_match.assert_called_with(monitor, b'input', b'usb_interface')
         monitor.filter_by('input', 'usb_interface')
-        add_match.assert_called_with(
-            monitor._monitor, b'input', b'usb_interface')
+        add_match.assert_called_with(monitor, b'input', b'usb_interface')
         assert isinstance(add_match.call_args[0][2], bytes)
 
 
@@ -158,9 +156,9 @@ def test_pytest_filter_by_tag_mock(monitor):
     with pytest.patch_libudev(match_tag) as match_tag:
         match_tag.return_value = 0
         monitor.filter_by_tag(b'spam')
-        match_tag.assert_called_with(monitor._monitor, b'spam')
+        match_tag.assert_called_with(monitor, b'spam')
         monitor.filter_by_tag('eggs')
-        match_tag.assert_called_with(monitor._monitor, b'eggs')
+        match_tag.assert_called_with(monitor, b'eggs')
         assert isinstance(match_tag.call_args[0][1], bytes)
 
 
@@ -196,7 +194,7 @@ def test_enable_receiving_mock(monitor):
     with pytest.patch_libudev('udev_monitor_enable_receiving') as func:
         func.return_value = 0
         monitor.enable_receiving()
-        func.assert_called_with(monitor._monitor)
+        func.assert_called_with(monitor)
 
 
 def test_enable_receiving_error_mock(context, monitor, socket_path):
@@ -252,9 +250,9 @@ def test_receive_device_mock(monitor):
         assert pytest.is_unicode_string(action)
         assert isinstance(device, Device)
         assert device.context is monitor.context
-        assert device._device is mock.sentinel.pointer
+        assert device._as_parameter_ is mock.sentinel.pointer
         get_action.assert_called_with(mock.sentinel.pointer)
-        receive_device.assert_called_with(monitor._monitor)
+        receive_device.assert_called_with(monitor)
 
 
 def test_receive_device_error_mock(monitor):

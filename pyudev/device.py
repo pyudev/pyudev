@@ -136,6 +136,9 @@ class Device(Mapping):
 
     :class:`Device` objects are hashable and can therefore be used as keys
     in dictionaries and sets.
+
+    They can also be given directly as ``udev_device *`` to functions wrapped
+    through :mod:`ctypes`.
     """
 
     @classmethod
@@ -187,7 +190,7 @@ class Device(Mapping):
            :exc:`NoSuchDeviceError`
         """
         device = libudev.udev_device_new_from_syspath(
-            context._context, ensure_byte_string(sys_path))
+            context, ensure_byte_string(sys_path))
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
         return cls(context, device)
@@ -215,7 +218,7 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         device = libudev.udev_device_new_from_subsystem_sysname(
-            context._context, ensure_byte_string(subsystem),
+            context, ensure_byte_string(subsystem),
             ensure_byte_string(sys_name))
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
@@ -242,18 +245,18 @@ class Device(Mapping):
 
         .. udevminversion:: 152
         """
-        device = libudev.udev_device_new_from_environment(context._context)
+        device = libudev.udev_device_new_from_environment(context)
         if not device:
             raise DeviceNotFoundInEnvironmentError()
         return cls(context, device)
 
     def __init__(self, context, _device):
         self.context = context
-        self._device = _device
+        self._as_parameter_ = _device
         self._attributes = Attributes(self)
 
     def __del__(self):
-        libudev.udev_device_unref(self._device)
+        libudev.udev_device_unref(self)
 
     def __repr__(self):
         return 'Device({0.sys_path!r})'.format(self)
@@ -264,7 +267,7 @@ class Device(Mapping):
         The parent :class:`Device` or ``None``, if there is no parent
         device.
         """
-        parent = libudev.udev_device_get_parent(self._device)
+        parent = libudev.udev_device_get_parent(self)
         if not parent:
             return None
         # the parent device is not referenced, thus forcibly acquire a
@@ -310,7 +313,7 @@ class Device(Mapping):
         if device_type is not None:
             device_type = ensure_byte_string(device_type)
         parent = libudev.udev_device_get_parent_with_subsystem_devtype(
-            self._device, subsystem, device_type)
+            self, subsystem, device_type)
         if not parent:
             return None
         # parent device is not referenced, thus forcibly acquire a reference
@@ -335,8 +338,7 @@ class Device(Mapping):
         Absolute path of this device in ``sysfs`` including the ``sysfs``
         mount point as unicode string.
         """
-        return ensure_unicode_string(
-            libudev.udev_device_get_syspath(self._device))
+        return ensure_unicode_string(libudev.udev_device_get_syspath(self))
 
     @property
     def device_path(self):
@@ -348,24 +350,21 @@ class Device(Mapping):
         mount point.  However, the path is absolute and starts with a slash
         ``'/'``.
         """
-        return ensure_unicode_string(
-            libudev.udev_device_get_devpath(self._device))
+        return ensure_unicode_string(libudev.udev_device_get_devpath(self))
 
     @property
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
         """
-        return ensure_unicode_string(
-            libudev.udev_device_get_subsystem(self._device))
+        return ensure_unicode_string(libudev.udev_device_get_subsystem(self))
 
     @property
     def sys_name(self):
         """
         Device file name inside ``sysfs`` as unicode string.
         """
-        return ensure_unicode_string(
-            libudev.udev_device_get_sysname(self._device))
+        return ensure_unicode_string(libudev.udev_device_get_sysname(self))
 
     @property
     def device_type(self):
@@ -382,7 +381,7 @@ class Device(Mapping):
         u'lo - ethernet'
         u'vboxnet0 - ethernet'
         """
-        device_type = libudev.udev_device_get_devtype(self._device)
+        device_type = libudev.udev_device_get_devtype(self)
         if device_type is not None:
             return ensure_unicode_string(device_type)
 
@@ -394,7 +393,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.5
         """
-        driver = libudev.udev_device_get_driver(self._device)
+        driver = libudev.udev_device_get_driver(self)
         if driver:
             return ensure_unicode_string(driver)
 
@@ -410,7 +409,7 @@ class Device(Mapping):
         See :attr:`device_links` to get a list of symbolic links to this
         device node.
         """
-        node = libudev.udev_device_get_devnode(self._device)
+        node = libudev.udev_device_get_devnode(self)
         if node:
             return ensure_unicode_string(node)
 
@@ -435,7 +434,7 @@ class Device(Mapping):
 
         .. udevminversion:: 165
         """
-        return bool(libudev.udev_device_get_is_initialized(self._device))
+        return bool(libudev.udev_device_get_is_initialized(self))
 
     @property
     def time_since_initialized(self):
@@ -452,8 +451,7 @@ class Device(Mapping):
 
         .. udevminversion:: 165
         """
-        microseconds = libudev.udev_device_get_usec_since_initialized(
-            self._device)
+        microseconds = libudev.udev_device_get_usec_since_initialized(self)
         return timedelta(microseconds=microseconds)
 
     @property
@@ -472,7 +470,7 @@ class Device(Mapping):
         The property provides access to all such symbolic links, which were
         created by UDev for this device.
         """
-        entry = libudev.udev_device_get_devlinks_list_entry(self._device)
+        entry = libudev.udev_device_get_devlinks_list_entry(self)
         for name in udev_list_iterate(entry):
             yield ensure_unicode_string(name)
 
@@ -504,7 +502,7 @@ class Device(Mapping):
 
         .. udevminversion:: 154
         """
-        entry = libudev.udev_device_get_tags_list_entry(self._device)
+        entry = libudev.udev_device_get_tags_list_entry(self)
         for tag in udev_list_iterate(entry):
             yield ensure_unicode_string(tag)
 
@@ -515,7 +513,7 @@ class Device(Mapping):
         Return a generator yielding the names of all properties of this
         device as unicode strings.
         """
-        entry = libudev.udev_device_get_properties_list_entry(self._device)
+        entry = libudev.udev_device_get_properties_list_entry(self)
         for name in udev_list_iterate(entry):
             yield ensure_unicode_string(name)
 
@@ -523,7 +521,7 @@ class Device(Mapping):
         """
         Return the amount of properties defined for this device as integer.
         """
-        entry = libudev.udev_device_get_properties_list_entry(self._device)
+        entry = libudev.udev_device_get_properties_list_entry(self)
         counter = count()
         for _ in udev_list_iterate(entry):
             next(counter)
@@ -541,7 +539,7 @@ class Device(Mapping):
         for this device.
         """
         value = libudev.udev_device_get_property_value(
-            self._device, ensure_byte_string(property))
+            self, ensure_byte_string(property))
         if value is None:
             raise KeyError('No such property: {0}'.format(property))
         return ensure_unicode_string(value)
@@ -661,8 +659,9 @@ class Attributes(Mapping):
         return iter(self._attribute_files)
 
     def __contains__(self, attribute):
-        return libudev.udev_device_get_sysattr_value(
-            self.device._device, ensure_byte_string(attribute)) is not None
+        value = libudev.udev_device_get_sysattr_value(
+            self.device, ensure_byte_string(attribute))
+        return value is not None
 
     def __getitem__(self, attribute):
         """
@@ -676,7 +675,7 @@ class Attributes(Mapping):
         for this device.
         """
         value = libudev.udev_device_get_sysattr_value(
-            self.device._device, ensure_byte_string(attribute))
+            self.device, ensure_byte_string(attribute))
         if value is None:
             raise KeyError('No such attribute: {0}'.format(attribute))
         return value

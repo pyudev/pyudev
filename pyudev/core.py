@@ -80,16 +80,19 @@ class Context(object):
     must be created before anything else can be done.  It holds the udev
     configuration and provides the interface to list devices (see
     :meth:`list_devices`).
+
+    Instances of this class can directly be given as ``udev *`` to functions
+    wrapped through :mod:`ctypes`.
     """
 
     def __init__(self):
         """
         Create a new context.
         """
-        self._context = libudev.udev_new()
+        self._as_parameter_ = libudev.udev_new()
 
     def __del__(self):
-        libudev.udev_unref(self._context)
+        libudev.udev_unref(self)
 
     @property
     def sys_path(self):
@@ -99,7 +102,7 @@ class Context(object):
         The mount point can be overwritten using the environment variable
         :envvar:`SYSFS_PATH`.  Use this for testing purposes.
         """
-        return ensure_unicode_string(libudev.udev_get_sys_path(self._context))
+        return ensure_unicode_string(libudev.udev_get_sys_path(self))
 
     @property
     def device_path(self):
@@ -108,7 +111,7 @@ class Context(object):
 
         This can be overridden in the udev configuration.
         """
-        return ensure_unicode_string(libudev.udev_get_dev_path(self._context))
+        return ensure_unicode_string(libudev.udev_get_dev_path(self))
 
     @property
     def log_priority(self):
@@ -125,11 +128,11 @@ class Context(object):
         >>> context = pyudev.Context()
         >>> context.log_priority = syslog.LOG_DEBUG
         """
-        return libudev.udev_get_log_priority(self._context)
+        return libudev.udev_get_log_priority(self)
 
     @log_priority.setter
     def log_priority(self, value):
-        libudev.udev_set_log_priority(self._context, value)
+        libudev.udev_set_log_priority(self, value)
 
     def list_devices(self, **kwargs):
         """
@@ -172,6 +175,9 @@ class Enumerator(object):
 
     Once added, a filter cannot be removed anymore.  Create a new object
     instead.
+
+    Instances of this class can directly be given as given ``udev_enumerate *``
+    to functions wrapped through :mod:`ctypes`.
     """
 
     def __init__(self, context):
@@ -185,11 +191,11 @@ class Enumerator(object):
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
         self.context = context
-        self._enumerator = libudev.udev_enumerate_new(context._context)
+        self._as_parameter_ = libudev.udev_enumerate_new(context)
         self._parents = []
 
     def __del__(self):
-        libudev.udev_enumerate_unref(self._enumerator)
+        libudev.udev_enumerate_unref(self)
 
     def match(self, **kwargs):
         """
@@ -237,7 +243,7 @@ class Enumerator(object):
         Return the instance again.
         """
         libudev.udev_enumerate_add_match_subsystem(
-            self._enumerator, ensure_byte_string(subsystem))
+            self, ensure_byte_string(subsystem))
         return self
 
     def match_sys_name(self, sys_name):
@@ -250,8 +256,8 @@ class Enumerator(object):
 
         .. versionadded:: 0.8
         """
-        libudev.udev_enumerate_add_match_sysname(self._enumerator,
-                                                 ensure_byte_string(sys_name))
+        libudev.udev_enumerate_add_match_sysname(
+            self, ensure_byte_string(sys_name))
         return self
 
     def match_property(self, property, value):
@@ -270,8 +276,7 @@ class Enumerator(object):
         Return the instance again.
         """
         libudev.udev_enumerate_add_match_property(
-            self._enumerator, ensure_byte_string(property),
-            property_value_to_bytes(value))
+            self, ensure_byte_string(property), property_value_to_bytes(value))
         return self
 
     def match_tag(self, tag):
@@ -286,8 +291,7 @@ class Enumerator(object):
 
         .. udevminversion:: 154
         """
-        libudev.udev_enumerate_add_match_tag(self._enumerator,
-                                             ensure_byte_string(tag))
+        libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):
@@ -308,7 +312,7 @@ class Enumerator(object):
 
         .. udevminversion:: 165
         """
-        libudev.udev_enumerate_add_match_is_initialized(self._enumerator)
+        libudev.udev_enumerate_add_match_is_initialized(self)
         return self
 
     def match_children(self, device):
@@ -327,8 +331,8 @@ class Enumerator(object):
 
         Yield :class:`Device` objects.
         """
-        libudev.udev_enumerate_scan_devices(self._enumerator)
-        entry = libudev.udev_enumerate_get_list_entry(self._enumerator)
+        libudev.udev_enumerate_scan_devices(self)
+        entry = libudev.udev_enumerate_get_list_entry(self)
         for name in udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)
             if (not self._parents) or any(device.parent == p for p

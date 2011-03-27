@@ -72,15 +72,18 @@ class Monitor(object):
     retrieve a file descriptor using :meth:`fileno`.  This file descriptor
     can then be passed to classes like
     :class:`~PyQt4.QtCore.QSocketNotifier` from Qt4.
+
+    Instances of this class can directly be given as ``udev_monitor *`` to
+    functions wrapped through :mod:`ctypes`.
     """
 
     def __init__(self, context, monitor_p, socket_path=None):
         self.context = context
-        self._monitor = monitor_p
+        self._as_parameter_ = monitor_p
         self._socket_path = socket_path
 
     def __del__(self):
-        libudev.udev_monitor_unref(self._monitor)
+        libudev.udev_monitor_unref(self)
 
     @classmethod
     def from_netlink(cls, context, source='udev'):
@@ -108,9 +111,8 @@ class Monitor(object):
         if source not in ('kernel', 'udev'):
             raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
                              'or "kernel"'.format(source))
-        source = ensure_byte_string(source)
         monitor = libudev.udev_monitor_new_from_netlink(
-            context._context, source)
+            context, ensure_byte_string(source))
         if not monitor:
             raise EnvironmentError('Could not create udev monitor')
         return cls(context, monitor)
@@ -133,7 +135,7 @@ class Monitor(object):
         the monitor failed.
         """
         monitor = libudev.udev_monitor_new_from_socket(
-            context._context, ensure_byte_string(socket_path))
+            context, ensure_byte_string(socket_path))
         if not monitor:
             raise EnvironmentError('Could not create monitor for socket: '
                                    '{0!r}'.format(socket_path))
@@ -146,7 +148,7 @@ class Monitor(object):
         This is really a real file descriptor ;), which can be watched and
         :func:`select.select`\ ed.
         """
-        return libudev.udev_monitor_get_fd(self._monitor)
+        return libudev.udev_monitor_get_fd(self)
 
     def filter_by(self, subsystem, device_type=None):
         """
@@ -171,7 +173,7 @@ class Monitor(object):
         if device_type:
             device_type = ensure_byte_string(device_type)
         libudev.udev_monitor_filter_add_match_subsystem_devtype(
-            self._monitor, subsystem, device_type)
+            self, subsystem, device_type)
 
     def filter_by_tag(self, tag):
         """
@@ -192,7 +194,7 @@ class Monitor(object):
         .. versionadded:: 0.9
         """
         libudev.udev_monitor_filter_add_match_tag(
-            self._monitor, ensure_byte_string(tag))
+            self, ensure_byte_string(tag))
 
     def enable_receiving(self):
         """
@@ -207,7 +209,7 @@ class Monitor(object):
            need to call it explicitly, if you are iterating over the
            monitor.
         """
-        error = libudev.udev_monitor_enable_receiving(self._monitor)
+        error = libudev.udev_monitor_enable_receiving(self)
         if error:
             errno = get_libudev_errno()
             raise EnvironmentError(errno, os.strerror(errno),
@@ -239,7 +241,7 @@ class Monitor(object):
         Raise :exc:`~exceptions.EnvironmentError`, if no device could be
         read.
         """
-        device_p = libudev.udev_monitor_receive_device(self._monitor)
+        device_p = libudev.udev_monitor_receive_device(self)
         if not device_p:
             errno = get_libudev_errno()
             if errno == 0:

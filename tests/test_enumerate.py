@@ -62,7 +62,7 @@ def test_match_tags_mock(context):
     with pytest.patch_libudev(add_match_tag) as add_match_tag:
         retval = enumerator.match_tag('spam')
         assert retval is enumerator
-        add_match_tag.assert_called_with(enumerator._enumerator, b'spam')
+        add_match_tag.assert_called_with(enumerator, b'spam')
         args, _ = add_match_tag.call_args
         assert isinstance(args[1], bytes)
 
