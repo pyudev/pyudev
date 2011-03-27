@@ -29,7 +29,10 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from subprocess import Popen, PIPE, CalledProcessError
+try:
+    from subprocess import check_output
+except ImportError:
+    from pyudev._compat import check_output
 
 from pyudev.device import Device
 from pyudev._libudev import libudev
@@ -60,16 +63,13 @@ def udev_version():
     could not be converted to an integer.  Raise
     :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
     not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
-    ``udevadm`` returned a non-zero exit code.
+    ``udevadm`` returned a non-zero exit code.  On Python 2.7 or newer, the
+    ``output`` attribute of this exception is correctly set.
 
     .. versionadded:: 0.8
     """
-    command = ['udevadm', '--version']
-    udevadm = Popen(command, stdout=PIPE)
-    stdout = ensure_unicode_string(udevadm.communicate()[0]).strip()
-    if udevadm.returncode != 0:
-        raise CalledProcessError(0, command)
-    return int(stdout)
+    output = ensure_unicode_string(check_output(['udevadm', '--version']))
+    return int(output.strip())
 
 
 class Context(object):
