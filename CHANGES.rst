@@ -1,6 +1,8 @@
 0.10 (in development)
 =====================
 
+- Added :attr:`pyudev.Device.device_type`
+
 
 0.9 (Mar 09, 2011)
 ==================

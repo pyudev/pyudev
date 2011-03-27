@@ -301,6 +301,15 @@ def test_device_driver(device, properties):
         assert device.driver is None
 
 
+@pytest.mark.properties
+def test_device_type(device, properties):
+    if 'DEVTYPE' in properties:
+        assert device.device_type == properties['DEVTYPE']
+        assert pytest.is_unicode_string(device.device_type)
+    else:
+        assert device.device_type is None
+
+
 def test_device_children(device):
     for child in device.children:
         assert child.parent == device

@@ -29,6 +29,8 @@
 
    .. autoattribute:: driver
 
+   .. autoattribute:: device_type
+
    .. autoattribute:: device_node
 
    .. autoattribute:: device_links

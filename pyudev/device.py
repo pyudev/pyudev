@@ -368,6 +368,25 @@ class Device(Mapping):
             libudev.udev_device_get_sysname(self._device))
 
     @property
+    def device_type(self):
+        """
+        Device type as unicode string, or ``None``, if the device type is
+        unknown.
+
+        >>> context = Context()
+        >>> for device in context.list_devices(subsystem='net'):
+        ...     '{0} - {1}'.format(device.sys_name, device.device_type or 'ethernet')
+        ...
+        u'eth0 - ethernet'
+        u'wlan0 - wlan'
+        u'lo - ethernet'
+        u'vboxnet0 - ethernet'
+        """
+        device_type = libudev.udev_device_get_devtype(self._device)
+        if device_type is not None:
+            return ensure_unicode_string(device_type)
+
+    @property
     def driver(self):
         """
         The driver name as unicode string, or ``None``, if there is no
