@@ -146,7 +146,11 @@
     attributes of :mod:`pyudev` classes are not available, if udev is too old.
     Whenever this is the case, the minimum version of udev required to use the
     attribute is described in the documentation, see for instance
-    :attr:`Device.is_initialized`.
+    :attr:`Device.is_initialized`.  If no specific version is mentioned, the
+    attribute is available from udev 151 onwards, which is the oldest udev
+    version supported by :mod:`pyudev`.  udev 150 and earlier may work with
+    :mod:`pyudev`, but are not tested and consequently not officially
+    supported.
 
     You can use :func:`udev_version()` to check the version of udev and see, if
     it is recent enough for your needs:
