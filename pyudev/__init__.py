@@ -170,5 +170,6 @@ __version_info__ = tuple(map(int, __version__.split('.')))
 __all__ = ['Context', 'Device']
 
 
+from pyudev.device import *
 from pyudev.core import *
 from pyudev.monitor import *
