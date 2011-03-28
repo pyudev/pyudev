@@ -1,6 +1,7 @@
 0.10 (in development)
 =====================
 
+- Added :attr:`pyudev.__version_info__`
 - Added :attr:`pyudev.Device.device_type`
 - :class:`pyudev.Context`, :class:`pyudev.Enumerator`, :class:`pyudev.Device`
   and :class:`pyudev.Monitor` can now directly be passed to
