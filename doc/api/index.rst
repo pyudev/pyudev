@@ -38,4 +38,6 @@ Other attributes
    ``(major, minor, revision)``.  As said, the ``revision`` component is
    optional and may not be present.
 
+   .. versionadded:: 0.10
+
 .. autofunction:: udev_version()
