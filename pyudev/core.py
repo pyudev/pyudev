@@ -270,8 +270,9 @@ class Enumerator(object):
 
         - :func:`int`
         - :func:`bool`
-        - A unicode or byte string
-        - Anything convertable to a byte string
+        - A byte string
+        - Anything convertable to a unicode string (including a unicode string
+          itself :)
 
         Return the instance again.
         """
