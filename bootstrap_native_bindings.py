@@ -47,6 +47,12 @@ from optparse import OptionParser
 from collections import namedtuple
 
 
+class MissingDependency(Exception):
+
+    def __str__(self):
+        return '{0} is missing'.format(self.args[0])
+
+
 class SubprocessMixin(object):
     def _check_call(self, command, **options):
         self.log.debug('calling %r with options %r', command, options)
@@ -104,9 +110,26 @@ class Build(SubprocessMixin):
         self.log = logging.getLogger('bootstrap.builder')
         self.source_directory = source_directory
 
+    def _check_program(self, program):
+        try:
+            with open(os.devnull, 'wb') as devnull:
+                self._check_call([program, '--version'], stdout=devnull)
+        except EnvironmentError as error:
+            raise MissingDependency(program)
+
+    def _check_package(self, package):
+        self._check_program('pkg-config')
+        try:
+            self._check_call(['pkg-config', '--exists', package])
+        except subprocess.CalledProcessError:
+            raise MissingDependency(package)
+
     @property
     def build_directory(self):
         return self.source_directory
+
+    def ensure_dependencies(self):
+        self._check_program('make')
 
     def initialize(self):
         pass
@@ -124,10 +147,15 @@ class Build(SubprocessMixin):
                          cwd=self.build_directory)
 
     def run(self):
-        self.initialize()
-        self.configure()
-        self.build()
-        self.install()
+        try:
+            self.ensure_dependencies()
+        except MissingDependency as missing:
+            print(missing)
+        else:
+            self.initialize()
+            self.configure()
+            self.build()
+            self.install()
 
     def __call__(self):
         self.run()
@@ -152,10 +180,18 @@ class PyQtBuild(SipBuild):
                          '--no-designer-plugin', '--no-sip-files',
                          '--no-qsci-api']
 
+    def ensure_dependencies(self):
+        SipBuild.ensure_dependencies(self)
+        self._check_package('QtCore')
+
 
 class CMakeBuild(Build):
 
     configure_options = ['-DBUILD_TESTS=OFF']
+
+    def ensure_dependencies(self):
+        Build.ensure_dependencies(self)
+        self._check_program('cmake')
 
     @property
     def build_directory(self):
@@ -182,6 +218,10 @@ class PySideBuild(CMakeBuild):
          'QtXmlPatterns', 'QtDeclarative', 'phonon', 'QtUiTools', 'QtHelp',
          'QtTest')]
 
+    def ensure_dependencies(self):
+        CMakeBuild.ensure_dependencies(self)
+        self._check_package('QtCore')
+
 
 class AutotoolsBuild(Build):
     configure_options = ['--prefix', sys.prefix]
@@ -196,6 +236,12 @@ class AutotoolsBuild(Build):
 
 class PyGObjectBuild(AutotoolsBuild):
     configure_options = AutotoolsBuild.configure_options + ['--disable-cairo']
+
+    def ensure_dependencies(self):
+        AutotoolsBuild.ensure_dependencies(self)
+        self._check_package('gobject-2.0')
+        self._check_package('gio-2.0')
+        self._check_package('gobject-introspection-1.0')
 
 
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
