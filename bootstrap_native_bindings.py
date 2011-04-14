@@ -187,7 +187,9 @@ class PyQtBuild(SipBuild):
 
 class CMakeBuild(Build):
 
-    configure_options = ['-DBUILD_TESTS=OFF']
+    configure_options = ['-DBUILD_TESTS=OFF',
+                         '-DPython_ADDITIONAL_VERSIONS={0}.{1}'.format(
+                             *sys.version_info)]
 
     def ensure_dependencies(self):
         Build.ensure_dependencies(self)
