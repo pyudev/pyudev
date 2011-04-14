@@ -114,7 +114,7 @@ class Build(SubprocessMixin):
         try:
             with open(os.devnull, 'wb') as devnull:
                 self._check_call([program, '--version'], stdout=devnull)
-        except EnvironmentError as error:
+        except EnvironmentError:
             raise MissingDependency(program)
 
     def _check_package(self, package):
