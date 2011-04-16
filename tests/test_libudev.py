@@ -73,7 +73,7 @@ def pytest_funcarg__errcheck(request):
     return binding.ERROR_CHECKERS.get(funcname)
 
 
-@pytest.check_udev_version('>= 165')
+@pytest.check_udev_version('>= {0}'.format(max(UDEV_ADDITIONS)))
 def test_presence(funcname):
     assert hasattr(libudev, funcname)
 
