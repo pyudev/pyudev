@@ -114,6 +114,14 @@ class Context(object):
         return ensure_unicode_string(libudev.udev_get_dev_path(self))
 
     @property
+    def run_path(self):
+        """
+        The run runtime directory path defaulting to ``/run`` as unicode
+        string.
+        """
+        return ensure_unicode_string(libudev.udev_get_run_path(self))
+
+    @property
     def log_priority(self):
         """
         The logging priority of the interal logging facitility of udev as

@@ -6,6 +6,7 @@
 - :class:`pyudev.Context`, :class:`pyudev.Enumerator`, :class:`pyudev.Device`
   and :class:`pyudev.Monitor` can now directly be passed to
   :mod:`ctypes`-wrapped functions
+- #24: Added :attr:`pyudev.Context.run_path`
 
 
 0.9 (Mar 09, 2011)
