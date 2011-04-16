@@ -36,12 +36,12 @@ def test_udev_version():
     assert udev_version() > 150
 
 
-def test_context_syspath(context):
+def test_context_sys_path(context):
     assert pytest.is_unicode_string(context.sys_path)
     assert context.sys_path == '/sys'
 
 
-def test_context_devpath(context):
+def test_context_device_path(context):
     assert pytest.is_unicode_string(context.device_path)
     assert context.device_path == '/dev'
 
