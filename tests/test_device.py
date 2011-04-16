@@ -101,7 +101,7 @@ def test_device_from_name_nonexisting_subsystem(context):
         error.sys_name, error.subsystem)
 
 
-@pytest.check_udev_version('>= 152')
+@pytest.need_udev_version('>= 152')
 def test_device_from_environment(context):
     # there is no device in a standard environment
     with pytest.raises(DeviceNotFoundInEnvironmentError):
@@ -232,7 +232,7 @@ def test_device_links(context, device, device_links):
     assert all(pytest.is_unicode_string(l) for l in device.device_links)
 
 
-@pytest.check_udev_version('>= 165')
+@pytest.need_udev_version('>= 165')
 @pytest.mark.properties
 def test_device_is_initialized(device):
     assert isinstance(device.is_initialized, bool)
@@ -243,7 +243,7 @@ def test_device_is_initialized(device):
         get_is_initialized.assert_called_with(device)
 
 
-@pytest.check_udev_version('>= 165')
+@pytest.need_udev_version('>= 165')
 @pytest.mark.properties
 def test_device_time_since_initialized(device):
     assert isinstance(device.time_since_initialized, timedelta)
@@ -254,7 +254,7 @@ def test_device_time_since_initialized(device):
         usec_since_init.assert_called_with(device)
 
 
-@pytest.check_udev_version('>= 154')
+@pytest.need_udev_version('>= 154')
 def test_device_tags_mock(device):
     tags_list = iter([b'spam', b'eggs', b'foo', b'bar'])
 
@@ -287,7 +287,7 @@ def test_device_tags_mock(device):
 
 
 @pytest.mark.xfail(reason='Not implemented')
-@pytest.check_udev_version('>= 154')
+@pytest.need_udev_version('>= 154')
 def test_device_tags():
     raise NotImplementedError()
 

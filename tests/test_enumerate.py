@@ -55,7 +55,7 @@ def test_match_property_bool(context):
     assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
 
-@pytest.check_udev_version('>= 154')
+@pytest.need_udev_version('>= 154')
 def test_match_tags_mock(context):
     add_match_tag = 'udev_enumerate_add_match_tag'
     enumerator = context.list_devices()
@@ -68,12 +68,12 @@ def test_match_tags_mock(context):
 
 
 @pytest.mark.xfail(reason='Not implemented')
-@pytest.check_udev_version('>= 154')
+@pytest.need_udev_version('>= 154')
 def test_match_tags():
     raise NotImplementedError()
 
 
-@pytest.check_udev_version('>= 165')
+@pytest.need_udev_version('>= 165')
 def test_match_is_initialized(context):
     match_is_initialized = 'udev_enumerate_add_match_is_initialized'
     with pytest.patch_libudev(match_is_initialized) as match_is_initialized:
