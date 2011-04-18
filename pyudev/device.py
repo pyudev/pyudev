@@ -639,7 +639,7 @@ class Attributes(Mapping):
         self.device = device
 
     @property
-    def _attribute_files(self):
+    def _attributes(self):
         sys_path = self.device.sys_path
         return [fn for fn in os.listdir(sys_path) if
                 _is_attribute_file(os.path.join(sys_path, fn)) and
@@ -649,7 +649,7 @@ class Attributes(Mapping):
         """
         Return the amount of attributes defined.
         """
-        return len(self._attribute_files)
+        return len(self._attributes)
 
     def __iter__(self):
         """
@@ -657,7 +657,7 @@ class Attributes(Mapping):
 
         Yield each attribute name as unicode string.
         """
-        return iter(self._attribute_files)
+        return iter(self._attributes)
 
     def __contains__(self, attribute):
         value = libudev.udev_device_get_sysattr_value(
