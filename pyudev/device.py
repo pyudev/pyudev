@@ -31,7 +31,6 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 from collections import Mapping
 from datetime import timedelta
-from itertools import count
 
 from pyudev._libudev import libudev
 from pyudev._util import (ensure_byte_string, ensure_unicode_string,
@@ -524,10 +523,10 @@ class Device(Mapping):
         Return the amount of properties defined for this device as integer.
         """
         properties = libudev.udev_device_get_properties_list_entry(self)
-        counter = count()
-        for _ in udev_list_iterate(properties):
-            next(counter)
-        return next(counter)
+        i = 0
+        for i, _ in enumerate(udev_list_iterate(properties), start=1):
+            pass
+        return i
 
     def __getitem__(self, property):
         """
