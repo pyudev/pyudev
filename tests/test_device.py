@@ -114,6 +114,18 @@ def test_device_properties(device, properties):
 
 
 @pytest.mark.properties
+def test_device_len(device, all_properties):
+    assert len(device) == len(all_properties)
+
+
+@pytest.mark.properties
+def test_device_iter(device, properties):
+    device_properties = set(device)
+    assert all(p in device_properties for p in properties)
+    assert all(pytest.is_unicode_string(p) for p in device_properties)
+
+
+@pytest.mark.properties
 def test_device_asint(device, properties):
     for property in properties:
         value = properties[property]
