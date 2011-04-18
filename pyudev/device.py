@@ -472,8 +472,8 @@ class Device(Mapping):
         The property provides access to all such symbolic links, which were
         created by UDev for this device.
         """
-        entry = libudev.udev_device_get_devlinks_list_entry(self)
-        for name in udev_list_iterate(entry):
+        devlinks = libudev.udev_device_get_devlinks_list_entry(self)
+        for name in udev_list_iterate(devlinks):
             yield ensure_unicode_string(name)
 
     @property
@@ -504,8 +504,8 @@ class Device(Mapping):
 
         .. udevminversion:: 154
         """
-        entry = libudev.udev_device_get_tags_list_entry(self)
-        for tag in udev_list_iterate(entry):
+        tags = libudev.udev_device_get_tags_list_entry(self)
+        for tag in udev_list_iterate(tags):
             yield ensure_unicode_string(tag)
 
     def __iter__(self):
@@ -515,17 +515,17 @@ class Device(Mapping):
         Return a generator yielding the names of all properties of this
         device as unicode strings.
         """
-        entry = libudev.udev_device_get_properties_list_entry(self)
-        for name in udev_list_iterate(entry):
+        properties = libudev.udev_device_get_properties_list_entry(self)
+        for name in udev_list_iterate(properties):
             yield ensure_unicode_string(name)
 
     def __len__(self):
         """
         Return the amount of properties defined for this device as integer.
         """
-        entry = libudev.udev_device_get_properties_list_entry(self)
+        properties = libudev.udev_device_get_properties_list_entry(self)
         counter = count()
-        for _ in udev_list_iterate(entry):
+        for _ in udev_list_iterate(properties):
             next(counter)
         return next(counter)
 
