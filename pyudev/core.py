@@ -119,9 +119,9 @@ class Context(object):
         The run runtime directory path defaulting to ``/run`` as unicode
         string.
 
-        .. versionadded:: 0.10
-
         .. udevminversion:: 167
+
+        .. versionadded:: 0.10
         """
         return ensure_unicode_string(libudev.udev_get_run_path(self))
 
@@ -302,9 +302,9 @@ class Enumerator(object):
 
         Return the instance again.
 
-        .. versionadded:: 0.6
-
         .. udevminversion:: 154
+
+        .. versionadded:: 0.6
         """
         libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
         return self
@@ -323,9 +323,9 @@ class Enumerator(object):
 
         .. seealso:: :attr:`Device.is_initialized`
 
-        .. versionadded:: 0.8
-
         .. udevminversion:: 165
+
+        .. versionadded:: 0.8
         """
         libudev.udev_enumerate_add_match_is_initialized(self)
         return self

@@ -240,9 +240,9 @@ class Device(Mapping):
         Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
         created from the environment.
 
-        .. versionadded:: 0.6
-
         .. udevminversion:: 152
+
+        .. versionadded:: 0.6
         """
         device = libudev.udev_device_new_from_environment(context)
         if not device:
@@ -431,9 +431,9 @@ class Device(Mapping):
 
         .. seealso:: :attr:`time_since_initialized`
 
-        .. versionadded:: 0.8
-
         .. udevminversion:: 165
+
+        .. versionadded:: 0.8
         """
         return bool(libudev.udev_device_get_is_initialized(self))
 
@@ -448,9 +448,9 @@ class Device(Mapping):
 
         .. seealso:: :attr:`is_initialized`
 
-        .. versionadded:: 0.8
-
         .. udevminversion:: 165
+
+        .. versionadded:: 0.8
         """
         microseconds = libudev.udev_device_get_usec_since_initialized(self)
         return timedelta(microseconds=microseconds)
@@ -499,9 +499,9 @@ class Device(Mapping):
         """
         An iterator, which yields all attached tags as unicode strings.
 
-        .. versionadded:: 0.6
-
         .. udevminversion:: 154
+
+        .. versionadded:: 0.6
         """
         tags = libudev.udev_device_get_tags_list_entry(self)
         for tag in udev_list_iterate(tags):
