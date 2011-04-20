@@ -23,7 +23,7 @@ import re
 import random
 import subprocess
 import socket
-from functools import wraps
+from functools import wraps, partial
 from contextlib import contextmanager
 from subprocess import check_call
 if sys.version_info[:2] < (3, 2):
@@ -210,6 +210,28 @@ def patch_libudev(funcname):
         yield func
 
 
+@contextmanager
+def patch_libudev_list(items, list_func):
+    item_list = iter(items)
+
+    def name(entry):
+        if entry:
+            return entry
+        else:
+            pytest.fail('empty entry!')
+
+    get_next = 'udev_list_entry_get_next'
+    get_name = 'udev_list_entry_get_name'
+    with pytest.nested(pytest.patch_libudev(get_next),
+                       pytest.patch_libudev(get_name),
+                       pytest.patch_libudev(list_func)) as (get_next, get_name,
+                                                           list_func):
+        list_func.return_value = next(item_list)
+        get_name.side_effect = name
+        get_next.side_effect = lambda e: next(item_list, None)
+        yield list_func
+
+
 def _need_privileges(func):
     @wraps(func)
     def wrapped(*args):
@@ -271,7 +293,8 @@ def need_udev_version(version_spec):
 def pytest_namespace():
     return dict((func.__name__, func) for func in
                 (get_device_sample, patch_libudev, load_dummy, nested,
-                 unload_dummy, is_unicode_string, need_udev_version))
+                 unload_dummy, is_unicode_string, need_udev_version,
+                 patch_libudev_list))
 
 
 def pytest_addoption(parser):
