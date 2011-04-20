@@ -638,18 +638,28 @@ class Attributes(Mapping):
     def __init__(self, device):
         self.device = device
 
-    @property
-    def _attribute_files(self):
-        sys_path = self.device.sys_path
-        return [fn for fn in os.listdir(sys_path) if
-                _is_attribute_file(os.path.join(sys_path, fn)) and
-                fn in self]
+    if hasattr(libudev, 'udev_device_get_sysattr_list_entry'):
+        @property
+        def _attributes(self):
+            attrs = libudev.udev_device_get_sysattr_list_entry(self.device)
+            for attribute in udev_list_iterate(attrs):
+                yield ensure_unicode_string(attribute)
+    else:
+        @property
+        def _attributes(self):
+            sys_path = self.device.sys_path
+            return (fn for fn in os.listdir(sys_path) if
+                    _is_attribute_file(os.path.join(sys_path, fn)) and
+                    fn in self)
 
     def __len__(self):
         """
         Return the amount of attributes defined.
         """
-        return len(self._attribute_files)
+        i = 0
+        for i, _ in enumerate(self._attributes, start=1):
+            pass
+        return i
 
     def __iter__(self):
         """
@@ -657,7 +667,7 @@ class Attributes(Mapping):
 
         Yield each attribute name as unicode string.
         """
-        return iter(self._attribute_files)
+        return self._attributes
 
     def __contains__(self, attribute):
         value = libudev.udev_device_get_sysattr_value(

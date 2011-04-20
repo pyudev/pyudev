@@ -153,6 +153,17 @@ def test_device_asbool(device, properties):
             assert str(exc_info.value) == message.format(value)
 
 
+@pytest.need_udev_version('>= 167')
+def test_attributes_iter_mock(device):
+    attributes = [b'spam', b'eggs']
+    get_sysattr_list = 'udev_device_get_sysattr_list_entry'
+    with pytest.patch_libudev_list(attributes,
+                                   get_sysattr_list) as get_sysattr_list:
+        attrs = list(device.attributes)
+        attrs == ['spam', 'eggs']
+        get_sysattr_list.assert_called_with(device)
+
+
 def test_attributes_iter(device, attributes):
     device_attributes = set(device.attributes)
     assert all(a in device_attributes for a in attributes)
@@ -268,31 +279,9 @@ def test_device_time_since_initialized(device):
 
 @pytest.need_udev_version('>= 154')
 def test_device_tags_mock(device):
-    tags_list = iter([b'spam', b'eggs', b'foo', b'bar'])
-
-    def next_entry(entry):
-        try:
-            return next(tags_list)
-        except StopIteration:
-            return None
-
-    def name(entry):
-        if entry:
-            return entry
-        else:
-            pytest.fail('empty entry!')
-
+    tags = [b'spam', b'eggs', b'foo', b'bar']
     get_tags_list_entry = 'udev_device_get_tags_list_entry'
-    get_next = 'udev_list_entry_get_next'
-    get_name = 'udev_list_entry_get_name'
-    with pytest.nested(pytest.patch_libudev(get_tags_list_entry),
-                       pytest.patch_libudev(get_name),
-                       pytest.patch_libudev(get_next)) as (get_tags_list_entry,
-                                                           get_name, get_next):
-        get_tags_list_entry.return_value = next(tags_list)
-        get_name.side_effect = name
-        get_next.side_effect = next_entry
-
+    with pytest.patch_libudev_list(tags, get_tags_list_entry):
         device_tags = list(device.tags)
         assert device_tags == ['spam', 'eggs', 'foo', 'bar']
         assert all(pytest.is_unicode_string(t) for t in device_tags)

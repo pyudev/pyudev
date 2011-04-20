@@ -131,7 +131,8 @@ SIGNATURES = {
         get_usec_since_initialized=([udev_device_p], c_ulonglong),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
         get_tags_list_entry=([udev_device_p], udev_list_entry_p),
-        get_properties_list_entry=([udev_device_p], udev_list_entry_p)),
+        get_properties_list_entry=([udev_device_p], udev_list_entry_p),
+        get_sysattr_list_entry=([udev_device_p], udev_list_entry_p)),
     # monitoring
     'udev_monitor': dict(
         ref=([udev_monitor_p], udev_monitor_p),
