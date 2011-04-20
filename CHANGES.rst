@@ -1,5 +1,5 @@
-0.10 (in development)
-=====================
+0.10 (Apr 20, 2011)
+===================
 
 - Added :attr:`pyudev.__version_info__`
 - Added :attr:`pyudev.Device.device_type`
