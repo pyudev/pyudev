@@ -139,6 +139,8 @@ class Context(object):
         >>> import syslog
         >>> context = pyudev.Context()
         >>> context.log_priority = syslog.LOG_DEBUG
+
+        .. versionadded:: 0.9
         """
         return libudev.udev_get_log_priority(self)
 
