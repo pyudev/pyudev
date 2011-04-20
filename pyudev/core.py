@@ -118,6 +118,10 @@ class Context(object):
         """
         The run runtime directory path defaulting to ``/run`` as unicode
         string.
+
+        .. versionadded:: 0.10
+
+        .. udevminversion:: 167
         """
         return ensure_unicode_string(libudev.udev_get_run_path(self))
 
