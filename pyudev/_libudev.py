@@ -31,7 +31,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-from errno import ENOMEM
+from errno import ENOMEM, EOVERFLOW
 from ctypes import (CDLL, Structure, POINTER, get_errno,
                     c_char_p, c_int, c_ulonglong)
 from ctypes.util import find_library
@@ -150,18 +150,28 @@ SIGNATURES = {
 
 def check_negative_errorcode(result, func, *args):
     """
-    Check if ``result`` is ``0``.  If so, return normally.  Otherwise interpret
-    ``result`` as negative error code, and raise
-    :exc:`~exceptions.MemoryError`, if ``result`` is ``-ENOMEM``, or
-    :exc:`~exceptions.EnvironmentError` in any other case.
+    Error checker for udev funtions, which return negative error codes.
+
+    If ``result`` is smaller than ``0``, it is interpreted as negative error
+    code, and an appropriate exception is raised:
+
+    - ``-ENOMEM`` raises a :exc:`~exceptions.MemoryError`
+    - ``-EOVERFLOW`` raises a :exc:`~exceptions.OverflowError`
+    - all other error codes raise :exc:`~exceptions.EnvironmentError`
+
+    If result is greater or equal to ``0``, it is returned unchanged.
     """
-    if result != 0:
+    if result < 0:
         # udev returns the *negative* errno code at this point
         errorcode = -result
-        if errorcode == ENOMEM:
-            raise MemoryError()
+        exceptions = {ENOMEM: MemoryError, EOVERFLOW: OverflowError}
+        exception = exceptions.get(errorcode)
+        if exception is not None:
+            raise exception()
         else:
             raise EnvironmentError(errorcode, os.strerror(errorcode))
+    else:
+        return result
 
 
 ERROR_CHECKERS = dict(
