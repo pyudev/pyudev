@@ -49,7 +49,7 @@ def test_context_device_path(context):
 @pytest.need_udev_version('>= 167')
 def test_context_run_path(context):
     assert pytest.is_unicode_string(context.run_path)
-    assert context.run_path == '/dev/.udev'
+    assert context.run_path == '/run/udev'
 
 
 def test_context_log_priority_get(context):
