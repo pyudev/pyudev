@@ -472,7 +472,7 @@ class Device(Mapping):
         created by UDev for this device.
         """
         devlinks = libudev.udev_device_get_devlinks_list_entry(self)
-        for name in udev_list_iterate(devlinks):
+        for name, _ in udev_list_iterate(devlinks):
             yield ensure_unicode_string(name)
 
     @property
@@ -504,7 +504,7 @@ class Device(Mapping):
         .. versionadded:: 0.6
         """
         tags = libudev.udev_device_get_tags_list_entry(self)
-        for tag in udev_list_iterate(tags):
+        for tag, _ in udev_list_iterate(tags):
             yield ensure_unicode_string(tag)
 
     def __iter__(self):
@@ -515,7 +515,7 @@ class Device(Mapping):
         device as unicode strings.
         """
         properties = libudev.udev_device_get_properties_list_entry(self)
-        for name in udev_list_iterate(properties):
+        for name, _ in udev_list_iterate(properties):
             yield ensure_unicode_string(name)
 
     def __len__(self):
@@ -642,7 +642,7 @@ class Attributes(Mapping):
         @property
         def _attributes(self):
             attrs = libudev.udev_device_get_sysattr_list_entry(self.device)
-            for attribute in udev_list_iterate(attrs):
+            for attribute, _ in udev_list_iterate(attrs):
                 yield ensure_unicode_string(attribute)
     else:
         @property

@@ -220,14 +220,24 @@ def patch_libudev_list(items, list_func):
         else:
             pytest.fail('empty entry!')
 
+    def value(entry):
+        if entry:
+            return 'value of {0}'.format(entry)
+        else:
+            pytest.fail('empty entry!')
+
     get_next = 'udev_list_entry_get_next'
     get_name = 'udev_list_entry_get_name'
+    get_value = 'udev_list_entry_get_value'
     with pytest.nested(pytest.patch_libudev(get_next),
                        pytest.patch_libudev(get_name),
+                       pytest.patch_libudev(get_value),
                        pytest.patch_libudev(list_func)) as (get_next, get_name,
-                                                           list_func):
+                                                            get_value,
+                                                            list_func):
         list_func.return_value = next(item_list)
         get_name.side_effect = name
+        get_value.side_effect = value
         get_next.side_effect = lambda e: next(item_list, None)
         yield list_func
 

@@ -348,7 +348,7 @@ class Enumerator(object):
         """
         libudev.udev_enumerate_scan_devices(self)
         entry = libudev.udev_enumerate_get_list_entry(self)
-        for name in udev_list_iterate(entry):
+        for name, _ in udev_list_iterate(entry):
             device = Device.from_sys_path(self.context, name)
             if (not self._parents) or any(device.parent == p for p
                                           in self._parents):
