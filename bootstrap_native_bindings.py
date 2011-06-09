@@ -249,23 +249,23 @@ class PyGObjectBuild(AutotoolsBuild):
 RIVERBANK_DOWNLOAD_URL = 'http://www.riverbankcomputing.com/static/Downloads/{0}'
 
 PYQT4_SOURCES = [
-    SourcePackage('sip', '4.12.1', SipBuild,
+    SourcePackage('sip', '4.12.3', SipBuild,
                   RIVERBANK_DOWNLOAD_URL.format(
                       'sip4/{name}-{version}.tar.gz')),
-    SourcePackage('PyQt-x11-gpl', '4.8.3', PyQtBuild,
+    SourcePackage('PyQt-x11-gpl', '4.8.4', PyQtBuild,
                   RIVERBANK_DOWNLOAD_URL.format(
                       'PyQt4/{name}-{version}.tar.gz'))]
 
 PYSIDE_DOWNLOAD_URL = 'http://www.pyside.org/files/{0}'
 
 PYSIDE_SOURCES = [
-    SourcePackage('apiextractor', '0.10.0', CMakeBuild,
+    SourcePackage('apiextractor', '0.10.3', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('generatorrunner', '0.6.7', CMakeBuild,
+    SourcePackage('generatorrunner', '0.6.10', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('shiboken', '1.0.0', CMakeBuild,
+    SourcePackage('shiboken', '1.0.3', CMakeBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
-    SourcePackage('pyside', 'qt4.7+1.0.0', PySideBuild,
+    SourcePackage('pyside', 'qt4.7+1.0.3', PySideBuild,
                   PYSIDE_DOWNLOAD_URL.format('{name}-{version}.tar.bz2')),
     ]
 
