@@ -38,7 +38,7 @@ from pyudev.device import Attributes
 
 def pytest_generate_tests(metafunc):
     args = metafunc.funcargnames
-    if 'device_path' in args or 'device' in args:
+    if any(a in ('sys_path', 'device_path', 'device') for a in args):
         devices = pytest.get_device_sample(metafunc.config)
         for device_path in devices:
             metafunc.addcall(id=device_path, param=device_path)
@@ -52,8 +52,6 @@ class TestDevice(object):
     def test_from_path(self, context, device_path, sys_path):
         device = Device.from_path(context, device_path)
         assert device is not None
-        assert device.sys_path == sys_path
-        assert device.device_path == device_path
         assert device == Device.from_sys_path(context, sys_path)
         assert device == Device.from_path(context, sys_path)
 
@@ -61,11 +59,10 @@ class TestDevice(object):
         assert Device.from_path(context, 'devices/platform') == \
                Device.from_path(context, '/devices/platform')
 
-    def test_from_sys_path(self, context, sys_path, device_path):
+    def test_from_sys_path(self, context, sys_path):
         device = Device.from_sys_path(context, sys_path)
         assert device is not None
         assert device.sys_path == sys_path
-        assert device.device_path == device_path
 
     def test_from_sys_path_device_not_found(self, context):
         sys_path = 'there_will_not_be_such_a_device'
@@ -155,11 +152,13 @@ class TestDevice(object):
             assert child in parent.children
             child = parent
 
-    def test_sys_path(self, device):
-        raise NotImplementedError()
+    def test_sys_path(self, device, sys_path):
+        assert device.sys_path == sys_path
+        assert pytest.is_unicode_string(device.sys_path)
 
-    def test_device_path(self, device):
-        raise NotImplementedError()
+    def test_device_path(self, device, device_path):
+        assert device.device_path == device_path
+        assert pytest.is_unicode_string(device.device_path)
 
     def test_subsystem(self, device, properties):
         assert device.subsystem == properties['SUBSYSTEM']
