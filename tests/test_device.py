@@ -102,7 +102,9 @@ class TestDevice(object):
             Device.from_environment(context)
 
     def test_parent(self, device):
-        raise NotImplementedError()
+        assert device.parent is None or isinstance(device.parent, Device)
+        if device.parent:
+            assert device in device.parent.children
 
     def test_children(self, device):
         for child in device.children:
