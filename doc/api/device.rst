@@ -23,6 +23,8 @@
 
    .. autoattribute:: sys_name
 
+   .. autoattribute:: sys_number
+
    .. autoattribute:: device_path
 
    .. autoattribute:: subsystem

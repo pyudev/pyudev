@@ -19,6 +19,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import re
 import os
 import operator
 import sys
@@ -236,6 +237,21 @@ def test_device_subsystem(device, properties):
 def test_device_sys_name(device):
     assert device.sys_name == os.path.basename(device.device_path)
     assert pytest.is_unicode_string(device.sys_name)
+
+
+SYS_NUMBER_PATTERN = re.compile('\d+$')
+
+
+@pytest.mark.properties
+def test_device_sys_number(device):
+    match = SYS_NUMBER_PATTERN.search(device.sys_name)
+    # filter out devices with completely nummeric names (first character
+    # doesn't count according to the implementation of libudev)
+    if match and match.start() > 1:
+        assert device.sys_number == match.group(0)
+        assert pytest.is_unicode_string(device.sys_name)
+    else:
+        assert device.sys_number is None
 
 
 @pytest.mark.properties
