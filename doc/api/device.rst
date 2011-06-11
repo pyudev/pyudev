@@ -5,6 +5,8 @@
 
 .. autoclass:: Device()
 
+   .. rubric:: Construction of device objects
+
    .. automethod:: from_path
 
    .. automethod:: from_sys_path
@@ -14,6 +16,8 @@
    .. automethod:: from_device_number
 
    .. automethod:: from_environment
+
+   .. rubric:: General attributes
 
    .. attribute:: context
 
@@ -29,11 +33,17 @@
 
    .. autoattribute:: device_path
 
+   .. autoattribute:: tags
+
+   .. rubric:: Device driver and subsystem
+
    .. autoattribute:: subsystem
 
    .. autoattribute:: driver
 
    .. autoattribute:: device_type
+
+   .. rubric:: Device nodes
 
    .. autoattribute:: device_node
 
@@ -41,13 +51,13 @@
 
    .. autoattribute:: device_links
 
+   .. rubric:: Device initialization time
+
    .. autoattribute:: is_initialized
 
    .. autoattribute:: time_since_initialized
 
-   .. autoattribute:: attributes
-
-   .. autoattribute:: tags
+   .. rubric:: Device hierarchy
 
    .. autoattribute:: parent
 
@@ -56,6 +66,8 @@
    .. automethod:: traverse
 
    .. automethod:: find_parent
+
+   .. rubric:: Device properties
 
    .. automethod:: __iter__
 
@@ -66,6 +78,10 @@
    .. automethod:: asint
 
    .. automethod:: asbool
+
+   .. rubric:: Sysfs attributes
+
+   .. autoattribute:: attributes
 
 .. autoclass:: Attributes()
 
