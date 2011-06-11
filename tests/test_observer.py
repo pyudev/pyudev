@@ -24,7 +24,6 @@ from functools import partial
 import pytest
 from mock import Mock
 
-
 class BaseBinding(object):
     def trigger_observer(self, action, monitor, action_trigger):
         mainloop = self.create_mainloop()
@@ -180,30 +179,32 @@ def test_fake_monitor(fake_monitor, platform_device):
         assert device == platform_device
 
 
-def test_observer_fake(binding, action, fake_monitor, platform_device):
-    binding.import_or_skip()
-    event_slot, action_slots = binding.trigger_observer(
-        action, fake_monitor, lambda: fake_monitor.trigger_action(action))
-    # check, that both slots were called
-    event_slot.assert_called_with(action, platform_device)
-    action_slots.pop(action).assert_called_with(platform_device)
+class TestObserver(object):
 
+    def test_observer_fake(self, binding, action, fake_monitor,
+                           platform_device):
+        binding.import_or_skip()
+        event_slot, action_slots = binding.trigger_observer(
+            action, fake_monitor, lambda: fake_monitor.trigger_action(action))
+        # check, that both slots were called
+        event_slot.assert_called_with(action, platform_device)
+        action_slots.pop(action).assert_called_with(platform_device)
 
-@pytest.mark.privileged
-def test_observer(binding, monitor):
-    binding.import_or_skip()
-    pytest.unload_dummy()
-    monitor.filter_by('net')
-    monitor.enable_receiving()
-    event_slot, action_slot = binding.trigger_observer(
-        'add', monitor, pytest.load_dummy)
-    action, device = event_slot.call_args[0]
-    assert action == 'add'
-    assert device.subsystem == 'net'
-    assert device.device_path == '/devices/virtual/net/dummy0'
-    event_slot, action_slot = binding.trigger_observer(
-        'remove', monitor, pytest.unload_dummy)
-    action, device = event_slot.call_args[0]
-    assert action == 'remove'
-    assert device.subsystem == 'net'
-    assert device.device_path == '/devices/virtual/net/dummy0'
+    @pytest.mark.privileged
+    def test_observer(self, binding, monitor):
+        binding.import_or_skip()
+        pytest.unload_dummy()
+        monitor.filter_by('net')
+        monitor.enable_receiving()
+        event_slot, action_slot = binding.trigger_observer(
+            'add', monitor, pytest.load_dummy)
+        action, device = event_slot.call_args[0]
+        assert action == 'add'
+        assert device.subsystem == 'net'
+        assert device.device_path == '/devices/virtual/net/dummy0'
+        event_slot, action_slot = binding.trigger_observer(
+            'remove', monitor, pytest.unload_dummy)
+        action, device = event_slot.call_args[0]
+        assert action == 'remove'
+        assert device.subsystem == 'net'
+        assert device.device_path == '/devices/virtual/net/dummy0'

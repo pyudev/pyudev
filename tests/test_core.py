@@ -36,51 +36,47 @@ def test_udev_version():
     assert udev_version() > 150
 
 
-def test_context_sys_path(context):
-    assert pytest.is_unicode_string(context.sys_path)
-    assert context.sys_path == '/sys'
+class TestContext(object):
 
+    def test_sys_path(self, context):
+        assert pytest.is_unicode_string(context.sys_path)
+        assert context.sys_path == '/sys'
 
-def test_context_device_path(context):
-    assert pytest.is_unicode_string(context.device_path)
-    assert context.device_path == '/dev'
+    def test_device_path(self, context):
+        assert pytest.is_unicode_string(context.device_path)
+        assert context.device_path == '/dev'
 
+    @pytest.need_udev_version('>= 167')
+    def test_run_path(self, context):
+        assert pytest.is_unicode_string(context.run_path)
+        assert context.run_path == '/run/udev'
 
-@pytest.need_udev_version('>= 167')
-def test_context_run_path(context):
-    assert pytest.is_unicode_string(context.run_path)
-    assert context.run_path == '/run/udev'
+    def test_log_priority_get(self, context):
+        assert isinstance(context.log_priority, int)
+        assert syslog.LOG_EMERG <= context.log_priority <= syslog.LOG_DEBUG
 
+    def test_log_priority_get_mock(self, context):
+        get_prio = 'udev_get_log_priority'
+        with pytest.patch_libudev(get_prio) as get_prio:
+            get_prio.return_value = mock.sentinel.log_priority
+            assert context.log_priority is mock.sentinel.log_priority
+            get_prio.assert_called_with(context)
 
-def test_context_log_priority_get(context):
-    assert isinstance(context.log_priority, int)
-    assert syslog.LOG_EMERG <= context.log_priority <= syslog.LOG_DEBUG
+    def test_log_priority_set_mock(self, context):
+        set_prio = 'udev_set_log_priority'
+        with pytest.patch_libudev(set_prio) as set_prio:
+            context.log_priority = mock.sentinel.log_priority
+            set_prio.assert_called_with(context, mock.sentinel.log_priority)
 
-
-def test_context_log_priority_get_mock(context):
-    get_prio = 'udev_get_log_priority'
-    with pytest.patch_libudev(get_prio) as get_prio:
-        get_prio.return_value = mock.sentinel.log_priority
-        assert context.log_priority is mock.sentinel.log_priority
-        get_prio.assert_called_with(context)
-
-
-def test_context_log_priority_set_mock(context):
-    set_prio = 'udev_set_log_priority'
-    with pytest.patch_libudev(set_prio) as set_prio:
-        context.log_priority = mock.sentinel.log_priority
-        set_prio.assert_called_with(context, mock.sentinel.log_priority)
-
-
-def test_context_log_priority_roundtrip(context):
-    old_priority = context.log_priority
-    available_levels = [
-        l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)
-        if l != old_priority]
-    new_priority = random.choice(available_levels)
-    assert new_priority != old_priority
-    try:
-        context.log_priority = new_priority
-        assert context.log_priority == new_priority
-    finally:
-        context.log_priority = old_priority
+    def test_log_priority_roundtrip(self, context):
+        old_priority = context.log_priority
+        available_levels = [
+            l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)
+            if l != old_priority]
+        new_priority = random.choice(available_levels)
+        assert new_priority != old_priority
+        try:
+            context.log_priority = new_priority
+            assert context.log_priority == new_priority
+        finally:
+            context.log_priority = old_priority
