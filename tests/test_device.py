@@ -21,6 +21,7 @@ from __future__ import (print_function, division, unicode_literals,
 
 import re
 import os
+import stat
 import operator
 import sys
 from itertools import count
@@ -32,6 +33,7 @@ import mock
 from pyudev import (Device,
                     DeviceNotFoundAtPathError,
                     DeviceNotFoundByNameError,
+                    DeviceNotFoundByNumberError,
                     DeviceNotFoundInEnvironmentError)
 from pyudev.device import Attributes
 
@@ -94,6 +96,44 @@ class TestDevice(object):
         assert error.sys_name == 'foobar'
         assert str(error) == 'No device {0!r} in {1!r}'.format(
             error.sys_name, error.subsystem)
+
+    def test_from_device_number(self, context, device_path, device_number,
+                                device_node):
+        if not device_node:
+            pytest.skip('no device node, no device number')
+        mode = os.stat(device_node).st_mode
+        type = 'block' if stat.S_ISBLK(mode) else 'char'
+        device = Device.from_device_number(context, type, device_number)
+        assert device.device_number == device_number
+        # make sure, we are really referring to the same device
+        assert device.device_path == device_path
+
+    def test_from_device_number_wrong_type(self, context, device_path,
+                                           device_number, device_node):
+        if not device_node:
+            pytest.skip('no device node, no device number')
+        mode = os.stat(device_node).st_mode
+        # deliberately use the wrong type here to cause either failure or at
+        # least device mismatch
+        type = 'char' if stat.S_ISBLK(mode) else 'block'
+        try:
+            # this either fails, in which case the caught exception is raised,
+            # or succeeds, but returns a wrong device (device numbers are not
+            # unique across device types)
+            device = Device.from_device_number(context, type, device_number)
+            # if it succeeds, the resulting device must not match the one, we
+            # are actually looking for!
+            assert device.device_path != device_path
+        except DeviceNotFoundByNumberError as error:
+            # check the correctness of the exception attributes
+            assert error.device_type == type
+            assert error.device_number == device_number
+
+    def test_from_device_number_invalid_type(self, context):
+        with pytest.raises(ValueError) as exc_info:
+            Device.from_device_number(context, 'foobar', 100)
+        assert str(exc_info.value) == ('Invalid type: {0!r}. Must be one of '
+                                       '"char" or "block".'.format('foobar'))
 
     @pytest.need_udev_version('>= 152')
     def test_from_environment(self, context):
@@ -194,13 +234,15 @@ class TestDevice(object):
         else:
             assert device.driver is None
 
-    def test_node(self, context, device, device_node):
+    def test_device_node(self, device, device_node):
         if device_node:
-            assert device.device_node == os.path.join(context.device_path,
-                                                      device_node)
+            assert device.device_node == device_node
             assert pytest.is_unicode_string(device.device_node)
         else:
             assert device.device_node is None
+
+    def test_device_number(self, device, device_number):
+        assert device.device_number == device_number
 
     @pytest.need_udev_version('>= 165')
     def test_is_initialized(self, device):

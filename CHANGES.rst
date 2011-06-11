@@ -2,6 +2,8 @@
 =====================
 
 - #30: Added :attr:`pyudev.Device.sys_number`
+- #29: Added :meth:`pyudev.Device.from_device_number` and
+  :attr:`pyudev.Device.device_number`
 
 
 0.10 (Apr 20, 2011)

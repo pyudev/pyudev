@@ -11,6 +11,8 @@
 
    .. automethod:: from_name
 
+   .. automethod:: from_device_number
+
    .. automethod:: from_environment
 
    .. attribute:: context
@@ -34,6 +36,8 @@
    .. autoattribute:: device_type
 
    .. autoattribute:: device_node
+
+   .. autoattribute:: device_number
 
    .. autoattribute:: device_links
 
@@ -91,6 +95,9 @@ Exceptions
    :members:
 
 .. autoclass:: DeviceNotFoundByNameError
+   :members:
+
+.. autoclass:: DeviceNotFoundByNumberError
    :members:
 
 .. autoclass:: DeviceNotFoundInEnvironmentError

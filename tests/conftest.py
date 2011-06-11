@@ -19,6 +19,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
+import os
 import re
 import random
 import subprocess
@@ -183,7 +184,8 @@ def _query_device(device_path, query_type):
     if query_type not in ('symlink', 'name'):
         raise ValueError(query_type)
     udevadm = subprocess.Popen(
-        ['udevadm', 'info', '--path', device_path, '--query', query_type],
+        ['udevadm', 'info', '--root', '--path', device_path,
+         '--query', query_type],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     query_result = udevadm.communicate()[0].strip().decode(
         sys.getfilesystemencoding())
@@ -406,6 +408,18 @@ def pytest_funcarg__device_node(request):
     """
     device_path = request.getfuncargvalue('device_path')
     return _query_device(device_path, 'name')
+
+
+def pytest_funcarg__device_number(request):
+    """
+    Return the device number of the device pointed to by the ``device_path``
+    funcarg.
+    """
+    device_node = request.getfuncargvalue('device_node')
+    if device_node:
+        return os.stat(device_node).st_rdev
+    else:
+        return 0
 
 
 def pytest_funcarg__device_links(request):

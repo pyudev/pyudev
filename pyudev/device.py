@@ -39,7 +39,8 @@ from pyudev._util import (ensure_byte_string, ensure_unicode_string,
 
 __all__ = ['Device', 'Attributes',
            'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
-           'DeviceNotFoundByNameError', 'DeviceNotFoundInEnvironmentError']
+           'DeviceNotFoundByNameError', 'DeviceNotFoundByNumberError',
+           'DeviceNotFoundInEnvironmentError']
 
 
 class DeviceNotFoundError(LookupError):
@@ -96,6 +97,35 @@ class DeviceNotFoundByNameError(DeviceNotFoundError):
 
     def __str__(self):
         return 'No device {0.sys_name!r} in {0.subsystem!r}'.format(self)
+
+
+class DeviceNotFoundByNumberError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating, that no :class:`Device` was found
+    for a given device number.
+    """
+
+    def __init__(self, type, number):
+        DeviceNotFoundError.__init__(self, type, number)
+
+    @property
+    def device_type(self):
+        """
+        The device type causing this error as string.  Either ``'char'`` or
+        ``'block'``.
+        """
+        return self.args[0]
+
+    @property
+    def device_number(self):
+        """
+        The device number causing this error as integer.
+        """
+        return self.args[1]
+
+    def __str__(self):
+        return 'No {0.device_type} device with number {0.device_number}'.format(
+            self)
 
 
 class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
@@ -221,6 +251,53 @@ class Device(Mapping):
             ensure_byte_string(sys_name))
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
+        return cls(context, device)
+
+    @classmethod
+    def from_device_number(cls, context, type, number):
+        """
+        Create a new device from a device ``number`` with the given device
+        ``type``:
+
+        >>> import os
+        >>> ctx = Context()
+        >>> major, minor = 8, 0
+        >>> device = Device.from_device_number(context, 'block',
+        ...     os.makedev(major, minor))
+        >>> device
+        Device(u'/sys/devices/pci0000:00/0000:00:11.0/host0/target0:0:0/0:0:0:0/block/sda')
+        >>> os.major(device.device_number), os.minor(device.device_number)
+        (8, 0)
+
+        Use :func:`os.makedev` to construct a device number from a major and a
+        minor device number, as shown in the example above.
+
+        .. note::
+
+           Device numbers are not unique across different device types.
+           Passing a correct number with a wrong type may silently yield a
+           wrong device object, so make sure to pass the correct device type.
+
+        ``context`` is the :class:`Context`, in which to search the device.
+        ``type`` is either ``'char'`` or ``'block'``, according to whether the
+        device is a character or block device.  ``number`` is the device number
+        as integer.
+
+        Return a :class:`Device` object for the device with the given device
+        ``number``.  Raise :exc:`DeviceNotFoundByNumberError`, if no device was
+        found with the given device type and number.  Raise
+        :exc:`~exceptions.ValueError`, if ``type`` is any other string than
+        ``'char'`` or ``'block'``.
+
+        .. versionadded:: 0.11
+        """
+        if type not in ('char', 'block'):
+            raise ValueError('Invalid type: {0!r}. Must be one of "char" '
+                             'or "block".'.format(type))
+        device = libudev.udev_device_new_from_devnum(
+            context, ensure_byte_string(type[0]), number)
+        if not device:
+            raise DeviceNotFoundByNumberError(type, number)
         return cls(context, device)
 
     @classmethod
@@ -439,6 +516,32 @@ class Device(Mapping):
         node = libudev.udev_device_get_devnode(self)
         if node:
             return ensure_unicode_string(node)
+
+    @property
+    def device_number(self):
+        """
+        The device number of the associated device as integer, or ``0``, if no
+        device number is associated.
+
+        Use :func:`os.major` and :func:`os.minor` to decompose the device
+        number into its major and minor number:
+
+        >>> ctx = Context()
+        >>> sda = Device.from_name('block', 'sda')
+        >>> sda.device_number
+        2048L
+        >>> (os.major(sda.device_number), os.minor(sda.device_number))
+        (8, 0)
+
+        For devices with an associated :attr:`device_node`, this is the same as
+        the ``st_rdev`` field of the stat result of the :attr:`device_node`:
+
+        >>> os.stat(sda.device_node).st_rdev
+        2048
+
+        .. versionadded:: 0.11
+        """
+        return libudev.udev_device_get_devnum(self)
 
     @property
     def is_initialized(self):

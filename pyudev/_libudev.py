@@ -33,7 +33,7 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 from errno import ENOMEM, EOVERFLOW
 from ctypes import (CDLL, Structure, POINTER, get_errno,
-                    c_char_p, c_int, c_ulonglong)
+                    c_char, c_char_p, c_int, c_ulonglong)
 from ctypes.util import find_library
 
 
@@ -78,6 +78,9 @@ class udev_monitor(Structure):
 udev_monitor_p = POINTER(udev_monitor)
 
 
+dev_t = c_ulonglong
+
+
 SIGNATURES = {
     # context
     'udev': dict(
@@ -113,6 +116,7 @@ SIGNATURES = {
         new_from_syspath=([udev_p, c_char_p], udev_device_p),
         new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
                                     udev_device_p),
+        new_from_devnum=([udev_p, c_char, dev_t], udev_device_p),
         new_from_environment=([udev_p], udev_device_p),
         get_parent=([udev_device_p], udev_device_p),
         get_parent_with_subsystem_devtype=([udev_device_p, c_char_p, c_char_p],
@@ -127,6 +131,7 @@ SIGNATURES = {
         get_devnode=([udev_device_p], c_char_p),
         get_property_value=([udev_device_p, c_char_p], c_char_p),
         get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
+        get_devnum=([udev_device_p], dev_t),
         get_action=([udev_device_p], c_char_p),
         get_is_initialized=([udev_device_p], c_int),
         get_usec_since_initialized=([udev_device_p], c_ulonglong),
