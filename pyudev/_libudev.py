@@ -120,6 +120,7 @@ SIGNATURES = {
         get_devpath=([udev_device_p], c_char_p),
         get_subsystem=([udev_device_p], c_char_p),
         get_syspath=([udev_device_p], c_char_p),
+        get_sysnum=([udev_device_p], c_char_p),
         get_sysname=([udev_device_p], c_char_p),
         get_driver=([udev_device_p], c_char_p),
         get_devtype=([udev_device_p], c_char_p),
