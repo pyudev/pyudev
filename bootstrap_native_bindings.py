@@ -43,6 +43,7 @@ import errno
 import posixpath
 import subprocess
 import logging
+import platform
 from optparse import OptionParser
 from collections import namedtuple
 
@@ -369,6 +370,9 @@ def main():
     if len(args) != 2:
         parser.error('missing arguments')
     logging.basicConfig(level=opts.loglevel)
+
+    if platform.python_implementation() != 'CPython':
+        return
 
     try:
         download_directory, build_directory = args
