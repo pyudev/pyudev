@@ -14,17 +14,16 @@ The current release is pyudev |release|, available in the `Python Package
 Index`_.  Refer to the :doc:`changes` for a list of important changes since
 the last release [#changes]_.
 
-The basic binding is implemented in pure Python atop of ctypes_, contains no
-native code and has no dependencies.  The only requirement are Python 2.6 or
-newer (Python 3 is supported as well) and of course udev_.  pyudev is tested
-against udev_ 151 and newer, older versions of udev_ may or may not work.  If
+The basic binding is implemented in pure Python atop of ctypes_.  The only
+dependencies are udev_ and Python.  pyudev supports CPython_ 2.6 or newer
+(including 3.x) and PyPy_ 1.5 or newer, and is tested against udev_ 151 and
+newer.  Older versions of older versions of udev_ may or may not work.  If
 pyudev doesn't work with your udev_ version, please report an issue (see
 :ref:`contribution`).
 
 The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`
-and :mod:`pyudev.glib` require some libraries from the corresponding
-toolkit.  Refer to the documentation of these modules for a more precise
-description.
+and :mod:`pyudev.glib` require some libraries from the corresponding toolkit.
+Refer to the documentation of these modules for a more precise description.
 
 Installation is rather simple, just run::
 
@@ -90,6 +89,8 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 
 .. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
+.. _CPython: http://www.python.org/
+.. _PyPy: http://codespeak.net/pypy/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
