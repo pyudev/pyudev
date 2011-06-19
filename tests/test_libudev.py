@@ -85,7 +85,10 @@ def test_signatures(funcname, restype, argtypes, errcheck):
     if not func:
         pytest.skip('{0} not available'.format(funcname))
     assert func.restype == restype
-    assert func.argtypes == argtypes
+    if not argtypes:
+        assert not func.argtypes
+    else:
+        assert func.argtypes == argtypes
     assert func.errcheck == errcheck
 
 
