@@ -273,9 +273,9 @@ PYSIDE_SOURCES = [
 GNOME_DOWNLOAD_URL = 'http://ftp.gnome.org/pub/GNOME/sources/{0}'
 
 GOBJECT_SOURCES = [
-    SourcePackage('pygobject', '2.27.0', PyGObjectBuild,
+    SourcePackage('pygobject', '2.26.0', PyGObjectBuild,
                   GNOME_DOWNLOAD_URL.format(
-                      '{name}/2.27/{name}-{version}.tar.bz2'))]
+                      '{name}/2.26/{name}-{version}.tar.bz2'))]
 
 
 def build_all(sources, download_directory, build_directory):
