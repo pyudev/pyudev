@@ -238,7 +238,8 @@ class AutotoolsBuild(Build):
 
 
 class PyGObjectBuild(AutotoolsBuild):
-    configure_options = AutotoolsBuild.configure_options + ['--disable-cairo']
+    configure_options = AutotoolsBuild.configure_options + [
+        '--disable-dependency-tracking']
 
     def ensure_dependencies(self):
         AutotoolsBuild.ensure_dependencies(self)
