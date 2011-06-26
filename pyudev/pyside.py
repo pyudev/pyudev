@@ -23,7 +23,7 @@
     :class:`~pyudev.Monitor` into the Qt event loop in applications using the
     PySide_ binding to Qt.
 
-    To use this module, :mod:`PyQt4.QtCore` from PySide_ must be available.
+    To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
 
     .. _PySide: http://www.pyside.org
 
