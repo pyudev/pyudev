@@ -47,7 +47,8 @@ release = pyudev.__version__
 html_theme = 'default'
 html_static_path = []
 
-intersphinx_mapping = {'python': ('http://docs.python.org/', None)}
+intersphinx_mapping = {'python': ('http://docs.python.org/', None),
+                       'pyside': ('http://www.pyside.org/docs/pyside/', None)}
 
 issuetracker = 'github'
 issuetracker_user = 'lunaryorn'
