@@ -1,5 +1,5 @@
-0.11 (in development)
-=====================
+0.11 (Jun 26, 2011)
+===================
 
 - #30: Added :attr:`pyudev.Device.sys_number`
 - #29: Added :meth:`pyudev.Device.from_device_number` and
