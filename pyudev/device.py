@@ -526,8 +526,8 @@ class Device(Mapping):
         Use :func:`os.major` and :func:`os.minor` to decompose the device
         number into its major and minor number:
 
-        >>> ctx = Context()
-        >>> sda = Device.from_name('block', 'sda')
+        >>> context = Context()
+        >>> sda = Device.from_name(context, 'block', 'sda')
         >>> sda.device_number
         2048L
         >>> (os.major(sda.device_number), os.minor(sda.device_number))
