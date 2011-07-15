@@ -329,7 +329,6 @@ class Device(Mapping):
     def __init__(self, context, _device):
         self.context = context
         self._as_parameter_ = _device
-        self._attributes = Attributes(self)
 
     def __del__(self):
         libudev.udev_device_unref(self)
@@ -621,7 +620,11 @@ class Device(Mapping):
 
         .. versionadded:: 0.5
         """
-        return self._attributes
+        # do *not* cache the created object in an attribute of this class.
+        # Doing so creates an uncollectable reference cycle between Device and
+        # Attributes, because Attributes refers to this object through
+        # Attributes.device.
+        return Attributes(self)
 
     @property
     def tags(self):

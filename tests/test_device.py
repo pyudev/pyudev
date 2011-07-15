@@ -24,6 +24,7 @@ import os
 import stat
 import operator
 import sys
+import gc
 from itertools import count
 from datetime import timedelta
 
@@ -270,7 +271,23 @@ class TestDevice(object):
     def test_attributes(self, device):
         # see TestAttributes for complete attribute tests
         assert isinstance(device.attributes, Attributes)
-        assert device.attributes is device._attributes
+
+    def test_attributes_no_leak(self, context):
+        """
+        Regression test for issue #32, modelled after the script which revealed
+        this issue.
+
+        The leak was caused by the following reference cycle between
+        ``Attributes`` and ``Device``:
+
+        Device._attributes -> Attributes.device
+
+        https://github.com/lunaryorn/pyudev/issues/32
+        """
+        for _ in context.list_devices(subsystem='usb'):
+            pass
+        # make sure that no memory leaks
+        assert not gc.garbage
 
     @pytest.mark.xfail(reason='Not implemented')
     @pytest.need_udev_version('>= 154')
