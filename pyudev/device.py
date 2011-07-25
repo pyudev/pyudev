@@ -124,8 +124,8 @@ class DeviceNotFoundByNumberError(DeviceNotFoundError):
         return self.args[1]
 
     def __str__(self):
-        return 'No {0.device_type} device with number {0.device_number}'.format(
-            self)
+        return ('No {0.device_type} device with number '
+                '{0.device_number}'.format(self))
 
 
 class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
