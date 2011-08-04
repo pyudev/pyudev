@@ -53,7 +53,7 @@ class TestEnumerator(object):
         assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
     @pytest.need_udev_version('>= 154')
-    def test_match_tags_mock(self, context):
+    def test_match_tag_mock(self, context):
         add_match_tag = 'udev_enumerate_add_match_tag'
         enumerator = context.list_devices()
         with pytest.patch_libudev(add_match_tag) as add_match_tag:
@@ -63,10 +63,10 @@ class TestEnumerator(object):
             args, _ = add_match_tag.call_args
             assert isinstance(args[1], bytes)
 
-    @pytest.mark.xfail(reason='Not implemented')
     @pytest.need_udev_version('>= 154')
-    def test_match_tags(self):
-        raise NotImplementedError()
+    def test_match_tag(self, context):
+        devices = list(context.list_devices().match_tag('seat'))
+        assert all('seat' in d.tags for d in devices)
 
     @pytest.need_udev_version('>= 165')
     def test_match_is_initialized(self, context):

@@ -289,10 +289,17 @@ class TestDevice(object):
         # make sure that no memory leaks
         assert not gc.garbage
 
-    @pytest.mark.xfail(reason='Not implemented')
     @pytest.need_udev_version('>= 154')
-    def test_device_tags(self):
-        raise NotImplementedError()
+    def test_device_tags(self, device):
+        try:
+            is_input_device = (device.asbool('ID_INPUT_MOUSE') or
+                               device.asbool('ID_INPUT_KEYBOARD'))
+        except KeyError:
+            is_input_device = False
+        if is_input_device:
+            assert 'seat' in device.tags
+        else:
+            pytest.skip('no tags known for device')
 
     @pytest.need_udev_version('>= 154')
     def test_device_tags_mock(self, device):
