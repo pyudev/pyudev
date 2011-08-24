@@ -51,7 +51,7 @@ intersphinx_mapping = {'python': ('http://docs.python.org/', None),
                        'pyside': ('http://www.pyside.org/docs/pyside/', None)}
 
 issuetracker = 'github'
-issuetracker_user = 'lunaryorn'
+issuetracker_project = 'lunaryorn/pyudev'
 
 
 class UDevMinimumVersion(Directive):
