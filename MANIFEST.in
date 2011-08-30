@@ -1,7 +1,7 @@
 recursive-include pyudev/ *.py
-recursive-include doc/ *.rst *.py Makefile
-recursive-include tests/ *.py
+recursive-include doc/ *.rst *.py
+recursive-include tests/ *.py Makefile *.mk
 include distribute_setup.py
-include tox.ini library_path_wrapper.py bootstrap_native_bindings.py
+include tox.ini
 global-include requirements.txt
 include CHANGES.rst COPYING README.rst
