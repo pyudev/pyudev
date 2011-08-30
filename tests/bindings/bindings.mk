@@ -59,5 +59,5 @@ endef
 
 define binding-rule
 .PHONY: $(1)
-$(1) : $$(if $(have$(1)),,build-$(1))
+$(1) : $$(if $$(have$(1)),,build-$(1))
 endef
