@@ -9,9 +9,10 @@ $(BUILDDIR) :
 	mkdir -p $(BUILDDIR)
 
 PYTHON = python
-PYTHON_MAJOR = $(shell $(PYTHON) -c 'import sys; print(sys.version_info[0])')
-PYTHON_MINOR = $(shell $(PYTHON) -c 'import sys; print(sys.version_info[1])')
-PYTHON_VERSION = $(PYTHON_MAJOR).$(PYTHON_MINOR)
+PYTHON_MAJOR := $(shell $(PYTHON) -c 'import sys; print(sys.version_info[0])')
+PYTHON_MINOR := $(shell $(PYTHON) -c 'import sys; print(sys.version_info[1])')
+PYTHON_VERSION := $(PYTHON_MAJOR).$(PYTHON_MINOR)
+PYTHON_FULL = python$(PYTHON_VERSION)
 
 PREFIX = $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.prefix)')
 LIBDIR = $(PREFIX)/lib
@@ -48,6 +49,19 @@ define cmake
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo $(2) ..
 	$(call make,$(1)/build)
+endef
+
+define waf
+	cd $(BUILDDIR)/$(1) && \
+		$(PYTHON) waf configure --prefix $(PREFIX)
+	cd $(BUILDDIR)/$(1) && $(PYTHON) waf build
+	cd $(BUILDDIR)/$(1) && $(PYTHON) waf install
+endef
+
+define autotools
+	cd $(BUILDDIR)/$(1) && \
+		PYTHON=$(PYTHON_FULL) ./configure --prefix $(PREFIX) $(2)
+	$(call make,$(1))
 endef
 
 define binding-rule

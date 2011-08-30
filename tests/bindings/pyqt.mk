@@ -11,7 +11,7 @@ $(eval $(call download-rule,$(pyqturl),$(pyqt).tar.gz))
 $(eval $(call builddir-rule,$(pyqt).tar.gz,$(pyqt)))
 
 build-pyqt : sip $(call builddir,$(pyqt))
-	$(call configure,$(pyqt)) --confirm-license --concatenate \
+	$(call sipconfigure,$(pyqt)) --confirm-license --concatenate \
 		--enable QtCore --no-designer-plugin --no-sip-files \
 		--no-qsci-api --qmake $(QMAKE)
 	$(call make,$(pyqt))
