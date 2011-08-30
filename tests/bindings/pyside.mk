@@ -11,7 +11,7 @@ pyside-disabled-modules = QtGui QtMultimedia QtNetwork QtOpenGL QtScript \
 	QtScriptTools QtSql QtSvg QtWebKit QtXml QtXmlPatterns QtDeclarative \
 	phonon QtUiTools QtHelp QtTest
 
-build-pyside: generatorrunner $(call builddir,$(pyside))
+build-pyside: shiboken $(call builddir,$(pyside))
 	$(call cmake,$(pyside), \
 		-DPython_ADDITIONAL_VERSIONS=$(PYTHON_VERSION) \
 		$(foreach mod,$(pyside-disabled-modules),-DDISABLE_$(mod)=ON))
