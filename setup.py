@@ -18,27 +18,45 @@
 
 
 import sys
+try:
+    import setuptools
+except ImportError:
+    import distribute_setup
+    distribute_setup.use_setuptools()
+    import setuptools
+
+from setuptools.command.build_py import build_py
+import setuptools.command.build_py
+
+import pyudev
+
+def find_fixers(blacklist=None):
+    blacklist = blacklist or []
+    names = getattr(build_py, 'fixer_names', None) or []
+    from lib2to3.refactor import get_fixers_from_package
+    for p in setuptools.lib2to3_fixer_packages:
+        names.extend(get_fixers_from_package(p))
+    # explicitly remove all blacklisted fixers to trigger value errors on
+    # non-existing filters in the blacklist
+    for f in blacklist:
+        names.remove(f)
+    build_py.fixer_names = names
+
 if sys.version_info[0] < 3:
     from codecs import open
     extra_arguments = {}
 else:
+    # Remove import fixer, because it blews up absolute imports on some python
+    # versions, see Python bug #8358
+    find_fixers(blacklist=['lib2to3.fixes.fix_import'])
     extra_arguments = dict(use_2to3=True)
-
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    import distribute_setup
-    distribute_setup.use_setuptools()
-    from setuptools import setup, find_packages
-
-import pyudev
 
 
 with open('README.rst', encoding='utf-8') as stream:
     long_description = stream.read()
 
 
-setup(
+setuptools.setup(
     name='pyudev',
     version=str(pyudev.__version__),
     url='http://packages.python.org/pyudev',
@@ -60,6 +78,6 @@ setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    packages=find_packages(),
+    packages=setuptools.find_packages(),
     **extra_arguments
     )
