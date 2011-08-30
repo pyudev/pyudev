@@ -3,9 +3,9 @@ include bindings/pyqt.mk
 include bindings/pyside.mk
 include bindings/pygobject.mk
 
-bindings = pyqt
+bindings = pyqt pygobject
 ifeq ($(PYTHON_MAJOR),2)
-bindings += pyside pygobject
+bindings += pyside
 endif
 
 .PHONY: bindings

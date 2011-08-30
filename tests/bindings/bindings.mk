@@ -51,13 +51,6 @@ define cmake
 	$(call make,$(1)/build)
 endef
 
-define waf
-	cd $(BUILDDIR)/$(1) && \
-		$(PYTHON) waf configure --prefix $(PREFIX)
-	cd $(BUILDDIR)/$(1) && $(PYTHON) waf build
-	cd $(BUILDDIR)/$(1) && $(PYTHON) waf install
-endef
-
 define autotools
 	cd $(BUILDDIR)/$(1) && \
 		PYTHON=$(PYTHON_FULL) ./configure --prefix $(PREFIX) $(2)
