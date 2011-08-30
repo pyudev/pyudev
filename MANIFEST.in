@@ -4,4 +4,4 @@ recursive-include tests/ *.py Makefile *.mk
 include distribute_setup.py
 include tox.ini
 global-include requirements.txt
-include CHANGES.rst COPYING README.rst
+include CHANGES.rst COPYING README.rst TESTING.rst

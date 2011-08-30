@@ -1,0 +1,4 @@
+Testing
+*******
+
+.. include:: ../TESTING.rst

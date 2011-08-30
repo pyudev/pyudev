@@ -62,6 +62,7 @@ the configuration email.
 
 Older discussions are available in the `list archives`_.
 
+
 .. _contribution:
 
 Contribution and Development
@@ -76,7 +77,9 @@ available in a git_ repository::
 
    git clone git://github.com/lunaryorn/pyudev.git
 
-Feel free to fork the repository.  Pull requests and patches are welcome!
+Feel free to fork the repository.  Pull requests and patches are welcome!  If
+you indent to contribute to pyudev, you may want to read the :doc:`testsuite
+documentation <testing>` to learn how to write unit tests for your code.
 
 
 .. rubric:: Footnotes
@@ -110,3 +113,4 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
    api/index
    licencing
    changes
+   testing
