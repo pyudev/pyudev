@@ -2,6 +2,7 @@
 =====================
 
 - #32: Fixed memory leak
+- #33: Fixed Python 3 support for :mod:`pyudev.glib`
 
 
 0.11 (Jun 26, 2011)

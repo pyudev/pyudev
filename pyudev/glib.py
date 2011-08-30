@@ -63,17 +63,22 @@ class GUDevMonitorObserver(gobject.GObject):
         'change': 'device-changed', 'move': 'device-moved'}
 
     __gsignals__ = {
-        # glib apparently expects byte-strings as signal names
-        b'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                          (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        b'device-added': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                          (gobject.TYPE_PYOBJECT,)),
-        b'device-removed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                            (gobject.TYPE_PYOBJECT,)),
-        b'device-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                            (gobject.TYPE_PYOBJECT,)),
-        b'device-moved': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                          (gobject.TYPE_PYOBJECT,)),
+        # explicitly convert the signal to str, because glib expects the
+        # *native* string type of the corresponding python version as type of
+        # signal name, and str() is the name of the native string type of both
+        # python versions.  We could also remove the "unicode_literals" import,
+        # but I don't want to make exceptions to the standard set of future
+        # imports used throughout pyudev for the sake of consistency.
+        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                              (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
+        str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT,)),
+        str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                                (gobject.TYPE_PYOBJECT,)),
+        str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                                (gobject.TYPE_PYOBJECT,)),
+        str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT,)),
         }
 
     def __init__(self, monitor):
