@@ -1,2 +1,2 @@
 sphinx>=1.0.7
-sphinxcontrib-issuetracker>=0.8
+sphinxcontrib-issuetracker>=0.9
