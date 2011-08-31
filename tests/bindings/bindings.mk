@@ -12,7 +12,9 @@ PYTHON = python
 PYTHON_MAJOR := $(shell $(PYTHON) -c 'import sys; print(sys.version_info[0])')
 PYTHON_MINOR := $(shell $(PYTHON) -c 'import sys; print(sys.version_info[1])')
 PYTHON_VERSION := $(PYTHON_MAJOR).$(PYTHON_MINOR)
-PYTHON_FULL = python$(PYTHON_VERSION)
+# full python executable name including the version, required for autotools
+# support
+PYTHON_FULL := python$(PYTHON_VERSION)
 
 PREFIX = $(shell $(PYTHON) -c 'import sys; sys.stdout.write(sys.prefix)')
 LIBDIR = $(PREFIX)/lib
@@ -53,11 +55,15 @@ endef
 
 define autotools
 	cd $(BUILDDIR)/$(1) && \
+# force autotools to use the full python version, otherwise headers won't be
+# found due to version mismatch between local python executable from virtualenv
+# and global python-config executable from system python
 		PYTHON=$(PYTHON_FULL) ./configure --prefix $(PREFIX) $(2)
 	$(call make,$(1))
 endef
 
 define binding-rule
 .PHONY: $(1)
+# only depend on the corresponding build rule if the binding isn't available
 $(1) : $$(if $$(have$(1)),,build-$(1))
 endef
