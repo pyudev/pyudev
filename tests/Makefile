@@ -1,7 +1,8 @@
 include bindings/bindings.mk
-include bindings/pyqt.mk
-include bindings/pyside.mk
-include bindings/pygobject.mk
+
+QT_MODULES = QtCore
+
+$(call enable-bindings,pyqt pyside pygobject)
 
 bindings = pyqt pygobject
 ifeq ($(PYTHON_MAJOR),2)
