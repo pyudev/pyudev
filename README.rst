@@ -45,7 +45,7 @@ Development
 Development happens on GitHub_.  The complete source code is available in a
 git_ repository::
 
-   git clone git://github.com/lunaryorn/pyudev.git
+   git clone --recursive git://github.com/lunaryorn/pyudev.git
 
 Feel free to fork the repository.  Pull requests and patches are welcome!
 
