@@ -1,0 +1,3 @@
+[submodule "tests/bindings"]
+	path = tests/bindings
+	url = git://github.com/lunaryorn/bindings
