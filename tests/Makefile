@@ -1,4 +1,4 @@
-include bindings/bindings.mk
+include buildbindings/bindings.mk
 
 QT_MODULES = QtCore
 
