@@ -3,6 +3,7 @@
 
 - #32: Fixed memory leak
 - #33: Fixed Python 3 support for :mod:`pyudev.glib`
+- Fixed license header in :mod:`pyudev._compat`
 
 
 0.11 (Jun 26, 2011)
