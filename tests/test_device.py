@@ -36,7 +36,7 @@ from pyudev import (Device,
                     DeviceNotFoundByNameError,
                     DeviceNotFoundByNumberError,
                     DeviceNotFoundInEnvironmentError)
-from pyudev.device import Attributes
+from pyudev.device import Attributes, Tags
 
 
 def pytest_generate_tests(metafunc):
@@ -272,7 +272,7 @@ class TestDevice(object):
         # see TestAttributes for complete attribute tests
         assert isinstance(device.attributes, Attributes)
 
-    def test_attributes_no_leak(self, context):
+    def test_no_leak(self, context):
         """
         Regression test for issue #32, modelled after the script which revealed
         this issue.
@@ -289,26 +289,9 @@ class TestDevice(object):
         # make sure that no memory leaks
         assert not gc.garbage
 
-    @pytest.need_udev_version('>= 154')
-    def test_device_tags(self, device):
-        try:
-            is_input_device = (device.asbool('ID_INPUT_MOUSE') or
-                               device.asbool('ID_INPUT_KEYBOARD'))
-        except KeyError:
-            is_input_device = False
-        if is_input_device:
-            assert 'seat' in device.tags
-        else:
-            pytest.skip('no tags known for device')
-
-    @pytest.need_udev_version('>= 154')
-    def test_device_tags_mock(self, device):
-        tags = [b'spam', b'eggs', b'foo', b'bar']
-        get_tags_list_entry = 'udev_device_get_tags_list_entry'
-        with pytest.patch_libudev_list(tags, get_tags_list_entry):
-            device_tags = list(device.tags)
-            assert device_tags == ['spam', 'eggs', 'foo', 'bar']
-            assert all(pytest.is_unicode_string(t) for t in device_tags)
+    def test_tags(self, device):
+        # see TestTags for complete tag tests
+        assert isinstance(device.tags, Tags)
 
     def test_iteration(self, device, properties):
         device_properties = set(device)
@@ -394,7 +377,7 @@ class TestAttributes(object):
         with pytest.patch_libudev_list(attributes,
                                        get_sysattr_list) as get_sysattr_list:
             attrs = list(device.attributes)
-            attrs == ['spam', 'eggs']
+            assert attrs == ['spam', 'eggs']
             get_sysattr_list.assert_called_with(device)
 
     def test_contains(self, device, attributes):
@@ -432,3 +415,26 @@ class TestAttributes(object):
                     device.attributes.asbool(attribute)
                 message = 'Not a boolean value: {0!r}'
                 assert str(exc_info.value) == message.format(value)
+
+
+class TestTags(object):
+
+    pytestmark = pytest.need_udev_version('>= 154')
+
+    def test_iteration(self, device, tags):
+        assert set(device.tags) == set(tags)
+        assert all(pytest.is_unicode_string(t) for t in device.tags)
+
+    def test_contains(self, device, tags):
+        assert all(t in device.tags for t in tags)
+
+    @pytest.need_udev_version('>= 172')
+    def test_contains_mock(self, device):
+        """
+        Test that ``udev_device_has_tag`` is called if available.
+        """
+        has_tag = 'udev_device_has_tag'
+        with pytest.patch_libudev(has_tag) as has_tag:
+            has_tag.return_value = 1
+            assert 'foo' in device.tags
+            has_tag.assert_called_with(device, b'foo')

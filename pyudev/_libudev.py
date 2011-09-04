@@ -138,7 +138,8 @@ SIGNATURES = {
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
         get_tags_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p),
-        get_sysattr_list_entry=([udev_device_p], udev_list_entry_p)),
+        get_sysattr_list_entry=([udev_device_p], udev_list_entry_p),
+        has_tag=([udev_device_p, c_char_p], c_int)),
     # monitoring
     'udev_monitor': dict(
         ref=([udev_monitor_p], udev_monitor_p),

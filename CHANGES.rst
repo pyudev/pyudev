@@ -1,6 +1,9 @@
 0.13 (in development)
 =====================
 
+- #34: :class:`pyudev.Device.tags` returns a :class:`pyudev.Tags` object
+  now
+
 
 0.12 (Aug 31, 2011)
 ===================

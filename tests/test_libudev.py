@@ -37,6 +37,7 @@ UDEV_ADDITIONS = {
           'udev_enumerate_add_match_is_initialized'],
     167: ['udev_get_run_path',
           'udev_device_get_sysattr_list_entry'],
+    172: ['udev_device_has_tag'],
     }
 
 
@@ -51,8 +52,8 @@ def pytest_generate_tests(metafunc):
         for version, functions in UDEV_ADDITIONS.items():
             for function in functions:
                 funcargs = dict(version=version, missing_function=function)
-                id = 'version {0}, {1}'.format(version, function)
-                metafunc.addcall(funcargs=funcargs, id=id)
+                testid = 'version {0}, {1}'.format(version, function)
+                metafunc.addcall(funcargs=funcargs, id=testid)
 
 
 def pytest_funcarg__signature(request):

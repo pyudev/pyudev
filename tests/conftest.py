@@ -391,6 +391,15 @@ def pytest_funcarg__properties(request):
     return properties
 
 
+def pytest_funcarg__tags(request):
+    """
+    Return the tags of the device pointed to by the ``device_path`` funcarg.
+    """
+    properties = request.getfuncargvalue('properties')
+    tags = properties.get('TAGS', '')
+    return [t for t in tags.split(':') if t]
+
+
 def pytest_funcarg__attributes(request):
     """
     Return a dictionary of all attributes for the device pointed to by the

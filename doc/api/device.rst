@@ -101,6 +101,12 @@
 
    .. automethod:: asbool
 
+.. autoclass:: Tags()
+
+   .. automethod:: __iter__
+
+   .. automethod:: __contains__
+
 
 Exceptions
 ----------

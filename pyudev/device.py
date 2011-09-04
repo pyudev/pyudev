@@ -29,7 +29,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-from collections import Mapping
+from collections import Mapping, Container, Iterable
 from datetime import timedelta
 
 from pyudev._libudev import libudev
@@ -37,7 +37,7 @@ from pyudev._util import (ensure_byte_string, ensure_unicode_string,
                           udev_list_iterate, string_to_bool)
 
 
-__all__ = ['Device', 'Attributes',
+__all__ = ['Device', 'Attributes', 'Tags',
            'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
            'DeviceNotFoundByNameError', 'DeviceNotFoundByNumberError',
            'DeviceNotFoundInEnvironmentError']
@@ -629,15 +629,31 @@ class Device(Mapping):
     @property
     def tags(self):
         """
-        An iterator, which yields all attached tags as unicode strings.
+        A :class:`Tags` object representing the tags attached to this device.
+
+        The :class:`Tags` object supports a test for a single tag as well as
+        iteration over all tags:
+
+        >>> 'systemd' in device.tags
+        True
+        >>> list(device.tags)
+        [u'systemd', u'seat']
+
+        Tags are arbitrary classifiers that can be attached to devices by udev
+        scripts and daemons.  For instance, systemd_ uses tags for multi-seat_
+        support.
+
+        .. _systemd: http://freedesktop.org/wiki/Software/systemd
+        .. _multi-seat: http://www.freedesktop.org/wiki/Software/systemd/multiseat
 
         .. udevminversion:: 154
 
         .. versionadded:: 0.6
+
+        .. versionchanged:: 0.13
+           Return a :class:`Tags` object now.
         """
-        tags = libudev.udev_device_get_tags_list_entry(self)
-        for tag, _ in udev_list_iterate(tags):
-            yield ensure_unicode_string(tag)
+        return Tags(self)
 
     def __iter__(self):
         """
@@ -735,6 +751,46 @@ class Device(Mapping):
 
     def __ge__(self, other):
         raise TypeError('Device not orderable')
+
+
+class Tags(Iterable, Container):
+    """
+    A iterable over :class:`Device` tags.
+
+    Subclasses the ``Container`` and the ``Iterable`` ABC.
+    """
+
+    def __init__(self, device):
+        self.device = device
+
+    if hasattr(libudev, 'udev_device_has_tag'):
+        def _has_tag(self, tag):
+            return bool(libudev.udev_device_has_tag(
+                self.device, ensure_byte_string(tag)))
+    else:
+        def _has_tag(self, tag):
+            return any(t == tag for t in self)
+
+    def __contains__(self, tag):
+        """
+        Check for existence of ``tag``.
+
+        ``tag`` is a tag as unicode string.
+
+        Return ``True``, if ``tag`` is attached to the device, ``False``
+        otherwise.
+        """
+        return self._has_tag(tag)
+
+    def __iter__(self):
+        """
+        Iterate over all tags.
+
+        Yield each tag as unicode string.
+        """
+        tags = libudev.udev_device_get_tags_list_entry(self.device)
+        for tag, _ in udev_list_iterate(tags):
+            yield ensure_unicode_string(tag)
 
 
 def _is_attribute_file(filepath):
