@@ -317,7 +317,7 @@ class Device(Mapping):
         Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
         created from the environment.
 
-        .. udevminversion:: 152
+        .. udevversion:: 152
 
         .. versionadded:: 0.6
         """
@@ -559,7 +559,7 @@ class Device(Mapping):
 
         .. seealso:: :attr:`time_since_initialized`
 
-        .. udevminversion:: 165
+        .. udevversion:: 165
 
         .. versionadded:: 0.8
         """
@@ -576,7 +576,7 @@ class Device(Mapping):
 
         .. seealso:: :attr:`is_initialized`
 
-        .. udevminversion:: 165
+        .. udevversion:: 165
 
         .. versionadded:: 0.8
         """
@@ -646,7 +646,7 @@ class Device(Mapping):
         .. _systemd: http://freedesktop.org/wiki/Software/systemd
         .. _multi-seat: http://www.freedesktop.org/wiki/Software/systemd/multiseat
 
-        .. udevminversion:: 154
+        .. udevversion:: 154
 
         .. versionadded:: 0.6
 

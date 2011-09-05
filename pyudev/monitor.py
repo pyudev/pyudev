@@ -189,7 +189,7 @@ class Monitor(object):
 
         This method must be called *before* :meth:`enable_receiving`.
 
-        .. udevminversion:: 154
+        .. udevversion:: 154
 
         .. versionadded:: 0.9
         """

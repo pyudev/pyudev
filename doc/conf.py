@@ -54,7 +54,7 @@ issuetracker = 'github'
 issuetracker_project = 'lunaryorn/pyudev'
 
 
-class UDevMinimumVersion(Directive):
+class UDevVersion(Directive):
     """
     Directive to document the minimum udev version to use an attribute or
     method
@@ -64,15 +64,14 @@ class UDevMinimumVersion(Directive):
     option_spec = {}
 
     def run(self):
-        version = self.arguments[0]
-        node = nodes.emphasis()
-        node['classes'].append('udev-min-version')
-        text = nodes.Text('Needs at least udev version {0}.'.format(version))
-        node.append(text)
-        return [node]
+        udevversion = self.arguments[0]
+        para = nodes.paragraph(udevversion, '', classes=['udevversion'])
+        text = 'Required udev version: {0}'.format(*self.arguments)
+        para.append(nodes.inline(udevversion, text, classes=['versionmodified']))
+        return [para]
 
 
 def setup(app):
     from sphinx.ext.autodoc import cut_lines
     app.connect(b'autodoc-process-docstring', cut_lines(2, what=['module']))
-    app.add_directive('udevminversion', UDevMinimumVersion)
+    app.add_directive('udevversion', UDevVersion)

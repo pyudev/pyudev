@@ -119,7 +119,7 @@ class Context(object):
         The run runtime directory path defaulting to ``/run`` as unicode
         string.
 
-        .. udevminversion:: 167
+        .. udevversion:: 167
 
         .. versionadded:: 0.10
         """
@@ -302,7 +302,7 @@ class Enumerator(object):
 
         Return the instance again.
 
-        .. udevminversion:: 154
+        .. udevversion:: 154
 
         .. versionadded:: 0.6
         """
@@ -323,7 +323,7 @@ class Enumerator(object):
 
         .. seealso:: :attr:`Device.is_initialized`
 
-        .. udevminversion:: 165
+        .. udevversion:: 165
 
         .. versionadded:: 0.8
         """
