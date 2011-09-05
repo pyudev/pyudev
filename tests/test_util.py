@@ -100,37 +100,10 @@ def test_udev_list_iterate_no_entry():
 
 
 def test_udev_list_iterate_mock():
-    test_list = iter(['spam', 'eggs', 'foo', 'bar'])
-
-    def next_entry(entry):
-        try:
-            return next(test_list)
-        except StopIteration:
-            return None
-
-    def name(entry):
-        if entry:
-            return entry
-        else:
-            pytest.fail('empty entry!')
-
-    def value(entry):
-        if entry:
-            return 'value of {0}'.format(entry)
-        else:
-            pytest.fail('empty entry!')
-
-    get_next = 'udev_list_entry_get_next'
-    get_name = 'udev_list_entry_get_name'
-    get_value = 'udev_list_entry_get_value'
-    with pytest.nested(pytest.patch_libudev(get_name),
-                       pytest.patch_libudev(get_next),
-                       pytest.patch_libudev(get_value)) as (get_name, get_next,
-                                                            get_value):
-        get_name.side_effect = name
-        get_next.side_effect = next_entry
-        get_value.side_effect = value
-        items = list(_util.udev_list_iterate(next(test_list)))
+    test_list = ['spam', 'eggs', 'foo', 'bar']
+    get_list_entry = 'udev_enumerate_get_list_entry'
+    with pytest.patch_libudev_list(test_list, get_list_entry) as get_list_entry:
+        items = list(_util.udev_list_iterate(get_list_entry()))
         assert items == [
             ('spam', 'value of spam'),
             ('eggs', 'value of eggs'),

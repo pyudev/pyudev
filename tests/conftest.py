@@ -24,7 +24,8 @@ import re
 import random
 import subprocess
 import socket
-from functools import wraps, partial
+from functools import wraps
+from collections import namedtuple
 from contextlib import contextmanager
 from subprocess import check_call
 if sys.version_info[:2] < (3, 2):
@@ -212,22 +213,35 @@ def patch_libudev(funcname):
         yield func
 
 
+class Node(namedtuple('Node', 'name next')):
+    """
+    Node in a :class:`LinkedList`.
+    """
+    @property
+    def value(self):
+        return 'value of {0}'.format(self.name)
+
+
+class LinkedList(object):
+    """
+    Linked list class to mock libudev list functions.
+    """
+
+    @classmethod
+    def from_sequence(cls, items):
+        next_node = None
+        for item in reversed(items):
+            node = Node(item, next_node)
+            next_node = node
+        return cls(next_node)
+
+    def __init__(self, first):
+        self.first = first
+
+
 @contextmanager
 def patch_libudev_list(items, list_func):
-    item_list = iter(items)
-
-    def name(entry):
-        if entry:
-            return entry
-        else:
-            pytest.fail('empty entry!')
-
-    def value(entry):
-        if entry:
-            return 'value of {0}'.format(entry)
-        else:
-            pytest.fail('empty entry!')
-
+    linked_list = LinkedList.from_sequence(items)
     get_next = 'udev_list_entry_get_next'
     get_name = 'udev_list_entry_get_name'
     get_value = 'udev_list_entry_get_value'
@@ -237,10 +251,10 @@ def patch_libudev_list(items, list_func):
                        pytest.patch_libudev(list_func)) as (get_next, get_name,
                                                             get_value,
                                                             list_func):
-        list_func.return_value = next(item_list)
-        get_name.side_effect = name
-        get_value.side_effect = value
-        get_next.side_effect = lambda e: next(item_list, None)
+        list_func.return_value = linked_list.first
+        get_name.side_effect = lambda e: e.name
+        get_value.side_effect = lambda e: e.value
+        get_next.side_effect = lambda e: e.next
         yield list_func
 
 
