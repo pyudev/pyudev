@@ -219,9 +219,16 @@ class Monitor(object):
 
     def set_receive_buffer_size(self, size):
         """
-        Sets the receive buffer size.
+        Set the receive buffer ``size``.
 
-        ``size`` is the value of the requested size, in bytes.
+        ``size`` is the requested buffer size in bytes, as integer.
+
+        .. note::
+
+           This method requires CAP_NET_ADMIN privileges from the caller.
+
+        Raise :exc:`~exceptions.EnvironmentError`, if the buffer size could not
+        bet set.
         """
         error = libudev.udev_monitor_set_receive_buffer_size(self, size)
         if error:
