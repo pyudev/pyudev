@@ -217,6 +217,17 @@ class Monitor(object):
 
     start = enable_receiving
 
+    def set_receive_buffer_size(self, size):
+        """
+        Sets the receive buffer size.
+
+        ``size`` is the value of the requested size, in bytes.
+        """
+        error = libudev.udev_monitor_set_receive_buffer_size(self, size)
+        if error:
+            errno = get_libudev_errno()
+            raise EnvironmentError(errno, os.strerror(errno))
+
     def receive_device(self):
         """
         Receive a single device from the monitor.
