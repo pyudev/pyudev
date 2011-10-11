@@ -217,6 +217,24 @@ class Monitor(object):
 
     start = enable_receiving
 
+    def set_receive_buffer_size(self, size):
+        """
+        Set the receive buffer ``size``.
+
+        ``size`` is the requested buffer size in bytes, as integer.
+
+        .. note::
+
+           This method requires CAP_NET_ADMIN privileges from the caller.
+
+        Raise :exc:`~exceptions.EnvironmentError`, if the buffer size could not
+        bet set.
+        """
+        error = libudev.udev_monitor_set_receive_buffer_size(self, size)
+        if error:
+            errno = get_libudev_errno()
+            raise EnvironmentError(errno, os.strerror(errno))
+
     def receive_device(self):
         """
         Receive a single device from the monitor.
