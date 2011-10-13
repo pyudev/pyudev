@@ -27,6 +27,8 @@
 
       Alias for :meth:`enable_receiving`
 
+   .. automethod:: set_receive_buffer_size
+
    .. automethod:: receive_device
 
    .. automethod:: __iter__
