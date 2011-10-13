@@ -197,6 +197,33 @@ class TestMonitor(object):
                 error = exc_info.value
                 assert error.filename == str(socket_path)
 
+    def test_set_receive_buffer_size_mock(self, monitor):
+        set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
+        with pytest.patch_libudev(set_receive_buffer_size) as func:
+            func.return_value = 0
+            monitor.set_receive_buffer_size(1000)
+            func.assert_called_with(monitor, 1000)
+
+    def test_set_receive_buffer_size_error_mock(self, monitor):
+        set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
+        with pytest.patch_libudev(set_receive_buffer_size) as func:
+            func.return_value = 1
+            with mock.patch('pyudev.monitor.get_libudev_errno') as geterrno:
+                geterrno.return_value = errno.EINVAL
+                with pytest.raises(EnvironmentError) as exc_info:
+                    monitor.set_receive_buffer_size(100)
+                func.assert_called_with(monitor, 100)
+                error = exc_info.value
+                assert error.errno == errno.EINVAL
+                assert error.strerror == os.strerror(errno.EINVAL)
+
+    def test_set_receive_buffer_size_privilege_error(self, monitor):
+        with pytest.raises(EnvironmentError) as exc_info:
+            monitor.set_receive_buffer_size(1000)
+        error = exc_info.value
+        assert error.errno == errno.EPERM
+        assert error.strerror == os.strerror(errno.EPERM)
+
     @pytest.mark.privileged
     def test_receive_device(self, monitor):
         # forcibly unload the dummy module to avoid hangs
