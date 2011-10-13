@@ -225,10 +225,20 @@ class Monitor(object):
 
         .. note::
 
-           This method requires CAP_NET_ADMIN privileges from the caller.
+           The CAP_NET_ADMIN capability must be contained in the effective
+           capability set of the caller for this method to succeed.  Otherwise
+           :exc:`~exceptions.EnvironmentError` will be raised, with ``errno``
+           set to :data:`~errno.EPERM`.  Unprivileged processes typically lack
+           this capability.  You can check the capabilities of the current
+           process with the python-prctl_ module:
+
+           >>> import prctl
+           >>> prctl.cap_effective.net_admin
 
         Raise :exc:`~exceptions.EnvironmentError`, if the buffer size could not
         bet set.
+
+        .. _python-prctl: http://packages.python.org/python-prctl
         """
         error = libudev.udev_monitor_set_receive_buffer_size(self, size)
         if error:
