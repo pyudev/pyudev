@@ -1,6 +1,8 @@
 0.13 (in development)
 =====================
 
+- #36: Added :meth:`pyudev.Monitor.set_receive_buffer_size` (thanks to Rémi
+  Rérolle)
 - #34: :class:`pyudev.Device.tags` returns a :class:`pyudev.Tags` object
   now
 
