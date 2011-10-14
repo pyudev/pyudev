@@ -20,7 +20,6 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
-import os
 import socket
 import errno
 
@@ -164,10 +163,7 @@ class TestMonitor(object):
         monitor = Monitor.from_socket(context, str(socket_path))
         with pytest.raises(EnvironmentError) as exc_info:
             monitor.enable_receiving()
-        error = exc_info.value
-        assert error.errno == errno.EADDRINUSE
-        assert error.strerror == os.strerror(errno.EADDRINUSE)
-        assert error.filename == str(socket_path)
+        pytest.assert_env_error(exc_info.value, errno.EADDRINUSE, str(socket_path))
 
     def test_enable_receiving_alias(self):
         assert Monitor.start == Monitor.enable_receiving
@@ -178,25 +174,6 @@ class TestMonitor(object):
             monitor.enable_receiving()
             func.assert_called_with(monitor)
 
-    def test_enable_receiving_error_mock(self, context, monitor, socket_path):
-        enable_receiving = 'udev_monitor_enable_receiving'
-        get_errno = 'pyudev.monitor.get_libudev_errno'
-        with pytest.nested(pytest.patch_libudev(enable_receiving),
-                           mock.patch(get_errno)) as (enable_receiving, get_errno):
-            get_errno.return_value = errno.ENOENT
-            enable_receiving.return_value = 1
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.enable_receiving()
-            error = exc_info.value
-            assert error.errno == errno.ENOENT
-            assert error.strerror == os.strerror(errno.ENOENT)
-
-            monitor = Monitor.from_socket(context, str(socket_path))
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.enable_receiving()
-            error = exc_info.value
-            assert error.filename == str(socket_path)
-
     def test_set_receive_buffer_size_mock(self, monitor):
         set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
         with pytest.patch_libudev(set_receive_buffer_size) as func:
@@ -204,25 +181,11 @@ class TestMonitor(object):
             monitor.set_receive_buffer_size(1000)
             func.assert_called_with(monitor, 1000)
 
-    def test_set_receive_buffer_size_error_mock(self, monitor):
-        set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
-        with pytest.patch_libudev(set_receive_buffer_size) as func:
-            func.return_value = 1
-            with mock.patch('pyudev.monitor.get_libudev_errno') as geterrno:
-                geterrno.return_value = errno.EINVAL
-                with pytest.raises(EnvironmentError) as exc_info:
-                    monitor.set_receive_buffer_size(100)
-                func.assert_called_with(monitor, 100)
-                error = exc_info.value
-                assert error.errno == errno.EINVAL
-                assert error.strerror == os.strerror(errno.EINVAL)
-
-    def test_set_receive_buffer_size_privilege_error(self, monitor):
+    def test_set_receive_buffer_size_privilege_error(self, monitor,
+                                                     socket_path):
         with pytest.raises(EnvironmentError) as exc_info:
             monitor.set_receive_buffer_size(1000)
-        error = exc_info.value
-        assert error.errno == errno.EPERM
-        assert error.strerror == os.strerror(errno.EPERM)
+        pytest.assert_env_error(exc_info.value, errno.EPERM)
 
     @pytest.mark.privileged
     def test_receive_device(self, monitor):
@@ -259,23 +222,6 @@ class TestMonitor(object):
             assert device._as_parameter_ is mock.sentinel.pointer
             get_action.assert_called_with(mock.sentinel.pointer)
             receive_device.assert_called_with(monitor)
-
-    def test_receive_device_error_mock(self, monitor):
-        get_errno = 'pyudev.monitor.get_libudev_errno'
-        receive_device = 'udev_monitor_receive_device'
-        with pytest.nested(pytest.patch_libudev(receive_device),
-                           mock.patch(get_errno)) as (receive_device, get_errno):
-            receive_device.return_value = None
-            get_errno.return_value = 0
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.receive_device()
-            assert str(exc_info.value) == 'Could not receive device'
-            get_errno.return_value = errno.ENOENT
-            with pytest.raises(EnvironmentError) as exc_info:
-                monitor.receive_device()
-            error = exc_info.value
-            assert error.errno == errno.ENOENT
-            assert error.strerror == os.strerror(errno.ENOENT)
 
     @pytest.mark.privileged
     def test_iter(self, monitor):

@@ -29,11 +29,11 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import os
+import sys
 import select
 from contextlib import closing
 
-from pyudev._libudev import libudev, get_libudev_errno
+from pyudev._libudev import libudev
 from pyudev._util import ensure_byte_string, ensure_unicode_string
 
 from pyudev.core import Device
@@ -81,6 +81,10 @@ class Monitor(object):
         self.context = context
         self._as_parameter_ = monitor_p
         self._socket_path = socket_path
+
+    def _reraise_with_socket_path(self, exc_type, exc_value, traceback):
+        exc_value.filename = self._socket_path
+        raise exc_type, exc_value, traceback
 
     def __del__(self):
         libudev.udev_monitor_unref(self)
@@ -209,11 +213,10 @@ class Monitor(object):
            need to call it explicitly, if you are iterating over the
            monitor.
         """
-        error = libudev.udev_monitor_enable_receiving(self)
-        if error:
-            errno = get_libudev_errno()
-            raise EnvironmentError(errno, os.strerror(errno),
-                                   self._socket_path)
+        try:
+            libudev.udev_monitor_enable_receiving(self)
+        except EnvironmentError:
+            self._reraise_with_socket_path(*sys.exc_info())
 
     start = enable_receiving
 
@@ -240,10 +243,10 @@ class Monitor(object):
 
         .. _python-prctl: http://packages.python.org/python-prctl
         """
-        error = libudev.udev_monitor_set_receive_buffer_size(self, size)
-        if error:
-            errno = get_libudev_errno()
-            raise EnvironmentError(errno, os.strerror(errno))
+        try:
+            libudev.udev_monitor_set_receive_buffer_size(self, size)
+        except EnvironmentError:
+            self._reraise_with_socket_path(*sys.exc_info())
 
     def receive_device(self):
         """
@@ -269,13 +272,12 @@ class Monitor(object):
         Raise :exc:`~exceptions.EnvironmentError`, if no device could be
         read.
         """
-        device_p = libudev.udev_monitor_receive_device(self)
+        try:
+            device_p = libudev.udev_monitor_receive_device(self)
+        except EnvironmentError:
+            self._reraise_with_socket_path(*sys.exc_info())
         if not device_p:
-            errno = get_libudev_errno()
-            if errno == 0:
-                raise EnvironmentError('Could not receive device')
-            else:
-                raise EnvironmentError(errno, os.strerror(errno))
+            raise EnvironmentError('Could not receive device')
         action = ensure_unicode_string(
             libudev.udev_device_get_action(device_p))
         return action, Device(self.context, device_p)

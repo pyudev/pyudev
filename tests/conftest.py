@@ -207,6 +207,13 @@ def get_device_sample(config):
         return random.sample(list(config.udev_database), actual_size)
 
 
+def assert_env_error(error, errno, filename=None):
+    __tracebackhide__ = True
+    assert error.errno == errno
+    assert error.strerror == os.strerror(errno)
+    assert error.filename == filename
+
+
 @contextmanager
 def patch_libudev(funcname):
     with mock.patch('pyudev._libudev.libudev.{0}'.format(funcname)) as func:
@@ -320,7 +327,7 @@ def pytest_namespace():
     return dict((func.__name__, func) for func in
                 (get_device_sample, patch_libudev, load_dummy, nested,
                  unload_dummy, is_unicode_string, need_udev_version,
-                 patch_libudev_list))
+                 patch_libudev_list, assert_env_error))
 
 
 def pytest_addoption(parser):

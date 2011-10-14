@@ -156,6 +156,24 @@ SIGNATURES = {
     }
 
 
+ERRNO_EXCEPTIONS = {ENOMEM: MemoryError, EOVERFLOW: OverflowError}
+
+
+def exception_from_errno(errno):
+    """
+    Create an exception from ``errno``.
+
+    ``errno`` is an integral error number.
+
+    Return an exception object appropriate to ``errno``.
+    """
+    exception = ERRNO_EXCEPTIONS.get(errno)
+    if exception is not None:
+        return exception()
+    else:
+        return EnvironmentError(errno, os.strerror(errno))
+
+
 def check_negative_errorcode(result, func, *args):
     """
     Error checker for udev funtions, which return negative error codes.
@@ -171,15 +189,40 @@ def check_negative_errorcode(result, func, *args):
     """
     if result < 0:
         # udev returns the *negative* errno code at this point
-        errorcode = -result
-        exceptions = {ENOMEM: MemoryError, EOVERFLOW: OverflowError}
-        exception = exceptions.get(errorcode)
-        if exception is not None:
-            raise exception()
-        else:
-            raise EnvironmentError(errorcode, os.strerror(errorcode))
+        errno = -result
+        raise exception_from_errno(errno)
     else:
         return result
+
+
+def check_errno(result, func, *args):
+    """
+    Error checker to check the system ``errno`` as returned by
+    :func:`ctypes.get_errno()`.
+
+    If ``result`` is not ``0``, an exception according to this errno is raised.
+    Otherwise nothing happens.
+    """
+    if result != 0:
+        errno = get_errno()
+        if errno != 0:
+            raise exception_from_errno(errno)
+    return result
+
+
+def check_errno_on_null_pointer(result, func, *args):
+    """
+    Error checker to check the system ``errno`` as returned by
+    :func:`ctypes.get_errno()`.
+
+    If ``result`` is a null pointer, an exception according to this errno is
+    raised.  Otherwise nothing happens.
+    """
+    if not result:
+        errno = get_errno()
+        if errno != 0:
+            raise exception_from_errno(errno)
+    return result
 
 
 ERROR_CHECKERS = dict(
@@ -188,6 +231,11 @@ ERROR_CHECKERS = dict(
     udev_enumerate_add_match_tag=check_negative_errorcode,
     udev_enumerate_add_match_sysname=check_negative_errorcode,
     udev_enumerate_add_match_is_initialized=check_negative_errorcode,
+    udev_monitor_set_receive_buffer_size=check_errno,
+    # libudev doc says, enable_receiving returns a negative errno, but tests
+    # show that this is not reliable, so query the real error code
+    udev_monitor_enable_receiving=check_errno,
+    udev_monitor_receive_device=check_errno_on_null_pointer,
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode,
     udev_monitor_filter_add_match_tag=check_negative_errorcode)
 
@@ -222,7 +270,3 @@ def load_udev_library():
 
 
 libudev = load_udev_library()
-
-
-def get_libudev_errno():
-    return get_errno()
