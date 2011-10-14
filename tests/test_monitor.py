@@ -183,19 +183,19 @@ class TestMonitor(object):
         get_errno = 'pyudev.monitor.get_libudev_errno'
         with pytest.nested(pytest.patch_libudev(enable_receiving),
                            mock.patch(get_errno)) as (enable_receiving, get_errno):
-                get_errno.return_value = errno.ENOENT
-                enable_receiving.return_value = 1
-                with pytest.raises(EnvironmentError) as exc_info:
-                    monitor.enable_receiving()
-                error = exc_info.value
-                assert error.errno == errno.ENOENT
-                assert error.strerror == os.strerror(errno.ENOENT)
+            get_errno.return_value = errno.ENOENT
+            enable_receiving.return_value = 1
+            with pytest.raises(EnvironmentError) as exc_info:
+                monitor.enable_receiving()
+            error = exc_info.value
+            assert error.errno == errno.ENOENT
+            assert error.strerror == os.strerror(errno.ENOENT)
 
-                monitor = Monitor.from_socket(context, str(socket_path))
-                with pytest.raises(EnvironmentError) as exc_info:
-                    monitor.enable_receiving()
-                error = exc_info.value
-                assert error.filename == str(socket_path)
+            monitor = Monitor.from_socket(context, str(socket_path))
+            with pytest.raises(EnvironmentError) as exc_info:
+                monitor.enable_receiving()
+            error = exc_info.value
+            assert error.filename == str(socket_path)
 
     def test_set_receive_buffer_size_mock(self, monitor):
         set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
