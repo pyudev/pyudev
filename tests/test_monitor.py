@@ -22,6 +22,7 @@ from __future__ import (print_function, division, unicode_literals,
 import sys
 import socket
 import errno
+from select import select
 
 import pytest
 import mock
@@ -195,6 +196,7 @@ class TestMonitor(object):
         monitor.enable_receiving()
         # load the dummy device to trigger an add event
         pytest.load_dummy()
+        select([monitor], [], [])
         action, device = monitor.receive_device()
         assert action == 'add'
         assert device.subsystem == 'net'
