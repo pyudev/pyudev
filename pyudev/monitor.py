@@ -241,6 +241,8 @@ class Monitor(object):
         Raise :exc:`~exceptions.EnvironmentError`, if the buffer size could not
         bet set.
 
+        .. versionadded:: 0.13
+
         .. _python-prctl: http://packages.python.org/python-prctl
         """
         try:
