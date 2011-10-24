@@ -34,7 +34,7 @@ import select
 from contextlib import closing
 
 from pyudev._libudev import libudev
-from pyudev._util import ensure_byte_string, ensure_unicode_string
+from pyudev._util import ensure_byte_string, ensure_unicode_string, reraise
 
 from pyudev.core import Device
 
@@ -82,9 +82,10 @@ class Monitor(object):
         self._as_parameter_ = monitor_p
         self._socket_path = socket_path
 
-    def _reraise_with_socket_path(self, exc_type, exc_value, traceback):
+    def _reraise_with_socket_path(self):
+        _, exc_value, traceback = sys.exc_info()
         exc_value.filename = self._socket_path
-        raise exc_type, exc_value, traceback
+        reraise(exc_value, traceback)
 
     def __del__(self):
         libudev.udev_monitor_unref(self)
@@ -216,7 +217,7 @@ class Monitor(object):
         try:
             libudev.udev_monitor_enable_receiving(self)
         except EnvironmentError:
-            self._reraise_with_socket_path(*sys.exc_info())
+            self._reraise_with_socket_path()
 
     start = enable_receiving
 
@@ -248,7 +249,7 @@ class Monitor(object):
         try:
             libudev.udev_monitor_set_receive_buffer_size(self, size)
         except EnvironmentError:
-            self._reraise_with_socket_path(*sys.exc_info())
+            self._reraise_with_socket_path()
 
     def receive_device(self):
         """
@@ -277,7 +278,7 @@ class Monitor(object):
         try:
             device_p = libudev.udev_monitor_receive_device(self)
         except EnvironmentError:
-            self._reraise_with_socket_path(*sys.exc_info())
+            self._reraise_with_socket_path()
         if not device_p:
             raise EnvironmentError('Could not receive device')
         action = ensure_unicode_string(
