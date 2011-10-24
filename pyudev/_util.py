@@ -33,6 +33,11 @@ import sys
 
 from pyudev._libudev import libudev
 
+if sys.version_info[0] == 2:
+    from pyudev._py2util import *
+else:
+    from pyudev._py3util import *
+
 
 def ensure_byte_string(value):
     """
