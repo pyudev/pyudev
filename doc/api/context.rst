@@ -29,6 +29,8 @@
 
    .. automethod:: match_tag
 
+   .. automethod:: match_parent
+
    .. automethod:: match_is_initialized
 
    .. automethod:: match_children
