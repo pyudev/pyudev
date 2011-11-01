@@ -50,12 +50,14 @@ class TestEnumerator(object):
         assert all(d.driver == 'usb' for d in devices)
 
     def test_match_property_int(self, context):
-        devices = list(context.list_devices().match_property('ID_INPUT_KEY', 1))
+        devices = list(context.list_devices().match_property(
+            'ID_INPUT_KEY', 1))
         assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
         assert all(d.asint('ID_INPUT_KEY') == 1 for d in devices)
 
     def test_match_property_bool(self, context):
-        devices = list(context.list_devices().match_property('ID_INPUT_KEY', True))
+        devices = list(context.list_devices().match_property(
+            'ID_INPUT_KEY', True))
         assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
         assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
