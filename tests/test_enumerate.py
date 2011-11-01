@@ -34,6 +34,11 @@ def pytest_generate_tests(metafunc):
             metafunc.addcall(id=device_path, param=device_path)
 
 
+def pytest_funcarg__enumerator(request):
+    context = request.getfuncargvalue('context')
+    return context.list_devices()
+
+
 class TestEnumerator(object):
 
     def test_match_subsystem(self, context):
@@ -142,31 +147,39 @@ class TestEnumerator(object):
         assert all(d.asbool('ID_INPUT_MOUSE') for d in devices)
         assert all(d.sys_name == 'mouse0' for d in devices)
 
-    def test_match_passthrough(self, context):
-        """
-        Test pass-through of all keyword arguments
-        """
-        enumerator = context.list_devices()
-        patch_enum = partial(mock.patch.object, enumerator, mocksignature=True)
-        with pytest.nested(patch_enum('match_subsystem'),
-                           patch_enum('match_sys_name'),
-                           patch_enum('match_tag'),
-                           patch_enum('match_property')) as (match_subsystem,
-                                                             match_sys_name,
-                                                             match_tag,
-                                                             match_property):
-            enumerator.match(subsystem=mock.sentinel.subsystem,
-                             sys_name=mock.sentinel.sys_name,
-                             tag=mock.sentinel.tag,
-                             prop1=mock.sentinel.prop1,
-                             prop2=mock.sentinel.prop2)
+    def test_match_passthrough_subsystem(self, enumerator):
+        with mock.patch.object(enumerator, 'match_subsystem',
+                               mocksignature=True) as match_subsystem:
+            enumerator.match(subsystem=mock.sentinel.subsystem)
             match_subsystem.assert_called_with(mock.sentinel.subsystem)
+
+    def test_match_passthrough_sys_name(self, enumerator):
+        with mock.patch.object(enumerator, 'match_sys_name',
+                               mocksignature=True) as match_sys_name:
+            enumerator.match(sys_name=mock.sentinel.sys_name)
             match_sys_name.assert_called_with(mock.sentinel.sys_name)
+
+    def test_match_passthrough_tag(self, enumerator):
+        with mock.patch.object(enumerator, 'match_tag',
+                               mocksignature=True) as match_tag:
+            enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
+
+    @pytest.need_udev_version('>= 172')
+    def test_match_passthrough_parent(self, enumerator):
+        with mock.patch.object(enumerator, 'match_parent',
+                               mocksignature=True) as match_parent:
+            enumerator.match(parent=mock.sentinel.parent)
+            match_parent.assert_called_with(mock.sentinel.parent)
+
+    def test_match_passthrough_property(self, enumerator):
+        with mock.patch.object(enumerator, 'match_property',
+                               mocksignature=True) as match_property:
+            enumerator.match(eggs=mock.sentinel.eggs, spam=mock.sentinel.spam)
             assert match_property.call_count == 2
-            positional_args = [args for args, _ in match_property.call_args_list]
-            assert ('prop1', mock.sentinel.prop1) in positional_args
-            assert ('prop2', mock.sentinel.prop2) in positional_args
+            posargs = [args for args, _ in match_property.call_args_list]
+            assert ('spam', mock.sentinel.spam) in posargs
+            assert ('eggs', mock.sentinel.eggs) in posargs
 
 
 class TestContext(object):
@@ -185,11 +198,13 @@ class TestContext(object):
             context.list_devices(subsystem=mock.sentinel.subsystem,
                                  sys_name=mock.sentinel.sys_name,
                                  tag=mock.sentinel.tag,
+                                 parent=mock.sentinel.parent,
                                  prop1=mock.sentinel.prop1,
                                  prop2=mock.sentinel.prop2)
             match.assert_called_with(
                 subsystem=mock.sentinel.subsystem,
                 sys_name=mock.sentinel.sys_name,
                 tag=mock.sentinel.tag,
+                parent=mock.sentinel.parent,
                 prop1=mock.sentinel.prop1,
                 prop2=mock.sentinel.prop2)
