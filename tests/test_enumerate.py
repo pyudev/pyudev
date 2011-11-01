@@ -27,6 +27,13 @@ import mock
 from pyudev import Enumerator
 
 
+def pytest_generate_tests(metafunc):
+    if 'device' in metafunc.funcargnames:
+        devices = pytest.get_device_sample(metafunc.config)
+        for device_path in devices:
+            metafunc.addcall(id=device_path, param=device_path)
+
+
 class TestEnumerator(object):
 
     def test_match_subsystem(self, context):
@@ -67,6 +74,15 @@ class TestEnumerator(object):
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
         assert all('seat' in d.tags for d in devices)
+
+    def test_match_parent(self, context, device):
+        parent = device.parent
+        if parent is None:
+            pytest.skip('Device {0!r} has no parent'.format(device))
+        else:
+            children = list(context.list_devices().match_parent(parent))
+            assert device in children
+            assert parent in children
 
     @pytest.need_udev_version('>= 165')
     def test_match_is_initialized(self, context):
