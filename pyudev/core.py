@@ -221,7 +221,9 @@ class Enumerator(object):
         - The value for the keyword argument ``sys_name`` is forwared to
           :meth:`match_sys_name()`.
         - The value for the keyword argument ``tag`` is forwared to
-          :meth:`match_tag()`
+          :meth:`match_tag()`.
+        - The value for the keyword argument ``parent`` is forwared to
+          :meth:`match_parent()`.
         - All other keyword arguments are forwareded one by one to
           :meth:`match_property()`.  The keyword argument itself is interpreted
           as property name, the value of the keyword argument as the property
@@ -233,6 +235,9 @@ class Enumerator(object):
         Return the instance again.
 
         .. versionadded:: 0.8
+
+        .. versionchanged:: 0.13
+           Added ``parent`` keyword
         """
         subsystem = kwargs.pop('subsystem', None)
         if subsystem is not None:
@@ -243,6 +248,9 @@ class Enumerator(object):
         tag = kwargs.pop('tag', None)
         if tag is not None:
             self.match_tag(tag)
+        parent = kwargs.pop('parent', None)
+        if parent is not None:
+            self.match_parent(parent)
         for property, value in kwargs.iteritems():
             self.match_property(property, value)
         return self
