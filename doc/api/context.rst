@@ -33,6 +33,4 @@
 
    .. automethod:: match_is_initialized
 
-   .. automethod:: match_children
-
    .. automethod:: __iter__

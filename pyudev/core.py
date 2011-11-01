@@ -206,7 +206,6 @@ class Enumerator(object):
             raise TypeError('Invalid context object')
         self.context = context
         self._as_parameter_ = libudev.udev_enumerate_new(context)
-        self._parents = []
 
     def __del__(self):
         libudev.udev_enumerate_unref(self)
@@ -338,16 +337,6 @@ class Enumerator(object):
         libudev.udev_enumerate_add_match_is_initialized(self)
         return self
 
-    def match_children(self, device):
-        """
-        Include all *direct* children of the given ``device``.  A child is a
-        device, whose :attr:`Device.parent` points to ``device``.
-
-        Return the instance again.
-        """
-        self._parents.append(device)
-        return self
-
     def match_parent(self, parent):
         """
         Include all devices on the subtree of the given ``parent`` device.
@@ -357,6 +346,8 @@ class Enumerator(object):
         ``parent`` is a :class:`~pyudev.Device`.
 
         Return the instance again.
+
+        .. udevversion:: 172
 
         .. versionadded:: 0.13
         """
@@ -372,7 +363,4 @@ class Enumerator(object):
         libudev.udev_enumerate_scan_devices(self)
         entry = libudev.udev_enumerate_get_list_entry(self)
         for name, _ in udev_list_iterate(entry):
-            device = Device.from_sys_path(self.context, name)
-            if (not self._parents) or any(device.parent == p for p
-                                          in self._parents):
-                yield device
+            yield Device.from_sys_path(self.context, name)

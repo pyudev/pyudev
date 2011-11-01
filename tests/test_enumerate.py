@@ -75,6 +75,7 @@ class TestEnumerator(object):
         devices = list(context.list_devices().match_tag('seat'))
         assert all('seat' in d.tags for d in devices)
 
+    @pytest.need_udev_version('>= 172')
     def test_match_parent(self, context, device):
         parent = device.parent
         if parent is None:

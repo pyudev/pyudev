@@ -144,12 +144,22 @@ class TestDevice(object):
 
     def test_parent(self, device):
         assert device.parent is None or isinstance(device.parent, Device)
-        if device.parent:
+
+    @pytest.need_udev_version('>= 172')
+    def test_child_of_parent(self, device):
+        if device.parent is None:
+            pytest.skip('Device {0!r} has no parent'.format(device))
+        else:
             assert device in device.parent.children
 
+    @pytest.need_udev_version('>= 172')
     def test_children(self, device):
-        for child in device.children:
-            assert child.parent == device
+        children = list(device.children)
+        if not children:
+            pytest.skip('Device {0!r} has no children'.format(device))
+        else:
+            assert all(c != device for c in children)
+            assert all(c.parent == device for c in children)
 
     def test_find_parent(self, device):
         parent = device.find_parent(device.subsystem)
@@ -157,7 +167,6 @@ class TestDevice(object):
             pytest.xfail('no parent within the same subsystem')
         assert parent.subsystem == device.subsystem
         assert parent in device.traverse()
-        assert device in parent.children
 
     def test_find_parent_no_devtype_mock(self, device):
         get_parent = 'udev_device_get_parent_with_subsystem_devtype'
@@ -192,7 +201,6 @@ class TestDevice(object):
         child = device
         for parent in device.traverse():
             assert parent == child.parent
-            assert child in parent.children
             child = parent
 
     def test_sys_path(self, device, sys_path):

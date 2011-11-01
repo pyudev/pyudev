@@ -7,6 +7,9 @@
   now
 - Added :meth:`pyudev.Enumerator.match_parent`
 - Added ``parent`` keyword argument to :meth:`pyudev.Enumerator.match()`
+- Removed :meth:`pyudev.Enumerator.match_children` in favour of
+  :meth:`pyudev.Enumerator.match_parent`
+- :attr:`pyudev.Device.children` requires udev version 172 now
 
 
 0.12 (Aug 31, 2011)

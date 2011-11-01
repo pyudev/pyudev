@@ -362,9 +362,15 @@ class Device(Mapping):
 
         Return an iterable yielding a :class:`Device` object for each direct
         child of this device.
+
+        .. udevversion:: 172
+
+        .. versionchanged:: 0.13
+           Requires udev version 172 now.
         """
-        for device in self.context.list_devices().match_children(self):
-            yield device
+        for device in self.context.list_devices().match_parent(self):
+            if device != self:
+                yield device
 
     def find_parent(self, subsystem, device_type=None):
         """
