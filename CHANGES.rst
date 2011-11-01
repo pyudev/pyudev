@@ -5,6 +5,8 @@
   Rérolle)
 - #34: :class:`pyudev.Device.tags` returns a :class:`pyudev.Tags` object
   now
+- Added :meth:`pyudev.Enumerator.match_parent`
+- Added ``parent`` keyword argument to :meth:`pyudev.Enumerator.match()`
 
 
 0.12 (Aug 31, 2011)
