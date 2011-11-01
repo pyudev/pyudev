@@ -59,6 +59,29 @@ class TestEnumerator(object):
         assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
         assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
+    def test_match_attribute_string(self, context):
+        devices = list(context.list_devices().match_attribute('driver', 'usb'))
+        assert all(d.attributes['driver'] == b'usb' for d in devices)
+
+    def test_match_attribute_int(self, context):
+        # busnum gives us the number of a USB bus.  And any decent system
+        # likely has two or more usb buses, so this should work on more or less
+        # any system.  I didn't find any other attribute that is likely to be
+        # present on a wide range of system, so this is probably as general as
+        # possible.  Still it may fail because the attribute isn't present on
+        # any device at all on the system running the test
+        devices = list(context.list_devices().match_attribute('busnum', 2))
+        assert all(d.attributes['busnum'] == b'2' for d in devices)
+        assert all(d.attributes.asint('busnum') == 2 for d in devices)
+
+    def test_match_attribute_bool(self, context):
+        # ro tells us whether a volumne is mounted read-only or not.  And any
+        # developers system should have at least one readable volume, thus this
+        # test should work on all systems these tests are ever run on
+        devices = list(context.list_devices().match_attribute('ro', False))
+        assert all(d.attributes['ro'] == b'0' for d in devices)
+        assert all(not d.attributes.asbool('ro') for d in devices)
+
     @pytest.need_udev_version('>= 154')
     def test_match_tag_mock(self, context):
         add_match_tag = 'udev_enumerate_add_match_tag'

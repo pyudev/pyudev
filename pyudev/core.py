@@ -293,12 +293,33 @@ class Enumerator(object):
         - :func:`bool`
         - A byte string
         - Anything convertable to a unicode string (including a unicode string
-          itself :)
+          itself)
 
         Return the instance again.
         """
         libudev.udev_enumerate_add_match_property(
             self, ensure_byte_string(property), property_value_to_bytes(value))
+        return self
+
+    def match_attribute(self, attribute, value):
+        """
+        Include all devices, whose ``attribute`` has the given ``value``.
+
+        ``attribute`` is either a unicode string or a byte string, containing
+        the name of a sys attribute to match.  ``value`` is an attribute value,
+        being one of the following types:
+
+        - :func:`int`,
+        - :func:`bool`
+        - A byte string
+        - Anything convertable to a unicode string (including a unicode string
+          itself)
+
+        Return the instance again.
+        """
+        libudev.udev_enumerate_add_match_sysattr(
+            self, ensure_byte_string(attribute),
+            property_value_to_bytes(value))
         return self
 
     def match_tag(self, tag):

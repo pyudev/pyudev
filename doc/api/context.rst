@@ -27,6 +27,8 @@
 
    .. automethod:: match_property
 
+   .. automethod:: match_attribute
+
    .. automethod:: match_tag
 
    .. automethod:: match_parent
