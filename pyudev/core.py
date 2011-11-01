@@ -340,6 +340,21 @@ class Enumerator(object):
         self._parents.append(device)
         return self
 
+    def match_parent(self, parent):
+        """
+        Include all devices on the subtree of the given ``parent`` device.
+
+        The ``parent`` device itself is also included.
+
+        ``parent`` is a :class:`~pyudev.Device`.
+
+        Return the instance again.
+
+        .. versionadded:: 0.13
+        """
+        libudev.udev_enumerate_add_match_parent(self, parent)
+        return self
+
     def __iter__(self):
         """
         Iterate over all matching devices.
