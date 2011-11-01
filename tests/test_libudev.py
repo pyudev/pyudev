@@ -37,7 +37,7 @@ UDEV_ADDITIONS = {
           'udev_enumerate_add_match_is_initialized'],
     167: ['udev_get_run_path',
           'udev_device_get_sysattr_list_entry'],
-    172: ['udev_device_has_tag'],
+    172: ['udev_device_has_tag', 'udev_enumerate_add_match_parent'],
     }
 
 
