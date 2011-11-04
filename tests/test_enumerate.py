@@ -76,6 +76,17 @@ class TestEnumerator(object):
         assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
         assert all(d.asbool('ID_INPUT_KEY') for d in devices)
 
+    def test_match_attribute_nomatch(self, context):
+        devices = context.list_devices().match_attribute(
+            'driver', 'usb', nomatch=True)
+        assert all(d.attributes.get('driver') != 'usb' for d in devices)
+
+    def test_match_attribute_nomatch_unfulfillable(self, context):
+        devices = context.list_devices()
+        devices.match_attribute('driver', 'usb')
+        devices.match_attribute('driver', 'usb', nomatch=True)
+        assert not list(devices)
+
     def test_match_attribute_string(self, context):
         devices = list(context.list_devices().match_attribute('driver', 'usb'))
         assert all(d.attributes['driver'] == b'usb' for d in devices)

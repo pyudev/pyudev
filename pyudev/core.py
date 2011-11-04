@@ -305,7 +305,7 @@ class Enumerator(object):
             self, ensure_byte_string(property), property_value_to_bytes(value))
         return self
 
-    def match_attribute(self, attribute, value):
+    def match_attribute(self, attribute, value, nomatch=False):
         """
         Include all devices, whose ``attribute`` has the given ``value``.
 
@@ -319,11 +319,24 @@ class Enumerator(object):
         - Anything convertable to a unicode string (including a unicode string
           itself)
 
+        If ``nomatch`` is ``True`` (default is ``False``), the match is
+        inverted:  A device is include if the ``attribute`` does *not* match
+        the given ``value``.
+
+        .. note::
+
+           If ``nomatch`` is ``True``, devices which do not have the given
+           ``attribute`` at all are also included.  In other words, with
+           ``nomatch=True`` the given ``attribute`` is *not* guaranteed to
+           exist on all returned devices.
+
         Return the instance again.
         """
-        libudev.udev_enumerate_add_match_sysattr(
-            self, ensure_byte_string(attribute),
-            property_value_to_bytes(value))
+        match = (libudev.udev_enumerate_add_match_sysattr
+                 if not nomatch else
+                 libudev.udev_enumerate_add_nomatch_sysattr)
+        match(self, ensure_byte_string(attribute),
+              property_value_to_bytes(value))
         return self
 
     def match_tag(self, tag):
