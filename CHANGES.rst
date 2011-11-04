@@ -1,5 +1,5 @@
-0.13 (in development)
-=====================
+0.13 (Nov 4, 2011)
+==================
 
 - #36: Added :meth:`pyudev.Monitor.set_receive_buffer_size` (thanks to Rémi
   Rérolle)
