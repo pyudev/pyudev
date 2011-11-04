@@ -254,17 +254,21 @@ class Enumerator(object):
             self.match_property(property, value)
         return self
 
-    def match_subsystem(self, subsystem):
+    def match_subsystem(self, subsystem, nomatch=False):
         """
         Include all devices, which are part of the given ``subsystem``.
 
-        ``subsystem`` is either a unicode string or a byte string,
-        containing the name of the subsystem.
+        ``subsystem`` is either a unicode string or a byte string, containing
+        the name of the subsystem.  If ``nomatch`` is ``True`` (default is
+        ``False``), the match is inverted:  A device is only included if it is
+        *not* part of the given ``subsystem``.
 
         Return the instance again.
         """
-        libudev.udev_enumerate_add_match_subsystem(
-            self, ensure_byte_string(subsystem))
+        match = (libudev.udev_enumerate_add_match_subsystem
+                 if not nomatch else
+                 libudev.udev_enumerate_add_nomatch_subsystem)
+        match(self, ensure_byte_string(subsystem))
         return self
 
     def match_sys_name(self, sys_name):

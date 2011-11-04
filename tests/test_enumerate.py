@@ -45,6 +45,16 @@ class TestEnumerator(object):
         devices = context.list_devices().match_subsystem('input')
         assert all(d.subsystem == 'input' for d in devices)
 
+    def test_match_subsystem_nomatch(self, context):
+        devices = context.list_devices().match_subsystem('input', nomatch=True)
+        assert all(d.subsystem != 'input' for d in devices)
+
+    def test_match_subsystem_nomatch_unfulfillable(self, context):
+        devices = context.list_devices()
+        devices.match_subsystem('input')
+        devices.match_subsystem('input', nomatch=True)
+        assert not list(devices)
+
     def test_match_sys_name(self, context):
         devices = context.list_devices().match_sys_name('sda')
         assert all(d.sys_name == 'sda' for d in devices)
@@ -151,7 +161,7 @@ class TestEnumerator(object):
         with mock.patch.object(enumerator, 'match_subsystem',
                                mocksignature=True) as match_subsystem:
             enumerator.match(subsystem=mock.sentinel.subsystem)
-            match_subsystem.assert_called_with(mock.sentinel.subsystem)
+            match_subsystem.assert_called_with(mock.sentinel.subsystem, False)
 
     def test_match_passthrough_sys_name(self, enumerator):
         with mock.patch.object(enumerator, 'match_sys_name',

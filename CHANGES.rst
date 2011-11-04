@@ -11,6 +11,7 @@
   :meth:`pyudev.Enumerator.match_parent`
 - :attr:`pyudev.Device.children` requires udev version 172 now
 - #31: Added :meth:`pyudev.Enumerator.match_attribute`
+- Added ``nomatch`` argument to :meth:`pyudev.Enumerator.match_subsystem`
 
 
 0.12 (Aug 31, 2011)

@@ -98,6 +98,7 @@ SIGNATURES = {
         ref=([udev_enumerate_p], udev_enumerate_p),
         unref=([udev_enumerate_p], None),
         add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
+        add_nomatch_subsystem=([udev_enumerate_p, c_char_p], c_int),
         add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
         add_match_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
         add_match_tag=([udev_enumerate_p, c_char_p], c_int),
@@ -230,6 +231,7 @@ def check_errno_on_null_pointer(result, func, *args):
 ERROR_CHECKERS = dict(
     udev_enumerate_add_match_parent=check_negative_errorcode,
     udev_enumerate_add_match_subsystem=check_negative_errorcode,
+    udev_enumerate_add_nomatch_subsystem=check_negative_errorcode,
     udev_enumerate_add_match_property=check_negative_errorcode,
     udev_enumerate_add_match_sysattr=check_negative_errorcode,
     udev_enumerate_add_match_tag=check_negative_errorcode,
