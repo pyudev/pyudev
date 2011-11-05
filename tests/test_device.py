@@ -309,14 +309,19 @@ class TestDevice(object):
     def test_length(self, device, all_properties):
         assert len(device) == len(all_properties)
 
-    def test_item_access(self, device, properties):
+    def test_getitem(self, device, properties):
         assert all(device[p] == properties[p] for p in properties)
 
-    def test_item_access_devname(self, context, device, all_properties):
+    def test_getitem_devname(self, context, device, all_properties):
         if 'DEVNAME' not in all_properties:
             pytest.xfail('%r has no DEVNAME' % device)
         assert os.path.join(context.device_path, device['DEVNAME']) == \
                os.path.join(context.device_path, all_properties['DEVNAME'])
+
+    def test_getitem_nonexisting(self, device):
+        with pytest.raises(KeyError) as excinfo:
+            device['a non-existing property']
+        assert str(excinfo.value) == repr('a non-existing property')
 
     def test_asint(self, device, properties):
         for property in properties:
@@ -395,6 +400,12 @@ class TestAttributes(object):
         assert all(isinstance(device.attributes[a], bytes) for a in attributes)
         assert all(device.attributes[a] == v.encode(sys.getfilesystemencoding())
                    for a, v in attributes.items())
+
+    def test_getitem_nonexisting(self, device):
+        with pytest.raises(KeyError) as excinfo:
+            device.attributes['a non-existing attribute']
+        print(type(excinfo.value))
+        assert str(excinfo.value) == repr('a non-existing attribute')
 
     def test_asstring(self, device, attributes):
         assert all(pytest.is_unicode_string(device.attributes.asstring(a))
