@@ -696,7 +696,7 @@ class Device(Mapping):
         value = libudev.udev_device_get_property_value(
             self, ensure_byte_string(property))
         if value is None:
-            raise KeyError('No such property: {0}'.format(property))
+            raise KeyError(property)
         return ensure_unicode_string(value)
 
     def asint(self, property):
@@ -882,7 +882,7 @@ class Attributes(Mapping):
         value = libudev.udev_device_get_sysattr_value(
             self.device, ensure_byte_string(attribute))
         if value is None:
-            raise KeyError('No such attribute: {0}'.format(attribute))
+            raise KeyError(attribute)
         return value
 
     def asstring(self, attribute):
