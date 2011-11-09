@@ -24,6 +24,7 @@ import re
 import random
 import subprocess
 import socket
+import errno
 from functools import wraps
 from collections import namedtuple
 from contextlib import contextmanager
@@ -89,7 +90,6 @@ class FakeMonitor(object):
             # ".makefile()" method, which is required by this class.  Work
             # around this limitation by wrapping these sockets in real
             # socket objects.
-            import os
             def _wrap_socket(sock):
                 wrapped = socket.socket(sock.family, sock.type,
                                         fileno=os.dup(sock.fileno()))
@@ -134,66 +134,96 @@ class FakeMonitor(object):
             self.server.close()
 
 
-def _read_udev_database(properties_blacklist):
-    udevadm = subprocess.Popen(['udevadm', 'info', '--export-db'],
-                               stdout=subprocess.PIPE)
-    database = udevadm.communicate()[0].splitlines()
-    devices = {}
-    current_properties = None
-    for line in database:
-        line = line.strip().decode(sys.getfilesystemencoding())
-        if not line:
-            continue
-        type, value = line.split(': ', 1)
-        if type == 'P':
-            current_properties = devices.setdefault(value, {})
-        elif type == 'E':
-            property, value = value.split('=', 1)
-            if property in properties_blacklist:
+
+class UDevAdm(object):
+    """
+    Wrap ``udevadm`` utility.
+    """
+
+    CANDIDATES = ['/sbin/udevadm', 'udevadm']
+
+    @classmethod
+    def find(cls):
+        for candidate in cls.CANDIDATES:
+            try:
+                print('checking')
+                return cls(candidate)
+            except EnvironmentError as error:
+                if error.errno != errno.ENOENT:
+                    raise
+
+    def __init__(self, udevadm):
+        """
+        Create a new ``udevadm`` wrapper for the given udevadm executable.
+
+        ``udevadm`` is the path to udevadm as string.  If relative, ``udevadm`` is
+        looked up in ``$PATH``.
+        """
+        self.udevadm = udevadm
+        self.version = int(self._execute('--version'))
+
+    def _execute(self, *args):
+        command = [self.udevadm] + list(args)
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+        output = proc.communicate()[0].strip()
+        if proc.returncode != 0:
+            raise subprocess.CalledProcessError(proc.returncode, command)
+        return output
+
+    def read_database(self, properties_blacklist):
+        database = self._execute('info', '--export-db').splitlines()
+        devices = {}
+        current_properties = None
+        for line in database:
+            line = line.strip().decode(sys.getfilesystemencoding())
+            if not line:
                 continue
-            current_properties[property] = value
-    return devices
+            type, value = line.split(': ', 1)
+            if type == 'P':
+                current_properties = devices.setdefault(value, {})
+            elif type == 'E':
+                property, value = value.split('=', 1)
+                if property in properties_blacklist:
+                    continue
+                current_properties[property] = value
+        return devices
 
+    def get_device_attributes(self, device_path, attributes_blacklist):
+        output = self._execute('info', '--attribute-walk',
+                               '--path', device_path)
+        attribute_dump = output.splitlines()
+        attributes = {}
+        for line in attribute_dump:
+            line = line.strip().decode(sys.getfilesystemencoding())
+            if line.startswith('looking at parent device'):
+                # we don't continue with attributes of parent devices, we only
+                # want the attributes of the given device
+                break
+            if line.startswith('ATTR'):
+                name, value = line.split('==', 1)
+                # remove quotation marks from attribute value
+                value = value[1:-1]
+                # remove prefix from attribute name
+                name = re.search('{(.*)}', name).group(1)
+                if name in attributes_blacklist:
+                    continue
+                attributes[name] = value
+        return attributes
 
-def _get_device_attributes(device_path, attributes_blacklist):
-    udevadm = subprocess.Popen(
-        ['udevadm', 'info', '--attribute-walk', '--path', device_path],
-        stdout=subprocess.PIPE)
-    attribute_dump = udevadm.communicate()[0].splitlines()
-    if udevadm.returncode != 0:
-        raise IOError('could not read attributes')
-    attributes = {}
-    for line in attribute_dump:
-        line = line.strip().decode(sys.getfilesystemencoding())
-        if line.startswith('looking at parent device'):
-            # we don't continue with attributes of parent devices, we only
-            # want the attributes of the given device
-            break
-        if line.startswith('ATTR'):
-            name, value = line.split('==', 1)
-            # remove quotation marks from attribute value
-            value = value[1:-1]
-            # remove prefix from attribute name
-            name = re.search('{(.*)}', name).group(1)
-            if name in attributes_blacklist:
-                continue
-            attributes[name] = value
-    return attributes
-
-
-def _query_device(device_path, query_type):
-    if query_type not in ('symlink', 'name'):
-        raise ValueError(query_type)
-    udevadm = subprocess.Popen(
-        ['udevadm', 'info', '--root', '--path', device_path,
-         '--query', query_type],
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    query_result = udevadm.communicate()[0].strip().decode(
-        sys.getfilesystemencoding())
-    if query_type == 'symlink':
-        return query_result.split()
-    else:
-        return query_result or None
+    def query_device(self, device_path, query_type):
+        if query_type not in ('symlink', 'name'):
+            raise ValueError(query_type)
+        try:
+            output = self._execute('info', '--root', '--path', device_path,
+                                   '--query', query_type)
+        except subprocess.CalledProcessError:
+            return None
+        else:
+            query_result = output.decode(sys.getfilesystemencoding())
+            if query_type == 'symlink':
+                return query_result.split()
+            else:
+                return query_result
 
 
 def get_device_sample(config):
@@ -360,8 +390,11 @@ def pytest_configure(config):
     config.attributes_blacklist = frozenset(
         ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
          'urbnum'])
-    config.udev_database = _read_udev_database(config.properties_blacklist)
-    config.udev_version = pyudev.udev_version()
+    config.udevadm = UDevAdm.find()
+    print('got udevadm')
+    config.udev_database = config.udevadm.read_database(config.properties_blacklist)
+    print('read database')
+    config.udev_version = config.udevadm.version
 
 
 def pytest_funcarg__database(request):
@@ -427,7 +460,7 @@ def pytest_funcarg__attributes(request):
     ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return _get_device_attributes(
+    return request.config.udevadm.get_device_attributes(
         device_path, request.config.attributes_blacklist)
 
 
@@ -437,7 +470,7 @@ def pytest_funcarg__device_node(request):
     ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return _query_device(device_path, 'name')
+    return request.config.udevadm.query_device(device_path, 'name')
 
 
 def pytest_funcarg__device_number(request):
@@ -458,7 +491,7 @@ def pytest_funcarg__device_links(request):
     for the device pointed to by the ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return _query_device(device_path, 'symlink')
+    return request.config.udevadm.query_device(device_path, 'symlink')
 
 
 def pytest_funcarg__sys_path(request):
