@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -146,7 +146,6 @@ class UDevAdm(object):
     def find(cls):
         for candidate in cls.CANDIDATES:
             try:
-                print('checking')
                 return cls(candidate)
             except EnvironmentError as error:
                 if error.errno != errno.ENOENT:
@@ -391,9 +390,7 @@ def pytest_configure(config):
         ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
          'urbnum'])
     config.udevadm = UDevAdm.find()
-    print('got udevadm')
     config.udev_database = config.udevadm.read_database(config.properties_blacklist)
-    print('read database')
     config.udev_version = config.udevadm.version
 
 
