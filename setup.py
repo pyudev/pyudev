@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -59,7 +59,7 @@ with open('README.rst', encoding='utf-8') as stream:
 setuptools.setup(
     name='pyudev',
     version=str(pyudev.__version__),
-    url='http://packages.python.org/pyudev',
+    url='http://pyudev.readthedocs.org/',
     author='Sebastian Wiesner',
     author_email='lunaryorn@googlemail.com',
     description='A libudev binding',

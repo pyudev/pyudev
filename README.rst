@@ -2,7 +2,7 @@
 pyudev
 ######
 
-http://packages.python.org/pyudev
+http://pyudev.readthedocs.org
 
 pyudev is a Python_ binding for libudev_, available under the terms fo the
 `GNU LGPL 2.1`_ (see ``COPYING``).
@@ -56,7 +56,7 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
 .. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
-.. _website: http://packages.python.org/pyudev
+.. _website: http://pyudev.readthedocs.org
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _issue tracker: http://github.com/lunaryorn/pyudev/issues
 .. _GitHub: http://github.com/lunaryorn/pyudev
