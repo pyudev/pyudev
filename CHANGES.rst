@@ -1,6 +1,8 @@
 0.14 (in development)
 =====================
 
+- #37: Added observer for wxPython (thanks to Tobias Eberle)
+
 
 0.13 (Nov 4, 2011)
 ==================

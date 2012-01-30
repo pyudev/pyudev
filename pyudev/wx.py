@@ -21,7 +21,7 @@
     To use this module, :mod:`wx` from wxPython must be available.
 
     .. moduleauthor::  Tobias Eberle  <tobias.eberle@gmx.de>
-    .. versionadded:: 0.??
+    .. versionadded:: 0.14
 """
 
 from __future__ import (print_function, division, unicode_literals,
