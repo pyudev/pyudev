@@ -4,33 +4,21 @@ Toolkit integration
 Qt integration
 --------------
 
-To plug monitoring with :class:`pyudev.Monitor` into the Qt event loop, so
-that Qt signals are asynchronously emitted upon events,
-:class:`QUDevMonitorObserver` is provided:
+:class:`QUDevMonitorObserver` plugs a :class:`pyudev.Monitor` into the Qt event
+loop, so that Qt signals are asynchronously emitted upon events.  This class is
+implemented for both available Qt bindings, PyQt4_ and PySide_.
 
-.. class:: QUDevMonitorObserver
 
-   Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
-   events:
+:mod:`pyudev.pyqt4` – PyQt4_ integration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   >>> context = pyudev.Context()
-   >>> monitor = pyudev.Monitor.from_netlink(context)
-   >>> monitor.filter_by(subsystem='input')
-   >>> observer = QUDevMonitorObserver(monitor)
-   >>> def device_connected(device):
-   ...     print('{0!r} added'.format(device))
-   >>> observer.deviceAdded.connect(device_connected)
-   >>> monitor.start()
+.. automodule:: pyudev.pyqt4
+   :platform: Linux
+   :synopsis: PyQt4 integration
 
-   This class is a child of :class:`QtCore.QObject`.
+.. autoclass:: QUDevMonitorObserver
 
-   .. method:: __init__(monitor, parent=None)
-
-      Observe the given ``monitor`` (a :class:`pyudev.Monitor`).
-
-      ``parent`` is the parent :class:`~QtCore.QObject` of this object.  It
-      is passed straight to the inherited constructor of
-      :class:`~QtCore.QObject`.
+   .. automethod:: __init__
 
    .. attribute:: monitor
 
@@ -41,14 +29,7 @@ that Qt signals are asynchronously emitted upon events,
       The underlying :class:`QtCore.QSocketNotifier` used to watch the
       :attr:`monitor`.
 
-   .. attribute:: enabled
-
-      Whether this observer is enabled or not.
-
-      If ``True`` (the default), this observer is enabled, and emits events.
-      Otherwise it is disabled and does not emit any events.  This merely
-      reflects the state of the ``enabled`` property of the underlying
-      :attr:`notifier`.
+   .. autoattribute:: enabled
 
    .. rubric:: Signals
 
@@ -84,42 +65,60 @@ that Qt signals are asynchronously emitted upon events,
       re-parented.
 
 
-Currently there are two different, incompatible bindings to Qt4:
-
-PyQt4_
-   Older, more mature, but developed by a 3rd party (Riverbank computing)
-   and distributed under the GPL (though with some exceptions for other free
-   software licences)
-
-PySide_
-   Developed by Nokia as alternative to PyQt4_ and distributed under the
-   less restrictive LGPL, however not yet as mature and feature-rich as
-   PyQt4_.
-
-For both of these bindings a :class:`QUDevMonitorObserver` implementation is
-provided, each in a separate module:
-
-:mod:`pyudev.pyqt4`
-^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: pyudev.pyqt4
-   :platform: Linux
-   :synopsis: PyQt4 integration
-
-.. class:: QUDevMonitorObserver
-
-   A :class:`QUDevMonitorObserver` implementation for PyQt4_
-
-:mod:`pyudev.pyside`
-^^^^^^^^^^^^^^^^^^^^
+:mod:`pyudev.pyside` – PySide_ integration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: pyudev.pyside
    :platform: Linux
    :synopsis: PySide integration
 
-.. class:: QUDevMonitorObserver
+.. autoclass:: QUDevMonitorObserver
 
-   A :class:`QUDevMonitorObserver` implementation for PySide_
+   .. automethod:: __init__
+
+   .. attribute:: monitor
+
+      The :class:`~pyudev.Monitor` observed by this object.
+
+   .. attribute:: notifier
+
+      The underlying :class:`QtCore.QSocketNotifier` used to watch the
+      :attr:`monitor`.
+
+   .. autoattribute:: enabled
+
+   .. rubric:: Signals
+
+   This class defines the following Qt signals:
+
+   .. method:: deviceEvent(action, device)
+
+      Emitted upon any device event.  ``action`` is a unicode string
+      containing the action name, and ``device`` is the
+      :class:`~pyudev.Device` object describing the device.
+
+      Basically the arguments of this signal are simply the return value of
+      :meth:`~pyudev.Monitor.receive_device`
+
+   .. method:: deviceAdded(device)
+
+      Emitted if a :class:`~pyudev.Device` is added (e.g a USB device was
+      plugged).
+
+   .. method:: deviceRemoved(device)
+
+      Emitted if a :class:`~pyudev.Device` is removed (e.g. a USB device was
+      unplugged).
+
+   .. method:: deviceChanged(device)
+
+      Emitted if a :class:`~pyudev.Device` was somehow changed (e.g. a
+      change of a property)
+
+   .. method:: deviceMoved(device)
+
+      Emitted if a :class:`~pyudev.Device` was renamed, moved or
+      re-parented.
 
 
 :mod:`pyudev.glib` – Glib and Gtk integration
