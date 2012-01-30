@@ -75,8 +75,8 @@ class WxUDevMonitorObserver(EvtHandler):
         """
         Whether this observer is enabled or not.
 
-        If ``True``, this observer is enabled, and emits events.  Otherwise it
-        is disabled and does not emit any events.
+        If ``True`` (the default), this observer is enabled, and emits events.
+        Otherwise it is disabled and does not emit any events.
         """
         return self._observer_thread is not None
 
