@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -84,8 +84,28 @@ class GUDevMonitorObserver(gobject.GObject):
     def __init__(self, monitor):
         gobject.GObject.__init__(self)
         self.monitor = monitor
-        self.event_source = glib.io_add_watch(monitor, glib.IO_IN,
-                                              self._process_udev_event)
+        self.event_source = None
+        self.enabled = True
+
+    @property
+    def enabled(self):
+        """
+        Whether this observer is enabled or not.
+
+        If ``True`` (the default), this observer is enabled, and emits events.
+        Otherwise it is disabled and does not emit any events.
+
+        .. versionadded:: 0.14
+        """
+        return self.event_source is not None
+
+    @enabled.setter
+    def enabled(self, value):
+        if value and self.event_source is None:
+            self.event_source = glib.io_add_watch(
+                self.monitor, glib.IO_IN, self._process_udev_event)
+        elif not value and self.event_source is not None:
+            glib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
         if condition == glib.IO_IN:

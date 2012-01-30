@@ -89,7 +89,7 @@ class Qt4Binding(BaseBinding):
         self.qtcore.QTimer.singleShot(timeout, callback)
 
     def cleanup(self, observer):
-        pass
+        observer.enabled = False
 
 
 class GlibBinding(BaseBinding):
@@ -141,12 +141,12 @@ class GlibBinding(BaseBinding):
         self.event_sources.append(self.glib.timeout_add(timeout, _callback))
 
     def cleanup(self, observer):
-        # cleanup all event sources.  If this was not done, all tests save
-        # the first would spin endlessly.  Apparently older event sources
+        observer.enabled = False
+        # cleanup all timer event sources.  If this was not done, all tests
+        # save the first would spin endlessly.  Apparently older event sources
         # kind of "confuse" the main loop of the current test
         for source in self.event_sources:
             self.glib.source_remove(source)
-        self.glib.source_remove(observer.event_source)
         self.event_sources = []
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -41,6 +41,24 @@ class QUDevMonitorObserverMixin(object):
             'add': self.deviceAdded, 'remove': self.deviceRemoved,
             'change': self.deviceChanged, 'move': self.deviceMoved,
         }
+
+    @property
+    def enabled(self):
+        """
+        Whether this observer is enabled or not.
+
+        If ``True`` (the default), this observer is enabled, and emits events.
+        Otherwise it is disabled and does not emit any events.  This merely
+        reflects the state of the ``enabled`` property of the underlying
+        :attr:`notifier`.
+
+        .. versionadded:: 0.14
+        """
+        return self.notifier.isEnabled()
+
+    @enabled.setter
+    def enabled(self, value):
+        self.notifier.setEnabled(value)
 
     def _process_udev_event(self):
         """

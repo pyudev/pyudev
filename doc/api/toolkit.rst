@@ -39,7 +39,16 @@ that Qt signals are asynchronously emitted upon events,
    .. attribute:: notifier
 
       The underlying :class:`QtCore.QSocketNotifier` used to watch the
-      :attr:`monitor`
+      :attr:`monitor`.
+
+   .. attribute:: enabled
+
+      Whether this observer is enabled or not.
+
+      If ``True`` (the default), this observer is enabled, and emits events.
+      Otherwise it is disabled and does not emit any events.  This merely
+      reflects the state of the ``enabled`` property of the underlying
+      :attr:`notifier`.
 
    .. rubric:: Signals
 
@@ -129,8 +138,10 @@ provided, each in a separate module:
    .. attribute:: event_source
 
       The event source, which represents the watch on the :attr:`monitor`
-      (as returned by :func:`glib.io_add_watch`).  Can be passed to
-      :func:`glib.source_remove` to stop observing the monitor.
+      (as returned by :func:`glib.io_add_watch`), or ``None``, if
+      :attr:`enabled` is ``False``.
+
+   .. autoattribute:: enabled
 
    .. rubric:: Signals
 

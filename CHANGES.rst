@@ -4,6 +4,9 @@
 - #37: Added :class:`pyudev.wx.WxUDevMonitorObserver` for wxPython (thanks to
   Tobias Eberle)
 - Added :class:`pyudev.MonitorObserver`
+- Added :attr:`pyudev.glib.GUDevMonitorObserver.enabled`,
+  :attr:`pyudev.pyqt4.QUDevMonitorObserver.enabled` and
+  :attr:`pyudev.pyside.QUDevMonitorObserver.enabled`
 
 
 0.13 (Nov 4, 2011)
