@@ -28,18 +28,20 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import wx
-import wx.lib.newevent
-import threading
+from threading import Thread
 
-DeviceEvent, EVT_DEVICE_EVENT = wx.lib.newevent.NewEvent()
-DeviceAddedEvent, EVT_DEVICE_ADDED = wx.lib.newevent.NewEvent()
-DeviceRemovedEvent, EVT_DEVICE_REMOVED = wx.lib.newevent.NewEvent()
-DeviceChangedEvent, EVT_DEVICE_CHANGED = wx.lib.newevent.NewEvent()
-DeviceMovedEvent, EVT_DEVICE_MOVED = wx.lib.newevent.NewEvent()
+from wx import EvtHandler, PostEvent
+from wx.lib.newevent import NewEvent
 
 
-class WXUDevMonitorObserver(wx.EvtHandler):
+DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
+DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
+DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
+DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
+DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
+
+
+class WXUDevMonitorObserver(EvtHandler):
     """
     Observe a :class:`~pyudev.Monitor` and posts wx events upon device events:
 
@@ -65,9 +67,9 @@ class WXUDevMonitorObserver(wx.EvtHandler):
     }
 
     def __init__(self, monitor):
-        wx.EvtHandler.__init__(self)
+        EvtHandler.__init__(self)
         self.monitor = monitor
-        self._thread = threading.Thread(target=self._observe_monitor)
+        self._thread = Thread(target=self._observe_monitor)
         self._thread.start()
 
     def stop(self):
@@ -83,7 +85,7 @@ class WXUDevMonitorObserver(wx.EvtHandler):
     def _observe_monitor(self):
         for event in self.monitor:
             action, device = event
-            wx.PostEvent(self, DeviceEvent(action=action, device=device))
-            wx.PostEvent(
-                self, self._action_event_map[action](device=device))
+            PostEvent(self, DeviceEvent(action=action, device=device))
+            event_class = self._action_event_map[action]
+            PostEvent(self, event_class(device=device))
 
