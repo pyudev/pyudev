@@ -179,26 +179,60 @@ provided, each in a separate module:
 
       The :class:`~pyudev.Monitor` observed by this object.
 
-The following events are available:
 
-EVT_DEVICE_EVENT
-  Emitted upon any device event.
-    ``DeviceEvent.action`` is a unicode string containing the action name
-    ``DeviceEvent.device`` is the :class:`~pyudev.Device`, which caused this event
-    Basically the two attributes are simply the return value of :meth:`~pyudev.Monitor.receive_device`
+.. rubric:: Event constants
 
-EVT_DEVICE_ADDED
-  Emitted if a :class:`~pyudev.Device` is added (e.g a USB device was plugged).
-  ``DeviceAddedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+:class:`WXUDevMonitorObserver` exposes the following events:
 
-EVT_DEVICE_REMOVED
-  Emitted if a :class:`~pyudev.Device` is removed (e.g. a USB device was unplugged).
-  ``DeviceRemovedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+.. data:: EVT_DEVICE_EVENT
 
-EVT_DEVICE_CHANGED
-  Emitted if a :class:`~pyudev.Device` was somehow changed (e.g. a change of a property)
-  ``DeviceChangedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+   Emitted upon any device event.  Receivers get a :class:`DeviceEvent` object
+   as argument.
 
-EVT_DEVICE_MOVED
-    Emitted if a :class:`~pyudev.Device` was renamed, moved or re-parented.
-    ``DeviceMovedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+.. data:: EVT_DEVICE_ADDED
+
+   Emitted if a :class:`~pyudev.Device` is added (e.g a USB device was
+   plugged).  Receivers get a :class:`DeviceAddedEvent` object as argument.
+
+.. data:: EVT_DEVICE_REMOVED
+
+   Emitted if a :class:`~pyudev.Device` is removed (e.g. a USB device was
+   unplugged).  Receivers get a :class:`DeviceRemovedEvent` object as argument.
+
+.. data:: EVT_DEVICE_CHANGED
+
+   Emitted if a :class:`~pyudev.Device` was somehow changed (e.g. a change of a
+   property).  Receivers get a :class:`DeviceChangedEvent` object as argument.
+
+.. data:: EVT_DEVICE_MOVED
+
+   Emitted if a :class:`~pyudev.Device` was renamed, moved or re-parented.
+   Receivers get a :class:`DeviceMovedEvent` object as argument.
+
+
+.. rubric:: Event objects
+
+.. class:: DeviceEvent
+
+   Argument object for :data:`EVT_DEVICE_EVENT`.
+
+   .. attribute:: action
+
+      A unicode string containing the action name.
+
+   .. attribute:: device
+
+      The :class:`~pyudev.Device` object that caused this event.
+
+
+.. class:: DeviceAddedEvent
+           DeviceRemovedEvent
+           DeviceChangedEvent
+           DeviceMovedEvent
+
+   Argument objects for :data:`EVT_DEVICE_ADDED`, :data:`EVT_DEVICE_REMOVED`,
+   :data:`EVT_DEVICE_CHANGED` and :data:`EVT_DEVICE_MOVED`.
+
+   .. attribute:: device
+
+      The :class:`~pyudev.Device` object that caused this event.
