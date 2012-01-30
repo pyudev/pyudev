@@ -66,7 +66,15 @@ class Mock(object):
 # mock out native modules used throughout pyudev to enable Sphinx autodoc even
 # if these modules are unavailable, as on readthedocs.org
 Mock.mock_modules('PyQt4', 'PyQt4.QtCore', 'PySide', 'PySide.QtCore',
-                  'glib', 'gobject', 'pyudev._libudev')
+                  'glib', 'gobject', 'wx', 'wx.lib', 'wx.lib.newevent',
+                  'pyudev._libudev')
+
+# mock out the NewEvent function of wxPython.  Let's praise the silly wx API
+def NewEventMock():
+    yield 'event_class'
+    yield 'event_constant'
+
+sys.modules['wx.lib.newevent'].NewEvent = NewEventMock
 
 
 import pyudev
