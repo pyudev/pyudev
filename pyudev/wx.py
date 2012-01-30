@@ -24,6 +24,7 @@
     .. versionadded:: 0.14
 """
 
+
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
@@ -37,10 +38,10 @@ DeviceRemovedEvent, EVT_DEVICE_REMOVED = wx.lib.newevent.NewEvent()
 DeviceChangedEvent, EVT_DEVICE_CHANGED = wx.lib.newevent.NewEvent()
 DeviceMovedEvent, EVT_DEVICE_MOVED = wx.lib.newevent.NewEvent()
 
+
 class WXUDevMonitorObserver(wx.EvtHandler):
     """
-    Observes a :class:`~pyudev.Monitor` and posts wx events upon device
-    events:
+    Observe a :class:`~pyudev.Monitor` and posts wx events upon device events:
 
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
@@ -57,10 +58,10 @@ class WXUDevMonitorObserver(wx.EvtHandler):
     """
 
     _action_event_map = {
-            'add': DeviceAddedEvent,
-            'remove': DeviceRemovedEvent,
-            'change': DeviceChangedEvent,
-            'move': DeviceMovedEvent 
+        'add': DeviceAddedEvent,
+        'remove': DeviceRemovedEvent,
+        'change': DeviceChangedEvent,
+        'move': DeviceMovedEvent
     }
 
     def __init__(self, monitor):
@@ -72,7 +73,7 @@ class WXUDevMonitorObserver(wx.EvtHandler):
     def stop(self):
         """
         stops observing the monitor
-        
+
         It is neccessary to run this when the wxwidgets application exits to
         also allow the python interpreter to exit. Otherwise the python
         interpreter keeps running.
@@ -80,10 +81,9 @@ class WXUDevMonitorObserver(wx.EvtHandler):
         self._thread._Thread__stop()
 
     def _run(self):
-        # blocking until a device is available
         for event in self.monitor:
             action, device = event
             wx.PostEvent(self, DeviceEvent(action=action, device=device))
-            wx.PostEvent(self, 
-                    self._action_event_map[action](device=device))
+            wx.PostEvent(
+                self, self._action_event_map[action](device=device))
 

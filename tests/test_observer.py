@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -154,22 +154,22 @@ class WXBinding(BaseBinding):
     name = 'wx'
 
     timer = []
-    
+
     def create_observer(self, monitor):
         from pyudev.wx import WXUDevMonitorObserver
         observer = WXUDevMonitorObserver(monitor)
         assert observer.monitor is monitor
         return observer
-    
+
     def import_or_skip(self):
         self.wx = pytest.importorskip('wx')
-    
+
     def create_mainloop(self):
         app = self.wx.App(False)
         app.frame = self.wx.Frame(None)
         self.frame = app.frame
         return app
-    
+
     def quit_mainloop(self, app):
         app.frame.Close()
 
@@ -179,7 +179,7 @@ class WXBinding(BaseBinding):
     def connect_signals(self, observer, event_slot, action_slots):
         def wrap_callback(callback):
             def _wrapper(event):
-                if (hasattr(event, "action")):
+                if (hasattr(event, 'action')):
                     return callback(event.action, event.device)
                 else:
                     return callback(event.device)
