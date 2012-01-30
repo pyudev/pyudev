@@ -67,7 +67,7 @@ class WXUDevMonitorObserver(wx.EvtHandler):
     def __init__(self, monitor):
         wx.EvtHandler.__init__(self)
         self.monitor = monitor
-        self._thread = threading.Thread(target=self._run)
+        self._thread = threading.Thread(target=self._observe_monitor)
         self._thread.start()
 
     def stop(self):
@@ -80,7 +80,7 @@ class WXUDevMonitorObserver(wx.EvtHandler):
         """
         self._thread._Thread__stop()
 
-    def _run(self):
+    def _observe_monitor(self):
         for event in self.monitor:
             action, device = event
             wx.PostEvent(self, DeviceEvent(action=action, device=device))
