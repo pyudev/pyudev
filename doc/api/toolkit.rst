@@ -165,3 +165,40 @@ provided, each in a separate module:
 
       Emitted if a :class:`~pyudev.Device` was renamed, moved or
       re-parented.
+
+:mod:`pyudev.wx` – wxWidgets integration
+---------------------------------------------
+
+.. automodule:: pyudev.wx
+   :platform: Linux
+   :synopsis: wxWidgets integration
+
+.. autoclass:: WXUDevMonitorObserver
+
+   .. attribute:: monitor
+
+      The :class:`~pyudev.Monitor` observed by this object.
+
+The following events are available:
+
+EVT_DEVICE_EVENT
+  Emitted upon any device event.
+    ``DeviceEvent.action`` is a unicode string containing the action name
+    ``DeviceEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+    Basically the two attributes are simply the return value of :meth:`~pyudev.Monitor.receive_device`
+
+EVT_DEVICE_ADDED
+  Emitted if a :class:`~pyudev.Device` is added (e.g a USB device was plugged).
+  ``DeviceAddedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+
+EVT_DEVICE_REMOVED
+  Emitted if a :class:`~pyudev.Device` is removed (e.g. a USB device was unplugged).
+  ``DeviceRemovedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+
+EVT_DEVICE_CHANGED
+  Emitted if a :class:`~pyudev.Device` was somehow changed (e.g. a change of a property)
+  ``DeviceChangedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
+
+EVT_DEVICE_MOVED
+    Emitted if a :class:`~pyudev.Device` was renamed, moved or re-parented.
+    ``DeviceMovedEvent.device`` is the :class:`~pyudev.Device`, which caused this event
