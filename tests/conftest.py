@@ -18,6 +18,9 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import select
+from contextlib import closing
+
 import sys
 import os
 import re
@@ -132,6 +135,14 @@ class FakeMonitor(object):
             self.client.close()
         finally:
             self.server.close()
+
+    def __iter__(self):
+        with closing(select.epoll()) as notifier:
+            notifier.register(self, select.EPOLLIN)
+            while True:
+                events = notifier.poll()
+                if events:
+                    yield self.receive_device()
 
 
 
