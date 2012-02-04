@@ -150,7 +150,61 @@ class GlibBinding(BaseBinding):
         self.event_sources = []
 
 
-BINDINGS = [Qt4Binding('PyQt4'), Qt4Binding('PySide'), GlibBinding()]
+class WXBinding(BaseBinding):
+    name = 'wx'
+
+    timer = []
+    
+    def create_observer(self, monitor):
+        from pyudev.wx import WXUDevMonitorObserver
+        observer = WXUDevMonitorObserver(monitor)
+        assert observer.monitor is monitor
+        return observer
+    
+    def import_or_skip(self):
+        self.wx = pytest.importorskip('wx')
+    
+    def create_mainloop(self):
+        app = self.wx.App(False)
+        app.frame = self.wx.Frame(None)
+        self.frame = app.frame
+        return app
+    
+    def quit_mainloop(self, app):
+        app.frame.Close()
+
+    def run_mainloop(self, app):
+        app.MainLoop()
+
+    def connect_signals(self, observer, event_slot, action_slots):
+        def wrap_callback(callback):
+            def _wrapper(event):
+                if (hasattr(event, "action")):
+                    return callback(event.action, event.device)
+                else:
+                    return callback(event.device)
+            return _wrapper
+
+        import pyudev.wx
+        observer.Bind(pyudev.wx.EVT_DEVICE_EVENT, wrap_callback(event_slot))
+        event_map = {
+                'add': pyudev.wx.EVT_DEVICE_ADDED,
+                'remove': pyudev.wx.EVT_DEVICE_REMOVED,
+                'change': pyudev.wx.EVT_DEVICE_CHANGED,
+                'move': pyudev.wx.EVT_DEVICE_MOVED }
+        for action, slot in action_slots.items():
+            observer.Bind(event_map[action], wrap_callback(slot))
+
+    def single_shot(self, timeout, callback):
+        timer = self.wx.PyTimer(callback)
+        self.timer.append(timer)
+        timer.Start(timeout, True)
+
+    def cleanup(self, observer):
+        observer.stop()
+
+
+BINDINGS = [Qt4Binding('PyQt4'), Qt4Binding('PySide'), GlibBinding(), WXBinding()]
 ACTIONS = ('add', 'remove', 'change', 'move')
 
 
