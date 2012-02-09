@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -85,6 +85,10 @@
     >>> for action, device in monitor:
     ...     if action == 'add':
     ...         print('{0!r} added'.format(device))
+
+    To conveniently observe monitors in background, the
+    :class:`MonitorObserver` class is provided, which implements a background
+    thread that continously receives events from a :class:`Monitor`.
 
     Accessing devices directly
     ^^^^^^^^^^^^^^^^^^^^^^^^^^

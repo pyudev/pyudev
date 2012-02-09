@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -23,11 +23,12 @@ import sys
 import socket
 import errno
 from select import select
+from operator import itemgetter
 
 import pytest
 import mock
 
-from pyudev import Monitor, Device
+from pyudev import Monitor, MonitorObserver, Device
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -242,3 +243,50 @@ class TestMonitor(object):
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         iterator.close()
+
+
+class TestMonitorObserver(object):
+
+    def receive_event(self, action, device):
+        self.events.append((action, device))
+        if len(self.events) >= 2:
+            self.observer.send_stop()
+
+    def make_observer(self, monitor):
+        self.observer = MonitorObserver(monitor, self.receive_event)
+        return self.observer
+
+    def setup(self):
+        self.events = []
+
+    def teardown(self):
+        self.events = None
+
+    def test_fake(self, fake_monitor, platform_device):
+        observer = self.make_observer(fake_monitor)
+        observer.start()
+        fake_monitor.trigger_action('add')
+        fake_monitor.trigger_action('remove')
+        # fake one second for the tests to finish
+        observer.join(1)
+        # forcibly quit the thread if it is still alive
+        if observer.is_alive():
+            observer.stop()
+        # check that we got two events
+        assert self.events == [('add', platform_device), ('remove', platform_device)]
+
+    @pytest.mark.privileged
+    def test_real(self, context, monitor):
+        observer = self.make_observer(monitor)
+        pytest.unload_dummy()
+        monitor.filter_by('net')
+        monitor.enable_receiving()
+        observer.start()
+        pytest.load_dummy()
+        pytest.unload_dummy()
+        observer.join(2)
+        if observer.is_alive():
+            observer.stop()
+        assert map(itemgetter(0), self.events) == ['add', 'remove']
+        assert all(device.device_path == '/devices/virtual/net/dummy0' for _, device in self.events)
+

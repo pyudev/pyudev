@@ -32,3 +32,16 @@
    .. automethod:: receive_device
 
    .. automethod:: __iter__
+
+
+.. autoclass:: MonitorObserver
+
+   .. attribute:: monitor
+
+      Get the :class:`Monitor` observer by this object.
+
+   .. automethod:: __init__
+
+   .. automethod:: send_stop
+
+   .. automethod:: stop

@@ -29,8 +29,10 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import os
 import sys
 import select
+from threading import Thread
 from contextlib import closing
 
 from pyudev._libudev import libudev
@@ -39,7 +41,7 @@ from pyudev._util import ensure_byte_string, ensure_unicode_string, reraise
 from pyudev.core import Device
 
 
-__all__ = ['Monitor']
+__all__ = ['Monitor', 'MonitorObserver']
 
 
 class Monitor(object):
@@ -306,3 +308,121 @@ class Monitor(object):
                 events = notifier.poll()
                 for event in events:
                     yield self.receive_device()
+
+
+class MonitorObserver(Thread):
+    """
+    A :class:`~threading.Thread` class to observe a :class:`Monitor` in background:
+
+    >>> context = pyudev.Context()
+    >>> monitor = pyudev.Monitor.from_netlink(context)
+    >>> monitor.filter_by(subsystem='input')
+    >>> def print_device_event(action, device):
+    ...     print('background event {0}: {1}'.format(action, device))
+    >>> observer = MonitorObserver(monitor, print_device_event, name='monitor-observer')
+    >>> observer.daemon
+    True
+    >>> observer.start()
+
+    In the above example, input device events will be printed in background,
+    until :meth:`stop()` is called on ``observer``.
+
+    .. note::
+
+      Instances of this class are always created as daemon thread.  If you do
+      not want to use daemon threads for monitoring, you need explicitly set
+      :attr:`~threading.Thread.daemon` to ``False`` before invoking
+      :meth:`~threading.Thread.start()`.
+    """
+
+    def __init__(self, monitor, event_handler, *args, **kwargs):
+        """
+        Create a new observer for the given ``monitor``.
+
+        ``monitor`` is the :class:`Monitor` to observe.  ``event_handler`` is a
+        callable with the signature ``event_handler(action, device)``, where
+        ``action`` is a string describing the event (see
+        :meth:`Monitor.receive_device`), and ``device`` is the :class:`Device`
+        object that caused this event.  This callable is invoked for every
+        device event received through ``monitor``.
+
+        .. warning::
+
+           ``event_handler`` is always invoked in this background thread, and
+           *not* in the calling thread.
+
+        ``args`` and ``kwargs`` are passed unchanged to the parent constructor
+        of :class:`~threading.Thread`.
+        """
+        Thread.__init__(self, *args, **kwargs)
+
+        self.monitor = monitor
+        # observer threads should not keep the interpreter alive
+        self.daemon = True
+        self._stop_event_source, self._stop_event_sink = os.pipe()
+        self._handle_event = event_handler
+
+    def run(self):
+        with closing(select.epoll()) as notifier:
+            # poll on the stop event fd
+            notifier.register(self._stop_event_source, select.EPOLLIN)
+            # and on the monitor
+            notifier.register(self.monitor, select.EPOLLIN)
+            while True:
+                for fd, _ in notifier.poll():
+                    if fd == self._stop_event_source:
+                        # in case of a stop event, close our pipe side, and
+                        # return from the thread
+                        os.close(self._stop_event_source)
+                        return
+                    else:
+                        event = self.monitor.receive_device()
+                        if event:
+                            action, device = event
+                            self._handle_event(action, device)
+
+    def send_stop(self):
+        """
+        Send a stop signal to the background thread.
+
+        The background thread will eventually exit, but it may still be running
+        when this method returns.  This method is essentially the asynchronous
+        equivalent to :meth:`stop()`.
+
+        .. note::
+
+           The underlying :attr:`monitor` is *not* stopped.
+        """
+        if self._stop_event_sink is None:
+            return
+        try:
+            # emit a stop event to the thread
+            os.write(self._stop_event_sink, b'\x01')
+        finally:
+            # close the out-of-thread side of the pipe
+            os.close(self._stop_event_sink)
+            self._stop_event_sink = None
+
+    def stop(self):
+        """
+        Stop the background thread.
+
+        .. warning::
+
+           Calling this method from the ``event_handler`` results in a dead
+           lock.  If you need to stop the observer from ``event_handler``, use
+           :meth:`send_stop`, and be prepared to get some more events before
+           the observer actually exits.
+
+        Send a stop signal to the backgroud (see :meth:`send_stop`) and waits
+        for the background thread to exit (see :meth:`~threading.Thread.join`).
+        After this method returns, it is guaranteed that the ``event_handler``
+        passed to :meth:`MonitorObserver.__init__()` is not longer called for
+        any event from :attr:`monitor`.
+
+        .. note::
+
+           The underlying :attr:`monitor` is *not* stopped.
+        """
+        self.send_stop()
+        self.join()
