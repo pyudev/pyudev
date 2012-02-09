@@ -1,7 +1,8 @@
 0.14 (in development)
 =====================
 
-- #37: Added observer for wxPython (thanks to Tobias Eberle)
+- #37: Added :class:`pyudev.wx.WxUDevMonitorObserver` for wxPython (thanks to
+  Tobias Eberle)
 - Added :class:`pyudev.MonitorObserver`
 
 

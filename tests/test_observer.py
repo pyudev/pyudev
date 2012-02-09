@@ -156,8 +156,8 @@ class WXBinding(BaseBinding):
     timer = []
 
     def create_observer(self, monitor):
-        from pyudev.wx import WXUDevMonitorObserver
-        observer = WXUDevMonitorObserver(monitor)
+        from pyudev.wx import WxUDevMonitorObserver
+        observer = WxUDevMonitorObserver(monitor)
         assert observer.monitor is monitor
         return observer
 

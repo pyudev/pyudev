@@ -173,7 +173,7 @@ provided, each in a separate module:
    :platform: Linux
    :synopsis: wxWidgets integration
 
-.. autoclass:: WXUDevMonitorObserver
+.. autoclass:: WxUDevMonitorObserver
 
    .. attribute:: monitor
 
@@ -184,7 +184,7 @@ provided, each in a separate module:
 
 .. rubric:: Event constants
 
-:class:`WXUDevMonitorObserver` exposes the following events:
+:class:`WxUDevMonitorObserver` exposes the following events:
 
 .. data:: EVT_DEVICE_EVENT
 
