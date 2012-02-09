@@ -179,6 +179,8 @@ provided, each in a separate module:
 
       The :class:`~pyudev.Monitor` observed by this object.
 
+   .. autoattribute::  enabled
+
 
 .. rubric:: Event constants
 

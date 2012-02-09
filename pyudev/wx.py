@@ -28,10 +28,10 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from threading import Thread
-
 from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent
+
+from pyudev.monitor import MonitorObserver
 
 
 DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
@@ -52,9 +52,7 @@ class WXUDevMonitorObserver(EvtHandler):
     >>> def device_connected(event):
     ...     print('{0!r} added'.format(event.device))
     >>> observer.Bind(EVT_DEVICE_ADDED, device_connected)
-    >>> ...
-    >>> observer.stop() # because otherwise only the MainLoop exits, but not
-    >>>                 # the python interpreter
+    >>> monitor.start()
 
     This class is a child of :class:`wx.EvtHandler`.
     """
@@ -69,23 +67,49 @@ class WXUDevMonitorObserver(EvtHandler):
     def __init__(self, monitor):
         EvtHandler.__init__(self)
         self.monitor = monitor
-        self._thread = Thread(target=self._observe_monitor)
-        self._thread.start()
+        self._observer_thread = None
+        self.start()
+
+    @property
+    def enabled(self):
+        """
+        Whether this observer is enabled or not.
+
+        If ``True``, this observer is enabled, and emits events.  Otherwise it
+        is disabled and does not emit any events.
+        """
+        return self._observer_thread is not None
+
+    @enabled.setter
+    def enabled(self, value):
+        if value:
+            self.start()
+        else:
+            self.stop()
+
+    def start(self):
+        """
+        Enable this observer.
+
+        Do nothing, if the observer is already enabled.
+        """
+        if self._observer_thread is not None:
+            return
+        self._observer_thread = MonitorObserver(
+            self.monitor, self._emit_events, name='wx-observer-thread')
+        self._observer_thread.start()
 
     def stop(self):
         """
-        stops observing the monitor
+        Disable this observer.
 
-        It is neccessary to run this when the wxwidgets application exits to
-        also allow the python interpreter to exit. Otherwise the python
-        interpreter keeps running.
+        Do nothing, if the observer is already disabled.
         """
-        self._thread._Thread__stop()
+        if self._observer_thread is None:
+            return
+        self._observer_thread.stop()
 
-    def _observe_monitor(self):
-        for event in self.monitor:
-            action, device = event
-            PostEvent(self, DeviceEvent(action=action, device=device))
-            event_class = self._action_event_map[action]
-            PostEvent(self, event_class(device=device))
-
+    def _emit_events(self, action, device):
+        PostEvent(self, DeviceEvent(action=action, device=device))
+        event_class = self._action_event_map[action]
+        PostEvent(self, event_class(device=device))

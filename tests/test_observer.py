@@ -201,7 +201,9 @@ class WXBinding(BaseBinding):
         timer.Start(timeout, True)
 
     def cleanup(self, observer):
-        observer.stop()
+        # disable the observer to avoid that some pending observers confuse our
+        # tests
+        observer.enabled = False
 
 
 BINDINGS = [Qt4Binding('PyQt4'), Qt4Binding('PySide'), GlibBinding(), WXBinding()]

@@ -136,15 +136,6 @@ class FakeMonitor(object):
         finally:
             self.server.close()
 
-    def __iter__(self):
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            while True:
-                events = notifier.poll()
-                if events:
-                    yield self.receive_device()
-
-
 
 class UDevAdm(object):
     """
