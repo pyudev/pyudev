@@ -22,7 +22,7 @@
 
     A binding to libudev_.
 
-    .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
+    .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
 
     Usage
     -----

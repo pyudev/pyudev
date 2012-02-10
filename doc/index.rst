@@ -95,8 +95,8 @@ documentation <testing>` to learn how to write unit tests for your code.
 .. _CPython: http://www.python.org/
 .. _PyPy: http://www.pypy.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
-.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
-.. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
+.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
+.. _udev: http://git.kernel.org/?p=linux/hotplug/udev.git
 .. _Python Package Index: http://pypi.python.org/pypi/pyudev
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _librelist.com: http://librelist.com/

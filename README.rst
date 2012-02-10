@@ -54,8 +54,8 @@ Feel free to fork the repository.  Pull requests and patches are welcome!
 .. _CPython: http://www.python.org/
 .. _PyPy: http://www.pypy.org/
 .. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
-.. _udev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
-.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/udev.html
+.. _udev: http://git.kernel.org/?p=linux/hotplug/udev.git
+.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
 .. _website: http://pyudev.readthedocs.org
 .. _ctypes: http://docs.python.org/library/ctypes.html
 .. _issue tracker: http://github.com/lunaryorn/pyudev/issues
