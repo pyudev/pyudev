@@ -43,7 +43,7 @@ DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
 
 class WxUDevMonitorObserver(EvtHandler):
     """
-    Observe a :class:`~pyudev.Monitor` and posts wx events upon device events:
+    Observe a :class:`~pyudev.Monitor` and post wx events upon device events:
 
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
