@@ -18,9 +18,10 @@ dependencies are udev_ and Python.pyudev supports CPython_ 2.6 or newer
 (including 3.x) and PyPy_ 1.5 or newer, and is tested against udev_ 151 and
 newer.  Older versions of older versions of udev_ may or may not work.
 
-The toolkit integration modules in ``pyudev.pyqt4``, ``pyudev.pyside`` and
-``pyudev.glib`` require some libraries from the corresponding toolkit.
-Refer to the documentation of these modules for a more precise description.
+The toolkit integration modules in ``pyudev.pyqt4``, ``pyudev.pyside``,
+``pyudev.glib`` and ``pyudev.wx`` require some libraries from the corresponding
+toolkit.  Refer to the documentation of these modules for a more precise
+description.
 
 Installation is rather simple, just run::
 

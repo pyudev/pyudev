@@ -21,9 +21,10 @@ newer.  Older versions of older versions of udev_ may or may not work.  If
 pyudev doesn't work with your udev_ version, please report an issue (see
 :ref:`contribution`).
 
-The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`
-and :mod:`pyudev.glib` require some libraries from the corresponding toolkit.
-Refer to the documentation of these modules for a more precise description.
+The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`,
+:mod:`pyudev.glib` and :mod:`pyudev.wx` require some libraries from the
+corresponding toolkit.  Refer to the documentation of these modules for a more
+precise description.
 
 Installation is rather simple, just run::
 
