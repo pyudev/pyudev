@@ -1,6 +1,8 @@
 0.14 (in development)
 =====================
 
+- Documentation now hosted at http://pyudev.readthedocs.org (thanks to the
+  readthedocs.org team for this service)
 - #37: Added :class:`pyudev.wx.WxUDevMonitorObserver` for wxPython (thanks to
   Tobias Eberle)
 - Added :class:`pyudev.MonitorObserver`
