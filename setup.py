@@ -65,11 +65,11 @@ setuptools.setup(
     description='A libudev binding',
     long_description=long_description,
     platforms=['Linux'],
-    license='MIT/X11',
+    license='LGPL 2.1+',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
