@@ -1,5 +1,5 @@
-0.14 (in development)
-=====================
+0.14 (Feb 10, 2012)
+===================
 
 - Documentation now hosted at http://pyudev.readthedocs.org (thanks to the
   readthedocs.org team for this service)
