@@ -329,10 +329,10 @@ class MonitorObserver(Thread):
 
     .. note::
 
-      Instances of this class are always created as daemon thread.  If you do
-      not want to use daemon threads for monitoring, you need explicitly set
-      :attr:`~threading.Thread.daemon` to ``False`` before invoking
-      :meth:`~threading.Thread.start()`.
+       Instances of this class are always created as daemon thread.  If you do
+       not want to use daemon threads for monitoring, you need explicitly set
+       :attr:`~threading.Thread.daemon` to ``False`` before invoking
+       :meth:`~threading.Thread.start()`.
     """
 
     def __init__(self, monitor, event_handler, *args, **kwargs):
