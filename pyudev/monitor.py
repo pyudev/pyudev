@@ -334,7 +334,7 @@ class MonitorObserver(Thread):
        :attr:`~threading.Thread.daemon` to ``False`` before invoking
        :meth:`~threading.Thread.start()`.
 
-    .. versionadded: 0.14
+    .. versionadded:: 0.14
     """
 
     def __init__(self, monitor, event_handler, *args, **kwargs):
