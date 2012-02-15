@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -215,7 +215,7 @@ class TestContext(object):
 
     @pytest.mark.match
     def test_list_devices_passthrough(self, context):
-        with mock.patch_object(Enumerator, 'match') as match:
+        with mock.patch.object(Enumerator, 'match') as match:
             context.list_devices(subsystem=mock.sentinel.subsystem,
                                  sys_name=mock.sentinel.sys_name,
                                  tag=mock.sentinel.tag,
