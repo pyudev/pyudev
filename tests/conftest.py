@@ -31,7 +31,7 @@ import errno
 from functools import wraps
 from collections import namedtuple
 from contextlib import contextmanager
-from subprocess import check_call
+from subprocess import call
 if sys.version_info[:2] < (3, 2):
     from contextlib import nested
 
@@ -311,7 +311,7 @@ def load_dummy():
     Load the ``dummy`` module or raise :exc:`ValueError` if sudo are not
     allowed.
     """
-    check_call(['sudo', 'modprobe', 'dummy'])
+    call(['sudo', 'modprobe', 'dummy'])
 
 
 @_need_privileges
@@ -320,7 +320,7 @@ def unload_dummy():
     Unload the ``dummy`` module or raise :exc:`ValueError` if sudo are not
     allowed.
     """
-    check_call(['sudo', 'modprobe', '-r', 'dummy'])
+    call(['sudo', 'modprobe', '-r', 'dummy'])
 
 
 def is_unicode_string(value):
