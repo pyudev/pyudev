@@ -61,9 +61,9 @@ class Monitor(object):
     Alternatively, connections to arbitrary daemons can be made using
     :meth:`from_socket`, which is however only seldom of use.
 
-    Once the monitor is created, you can add a filter using
-    :meth:`filter_by` to drop incoming events in subsystems, which are not
-    of interest to the application.
+    Once the monitor is created, you can add a filter using :meth:`filter_by()`
+    or :meth:`filter_by_tag()` to drop incoming events in subsystems, which are
+    not of interest to the application.
 
     If the monitor is eventually set up, you can either iterate over the
     :class:`Monitor` object to synchronously receive events (see
