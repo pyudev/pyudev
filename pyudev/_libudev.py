@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -156,7 +156,8 @@ SIGNATURES = {
         receive_device=([udev_monitor_p], udev_device_p),
         filter_add_match_subsystem_devtype=(
             [udev_monitor_p, c_char_p, c_char_p], c_int),
-        filter_add_match_tag=([udev_monitor_p, c_char_p], c_int))
+        filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
+        filter_update=([udev_monitor_p], c_int))
     }
 
 
@@ -245,7 +246,9 @@ ERROR_CHECKERS = dict(
     udev_monitor_enable_receiving=check_errno,
     udev_monitor_receive_device=check_errno_on_null_pointer,
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode,
-    udev_monitor_filter_add_match_tag=check_negative_errorcode)
+    udev_monitor_filter_add_match_tag=check_negative_errorcode,
+    udev_monitor_filter_update=check_negative_errorcode,
+)
 
 
 def load_udev_library():

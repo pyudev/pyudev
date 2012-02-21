@@ -174,13 +174,15 @@ class Monitor(object):
         will usually not be woken up for device, that do not match these
         filters.
 
-        This method must be called *before* :meth:`enable_receiving`.
+        .. versionchanged:: 0.15
+           This method can also be after :meth:`enable_receiving()` now
         """
         subsystem = ensure_byte_string(subsystem)
         if device_type:
             device_type = ensure_byte_string(device_type)
         libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self, subsystem, device_type)
+        libudev.udev_monitor_filter_update(self)
 
     def filter_by_tag(self, tag):
         """
@@ -194,14 +196,16 @@ class Monitor(object):
         kernel, so that client processes are usually not woken up for devices
         without the given ``tag``.
 
-        This method must be called *before* :meth:`enable_receiving`.
-
         .. udevversion:: 154
 
         .. versionadded:: 0.9
+
+        .. versionchanged:: 0.15
+           This method can also be after :meth:`enable_receiving()` now
         """
         libudev.udev_monitor_filter_add_match_tag(
             self, ensure_byte_string(tag))
+        libudev.udev_monitor_filter_update(self)
 
     def enable_receiving(self):
         """

@@ -22,6 +22,7 @@ from __future__ import (print_function, division, unicode_literals,
 import sys
 import socket
 import errno
+from contextlib import contextmanager
 from select import select
 from operator import itemgetter
 
@@ -46,6 +47,17 @@ def _assert_from_netlink_called(context, *args):
         new_from_netlink.assert_called_with(context, source)
         assert isinstance(new_from_netlink.call_args[0][1], bytes)
         assert monitor._as_parameter_ is mock.sentinel.pointer
+
+
+@contextmanager
+def patch_filter_by(type):
+    add_match = 'udev_monitor_filter_add_match_{0}'.format(type)
+    filter_update = 'udev_monitor_filter_update'
+    with pytest.patch_libudev(add_match) as add_match:
+        add_match.return_value = 0
+        with pytest.patch_libudev(filter_update) as filter_update:
+            filter_update.return_value = 0
+            yield add_match, filter_update
 
 
 class TestMonitor(object):
@@ -111,13 +123,13 @@ class TestMonitor(object):
         monitor.filter_by('input')
 
     def test_filter_by_subsystem_no_dev_type_mock(self, monitor):
-        add_match = 'udev_monitor_filter_add_match_subsystem_devtype'
-        with pytest.patch_libudev(add_match) as add_match:
-            add_match.return_value = 0
+        with patch_filter_by('subsystem_devtype') as (add_match, filter_update):
             monitor.filter_by(b'input')
             add_match.assert_called_with(monitor, b'input', None)
+            filter_update.assert_called_with(monitor)
             monitor.filter_by('input')
             add_match.assert_called_with(monitor, b'input', None)
+            filter_update.assert_called_with(monitor)
             assert isinstance(add_match.call_args[0][1], bytes)
 
     def test_filter_by_subsystem_dev_type(self, monitor):
@@ -125,13 +137,13 @@ class TestMonitor(object):
         monitor.filter_by('input', 'usb_interface')
 
     def test_filter_by_subsystem_dev_type_mock(self, monitor):
-        add_match = 'udev_monitor_filter_add_match_subsystem_devtype'
-        with pytest.patch_libudev(add_match) as add_match:
-            add_match.return_value = 0
+        with patch_filter_by('subsystem_devtype') as (add_match, filter_update):
             monitor.filter_by(b'input', b'usb_interface')
             add_match.assert_called_with(monitor, b'input', b'usb_interface')
+            filter_update.assert_called_with(monitor)
             monitor.filter_by('input', 'usb_interface')
             add_match.assert_called_with(monitor, b'input', b'usb_interface')
+            filter_update.assert_called_with(monitor)
             assert isinstance(add_match.call_args[0][2], bytes)
 
     @pytest.need_udev_version('>= 154')
@@ -139,14 +151,15 @@ class TestMonitor(object):
         monitor.filter_by_tag('spam')
 
     @pytest.need_udev_version('>= 154')
-    def test_pytest_filter_by_tag_mock(self, monitor):
-        match_tag = 'udev_monitor_filter_add_match_tag'
-        with pytest.patch_libudev(match_tag) as match_tag:
+    def test_filter_by_tag_mock(self, monitor):
+        with patch_filter_by('tag') as (match_tag, filter_update):
             match_tag.return_value = 0
             monitor.filter_by_tag(b'spam')
             match_tag.assert_called_with(monitor, b'spam')
+            filter_update.assert_called_with(monitor)
             monitor.filter_by_tag('eggs')
             match_tag.assert_called_with(monitor, b'eggs')
+            filter_update.assert_called_with(monitor)
             assert isinstance(match_tag.call_args[0][1], bytes)
 
     def test_enable_receiving_netlink_kernel_source(self, context):
