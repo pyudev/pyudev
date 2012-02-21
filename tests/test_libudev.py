@@ -148,6 +148,7 @@ def _is_blacklisted(function_name):
         return False
 
 
+@pytest.mark.coverage
 def test_is_wrapped(function_name):
     wrapped_functions = set('{0}_{1}'.format(ns, member)
                             for ns, members in binding.SIGNATURES.items()
