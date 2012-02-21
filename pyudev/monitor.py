@@ -66,14 +66,14 @@ class Monitor(object):
     of interest to the application.
 
     If the monitor is eventually set up, you can either iterate over the
-    :class:`Monitor` object.  In this case, the monitor implicitly starts
-    listening, and polls for incoming events.  Such events are then yielded
-    to the caller.  Iteration is a blocking operation and does not integrate
-    into external event loops.  If such integration is required, you can
-    explicitly enable the monitor (see :meth:`enable_receiving`), and then
-    retrieve a file descriptor using :meth:`fileno`.  This file descriptor
-    can then be passed to classes like
-    :class:`~PyQt4.QtCore.QSocketNotifier` from Qt4.
+    :class:`Monitor` object to synchronously receive events (see
+    :meth:`__iter__()`), use a :class:`MonitorObserver` to asynchronously react
+    on events or plug event handling into the event loop of various toolkits
+    using the :ref:`toolkit integration modules <toolkit-integration>`.
+    Moreover the monitor provides a real file descriptor (see
+    :meth:`fileno()`), which is :func:`selectable <select.select>`, so you can
+    also plug the monitor into custom notification mechanisms.  Do *not* read
+    or write on this file descriptor.
 
     Instances of this class can directly be given as ``udev_monitor *`` to
     functions wrapped through :mod:`ctypes`.

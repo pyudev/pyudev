@@ -1,3 +1,5 @@
+.. _toolkit-integration:
+
 Toolkit integration
 ===================
 
