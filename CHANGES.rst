@@ -4,6 +4,7 @@
 - #20: :meth:`pyudev.Monitor.filter_by()` and
   :meth:`pyudev.Monitor.filter_by_tag()` can be called after
   :meth:`pyudev.Monitor.enable_receiving()` now
+- #20: Added :meth:`~pyudev.Monitor.remove_filter()`
 - :class:`pyudev.MonitorObserver` calls
   :meth:`pyudev.Monitor.enable_receiving()` now when started.
 - #40: Added user guide to the documentation

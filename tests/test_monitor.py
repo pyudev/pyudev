@@ -162,6 +162,21 @@ class TestMonitor(object):
             filter_update.assert_called_with(monitor)
             assert isinstance(match_tag.call_args[0][1], bytes)
 
+    @pytest.mark.xfail(reason='udev_monitor_filter_remove() broken?')
+    def test_remove_filter(self, monitor):
+        monitor.remove_filter()
+
+    def test_remove_filter_mock(self, monitor):
+        remove = 'udev_monitor_filter_remove'
+        update = 'udev_monitor_filter_update'
+        with pytest.patch_libudev(remove) as remove:
+            remove.return_value = 0
+            with pytest.patch_libudev(update) as update:
+                update.return_value = 0
+                monitor.remove_filter()
+                update.assert_called_with(monitor)
+                remove.assert_called_with(monitor)
+
     def test_enable_receiving_netlink_kernel_source(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
         monitor.enable_receiving()

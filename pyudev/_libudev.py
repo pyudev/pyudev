@@ -157,7 +157,8 @@ SIGNATURES = {
         filter_add_match_subsystem_devtype=(
             [udev_monitor_p, c_char_p, c_char_p], c_int),
         filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
-        filter_update=([udev_monitor_p], c_int))
+        filter_update=([udev_monitor_p], c_int),
+        filter_remove=([udev_monitor_p], c_int))
     }
 
 
@@ -248,6 +249,7 @@ ERROR_CHECKERS = dict(
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode,
     udev_monitor_filter_add_match_tag=check_negative_errorcode,
     udev_monitor_filter_update=check_negative_errorcode,
+    udev_monitor_filter_remove=check_errno,
 )
 
 

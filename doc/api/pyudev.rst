@@ -219,6 +219,8 @@
 
    .. automethod:: filter_by_tag
 
+   .. automethod:: remove_filter
+
    .. automethod:: enable_receiving
 
    .. method:: start

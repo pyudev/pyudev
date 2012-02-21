@@ -206,6 +206,27 @@ class Monitor(object):
             self, ensure_byte_string(tag))
         libudev.udev_monitor_filter_update(self)
 
+    def remove_filter(self):
+        """
+        Remove any filters installed with :meth:`filter_by()` or
+        :meth:`filter_by_tag()` from this monitor.
+
+        .. warning::
+
+           Up to udev 181 (and possibly even later versions) the underlying
+           ``udev_monitor_filter_remove()`` seems to be broken.  If used with
+           affected versions this method always raises
+           :exc:`~exceptions.EnvironmentError` with ``errno`` set to
+           :data:`~errno.EINVAL`.
+
+        Raise :exc:`~exceptions.EnvironmentError` if removal of installed
+        filters failed.
+
+        .. versionadded:: 0.15
+        """
+        libudev.udev_monitor_filter_remove(self)
+        libudev.udev_monitor_filter_update(self)
+
     def enable_receiving(self):
         """
         Switch the monitor into listing mode.
