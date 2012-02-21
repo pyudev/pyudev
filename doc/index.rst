@@ -1,94 +1,57 @@
 Welcome to pyudev's documentation!
 ==================================
 
-pyudev is a Python_ binding to libudev_, the hardware management library and
-service found in modern linux systems.  It is available under the same
-licence as the original library, which is the `GNU LGPL 2.1`_ (see
-:doc:`licencing` for details).
+pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ binding to libudev_,
+the device and hardware management and information library of Linux.
+
+It exposes almost the complete libudev_ functionality.  You can:
+
+* enumerate devices, filtered by specific criteria (:class:`pyudev.Context`)
+* query device information, properties and attributes,
+* monitor devices, both synchronously and asynchronously with background
+  threads, or within the event loops of Qt (:`pyudev.pyqt4`,
+  :mod:`pyudev.pyside`), glib (:mod:`pyudev.glib`) and wxPython
+  (:mod:`pyudev.wx`).
+
+pyudev supports CPython_ 2 (2.6 or newer) and 3 (3.1 or newer), and PyPy_ 1.5
+or newer.  It is tested against udev_ 151 or newer.  Older versions of udev_ as
+found on dated Linux systems may work, but are not officially supported.
+
+The :doc:`API documentation <api/index>` provides detailled usage instructions.
 
 
-Installation
-------------
+Support
+-------
 
-The current release is pyudev |release|, available in the `Python Package
-Index`_.  Refer to the :doc:`changes` for a list of important changes since
-the last release [#changes]_.
+.. rubric:: Mailing list
 
-The basic binding is implemented in pure Python atop of ctypes_.  The only
-dependencies are udev_ and Python.  pyudev supports CPython_ 2.6 or newer
-(including 3.x) and PyPy_ 1.5 or newer, and is tested against udev_ 151 and
-newer.  Older versions of older versions of udev_ may or may not work.  If
-pyudev doesn't work with your udev_ version, please report an issue (see
-:ref:`contribution`).
-
-The toolkit integration modules in :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`,
-:mod:`pyudev.glib` and :mod:`pyudev.wx` require some libraries from the
-corresponding toolkit.  Refer to the documentation of these modules for a more
-precise description.
-
-Installation is rather simple, just run::
-
-   pip install pyudev
+Questions about usage and development of pyudev can be posted to the mailing
+list pyudev@librelist.com, which is hosted by `librelist.com`_.  To subscribe
+to this list, just send a mail to pyudev@librehost.com and reply to the
+confirmation mail.  To unsubscribe again, write to
+pyudev-unsubscribe@librelist.com and reply to the confirmation mail.  Past
+discussions and questions are available in the `list archives`_.
 
 
-Documentation
--------------
+.. rubric:: Issues
 
-Usage of pyudev is rather simple:
-
->>> from pyudev import Context
->>> context = Context()
->>> for device in context.list_devices(subsystem='input', ID_INPUT_MOUSE=True):
-...     if device.sys_name.startswith('event'):
-...         device.parent['NAME']
-...
-u'"Logitech USB-PS/2 Optical Mouse"'
-u'"Broadcom Corp"'
-u'"PS/2 Mouse"'
-
-Please read the :doc:`API documentation <api/index>` for detailed
-information.
+Issues and bugs can be reported to the `issue tracker`_ on GitHub_.  Please
+provide as much information as possible when reporting an issue.  Patches
+addressing new or existing issues are very welcome.
 
 
-Feedback and Questions
-----------------------
+.. _development:
 
-There is a mailing list at pyudev@librelist.com (hosted by `librelist.com`_)
-for user questions and development discussion around pyudev.  To subscribe
-to this list, just send a mail to pyudev@librelist.com and reply to the
-configuration mail.  The original mail is ditched.
+Development
+-----------
 
-To unsubscribe, send a mail to pyudev-unsubscribe@librelist.com and reply to
-the configuration email.
-
-Older discussions are available in the `list archives`_.
-
-
-.. _contribution:
-
-Contribution and Development
-----------------------------
-
-Please report issues and feature requests to the `issue tracker`_
-[#issues]_.  Development discussions are located on the mailing list (see
-above).
-
-Development itself happens on GitHub_.  The complete source code is
-available in a git_ repository::
+The source code is hosted on GitHub_::
 
    git clone --recursive git://github.com/lunaryorn/pyudev.git
 
-Feel free to fork the repository.  Pull requests and patches are welcome!  If
-you indent to contribute to pyudev, you may want to read the :doc:`testsuite
-documentation <testing>` to learn how to write unit tests for your code.
-
-
-.. rubric:: Footnotes
-
-.. [#changes] A detailed list of changesets_ is also available.
-.. [#issues] Please assign proper labels to the issue and provide detailed
-   information about the issue.  If possible, include copied and pasted
-   output from the programs, or a code example demonstrating the issue.
+Feel free to fork the repository and send pull requests or patches.  Please add
+unit tests for your code, if possible.  The :doc:`testsuite documentation
+<testing>` gives you an overview about the pyudev testsuite.
 
 
 .. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html

@@ -1,0 +1,25 @@
+{% macro link(title, link, internal=false) -%}
+<a class="reference {{'internal' if internal else 'external'}}"
+   href="{{ link }}">{{ title }}</a>
+{%- endmacro %}
+
+<h3>Install</h3>
+
+<ul>
+  <li><tt class="literal"><span class="pre">pip install pyudev</span></tt></li>
+</ul>
+
+<h3>Links</h3>
+<ul>
+  <li>pyudev on {{link('PyPI', 'https://pypi.python.org/pypi/requests')}} or
+  {{link('Crate.io', 'https://crate.io/packages/pyudev')}}</li>
+  <li>pyudev on {{link('Read the Docs', 'http://readthedocs.org/projects/pyudev/?fromdocs=pyudev')}}</li>
+  <li>pyudev on {{link('GitHub', 'https://github.com/lunaryorn/pyudev')}}</li>
+</ul>
+
+<h3>Support</h3>
+<ul>
+  <li>{{link('mailing list', 'mailto:pyudev@librelist.com')}}
+  ({{link('archives', 'http://librelist.com/browser/pyudev')}})</li>
+  <li>{{link('issue tracker', 'https://github.com/lunaryorn/pyudev/issues')}}</li>
+</ul>

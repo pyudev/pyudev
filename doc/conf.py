@@ -93,8 +93,11 @@ copyright = u'2010, 2011 Sebastian Wiesner'
 version = '.'.join(pyudev.__version__.split('.')[:2])
 release = pyudev.__version__
 
+templates_path = ['_templates']
 html_theme = 'default'
 html_static_path = []
+html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
+                        'sourcelink.html']}
 
 intersphinx_mapping = {'python': ('http://docs.python.org/', None),
                        'pyside': ('http://www.pyside.org/docs/pyside/', None)}
