@@ -1,5 +1,5 @@
-Welcome to pyudev's documentation!
-==================================
+pyudev -- pure Python libudev_ binding
+======================================
 
 pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ binding to libudev_,
 the device and hardware management and information library of Linux.
