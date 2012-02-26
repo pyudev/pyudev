@@ -137,7 +137,9 @@ with the generic properties:
 
 
 But you can also query many device properties that are not available as Python
-properties on the :class:`Device` object, like the filesystem type.
+properties on the :class:`Device` object with a convenient mapping interface,
+like the filesystem type.  :class:`Device` provides a convenient mapping
+interface for this purpose:
 
 >>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
 ...     print('{0} ({1})'.format(device.device_node, device.get('ID_FS_TYPE')))
