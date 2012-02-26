@@ -90,6 +90,39 @@ classifies and categorizes devices.  Poke around in ``/sys/`` to get a feeling
 for the udev-way to handle devices.
 
 
+Accessing individual devices directly
+-------------------------------------
+
+If you just need a single specific :class:`Device`, you don't need to enumerate
+all devices with a specific filter criterion.  Instead, just get the device
+object directly either by its device path (:meth:`Device.from_path()`), or by
+the its subsystem and device name (:meth:`Device.from_name()`).  The following
+code gets the :class:`Device` object for the first hard disc in two different
+ways:
+
+>>> pyudev.Device.from_path(context, '/sys/block/sda')
+Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
+>>> pyudev.Device.from_name(context, 'block', 'sda')
+Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
+
+As you can see, you need to pass a :class:`Context` to both methods as
+reference to the udev database from which to retrieve information about the
+device.
+
+.. note::
+
+   The :class:`Device` objects created in the above example refer to the same
+   device.  Consequently, they are considered equal:
+
+   >>> pyudev.Device.from_path(context, '/sys/block/sda') == pyudev.Device.from_name(context, 'block', 'sda')
+   True
+
+   Whereas :class:`Device` objects referring to different devices are unequal:
+
+   >>> pyudev.Device.from_name(context, 'block', 'sda') == pyudev.Device.from_name(context, 'block', 'sda1')
+   False
+
+
 Querying device information
 ---------------------------
 
