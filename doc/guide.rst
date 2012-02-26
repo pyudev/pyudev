@@ -159,5 +159,45 @@ device-specific "device attributes".  The :attr:`Device.attributes` mapping
 gives you access to these attributes, but generally you should not need these.
 Use the device properties whenever possible.
 
+
+Examing the device hierarchy
+----------------------------
+
+Udev stores devices in a tree-like structure, where many devices have a
+:attr:`~Device.parent` device that more or less resembles the physical
+relationship between devices.  For instance, the :attr:`~Device.parent` of
+partition devices is the :class:`Device` object that represents the disc these
+partitions are located on:
+
+>>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
+...    print('{0} is located on {1}'.format(device.device_node, device.parent.device_node))
+...
+/dev/sda1 is located on /dev/sda
+/dev/sda2 is located on /dev/sda
+/dev/sda3 is located on /dev/sda
+
+Generally, you should not rely on the direct parent-child relationship between
+two devices.  Instead of accessing the parent directly, search for a parent
+within a specific subsystem, e.g. for the parent ``block`` device:
+
+>>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
+...    print('{0} is located on {1}'.format(device.device_node, device.find_parent('block').device_node))
+...
+/dev/sda1 is located on /dev/sda
+/dev/sda2 is located on /dev/sda
+/dev/sda3 is located on /dev/sda
+
+This also save you the tedious work of traversing the device tree manually, if
+you are interested in grand parents, like the name of the PCI slot of the SCSI
+or IDE controller of the disc that contains a partition:
+
+>>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
+...    print('{0} attached to PCI slot {1}'.format(device.device_node, device.find_parent('pci')['PCI_SLOT_NAME']))
+...
+/dev/sda1 attached to PCI slot 0000:00:0d.0
+/dev/sda2 attached to PCI slot 0000:00:0d.0
+/dev/sda3 attached to PCI slot 0000:00:0d.0
+
+
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
