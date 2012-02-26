@@ -72,6 +72,18 @@ unit tests for your code, if possible.  The :doc:`testsuite documentation
 <testing>` gives you an overview about the pyudev testsuite.
 
 
+Contents
+--------
+
+.. toctree::
+
+   guide
+   api/index
+   testing
+   changes
+   licencing
+
+
 .. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
 .. _CPython: http://www.python.org/
