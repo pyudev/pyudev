@@ -1,4 +1,1 @@
-Testing
-*******
-
 .. include:: ../TESTING.rst

@@ -1,6 +1,6 @@
-======================
- Unittests for pyudev
-======================
+=========================
+ Testsuite documentation
+=========================
 
 Unittests for pyudev are contained in the sub-directory ``tests``.  The unit
 tests are written using the pytest_ framework.
