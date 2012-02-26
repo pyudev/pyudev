@@ -154,6 +154,10 @@ interface for this purpose:
    ``get()`` to specify default values for missing properties, or be prepared
    to catch :exc:`~exceptions.KeyError`.
 
+Most device properties are computed by udev rules from the driver- and
+device-specific "device attributes".  The :attr:`Device.attributes` mapping
+gives you access to these attributes, but generally you should not need these.
+Use the device properties whenever possible.
 
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
