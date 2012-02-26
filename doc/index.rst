@@ -9,7 +9,7 @@ It exposes almost the complete libudev_ functionality.  You can:
 * enumerate devices, filtered by specific criteria (:class:`pyudev.Context`)
 * query device information, properties and attributes,
 * monitor devices, both synchronously and asynchronously with background
-  threads, or within the event loops of Qt (:`pyudev.pyqt4`,
+  threads, or within the event loops of Qt (:mod:`pyudev.pyqt4`,
   :mod:`pyudev.pyside`), glib (:mod:`pyudev.glib`) and wxPython
   (:mod:`pyudev.wx`).
 
