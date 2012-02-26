@@ -178,7 +178,8 @@ partitions are located on:
 
 Generally, you should not rely on the direct parent-child relationship between
 two devices.  Instead of accessing the parent directly, search for a parent
-within a specific subsystem, e.g. for the parent ``block`` device:
+within a specific subsystem, e.g. for the parent ``block`` device, with
+:meth:`~Device.find_parent()`:
 
 >>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
 ...    print('{0} is located on {1}'.format(device.device_node, device.find_parent('block').device_node))
