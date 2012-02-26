@@ -17,7 +17,25 @@ pyudev supports CPython_ 2 (2.6 or newer) and 3 (3.1 or newer), and PyPy_ 1.5
 or newer.  It is tested against udev_ 151 or newer.  Older versions of udev_ as
 found on dated Linux systems may work, but are not officially supported.
 
-The :doc:`API documentation <api/index>` provides detailled usage instructions.
+
+Usage
+-----
+
+Thanks to the power of libudev_, usage of pyudev is very simple.  Getting the
+labels of all partitions just takes a few lines:
+
+>>> import pyudev
+>>> context = pyudev.Context()
+>>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
+...     print(device.get('ID_FS_LABEL', 'unlabeled partition'))
+...
+boot
+swap
+system
+
+The :doc:`guide` gives an introduction into the most common operations in
+pyudev, a detailled reference is provided by the :doc:`API documentation
+<api/index>`.
 
 
 Support
