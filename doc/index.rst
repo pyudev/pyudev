@@ -99,12 +99,3 @@ Contents
 .. _GitHub: https://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
 .. _changesets: https://github.com/lunaryorn/pyudev/commits/master
-
-
-.. toctree::
-   :hidden:
-
-   api/index
-   licencing
-   changes
-   testing
