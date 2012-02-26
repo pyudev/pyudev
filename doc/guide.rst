@@ -111,7 +111,6 @@ object.  For instance, you can directly query the :attr:`device_node` and the
 /dev/sda2 (partition)
 /dev/sda3 (partition)
 
-
 For all other properties, :class:`Device` provides a dictionary-like interface
 to directly access the device properties.  You'll get the same information has
 with the generic properties:
@@ -124,7 +123,6 @@ with the generic properties:
 /dev/sda1 (partition)
 /dev/sda2 (partition)
 /dev/sda3 (partition)
-
 
 .. warning::
 
