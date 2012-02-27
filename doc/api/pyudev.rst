@@ -196,8 +196,8 @@
    :members:
 
 
-:class:`Monitor` – monitor devices
-----------------------------------
+:class:`Monitor` – device monitoring
+------------------------------------
 
 .. autoclass:: Monitor()
 
