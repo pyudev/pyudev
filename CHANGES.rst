@@ -1,9 +1,11 @@
 0.15 (in development)
 =====================
 
-- #20: :meth:`~pyudev.Monitor.filter_by()` and
-  :meth:`~pyudev.Monitor.filter_by_tag()` can be called after
+- #20: :meth:`pyudev.Monitor.filter_by()` and
+  :meth:`pyudev.Monitor.filter_by_tag()` can be called after
   :meth:`pyudev.Monitor.enable_receiving()` now
+- :class:`pyudev.MonitorObserver` calls
+  :meth:`pyudev.Monitor.enable_receiving()` now when started.
 
 
 0.14 (Feb 10, 2012)

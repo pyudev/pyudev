@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
@@ -339,6 +340,10 @@ class MonitorObserver(Thread):
        :meth:`~threading.Thread.start()`.
 
     .. versionadded:: 0.14
+
+    .. versionchanged:: 0.15
+       :meth:`Monitor.enable_receiving()` is implicitly called when the thread
+       is started.
     """
 
     def __init__(self, monitor, event_handler, *args, **kwargs):
@@ -369,6 +374,7 @@ class MonitorObserver(Thread):
         self._handle_event = event_handler
 
     def run(self):
+        self.monitor.enable_receiving()
         with closing(select.epoll()) as notifier:
             # poll on the stop event fd
             notifier.register(self._stop_event_source, select.EPOLLIN)
