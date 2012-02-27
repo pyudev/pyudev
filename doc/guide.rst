@@ -321,5 +321,39 @@ The ``observer`` can be stopped at any moment using :meth:`~MonitorObserver.stop
    if you need to stop monitoring from inside the event handler.
 
 
+GUI toolkit integration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you're using a GUI toolkit, you already have the event system of the GUI
+toolkit at hand.  pyudev provides observer classes that seamlessly integration
+in the event system of the GUI toolkit and relieve you from caring with
+synchronisation issues that would occur with thread-based monitoring as
+implemented by :class:`MonitorObserver`.
+
+pyudev supports all major GUI toolkits available for Python:
+
+- Qt_ 4 using :mod:`pyudev.pyqt4` for the PyQt4_ binding or :mod:`pyudev.pyside`
+  for the PySide_ binding
+- PyGtk_ 2 using :mod:`pyudev.glib`
+- wxWidgets_ and wxPython_ using :mod:`pyudev.wx`
+
+Each of these modules provides an observer class that observers the monitor
+asynchronously and emits proper signals upon device events.
+
+For instance, the above example would look like this in a PySide_ application:
+
+>>> from pyudev.pyside import QUDevMonitorObserver
+>>> monitor = pyudev.Monitor.from_netlink(context)
+>>> observer = QUDevMonitorObserver(monitor)
+>>> observer.deviceEvent.connect(log_event)
+>>> monitor.start()
+
+
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
+.. _Qt: http://qt-project.org/
+.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
+.. _PySide: http://www.pyside.org
+.. _PyGtk: http://www.pygtk.org/
+.. _wxWidgets: http://wxwidgets.org
+.. _wxPython: http://www.wxpython.org
