@@ -34,8 +34,7 @@ swap
 system
 
 The :doc:`guide` gives an introduction into the most common operations in
-pyudev, a detailled reference is provided by the :doc:`API documentation
-<api/index>`.
+pyudev, a detailled reference is provided by the :doc:`api/index`.
 
 
 Support
