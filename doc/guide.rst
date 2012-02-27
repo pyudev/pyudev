@@ -11,12 +11,13 @@ the :doc:`API documentation <api/index>`.
 Installation
 ------------
 
-Before we can start, you need to install pyudev from PyPI_::
+Before we can start, you need to install pyudev from PyPI_, which is as easy
+as::
 
    pip install pyudev
 
-No compiler and no library headers required, because pyudev is implemented in
-pure Python thanks to :mod:`ctypes`.
+Thanks to :mod:`ctypes` pyudev is implemented in pure Python, and no compiler
+and no library headers are required for installation.
 
 
 Getting started
@@ -29,6 +30,8 @@ Now you can import pyudev and do some version checks:
 u'0.15'
 >>> pyudev.udev_version()
 181
+
+This prints the version of pyudev itself and of the underlying libudev_
 
 
 A note on versioning
@@ -48,20 +51,16 @@ You can check the version of the underlying libudev_ with
 Enumerating devices
 -------------------
 
-To enumerate devices, you need to establish a "connection" to the udev device
-database first.  This connection is represented by a library :class:`Context`:
+A common use case is to enumerate available devices, or a subset thereof.  But
+before you can do anything with pyudev, you need to establish a "connection" to
+the udev device database first.  This connection is represented by a library
+:class:`Context`:
 
 >>> context = pyudev.Context()
 
-This object provides general information about the udev database, like the
-device node directory and the ``sysfs`` mount point:
-
->>> context.device_path
-u'/dev'
->>> context.sys_path
-u'/sys'
-
-It's main purpose however is to provide access to the device database:
+The :class:`Context` is the central object of pyudev and libudev_.  You will
+need a :class:`Context` object for almost anything in pyudev.  With the
+``context`` you can now enumerate the available devices:
 
 >>> for device in context.list_devices(): # doctest: +ELLIPSIS
 ...     device
@@ -71,8 +70,9 @@ Device(u'/sys/devices/LNXSYSTM:00/LNXCPU:00')
 Device(u'/sys/devices/LNXSYSTM:00/LNXCPU:01')
 ...
 
-You can filter the devices with keyword arguments to
-:meth:`~Context.list_devices()`.  The following code enumerates all partitions:
+By default, :meth:`list_devices()` yields all devices available on the system
+as :class:`Device` objects, but you can filter the list of devices with keyword
+arguments to enumerate all available partitions for example:
 
 >>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
 ...    print(device)
@@ -81,22 +81,25 @@ Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sd
 Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda/sda2')
 Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda/sda3')
 
-:meth:`~Context.list_devices()` returns an :class:`Enumerator` object.  This
-object represents a filtered list of devices.  Iterating over this object
-yields :class:`Device` objects which represent individual devices.
+The choice of the right filters depends on the use case and generally requires
+some knowledge about how udev classifies and categorizes devices.  This is out
+of the scope of this guide.  Poke around in ``/sys/`` to get a feeling for the
+udev-way of device handling, read the udev documentation or one of the
+tutorials in the net.
 
-The choice of the right filters requires some knowledge about the way udev
-classifies and categorizes devices.  Poke around in ``/sys/`` to get a feeling
-for the udev-way to handle devices.
+The keyword arguments of :meth:`list_devices()` provide the most common filter
+operations.  You can apply other, less common filters by calling one of the
+``match_*`` methods on the :class:`Enumerator` returned by of
+:meth:`list_devices()`.
 
 
 Accessing individual devices directly
 -------------------------------------
 
 If you just need a single specific :class:`Device`, you don't need to enumerate
-all devices with a specific filter criterion.  Instead, just get the device
-object directly either by its device path (:meth:`Device.from_path()`), or by
-the its subsystem and device name (:meth:`Device.from_name()`).  The following
+all devices with a specific filter criterion.  Instead, you can directly create
+:class:`Device` objects from a device path (:meth:`Device.from_path()`), or by
+from a subsystem and device name (:meth:`Device.from_name()`).  The following
 code gets the :class:`Device` object for the first hard disc in two different
 ways:
 
@@ -126,12 +129,12 @@ device.
 Querying device information
 ---------------------------
 
-A :class:`Device` has a set of "device properties" (not to be confused with
-Python properties as created by :func:`property()`) that describe the
-capabilities and features of this device as well as its relationship to other
-devices.
+As you've seen, :class:`Device` represents a device in the udev database.  Each
+such device as a set of "device properties" (not to be confused with Python
+properties as created by :func:`property()`!) that describe the capabilities
+and features of this device as well as its relationship to other devices.
 
-Common device properties are available as properties of a :class:`Device`
+Common device properties are also available as properties of a :class:`Device`
 object.  For instance, you can directly query the :attr:`device_node` and the
 :attr:`device_type` of block devices:
 
@@ -196,11 +199,11 @@ Use the device properties whenever possible.
 Examing the device hierarchy
 ----------------------------
 
-Udev stores devices in a tree-like structure, where many devices have a
+A :class:`Device` is part of a device hierarchy, and can have a
 :attr:`~Device.parent` device that more or less resembles the physical
 relationship between devices.  For instance, the :attr:`~Device.parent` of
-partition devices is the :class:`Device` object that represents the disc these
-partitions are located on:
+partition devices is a :class:`Device` object that represents the disc the
+partition is located on:
 
 >>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
 ...    print('{0} is located on {1}'.format(device.device_node, device.parent.device_node))
@@ -271,16 +274,21 @@ using :meth:`~Monitor.filter_by()`.  In the above example only events from the
 Eventually, you can receive events from the monitor.  As you can see, a
 :class:`Monitor` is iterable and synchronously yields occurred events.  If you
 iterate over a :class:`Monitor`, you will synchronously receive events in an
-endless loop, until you raise an exception, or ``break`` the loop.  While this
-is sufficient for quick and dirty scripts, typically more sophisticated control
-of monitoring is required.
+endless loop, until you raise an exception, or ``break`` the loop.
+
+This is the quick and dirty way of monitoring, suitable for small scripts or
+quick experiments.  In most cases however, simply iterating over the monitor is
+not sufficient, because it blocks the main thread, and can only be stopped if
+an event occurs (otherwise the loop is not entered and you have no chance to
+``break`` it).
 
 
 Asynchronous monitoring
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-For this purpose, pyudev provides asynchronous monitoring with
-:class:`MonitorObserver`:
+For such use cases, pyudev provides asynchronous monitoring with
+:class:`MonitorObserver`.  You can use it to log added and removed mountable
+filesystems to a file, for example:
 
 >>> monitor = pyudev.Monitor.from_netlink(context)
 >>> monitor.filter_by('block')
@@ -292,8 +300,9 @@ For this purpose, pyudev provides asynchronous monitoring with
 >>> observer = pyudev.MonitorObserver(monitor, log_event)
 >>> observer.start()
 
-Once the ``observer`` is started, the ``log_event()`` is invoked asynchronously
-for every event emitted by the ``monitor``.
+The ``observer`` gets an event handler (``log_event()`` in this case) which is
+asynchronously invoked on every event emitted by the underlying ``monitor``
+after the observer has been started using :meth:`~threading.Thread.start()`.
 
 .. warning::
 
@@ -301,11 +310,15 @@ for every event emitted by the ``monitor``.
    ``observer`` was created.  Be sure to protect access to shared resource
    properly when you access them from the callback (e.g. by locking).
 
-You can stop :class:`MonitorObserver` objects again, if you don't need them any
-longer:
+The ``observer`` can be stopped at any moment using :meth:`~MonitorObserver.stop()``:
 
 >>> observer.stop()
->>> observer.join()
+
+.. warning::
+
+   Do *not* call :meth:`~MonitorObserver.stop()` from the event handler,
+   neither directly nor indirectly.  Use :meth:`~MonitorObserver.send_stop()`
+   if you need to stop monitoring from inside the event handler.
 
 
 .. _pypi: https://pypi.python.org/pypi/pyudev
