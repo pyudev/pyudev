@@ -233,5 +233,80 @@ or IDE controller of the disc that contains a partition:
 /dev/sda3 attached to PCI slot 0000:00:0d.0
 
 
+Monitoring devices
+------------------
+
+Synchronous monitoring
+~~~~~~~~~~~~~~~~~~~~~~
+
+The Linux kernel emits events whenever devices are added, removed (e.g. a USB
+stick was plugged or unplugged) or have their attributes changed (e.g. the
+charge level of the battery changed).  With :class:`pyudev.Monitor` you can
+react on such events, for example to react on added or removed mountable
+filesystems:
+
+>>> monitor = pyudev.Monitor.from_netlink(context)
+>>> monitor.filter_by('block')
+>>> for action, device in monitor:
+...     if 'ID_FS_TYPE' in device:
+...         print('{0} partition {1}'.format(action, device.get('ID_FS_LABEL')))
+...
+add partition MULTIBOOT
+remove partition MULTIBOOT
+
+After construction of a monitor, you can install an event filter on the monitor
+using :meth:`~Monitor.filter_by()`.  In the above example only events from the
+``block`` subsystem are handled.
+
+.. note::
+
+   Always prefer :meth:`~Monitor.filter_by()` and
+   :meth:`~Monitor.filter_by_tag()` over manually filtering devices (e.g. by
+   `device.subsystem == 'block'`` or ``tag in device.tags``).  These methods
+   install the filter on the *kernel side*.  A process waiting for events is
+   thus only woken up for events that match these filters.  This is much nicer
+   in terms of power consumption and system load than executing filters in the
+   process itself.
+
+Eventually, you can receive events from the monitor.  As you can see, a
+:class:`Monitor` is iterable and synchronously yields occurred events.  If you
+iterate over a :class:`Monitor`, you will synchronously receive events in an
+endless loop, until you raise an exception, or ``break`` the loop.  While this
+is sufficient for quick and dirty scripts, typically more sophisticated control
+of monitoring is required.
+
+
+Asynchronous monitoring
+~~~~~~~~~~~~~~~~~~~~~~~
+
+For this purpose, pyudev provides asynchronous monitoring with
+:class:`MonitorObserver`:
+
+>>> monitor = pyudev.Monitor.from_netlink(context)
+>>> monitor.filter_by('block')
+>>> def log_event(action, device):
+...    if 'ID_FS_TYPE' in device:
+...        with open('filesystems.log', 'a+') as stream:
+...            print('{0} - {1}'.format(action, device.get('ID_FS_LABEL')), file=stream)
+...
+>>> observer = pyudev.MonitorObserver(monitor, log_event)
+>>> observer.start()
+
+Once the ``observer`` is started, the ``log_event()`` is invoked asynchronously
+for every event emitted by the ``monitor``.
+
+.. warning::
+
+   The callback is invoked from a *different* thread than the one in which the
+   ``observer`` was created.  Be sure to protect access to shared resource
+   properly when you access them from the callback (e.g. by locking).
+
+You can stop :class:`MonitorObserver` objects again, if you don't need them any
+longer:
+
+>>> observer.stop()
+>>> observer.join()
+
+
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
