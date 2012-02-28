@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -25,6 +25,7 @@ import stat
 import operator
 import sys
 import gc
+import errno
 from itertools import count
 from datetime import timedelta
 
@@ -135,6 +136,40 @@ class TestDevice(object):
             Device.from_device_number(context, 'foobar', 100)
         assert str(exc_info.value) == ('Invalid type: {0!r}. Must be one of '
                                        '"char" or "block".'.format('foobar'))
+
+    def test_from_device_file(self, context, device_path, device_node):
+        if not device_node:
+            pytest.skip('no device file')
+        device = Device.from_device_file(context, device_node)
+        assert device.device_node == device_node
+        assert device.device_path == device_path
+
+    def test_from_device_file_links(self, context, device_links,
+                                    device_node, device_path):
+        if not device_links:
+            pytest.skip('no device links')
+        for link in device_links:
+            link = os.path.join(context.device_path, link)
+            device = Device.from_device_file(context, link)
+            assert device.device_path == device_path
+            assert link in device_links
+
+    def test_from_device_file_no_device_file(self, context, tmpdir):
+        filename = tmpdir.join('test')
+        filename.ensure(file=True)
+        with pytest.raises(ValueError) as excinfo:
+            Device.from_device_file(context, str(filename))
+        message = 'not a device file: {0!r}'.format(str(filename))
+        assert str(excinfo.value) == message
+
+    def test_from_device_file_non_existing(self, context, tmpdir):
+        filename = tmpdir.join('test')
+        assert not tmpdir.check(file=True)
+        with pytest.raises(EnvironmentError) as excinfo:
+            Device.from_device_file(context, str(filename))
+        assert excinfo.value.errno == errno.ENOENT
+        assert excinfo.value.strerror == os.strerror(errno.ENOENT)
+        assert excinfo.value.filename == str(filename)
 
     @pytest.need_udev_version('>= 152')
     def test_from_environment(self, context):

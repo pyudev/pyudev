@@ -85,6 +85,8 @@
 
    .. automethod:: from_device_number
 
+   .. automethod:: from_device_file
+
    .. automethod:: from_environment
 
    .. rubric:: General attributes

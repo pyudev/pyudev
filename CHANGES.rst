@@ -7,6 +7,7 @@
 - :class:`pyudev.MonitorObserver` calls
   :meth:`pyudev.Monitor.enable_receiving()` now when started.
 - #40: Added user guide to the documentation
+- #39: Added :meth:`pyudev.Device.from_device_file()`
 
 
 0.14 (Feb 10, 2012)

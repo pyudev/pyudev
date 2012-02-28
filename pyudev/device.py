@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -34,7 +34,8 @@ from datetime import timedelta
 
 from pyudev._libudev import libudev
 from pyudev._util import (ensure_byte_string, ensure_unicode_string,
-                          udev_list_iterate, string_to_bool)
+                          udev_list_iterate, string_to_bool,
+                          get_device_type)
 
 
 __all__ = ['Device', 'Attributes', 'Tags',
@@ -301,6 +302,44 @@ class Device(Mapping):
         return cls(context, device)
 
     @classmethod
+    def from_device_file(cls, context, filename):
+        """
+        Create a new device from the given device file:
+
+        >>> context = Context()
+        >>> device = Device.from_device_file(context, '/dev/sda')
+        >>> device
+        Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
+        >>> device.device_node
+        u'/dev/sda'
+
+        .. warning::
+
+           Though the example seems to suggest that ``device.device_node ==
+           filename`` holds with ``device = Device.from_device_file(context,
+           filename)``, this is only true in a majority of cases.  There *can*
+           be devices, for which this relation is actually false!  Thus, do
+           *not* expect :attr:`~Device.device_node` to be equal to the given
+           ``filename`` for the returned :class:`Device`.  Especially, use
+           :attr:`~Device.device_node` if you need the device file of a
+           :class:`Device` created with this method afterwards.
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``filename`` is a string containing the path of a device file.
+
+        Return a :class:`Device` representing the given device file.  Raise
+        :exc:`~exceptions.ValueError` if ``filename`` is no device file at all.
+        Raise :exc:`~exceptions.EnvironmentError` if ``filename`` does not
+        exist or if its metadata was inaccessible.
+
+        .. versionadded:: 0.15
+        """
+        device_type = get_device_type(filename)
+        device_number = os.stat(filename).st_rdev
+        return cls.from_device_number(context, device_type, device_number)
+
+
+    @classmethod
     def from_environment(cls, context):
         """
         Create a new device from the process environment (as in
@@ -517,6 +556,12 @@ class Device(Mapping):
         this device, and never to any symbolic links to this device node.
         See :attr:`device_links` to get a list of symbolic links to this
         device node.
+
+        .. warning::
+
+           For devices created with :meth:`from_device_file()`, the value of
+           this property is not necessary equal to the ``filename`` given to
+           :meth:`from_device_file()`.
         """
         node = libudev.udev_device_get_devnode(self)
         if node:
