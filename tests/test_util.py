@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -18,7 +18,9 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import os
 import sys
+import errno
 
 import pytest
 
@@ -124,3 +126,30 @@ def test_reraise():
             _util.reraise(ValueError('from except clause'), tb)
     assert str(excinfo.value) == 'from except clause'
     assert excinfo.traceback.getcrashentry().name == 'raise_valueerror'
+
+
+def test_get_device_type_character_device():
+    assert _util.get_device_type('/dev/console') == 'char'
+
+
+def test_get_device_type_block_device():
+    assert _util.get_device_type('/dev/sda') == 'block'
+
+
+def test_get_device_type_no_device_file(tmpdir):
+    filename = tmpdir.join('test')
+    filename.ensure(file=True)
+    with pytest.raises(ValueError) as excinfo:
+        _util.get_device_type(str(filename))
+    message = 'not a device file: {0!r}'.format(str(filename))
+    assert str(excinfo.value) == message
+
+
+def test_get_device_type_not_existing(tmpdir):
+    filename = tmpdir.join('test')
+    assert not tmpdir.check(file=True)
+    with pytest.raises(EnvironmentError) as excinfo:
+        _util.get_device_type(str(filename))
+    assert excinfo.value.errno == errno.ENOENT
+    assert excinfo.value.strerror == os.strerror(errno.ENOENT)
+    assert excinfo.value.filename == str(filename)

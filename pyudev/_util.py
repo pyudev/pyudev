@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -29,7 +29,9 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import os
 import sys
+import stat
 
 from pyudev._libudev import libudev
 
@@ -112,3 +114,31 @@ def udev_list_iterate(entry):
         value = libudev.udev_list_entry_get_value(entry)
         yield (name, value)
         entry = libudev.udev_list_entry_get_next(entry)
+
+
+# for the sake of readability
+_is_char_device = stat.S_ISCHR
+_is_block_device = stat.S_ISBLK
+
+
+def get_device_type(filename):
+    """
+    Get the device type of a device file.
+
+    ``filename`` is a string containing the path of a device file.
+
+    Return ``'char'`` if ``filename`` is a character device, or ``'block'`` if
+    ``filename`` is a block device.  Raise :exc:`~exceptions.ValueError` if
+    ``filename`` is no device file at all.  Raise
+    :exc:`~exceptions.EnvironmentError` if ``filename`` does not exist or if
+    its metadata was inaccessible.
+
+    .. versionadded:: 0.15
+    """
+    mode = os.stat(filename).st_mode
+    if _is_char_device(mode):
+        return 'char'
+    elif _is_block_device(mode):
+        return 'block'
+    else:
+        raise ValueError('not a device file: {0!r}'.format(filename))
