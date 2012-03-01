@@ -24,7 +24,6 @@ import socket
 import errno
 from contextlib import contextmanager
 from select import select
-from operator import itemgetter
 
 import pytest
 import mock
@@ -319,6 +318,6 @@ class TestMonitorObserver(object):
         observer.join(2)
         if observer.is_alive():
             observer.stop()
-        assert map(itemgetter(0), self.events) == ['add', 'remove']
+        assert [e[0] for e in self.events] == ['add', 'remove']
         assert all(device.device_path == '/devices/virtual/net/dummy0' for _, device in self.events)
 
