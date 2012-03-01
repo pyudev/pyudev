@@ -248,7 +248,7 @@ ERROR_CHECKERS = dict(
     udev_monitor_receive_device=check_errno_on_null_pointer,
     udev_monitor_filter_add_match_subsystem_devtype=check_negative_errorcode,
     udev_monitor_filter_add_match_tag=check_negative_errorcode,
-    udev_monitor_filter_update=check_negative_errorcode,
+    udev_monitor_filter_update=check_errno,
     udev_monitor_filter_remove=check_errno,
 )
 
