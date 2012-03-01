@@ -53,7 +53,7 @@ def get_libudev_functions():
     with NamedTemporaryFile() as stream:
         check_call(['gccxml', LIBUDEV_H, '-fxml={0}'.format(stream.name)])
         tree = etree.parse(stream.name)
-    names = [f.get('name') for f in tree.findall('//Function')]
+    names = [f.get('name') for f in tree.findall('.//Function')]
     return [n for n in names if n.startswith('udev_')]
 
 
