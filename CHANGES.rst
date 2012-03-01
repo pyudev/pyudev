@@ -1,5 +1,5 @@
-0.15 (in development)
-=====================
+0.15 (Mar 1, 2012)
+==================
 
 - #20: :meth:`pyudev.Monitor.filter_by()` and
   :meth:`pyudev.Monitor.filter_by_tag()` can be called after
