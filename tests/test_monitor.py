@@ -162,9 +162,13 @@ class TestMonitor(object):
             filter_update.assert_called_with(monitor)
             assert isinstance(match_tag.call_args[0][1], bytes)
 
-    @pytest.mark.xfail(reason='udev_monitor_filter_remove() broken?')
     def test_remove_filter(self, monitor):
-        monitor.remove_filter()
+        """
+        The underlying ``udev_monitor_filter_remove()`` is apparently broken.
+        It always causes ``EINVAL`` from ``setsockopt()``.
+        """
+        with pytest.raises(ValueError):
+            monitor.remove_filter()
 
     def test_remove_filter_mock(self, monitor):
         remove = 'udev_monitor_filter_remove'

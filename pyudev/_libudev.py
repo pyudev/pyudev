@@ -31,7 +31,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-from errno import ENOMEM, EOVERFLOW
+import errno
 from ctypes import (CDLL, Structure, POINTER, get_errno,
                     c_char, c_char_p, c_int, c_ulonglong)
 from ctypes.util import find_library
@@ -162,7 +162,11 @@ SIGNATURES = {
     }
 
 
-ERRNO_EXCEPTIONS = {ENOMEM: MemoryError, EOVERFLOW: OverflowError}
+ERRNO_EXCEPTIONS = {
+    errno.ENOMEM: MemoryError,
+    errno.EOVERFLOW: OverflowError,
+    errno.EINVAL: ValueError
+}
 
 
 def exception_from_errno(errno):

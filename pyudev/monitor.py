@@ -216,8 +216,7 @@ class Monitor(object):
            Up to udev 181 (and possibly even later versions) the underlying
            ``udev_monitor_filter_remove()`` seems to be broken.  If used with
            affected versions this method always raises
-           :exc:`~exceptions.EnvironmentError` with ``errno`` set to
-           :data:`~errno.EINVAL`.
+           :exc:`~exceptions.ValueError`.
 
         Raise :exc:`~exceptions.EnvironmentError` if removal of installed
         filters failed.

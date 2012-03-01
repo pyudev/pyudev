@@ -9,6 +9,9 @@
   :meth:`pyudev.Monitor.enable_receiving()` now when started.
 - #40: Added user guide to the documentation
 - #39: Added :meth:`pyudev.Device.from_device_file()`
+- :data:`errno.EINVAL` from underlying libudev functions causes
+  :exc:`~exceptions.ValueError` instead of :exc:`~exceptions.EnvironmentError`
+  now.
 
 
 0.14 (Feb 10, 2012)
