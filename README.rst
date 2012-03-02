@@ -27,7 +27,7 @@ just send a mail to pyudev@librelist.com and reply to the confirmation mail.
 Bugs and issues can be reported to the issue `issue tracker`_ on GitHub_.  The
 source code is located in a git_ repository on GitHub_, too::
 
-   git clone --recursive git://github.com/lunaryorn/pyudev.git
+   git clone git://github.com/lunaryorn/pyudev.git
 
 Feel free to fork the repository.  Pull requests and patches are welcome!
 

@@ -64,7 +64,7 @@ Development
 
 The source code is hosted on GitHub_::
 
-   git clone --recursive git://github.com/lunaryorn/pyudev.git
+   git clone git://github.com/lunaryorn/pyudev.git
 
 Feel free to fork the repository and send pull requests or patches.  Please add
 unit tests for your code, if possible.  The :doc:`testsuite documentation
