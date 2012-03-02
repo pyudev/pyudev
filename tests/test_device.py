@@ -167,9 +167,7 @@ class TestDevice(object):
         assert not tmpdir.check(file=True)
         with pytest.raises(EnvironmentError) as excinfo:
             Device.from_device_file(context, str(filename))
-        assert excinfo.value.errno == errno.ENOENT
-        assert excinfo.value.strerror == os.strerror(errno.ENOENT)
-        assert excinfo.value.filename == str(filename)
+        pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
     @pytest.need_udev_version('>= 152')
     def test_from_environment(self, context):
