@@ -43,8 +43,7 @@ from pyudev.device import Attributes, Tags
 def pytest_generate_tests(metafunc):
     args = metafunc.funcargnames
     if any(a in ('sys_path', 'device_path', 'device') for a in args):
-        devices = pytest.get_device_sample(metafunc.config)
-        for device_path in devices:
+        for device_path in metafunc.config.udev_database_sample:
             metafunc.addcall(id=device_path, param=device_path)
     elif 'operator' in args:
         for op in (operator.gt, operator.lt, operator.le, operator.ge):
@@ -169,7 +168,7 @@ class TestDevice(object):
             Device.from_device_file(context, str(filename))
         pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
-    @pytest.need_udev_version('>= 152')
+    @pytest.mark.udev_version('>= 152')
     def test_from_environment(self, context):
         # there is no device in a standard environment
         with pytest.raises(DeviceNotFoundInEnvironmentError):
@@ -178,14 +177,14 @@ class TestDevice(object):
     def test_parent(self, device):
         assert device.parent is None or isinstance(device.parent, Device)
 
-    @pytest.need_udev_version('>= 172')
+    @pytest.mark.udev_version('>= 172')
     def test_child_of_parent(self, device):
         if device.parent is None:
             pytest.skip('Device {0!r} has no parent'.format(device))
         else:
             assert device in device.parent.children
 
-    @pytest.need_udev_version('>= 172')
+    @pytest.mark.udev_version('>= 172')
     def test_children(self, device):
         children = list(device.children)
         if not children:
@@ -286,7 +285,7 @@ class TestDevice(object):
     def test_device_number(self, device, device_number):
         assert device.device_number == device_number
 
-    @pytest.need_udev_version('>= 165')
+    @pytest.mark.udev_version('>= 165')
     def test_is_initialized(self, device):
         assert isinstance(device.is_initialized, bool)
         get_is_initialized = 'udev_device_get_is_initialized'
@@ -295,7 +294,7 @@ class TestDevice(object):
             assert device.is_initialized
             get_is_initialized.assert_called_with(device)
 
-    @pytest.need_udev_version('>= 165')
+    @pytest.mark.udev_version('>= 165')
     def test_time_since_initialized(self, device):
         assert isinstance(device.time_since_initialized, timedelta)
         usec_since_init = 'udev_device_get_usec_since_initialized'
@@ -416,7 +415,7 @@ class TestAttributes(object):
         assert all(a in device_attributes for a in attributes)
         assert all(pytest.is_unicode_string(a) for a in device_attributes)
 
-    @pytest.need_udev_version('>= 167')
+    @pytest.mark.udev_version('>= 167')
     def test_iteration_mock(self, device):
         attributes = [b'spam', b'eggs']
         get_sysattr_list = 'udev_device_get_sysattr_list_entry'
@@ -471,7 +470,7 @@ class TestAttributes(object):
 
 class TestTags(object):
 
-    pytestmark = pytest.need_udev_version('>= 154')
+    pytestmark = pytest.mark.udev_version('>= 154')
 
     def test_iteration(self, device, tags):
         assert set(device.tags) == set(tags)
@@ -480,7 +479,7 @@ class TestTags(object):
     def test_contains(self, device, tags):
         assert all(t in device.tags for t in tags)
 
-    @pytest.need_udev_version('>= 172')
+    @pytest.mark.udev_version('>= 172')
     def test_contains_mock(self, device):
         """
         Test that ``udev_device_has_tag`` is called if available.

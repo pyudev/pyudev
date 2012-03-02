@@ -37,6 +37,19 @@ from pyudev import Monitor, MonitorObserver, Device
 # necessary anyway, libudev can just assumed to be correct.
 
 
+def pytest_funcarg__socket_path(request):
+    """
+    Return a socket path for :meth:`pyudev.Monitor.from_socket`.  The path
+    is unique for each test.
+    """
+    tmpdir = request.getfuncargvalue('tmpdir')
+    return tmpdir.join('monitor-socket')
+
+
+def pytest_funcarg__fake_monitor_device(request):
+    return request.getfuncargvalue('platform_device')
+
+
 def _assert_from_netlink_called(context, *args):
     new_from_netlink = 'udev_monitor_new_from_netlink'
     with pytest.patch_libudev(new_from_netlink) as new_from_netlink:
@@ -145,11 +158,11 @@ class TestMonitor(object):
             filter_update.assert_called_with(monitor)
             assert isinstance(add_match.call_args[0][2], bytes)
 
-    @pytest.need_udev_version('>= 154')
+    @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag(self, monitor):
         monitor.filter_by_tag('spam')
 
-    @pytest.need_udev_version('>= 154')
+    @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag_mock(self, monitor):
         with patch_filter_by('tag') as (match_tag, filter_update):
             match_tag.return_value = 0
@@ -293,7 +306,7 @@ class TestMonitorObserver(object):
     def teardown(self):
         self.events = None
 
-    def test_fake(self, fake_monitor, platform_device):
+    def test_fake(self, fake_monitor, fake_monitor_device):
         observer = self.make_observer(fake_monitor)
         observer.start()
         fake_monitor.trigger_action('add')
@@ -304,7 +317,8 @@ class TestMonitorObserver(object):
         if observer.is_alive():
             observer.stop()
         # check that we got two events
-        assert self.events == [('add', platform_device), ('remove', platform_device)]
+        assert self.events == [('add', fake_monitor_device),
+                               ('remove', fake_monitor_device)]
 
     @pytest.mark.privileged
     def test_real(self, context, monitor):

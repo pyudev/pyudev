@@ -29,8 +29,7 @@ from pyudev import Enumerator
 
 def pytest_generate_tests(metafunc):
     if 'device' in metafunc.funcargnames:
-        devices = pytest.get_device_sample(metafunc.config)
-        for device_path in devices:
+        for device_path in metafunc.config.udev_database_sample:
             metafunc.addcall(id=device_path, param=device_path)
 
 
@@ -110,7 +109,7 @@ class TestEnumerator(object):
         assert all(d.attributes['ro'] == b'0' for d in devices)
         assert all(not d.attributes.asbool('ro') for d in devices)
 
-    @pytest.need_udev_version('>= 154')
+    @pytest.mark.udev_version('>= 154')
     def test_match_tag_mock(self, context):
         add_match_tag = 'udev_enumerate_add_match_tag'
         enumerator = context.list_devices()
@@ -121,12 +120,12 @@ class TestEnumerator(object):
             args, _ = add_match_tag.call_args
             assert isinstance(args[1], bytes)
 
-    @pytest.need_udev_version('>= 154')
+    @pytest.mark.udev_version('>= 154')
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
         assert all('seat' in d.tags for d in devices)
 
-    @pytest.need_udev_version('>= 172')
+    @pytest.mark.udev_version('>= 172')
     def test_match_parent(self, context, device):
         parent = device.parent
         if parent is None:
@@ -136,7 +135,7 @@ class TestEnumerator(object):
             assert device in children
             assert parent in children
 
-    @pytest.need_udev_version('>= 165')
+    @pytest.mark.udev_version('>= 165')
     def test_match_is_initialized(self, context):
         match_is_initialized = 'udev_enumerate_add_match_is_initialized'
         with pytest.patch_libudev(match_is_initialized) as match_is_initialized:
@@ -186,7 +185,7 @@ class TestEnumerator(object):
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
-    @pytest.need_udev_version('>= 172')
+    @pytest.mark.udev_version('>= 172')
     def test_match_passthrough_parent(self, enumerator):
         with mock.patch.object(enumerator, 'match_parent',
                                mocksignature=True) as match_parent:

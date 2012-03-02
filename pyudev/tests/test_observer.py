@@ -24,6 +24,7 @@ from functools import partial
 import pytest
 from mock import Mock
 
+
 class BaseBinding(object):
     def trigger_observer(self, action, monitor, action_trigger):
         mainloop = self.create_mainloop()
@@ -224,7 +225,11 @@ def pytest_generate_tests(metafunc):
                 metafunc.addcall(funcargs=funcargs, id=id)
 
 
-def test_fake_monitor(fake_monitor, platform_device):
+def pytest_funcarg__fake_monitor_device(request):
+    return request.getfuncargvalue('platform_device')
+
+
+def test_fake_monitor(fake_monitor, fake_monitor_device):
     """
     Test the fake monitor just to make sure, that it works.
     """
@@ -232,19 +237,19 @@ def test_fake_monitor(fake_monitor, platform_device):
         fake_monitor.trigger_action(action)
         received_action, device = fake_monitor.receive_device()
         assert action == received_action
-        assert device == platform_device
+        assert device == fake_monitor_device
 
 
 class TestObserver(object):
 
     def test_observer_fake(self, binding, action, fake_monitor,
-                           platform_device):
+                           fake_monitor_device):
         binding.import_or_skip()
         event_slot, action_slots = binding.trigger_observer(
             action, fake_monitor, lambda: fake_monitor.trigger_action(action))
         # check, that both slots were called
-        event_slot.assert_called_with(action, platform_device)
-        action_slots.pop(action).assert_called_with(platform_device)
+        event_slot.assert_called_with(action, fake_monitor_device)
+        action_slots.pop(action).assert_called_with(fake_monitor_device)
 
     @pytest.mark.privileged
     def test_observer(self, binding, monitor):

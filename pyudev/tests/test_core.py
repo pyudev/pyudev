@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -46,7 +46,7 @@ class TestContext(object):
         assert pytest.is_unicode_string(context.device_path)
         assert context.device_path == '/dev'
 
-    @pytest.need_udev_version('>= 167')
+    @pytest.mark.udev_version('>= 167')
     def test_run_path(self, context):
         assert pytest.is_unicode_string(context.run_path)
         assert context.run_path == '/run/udev'
