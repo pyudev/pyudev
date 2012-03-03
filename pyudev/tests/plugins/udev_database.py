@@ -15,15 +15,28 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+"""
+    pyudev.tests.plugins.udev_database
+    ==================================
+
+    pytest_ plugins to access the udev device database.
+
+    This plugin parses the udev device database from :program:`udevadm` and
+    attaches it to the test configuration object.
+
+    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+"""
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
+import os
 import re
 import errno
 import random
 import subprocess
+from collections import Iterable, Sized
 
 import pytest
 
@@ -39,7 +52,9 @@ class UDevAdm(object):
     def find(cls):
         for candidate in cls.CANDIDATES:
             try:
-                return cls(candidate)
+                udevadm = cls(candidate)
+                udevadm.read_version()
+                return udevadm
             except EnvironmentError as error:
                 if error.errno != errno.ENOENT:
                     raise
@@ -52,7 +67,9 @@ class UDevAdm(object):
         looked up in ``$PATH``.
         """
         self.udevadm = udevadm
-        self.version = int(self._execute('--version'))
+
+    def read_version(self):
+        return int(self._execute('--version'))
 
     def _execute(self, *args):
         command = [self.udevadm] + list(args)
@@ -62,7 +79,7 @@ class UDevAdm(object):
             raise subprocess.CalledProcessError(proc.returncode, command)
         return output
 
-    def read_database(self, properties_blacklist):
+    def read_devices(self, properties_blacklist):
         database = self._execute('info', '--export-db').splitlines()
         devices = {}
         current_properties = None
@@ -80,7 +97,7 @@ class UDevAdm(object):
                 current_properties[property] = value
         return devices
 
-    def get_device_attributes(self, device_path, attributes_blacklist):
+    def read_device_attributes(self, device_path, attributes_blacklist):
         output = self._execute('info', '--attribute-walk',
                                '--path', device_path)
         attribute_dump = output.splitlines()
@@ -111,11 +128,108 @@ class UDevAdm(object):
         except subprocess.CalledProcessError:
             return None
         else:
-            query_result = output.decode(sys.getfilesystemencoding())
-            if query_type == 'symlink':
-                return query_result.split()
-            else:
-                return query_result
+            return output.decode(sys.getfilesystemencoding())
+
+
+class DeviceDatabase(Iterable, Sized):
+    """
+    The udev device database.
+
+    This class is an iterable over device paths, and provides methods to query
+    devices based on their device paths.
+    """
+
+    # these are volatile, frequently changing properties and attributes, which
+    # lead to bogus failures during tests, and therefore they are masked and
+    # shall be ignored for test runs.
+    PROPERTIES_BLACKLIST = frozenset(
+        ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
+         'POWER_SUPPLY_CHARGE_NOW'])
+
+    ATTRIBUTES_BLACKLIST = frozenset(
+        ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
+         'urbnum'])
+
+    def __init__(self, udevadm):
+        self._udevadm = udevadm
+        self._devices = self._udevadm.read_devices(self.PROPERTIES_BLACKLIST)
+
+    def __iter__(self):
+        return iter(self._devices)
+
+    def __len__(self):
+        return len(self._devices)
+
+    def get_device_properties(self, device_path):
+        """
+        Get the properties of a device.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return a mapping of property names as strings to property values as
+        strings.
+        """
+        return dict(self._devices[device_path])
+
+    def get_device_attributes(self, device_path):
+        """
+        Get the attributes of a device.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return a mapping of attributes names as strings to property values as
+        byte strings.
+        """
+        return self._udevadm.read_device_attributes(
+            device_path, self.ATTRIBUTES_BLACKLIST)
+
+    def get_device_tags(self, device_path):
+        """
+        Get the tags of a device.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return the tags as list of strings.
+        """
+        properties = self.get_device_properties(device_path)
+        return [t for t in properties.get('TAGS', '').split(':') if t]
+
+    def get_device_node(self, device_path):
+        """
+        Get the device node of a device.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return the path of the device node as string, or ``None`` if the device
+        has no device node.
+        """
+        return self._udevadm.query_device(device_path, 'name')
+
+    def get_device_links(self, device_path):
+        """
+        Get the device links.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return a list of device links.
+        """
+        links = self._udevadm.query_device(device_path, 'symlink')
+        return links.split() if links else []
+
+    def get_device_number(self, device_path):
+        """
+        Get the device number of a device.
+
+        ``device_path`` is a string containing the path of a device.
+
+        Return the device number as integer or 0 if the device has no device
+        number.
+        """
+        node = self.get_device_node(device_path)
+        if node:
+            return os.stat(node).st_rdev
+        else:
+            return 0
 
 
 def _get_device_sample(config):
@@ -165,22 +279,13 @@ def pytest_configure(config):
         'markers', 'udev_version(spec): mark test to run only if the udev '
         'version matches the given version spec')
 
-    # these are volatile, frequently changing properties and attributes,
-    # which lead to bogus failures during tests, and therefore they are
-    # masked and shall be ignored for test runs.
-    config.properties_blacklist = frozenset(
-        ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
-         'POWER_SUPPLY_CHARGE_NOW'])
-    config.attributes_blacklist = frozenset(
-        ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
-         'urbnum'])
-    config.udevadm = UDevAdm.find()
-    config.udev_version = config.udevadm.version
-    config.udev_database = config.udevadm.read_database(config.properties_blacklist)
-    config.udev_database_sample = _get_device_sample(config)
+    udevadm = UDevAdm.find()
+    config.udev_version = udevadm.read_version()
+    config.udev_database = DeviceDatabase(udevadm)
+    config.udev_device_sample = _get_device_sample(config)
 
 
-def pytest_funcarg__database(request):
+def pytest_funcarg__udev_database(request):
     """
     The complete udev database parsed from the output of ``udevadm info
     --export-db``.

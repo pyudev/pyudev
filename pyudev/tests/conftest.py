@@ -186,7 +186,8 @@ def pytest_funcarg__all_properties(request):
     funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return dict(request.getfuncargvalue('database')[device_path])
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_properties(device_path)
 
 
 def pytest_funcarg__properties(request):
@@ -203,19 +204,20 @@ def pytest_funcarg__tags(request):
     """
     Return the tags of the device pointed to by the ``device_path`` funcarg.
     """
-    properties = request.getfuncargvalue('properties')
-    tags = properties.get('TAGS', '')
-    return [t for t in tags.split(':') if t]
+    device_path = request.getfuncargvalue('device_path')
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_tags(device_path)
 
 
 def pytest_funcarg__attributes(request):
     """
+
     Return a dictionary of all attributes for the device pointed to by the
     ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return request.config.udevadm.get_device_attributes(
-        device_path, request.config.attributes_blacklist)
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_attributes(device_path)
 
 
 def pytest_funcarg__device_node(request):
@@ -224,7 +226,8 @@ def pytest_funcarg__device_node(request):
     ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return request.config.udevadm.query_device(device_path, 'name')
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_node(device_path)
 
 
 def pytest_funcarg__device_number(request):
@@ -232,11 +235,9 @@ def pytest_funcarg__device_number(request):
     Return the device number of the device pointed to by the ``device_path``
     funcarg.
     """
-    device_node = request.getfuncargvalue('device_node')
-    if device_node:
-        return os.stat(device_node).st_rdev
-    else:
-        return 0
+    device_path = request.getfuncargvalue('device_path')
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_number(device_path)
 
 
 def pytest_funcarg__device_links(request):
@@ -245,7 +246,8 @@ def pytest_funcarg__device_links(request):
     for the device pointed to by the ``device_path`` funcarg.
     """
     device_path = request.getfuncargvalue('device_path')
-    return request.config.udevadm.query_device(device_path, 'symlink')
+    database = request.getfuncargvalue('udev_database')
+    return database.get_device_links(device_path)
 
 
 def pytest_funcarg__sys_path(request):

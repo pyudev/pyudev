@@ -43,7 +43,7 @@ from pyudev.device import Attributes, Tags
 def pytest_generate_tests(metafunc):
     args = metafunc.funcargnames
     if any(a in ('sys_path', 'device_path', 'device') for a in args):
-        for device_path in metafunc.config.udev_database_sample:
+        for device_path in metafunc.config.udev_device_sample:
             metafunc.addcall(id=device_path, param=device_path)
     elif 'operator' in args:
         for op in (operator.gt, operator.lt, operator.le, operator.ge):

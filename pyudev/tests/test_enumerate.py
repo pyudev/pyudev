@@ -29,7 +29,7 @@ from pyudev import Enumerator
 
 def pytest_generate_tests(metafunc):
     if 'device' in metafunc.funcargnames:
-        for device_path in metafunc.config.udev_database_sample:
+        for device_path in metafunc.config.udev_device_sample:
             metafunc.addcall(id=device_path, param=device_path)
 
 
