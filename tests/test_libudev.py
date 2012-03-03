@@ -64,15 +64,6 @@ def pytest_generate_tests(metafunc):
                 full_name = '{0}_{1}'.format(namespace, funcname)
                 metafunc.addcall(param=(namespace, funcname), id=full_name,
                                  funcargs=dict(funcname=full_name))
-    if metafunc.function.__name__ == 'test_missing_functions':
-        for version, functions in UDEV_ADDITIONS.items():
-            for function in functions:
-                funcargs = dict(version=version, missing_function=function)
-                testid = 'version {0}, {1}'.format(version, function)
-                metafunc.addcall(funcargs=funcargs, id=testid)
-    elif metafunc.function.__name__ == 'test_is_wrapped':
-        for function in get_libudev_functions():
-            metafunc.addcall(funcargs=dict(function_name=function), id=function)
 
 
 def pytest_funcarg__signature(request):
@@ -112,11 +103,26 @@ def test_signatures(funcname, restype, argtypes, errcheck):
     assert func.errcheck == errcheck
 
 
-def test_missing_functions(version, missing_function):
+UDEV_ADDITIONS = {
+    152: ['udev_new_from_environment'],
+    154: ['udev_device_get_tags_list_entry',
+          'udev_enumerate_add_match_tag',
+          'udev_monitor_filter_add_match_tag'],
+    165: ['udev_device_get_is_initialized',
+          'udev_device_get_usec_since_initialized',
+          'udev_enumerate_add_match_is_initialized'],
+    167: ['udev_get_run_path',
+          'udev_device_get_sysattr_list_entry'],
+    172: ['udev_device_has_tag', 'udev_enumerate_add_match_parent'],
+    }
+
+
+@pytest.mark.parametrize(('version', 'missing_functions'),
+                         UDEV_ADDITIONS.items())
+def test_missing_functions(version, missing_functions):
     if pytest.config.udev_version >= version:
-        pytest.skip('{0} already exists in {1}'.format(
-            missing_function, pytest.config.udev_version))
-    assert not hasattr(libudev, missing_function)
+        pytest.skip('udev too new')
+    assert not any(hasattr(libudev, fn) for fn in missing_functions)
 
 
 WRAPPER_BLACKLIST_PATTERNS = [
@@ -149,6 +155,7 @@ def _is_blacklisted(function_name):
 
 
 @pytest.mark.coverage
+@pytest.mark.parametrize('function_name', get_libudev_functions())
 def test_is_wrapped(function_name):
     wrapped_functions = set('{0}_{1}'.format(ns, member)
                             for ns, members in binding.SIGNATURES.items()
