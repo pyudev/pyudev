@@ -45,9 +45,6 @@ def pytest_generate_tests(metafunc):
     if any(a in ('sys_path', 'device_path', 'device') for a in args):
         for device_path in metafunc.config.udev_device_sample:
             metafunc.addcall(id=device_path, param=device_path)
-    elif 'operator' in args:
-        for op in (operator.gt, operator.lt, operator.le, operator.ge):
-            metafunc.addcall(funcargs=dict(operator=op), id=op.__name__)
 
 
 class TestDevice(object):
@@ -396,6 +393,11 @@ class TestDevice(object):
         assert not (device.parent != device.parent)
         assert device != device.parent
 
+    ORDERING_OPERATORS = [operator.gt, operator.lt, operator.le, operator.ge]
+
+    @pytest.mark.parametrize(
+        'operator', ORDERING_OPERATORS,
+        ids=[f.__name__ for f in ORDERING_OPERATORS])
     def test_device_ordering(self, platform_device, operator):
         with pytest.raises(TypeError) as exc_info:
             operator(platform_device, platform_device)
