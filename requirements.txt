@@ -1,2 +1,7 @@
--r tests/requirements.txt
--r doc/requirements.txt
+# unit test requirements
+pytest>=2.2
+mock>=0.8
+
+# documentation requirements
+sphinx>=1.0.7
+sphinxcontrib-issuetracker>=0.9
