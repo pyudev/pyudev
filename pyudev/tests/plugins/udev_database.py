@@ -19,7 +19,7 @@
     pyudev.tests.plugins.udev_database
     ==================================
 
-    pytest_ plugins to access the udev device database.
+    Provide access the udev device database.
 
     This plugin parses the udev device database from :program:`udevadm` and
     attaches it to the test configuration object.
@@ -287,11 +287,7 @@ def pytest_configure(config):
 
 def pytest_funcarg__udev_database(request):
     """
-    The complete udev database parsed from the output of ``udevadm info
-    --export-db``.
-
-    Return a dictionary, mapping the devpath of a device *without* sysfs
-    mountpoint to a dictionary of properties of the device.
+    The udev database as provided by :attr:`pytest.config.udev_database`.
     """
     return request.config.udev_database
 

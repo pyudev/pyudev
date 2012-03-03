@@ -15,5 +15,15 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+"""
+    pyudev.tests.plugins
+    ====================
+
+    Plugins to support the pyudev testsuite.
+
+    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
+"""
+
+
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)

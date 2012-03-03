@@ -50,15 +50,18 @@ def check_privileges_or_skip():
 def load_dummy():
     """
     Load the ``dummy`` module.
+
+    If privileged tests are disabled, the current test is skipped.
     """
     check_privileges_or_skip()
     call(['sudo', 'modprobe', 'dummy'])
 
 
-
 def unload_dummy():
     """
     Unload the ``dummy`` module.
+
+    If privileged tests are disabled, the current test is skipped.
     """
     check_privileges_or_skip()
     call(['sudo', 'modprobe', '-r', 'dummy'])

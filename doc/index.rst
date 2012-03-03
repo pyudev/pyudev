@@ -68,7 +68,7 @@ The source code is hosted on GitHub_::
 
 Feel free to fork the repository and send pull requests or patches.  Please add
 unit tests for your code, if possible.  The :doc:`testsuite documentation
-<testing>` gives you an overview about the pyudev testsuite.
+<tests/index>` gives you an overview about the pyudev testsuite.
 
 
 Contents
@@ -78,6 +78,7 @@ Contents
 
    guide
    api/index
+   tests/index
    testing
    changes
    licencing

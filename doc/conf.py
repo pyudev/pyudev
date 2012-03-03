@@ -81,8 +81,8 @@ import pyudev
 
 needs_sphinx = '1.0'
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx',
-              'sphinxcontrib.issuetracker']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
+              'sphinx.ext.intersphinx', 'sphinxcontrib.issuetracker']
 
 master_doc = 'index'
 exclude_patterns = ['_build/*']
@@ -100,6 +100,7 @@ html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
                         'sourcelink.html']}
 
 intersphinx_mapping = {'python': ('http://docs.python.org/', None),
+                       'pytest': ('http://pytest.org/latest', None),
                        'pyside': ('http://www.pyside.org/docs/pyside/', None)}
 
 issuetracker = 'github'
