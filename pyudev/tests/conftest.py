@@ -44,6 +44,7 @@ import pyudev
 pytest_plugins = [
     str('pyudev.tests.plugins.udev_database'),
     str('pyudev.tests.plugins.fake_monitor'),
+    str('pyudev.tests.plugins.privileged')
 ]
 
 
@@ -143,33 +144,6 @@ def patch_libudev_list(items, list_func):
         yield list_func
 
 
-def _need_privileges(func):
-    @wraps(func)
-    def wrapped(*args):
-        if not pytest.config.getvalue('allow_privileges'):
-            pytest.skip('privileges disabled')
-        return func(*args)
-    return wrapped
-
-
-@_need_privileges
-def load_dummy():
-    """
-    Load the ``dummy`` module or raise :exc:`ValueError` if sudo are not
-    allowed.
-    """
-    call(['sudo', 'modprobe', 'dummy'])
-
-
-@_need_privileges
-def unload_dummy():
-    """
-    Unload the ``dummy`` module or raise :exc:`ValueError` if sudo are not
-    allowed.
-    """
-    call(['sudo', 'modprobe', '-r', 'dummy'])
-
-
 def is_unicode_string(value):
     """
     Return ``True``, if ``value`` is of a real unicode string type
@@ -184,20 +158,8 @@ def is_unicode_string(value):
 
 def pytest_namespace():
     return dict((func.__name__, func) for func in
-                (patch_libudev, load_dummy, nested,
-                 unload_dummy, is_unicode_string,
+                (patch_libudev, nested, is_unicode_string,
                  patch_libudev_list, assert_env_error))
-
-
-def pytest_addoption(parser):
-    parser.addoption('--allow-privileges', action='store_true',
-                     help='Permit execution of tests, which require '
-                     'root privileges.  This affects all monitor tests, '
-                     'that need to load or unload modules to trigger udev '
-                     'events.  "sudo" will be used to execute privileged '
-                     'code, be sure to have proper privileges before '
-                     'enabling this option!', default=False)
-
 
 
 def pytest_funcarg__context(request):
