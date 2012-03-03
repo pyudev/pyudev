@@ -24,6 +24,12 @@ from functools import partial
 import pytest
 from mock import Mock
 
+from pyudev import Monitor
+
+
+def pytest_funcarg__monitor(request):
+    return Monitor.from_netlink(request.getfuncargvalue('context'))
+
 
 class BaseBinding(object):
     def trigger_observer(self, action, monitor, action_trigger):

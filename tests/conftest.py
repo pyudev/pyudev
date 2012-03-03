@@ -279,10 +279,3 @@ def pytest_funcarg__platform_device(request):
     """
     context = request.getfuncargvalue('context')
     return pyudev.Device.from_sys_path(context, '/sys/devices/platform')
-
-
-def pytest_funcarg__monitor(request):
-    """
-    Return a netlink monitor for udev source.
-    """
-    return pyudev.Monitor.from_netlink(request.getfuncargvalue('context'))

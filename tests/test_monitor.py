@@ -46,6 +46,10 @@ def pytest_funcarg__socket_path(request):
     return tmpdir.join('monitor-socket')
 
 
+def pytest_funcarg__monitor(request):
+    return Monitor.from_netlink(request.getfuncargvalue('context'))
+
+
 def pytest_funcarg__fake_monitor_device(request):
     return request.getfuncargvalue('platform_device')
 
