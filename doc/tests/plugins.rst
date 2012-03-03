@@ -1,7 +1,7 @@
-:mod:`pyudev.tests.plugins` – Testsuite plugins
-===============================================
+:mod:`tests.plugins` – Testsuite plugins
+========================================
 
-.. automodule:: pyudev.tests.plugins
+.. automodule:: tests.plugins
 
 The following plugins are provided and enabled:
 
@@ -11,7 +11,7 @@ The following plugins are provided and enabled:
    privileged
    fake_monitor
 
-The main plugin is :mod:`~pyudev.tests.plugins.udev_database` that extracts the
+The main plugin is :mod:`~tests.plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
 sample of this database.  It also supports to restrict tests to certain udev
 versions.
@@ -20,10 +20,10 @@ The other plugins only provide support for specific test cases by tuning some
 hooks or adding some additional funcargs.
 
 
-:mod:`~pyudev.tests.plugins.udev_database` – pytest_ plugin to access the udev device database
-----------------------------------------------------------------------------------------------
+:mod:`~tests.plugins.udev_database` – pytest_ plugin to access the udev device database
+---------------------------------------------------------------------------------------
 
-.. automodule:: pyudev.tests.plugins.udev_database
+.. automodule:: tests.plugins.udev_database
 
 .. autoclass:: DeviceDatabase()
    :members:
@@ -99,10 +99,10 @@ The plugin adds the following command line options to :program:`py.test`:
    The size of the random sample.  Defaults to 10.
 
 
-:mod:`~pyudev.tests.plugins.privileged` – Privileged operations
----------------------------------------------------------------
+:mod:`~tests.plugins.privileged` – Privileged operations
+--------------------------------------------------------
 
-.. automodule:: pyudev.tests.plugins.privileged
+.. automodule:: tests.plugins.privileged
 
 
 Command line options
@@ -128,10 +128,10 @@ The plugin adds the following functions to the :mod:`pytest` namespace:
 .. autofunction:: unload_dummy
 
 
-:mod:`~pyudev.tests.plugins.fake_monitor` – A fake :class:`pyudev.Monitor`
---------------------------------------------------------------------------
+:mod:`~tests.plugins.fake_monitor` – A fake :class:`Monitor`
+------------------------------------------------------------
 
-.. automodule:: pyudev.tests.plugins.fake_monitor
+.. automodule:: tests.plugins.fake_monitor
 
 .. autoclass:: FakeMonitor
    :members:

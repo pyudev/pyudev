@@ -16,8 +16,8 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.tests.plugins.privileged
-    ===============================
+    tests.plugins.privileged
+    ========================
 
     Support privileged operations to trigger real udev events.
 

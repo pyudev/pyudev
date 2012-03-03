@@ -42,9 +42,9 @@ import pyudev
 
 
 pytest_plugins = [
-    str('pyudev.tests.plugins.udev_database'),
-    str('pyudev.tests.plugins.fake_monitor'),
-    str('pyudev.tests.plugins.privileged')
+    str('tests.plugins.udev_database'),
+    str('tests.plugins.fake_monitor'),
+    str('tests.plugins.privileged')
 ]
 
 
