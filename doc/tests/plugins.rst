@@ -28,6 +28,13 @@ hooks or adding some additional funcargs.
 .. autoclass:: DeviceDatabase()
    :members:
 
+.. autoclass:: DeviceData()
+   :members:
+
+   .. attribute:: device_path
+
+      The path of the device without the ``sysfs`` mountpoint.
+
 
 Test markers
 ------------
@@ -62,7 +69,8 @@ The plugin attaches the following attributes to :data:`pytest.config`:
 
 .. attribute:: pytest.config.udev_device_sample
 
-   A list of devices to use for tests as lists of device paths.
+   A list of devices to use for tests as list of :class:`DeviceData` objects,
+   an excerpt of :attr:`pytest.config.udev_database`.
 
 
 Funcargs

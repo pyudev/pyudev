@@ -119,10 +119,10 @@ class TestEnumerator(object):
         devices = list(context.list_devices().match_tag('seat'))
         assert all('seat' in d.tags for d in devices)
 
-    @pytest.mark.parametrize('device_path', pytest.config.udev_device_sample)
+    @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
     @pytest.mark.udev_version('>= 172')
-    def test_match_parent(self, context, device_path):
-        device = Device.from_path(context, device_path)
+    def test_match_parent(self, context, device_data):
+        device = Device.from_path(context, device_data.device_path)
         parent = device.parent
         if parent is None:
             pytest.skip('Device {0!r} has no parent'.format(device))

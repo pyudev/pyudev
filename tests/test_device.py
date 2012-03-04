@@ -40,29 +40,41 @@ from pyudev import (Device,
 from pyudev.device import Attributes, Tags
 
 
-def pytest_generate_tests(metafunc):
-    args = metafunc.funcargnames
-    if any(a in ('sys_path', 'device_path', 'device') for a in args):
-        for device_path in metafunc.config.udev_device_sample:
-            metafunc.addcall(id=device_path, param=device_path)
+with_device_data = pytest.mark.parametrize(
+    'device_data', pytest.config.udev_device_sample,
+    ids=pytest.config.udev_device_sample)
+
+
+with_devices = pytest.mark.parametrize(
+    'device', pytest.config.udev_device_sample,
+    indirect=True, ids=pytest.config.udev_device_sample)
+
+
+def pytest_funcarg__device(request):
+    device_data = getattr(request, 'param', None) or \
+                  request.getfuncargvalue('device_data')
+    context = request.getfuncargvalue('context')
+    return Device.from_path(context, device_data.device_path)
 
 
 class TestDevice(object):
 
-    def test_from_path(self, context, device_path, sys_path):
-        device = Device.from_path(context, device_path)
+    @with_device_data
+    def test_from_path(self, context, device_data):
+        device = Device.from_path(context, device_data.device_path)
         assert device is not None
-        assert device == Device.from_sys_path(context, sys_path)
-        assert device == Device.from_path(context, sys_path)
+        assert device == Device.from_sys_path(context, device_data.sys_path)
+        assert device == Device.from_path(context, device_data.sys_path)
 
     def test_from_path_strips_leading_slash(self, context):
         assert Device.from_path(context, 'devices/platform') == \
                Device.from_path(context, '/devices/platform')
 
-    def test_from_sys_path(self, context, sys_path):
-        device = Device.from_sys_path(context, sys_path)
+    @with_device_data
+    def test_from_sys_path(self, context, device_data):
+        device = Device.from_sys_path(context, device_data.sys_path)
         assert device is not None
-        assert device.sys_path == sys_path
+        assert device.sys_path == device_data.sys_path
 
     def test_from_sys_path_device_not_found(self, context):
         sys_path = 'there_will_not_be_such_a_device'
@@ -72,6 +84,7 @@ class TestDevice(object):
         assert error.sys_path == sys_path
         assert str(error) == 'No device at {0!r}'.format(sys_path)
 
+    @with_devices
     def test_from_name(self, context, device):
         new_device = Device.from_name(context, device.subsystem,
                                       device.sys_name)
@@ -95,22 +108,22 @@ class TestDevice(object):
         assert str(error) == 'No device {0!r} in {1!r}'.format(
             error.sys_name, error.subsystem)
 
-    def test_from_device_number(self, context, device_path, device_number,
-                                device_node):
-        if not device_node:
+    @with_device_data
+    def test_from_device_number(self, context, device_data):
+        if not device_data.device_node:
             pytest.skip('no device node, no device number')
-        mode = os.stat(device_node).st_mode
+        mode = os.stat(device_data.device_node).st_mode
         type = 'block' if stat.S_ISBLK(mode) else 'char'
-        device = Device.from_device_number(context, type, device_number)
-        assert device.device_number == device_number
+        device = Device.from_device_number(context, type, device_data.device_number)
+        assert device.device_number == device_data.device_number
         # make sure, we are really referring to the same device
-        assert device.device_path == device_path
+        assert device.device_path == device_data.device_path
 
-    def test_from_device_number_wrong_type(self, context, device_path,
-                                           device_number, device_node):
-        if not device_node:
+    @with_device_data
+    def test_from_device_number_wrong_type(self, context, device_data):
+        if not device_data.device_node:
             pytest.skip('no device node, no device number')
-        mode = os.stat(device_node).st_mode
+        mode = os.stat(device_data.device_node).st_mode
         # deliberately use the wrong type here to cause either failure or at
         # least device mismatch
         type = 'char' if stat.S_ISBLK(mode) else 'block'
@@ -118,14 +131,15 @@ class TestDevice(object):
             # this either fails, in which case the caught exception is raised,
             # or succeeds, but returns a wrong device (device numbers are not
             # unique across device types)
-            device = Device.from_device_number(context, type, device_number)
+            device = Device.from_device_number(
+                context, type, device_data.device_number)
             # if it succeeds, the resulting device must not match the one, we
             # are actually looking for!
-            assert device.device_path != device_path
+            assert device.device_path != device_data.device_path
         except DeviceNotFoundByNumberError as error:
             # check the correctness of the exception attributes
             assert error.device_type == type
-            assert error.device_number == device_number
+            assert error.device_number == device_data.device_number
 
     def test_from_device_number_invalid_type(self, context):
         with pytest.raises(ValueError) as exc_info:
@@ -133,22 +147,23 @@ class TestDevice(object):
         assert str(exc_info.value) == ('Invalid type: {0!r}. Must be one of '
                                        '"char" or "block".'.format('foobar'))
 
-    def test_from_device_file(self, context, device_path, device_node):
-        if not device_node:
+    @with_device_data
+    def test_from_device_file(self, context, device_data):
+        if not device_data.device_node:
             pytest.skip('no device file')
-        device = Device.from_device_file(context, device_node)
-        assert device.device_node == device_node
-        assert device.device_path == device_path
+        device = Device.from_device_file(context, device_data.device_node)
+        assert device.device_node == device_data.device_node
+        assert device.device_path == device_data.device_path
 
-    def test_from_device_file_links(self, context, device_links,
-                                    device_node, device_path):
-        if not device_links:
+    @with_device_data
+    def test_from_device_file_links(self, context, device_data):
+        if not device_data.device_links:
             pytest.skip('no device links')
-        for link in device_links:
+        for link in device_data.device_links:
             link = os.path.join(context.device_path, link)
             device = Device.from_device_file(context, link)
-            assert device.device_path == device_path
-            assert link in device_links
+            assert device.device_path == device_data.device_path
+            assert link in device_data.device_links
 
     def test_from_device_file_no_device_file(self, context, tmpdir):
         filename = tmpdir.join('test')
@@ -171,10 +186,12 @@ class TestDevice(object):
         with pytest.raises(DeviceNotFoundInEnvironmentError):
             Device.from_environment(context)
 
+    @with_devices
     def test_parent(self, device):
         assert device.parent is None or isinstance(device.parent, Device)
 
     @pytest.mark.udev_version('>= 172')
+    @with_devices
     def test_child_of_parent(self, device):
         if device.parent is None:
             pytest.skip('Device {0!r} has no parent'.format(device))
@@ -182,6 +199,7 @@ class TestDevice(object):
             assert device in device.parent.children
 
     @pytest.mark.udev_version('>= 172')
+    @with_devices
     def test_children(self, device):
         children = list(device.children)
         if not children:
@@ -190,13 +208,15 @@ class TestDevice(object):
             assert all(c != device for c in children)
             assert all(c.parent == device for c in children)
 
+    @with_devices
     def test_find_parent(self, device):
         parent = device.find_parent(device.subsystem)
         if not parent:
-            pytest.xfail('no parent within the same subsystem')
+            pytest.skip('no parent within the same subsystem')
         assert parent.subsystem == device.subsystem
         assert parent in device.traverse()
 
+    @with_devices
     def test_find_parent_no_devtype_mock(self, device):
         get_parent = 'udev_device_get_parent_with_subsystem_devtype'
         ref = 'udev_device_ref'
@@ -211,6 +231,7 @@ class TestDevice(object):
             assert isinstance(parent, Device)
             assert parent._as_parameter_ is mock.sentinel.referenced_device
 
+    @with_devices
     def test_find_parent_with_devtype_mock(self, device):
         get_parent = 'udev_device_get_parent_with_subsystem_devtype'
         ref = 'udev_device_ref'
@@ -226,28 +247,34 @@ class TestDevice(object):
             assert isinstance(parent, Device)
             assert parent._as_parameter_ is mock.sentinel.referenced_device
 
+    @with_devices
     def test_traverse(self, device):
         child = device
         for parent in device.traverse():
             assert parent == child.parent
             child = parent
 
-    def test_sys_path(self, device, sys_path):
-        assert device.sys_path == sys_path
+    @with_device_data
+    def test_sys_path(self, device, device_data):
+        assert device.sys_path == device_data.sys_path
         assert pytest.is_unicode_string(device.sys_path)
 
-    def test_device_path(self, device, device_path):
-        assert device.device_path == device_path
+    @with_device_data
+    def test_device_path(self, device, device_data):
+        assert device.device_path == device_data.device_path
         assert pytest.is_unicode_string(device.device_path)
 
-    def test_subsystem(self, device, properties):
-        assert device.subsystem == properties['SUBSYSTEM']
+    @with_device_data
+    def test_subsystem(self, device, device_data):
+        assert device.subsystem == device_data.properties['SUBSYSTEM']
         assert pytest.is_unicode_string(device.subsystem)
 
+    @with_devices
     def test_device_sys_name(self, device):
         assert device.sys_name == os.path.basename(device.device_path)
         assert pytest.is_unicode_string(device.sys_name)
 
+    @with_devices
     def test_sys_number(self, device):
         match = re.search(r'\d+$', device.sys_name)
         # filter out devices with completely nummeric names (first character
@@ -258,31 +285,30 @@ class TestDevice(object):
         else:
             assert device.sys_number is None
 
-    def test_type(self, device, properties):
-        if 'DEVTYPE' in properties:
-            assert device.device_type == properties['DEVTYPE']
+    @with_device_data
+    def test_type(self, device, device_data):
+        assert device.device_type == device_data.properties.get('DEVTYPE')
+        if device.device_type:
             assert pytest.is_unicode_string(device.device_type)
-        else:
-            assert device.device_type is None
 
-    def test_driver(self, device, properties):
-        if 'DRIVER' in properties:
-            assert device.driver == properties['DRIVER']
+    @with_device_data
+    def test_driver(self, device, device_data):
+        assert device.driver == device_data.properties.get('DRIVER')
+        if device.driver:
             assert pytest.is_unicode_string(device.driver)
-        else:
-            assert device.driver is None
 
-    def test_device_node(self, device, device_node):
-        if device_node:
-            assert device.device_node == device_node
+    @with_device_data
+    def test_device_node(self, device, device_data):
+        assert device.device_node == device_data.device_node
+        if device.device_node:
             assert pytest.is_unicode_string(device.device_node)
-        else:
-            assert device.device_node is None
 
-    def test_device_number(self, device, device_number):
-        assert device.device_number == device_number
+    @with_device_data
+    def test_device_number(self, device, device_data):
+        assert device.device_number == device_data.device_number
 
     @pytest.mark.udev_version('>= 165')
+    @with_devices
     def test_is_initialized(self, device):
         assert isinstance(device.is_initialized, bool)
         get_is_initialized = 'udev_device_get_is_initialized'
@@ -292,6 +318,7 @@ class TestDevice(object):
             get_is_initialized.assert_called_with(device)
 
     @pytest.mark.udev_version('>= 165')
+    @with_devices
     def test_time_since_initialized(self, device):
         assert isinstance(device.time_since_initialized, timedelta)
         usec_since_init = 'udev_device_get_usec_since_initialized'
@@ -300,11 +327,12 @@ class TestDevice(object):
             assert device.time_since_initialized.microseconds == 100
             usec_since_init.assert_called_with(device)
 
-    def test_links(self, context, device, device_links):
-        assert sorted(device.device_links) == sorted(
-            os.path.join(context.device_path, l) for l in device_links)
+    @with_device_data
+    def test_links(self, context, device, device_data):
+        assert sorted(device.device_links) == sorted(device_data.device_links)
         assert all(pytest.is_unicode_string(l) for l in device.device_links)
 
+    @with_devices
     def test_attributes(self, device):
         # see TestAttributes for complete attribute tests
         assert isinstance(device.attributes, Attributes)
@@ -326,35 +354,43 @@ class TestDevice(object):
         # make sure that no memory leaks
         assert not gc.garbage
 
+    @with_devices
     def test_tags(self, device):
         # see TestTags for complete tag tests
         assert isinstance(device.tags, Tags)
 
-    def test_iteration(self, device, properties):
+    @with_device_data
+    def test_iteration(self, device, device_data):
         device_properties = set(device)
-        assert all(p in device_properties for p in properties)
-        assert all(pytest.is_unicode_string(p) for p in device_properties)
+        assert all(p in device_properties for p in device_data.properties)
+        assert all(pytest.is_unicode_string(p)
+                   for p in device_data.properties)
 
-    def test_length(self, device, all_properties):
-        assert len(device) == len(all_properties)
+    @with_device_data
+    def test_length(self, device, device_data):
+        assert len(device) == len(device_data.properties)
 
-    def test_getitem(self, device, properties):
-        assert all(device[p] == properties[p] for p in properties)
+    @with_device_data
+    def test_getitem(self, device, device_data):
+        assert all(device[p] == device_data.properties[p]
+                   for p in device_data.properties)
 
-    def test_getitem_devname(self, context, device, all_properties):
-        if 'DEVNAME' not in all_properties:
-            pytest.xfail('%r has no DEVNAME' % device)
+    @with_device_data
+    def test_getitem_devname(self, context, device, device_data):
+        if 'DEVNAME' not in device_data.properties:
+            pytest.skip('%r has no DEVNAME' % device)
         assert os.path.join(context.device_path, device['DEVNAME']) == \
-               os.path.join(context.device_path, all_properties['DEVNAME'])
+               os.path.join(context.device_path, device_data.properties['DEVNAME'])
 
+    @with_devices
     def test_getitem_nonexisting(self, device):
         with pytest.raises(KeyError) as excinfo:
             device['a non-existing property']
         assert str(excinfo.value) == repr('a non-existing property')
 
-    def test_asint(self, device, properties):
-        for property in properties:
-            value = properties[property]
+    @with_device_data
+    def test_asint(self, device, device_data):
+        for property, value in device_data.properties.items():
             try:
                 value = int(value)
             except ValueError:
@@ -363,9 +399,9 @@ class TestDevice(object):
             else:
                 assert device.asint(property) == value
 
-    def test_asbool(self, device, properties):
-        for property in properties:
-            value = properties[property]
+    @with_device_data
+    def test_asbool(self, device, device_data):
+        for property, value in device_data.properties.items():
             if value == '1':
                 assert device.asbool(property)
             elif value == '0':
@@ -376,17 +412,20 @@ class TestDevice(object):
                 message = 'Not a boolean value: {0!r}'
                 assert str(exc_info.value) == message.format(value)
 
+    @with_devices
     def test_hash(self, device):
         assert hash(device) == hash(device.device_path)
         assert hash(device.parent) == hash(device.parent)
         assert hash(device.parent) != hash(device)
 
+    @with_devices
     def test_equality(self, device):
         assert device == device.device_path
         assert device == device
         assert device.parent == device.parent
         assert not (device == device.parent)
 
+    @with_devices
     def test_inequality(self, device):
         assert not (device != device.device_path)
         assert not (device != device)
@@ -406,18 +445,23 @@ class TestDevice(object):
 
 class TestAttributes(object):
 
+    @with_devices
     def test_length(self, device):
         counter = count()
         for _ in device.attributes:
             next(counter)
         assert len(device.attributes) == next(counter)
 
-    def test_iteration(self, device, attributes):
+    @with_device_data
+    def test_iteration(self, device, device_data):
+        # creating a set from the attributes implicitly iterates over all
+        # attributes
         device_attributes = set(device.attributes)
-        assert all(a in device_attributes for a in attributes)
+        assert all(a in device_attributes for a in device_data.attributes)
         assert all(pytest.is_unicode_string(a) for a in device_attributes)
 
     @pytest.mark.udev_version('>= 167')
+    @with_devices
     def test_iteration_mock(self, device):
         attributes = [b'spam', b'eggs']
         get_sysattr_list = 'udev_device_get_sysattr_list_entry'
@@ -427,28 +471,34 @@ class TestAttributes(object):
             assert attrs == ['spam', 'eggs']
             get_sysattr_list.assert_called_with(device)
 
-    def test_contains(self, device, attributes):
-        assert all(a in device.attributes for a in attributes)
+    @with_device_data
+    def test_contains(self, device, device_data):
+        assert all(a in device.attributes for a in device_data.attributes)
 
-    def test_getitem(self, device, attributes):
-        assert all(isinstance(device.attributes[a], bytes) for a in attributes)
+    @with_device_data
+    def test_getitem(self, device, device_data):
+        assert all(isinstance(device.attributes[a], bytes)
+                   for a in device_data.attributes)
         assert all(device.attributes[a] == v.encode(sys.getfilesystemencoding())
-                   for a, v in attributes.items())
+                   for a, v in device_data.attributes.items())
 
+    @with_devices
     def test_getitem_nonexisting(self, device):
         with pytest.raises(KeyError) as excinfo:
             device.attributes['a non-existing attribute']
         print(type(excinfo.value))
         assert str(excinfo.value) == repr('a non-existing attribute')
 
-    def test_asstring(self, device, attributes):
+    @with_device_data
+    def test_asstring(self, device, device_data):
         assert all(pytest.is_unicode_string(device.attributes.asstring(a))
-                   for a in attributes)
+                   for a in device_data.attributes)
         assert all(device.attributes.asstring(a) == v
-                   for a, v in attributes.items())
+                   for a, v in device_data.attributes.items())
 
-    def test_asint(self, device, attributes):
-        for attribute, value in attributes.items():
+    @with_device_data
+    def test_asint(self, device, device_data):
+        for attribute, value in device_data.attributes.items():
             try:
                 value = int(value)
             except ValueError:
@@ -457,8 +507,9 @@ class TestAttributes(object):
             else:
                 assert device.attributes.asint(attribute) == value
 
-    def test_asbool(self, device, attributes):
-        for attribute, value in attributes.items():
+    @with_device_data
+    def test_asbool(self, device, device_data):
+        for attribute, value in device_data.attributes.items():
             if value == '1':
                 assert device.attributes.asbool(attribute)
             elif value == '0':
@@ -474,14 +525,21 @@ class TestTags(object):
 
     pytestmark = pytest.mark.udev_version('>= 154')
 
-    def test_iteration(self, device, tags):
-        assert set(device.tags) == set(tags)
+    @with_device_data
+    def test_iteration(self, device, device_data):
+        if not device_data.tags:
+            pytest.skip('no tags on device')
+        assert set(device.tags) == set(device_data.tags)
         assert all(pytest.is_unicode_string(t) for t in device.tags)
 
-    def test_contains(self, device, tags):
-        assert all(t in device.tags for t in tags)
+    @with_device_data
+    def test_contains(self, device, device_data):
+        if not device_data.tags:
+            pytest.skip('no tags on device')
+        assert all(t in device.tags for t in device_data.tags)
 
     @pytest.mark.udev_version('>= 172')
+    @with_devices
     def test_contains_mock(self, device):
         """
         Test that ``udev_device_has_tag`` is called if available.

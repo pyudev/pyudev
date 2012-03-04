@@ -79,7 +79,7 @@ class UDevAdm(object):
             raise subprocess.CalledProcessError(proc.returncode, command)
         return output
 
-    def read_devices(self, properties_blacklist):
+    def read_devices(self):
         database = self._execute('info', '--export-db').splitlines()
         devices = {}
         current_properties = None
@@ -92,12 +92,10 @@ class UDevAdm(object):
                 current_properties = devices.setdefault(value, {})
             elif type == 'E':
                 property, value = value.split('=', 1)
-                if property in properties_blacklist:
-                    continue
                 current_properties[property] = value
         return devices
 
-    def read_device_attributes(self, device_path, attributes_blacklist):
+    def read_device_attributes(self, device_path):
         output = self._execute('info', '--attribute-walk',
                                '--path', device_path)
         attribute_dump = output.splitlines()
@@ -114,8 +112,6 @@ class UDevAdm(object):
                 value = value[1:-1]
                 # remove prefix from attribute name
                 name = re.search('{(.*)}', name).group(1)
-                if name in attributes_blacklist:
-                    continue
                 attributes[name] = value
         return attributes
 
@@ -131,12 +127,14 @@ class UDevAdm(object):
             return output.decode(sys.getfilesystemencoding())
 
 
-class DeviceDatabase(Iterable, Sized):
-    """
-    The udev device database.
+def _filter_dict(d, blacklisted_attributes):
+    return dict((k, v) for k, v in d.items()
+                if k not in blacklisted_attributes)
 
-    This class is an iterable over device paths, and provides methods to query
-    devices based on their device paths.
+
+class DeviceData(object):
+    """
+    Data for a single device.
     """
 
     # these are volatile, frequently changing properties and attributes, which
@@ -150,86 +148,113 @@ class DeviceDatabase(Iterable, Sized):
         ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
          'urbnum'])
 
+    def __init__(self, device_path, properties, udevadm):
+        self.device_path = device_path
+        self._all_properties = properties
+        self._udevadm = udevadm
+
+    def __repr__(self):
+        return '{0}({1})'.format(self.__class__.__name__, self.device_path)
+
+    @property
+    def sys_path(self):
+        """
+        Get the ``sysfs`` path of the device.
+        """
+        return '/sys' + self.device_path
+
+    @property
+    def properties(self):
+        """
+        Get the device properties as mapping of property names as strings to
+        property values as strings.
+        """
+        return _filter_dict(self._all_properties, self.PROPERTIES_BLACKLIST)
+
+    @property
+    def attributes(self):
+        """
+        Get the device attributes as mapping of attributes names as strings to
+        property values as byte strings.
+
+        .. warning::
+
+           As ``udevadm`` only exports printable attributes, this list can be
+           incomplete!  Do *not* compare this dictionary directly to a
+           attributes dictionary received through pyudev!
+        """
+        attrs = self._udevadm.read_device_attributes(self.device_path)
+        return _filter_dict(attrs, self.ATTRIBUTES_BLACKLIST)
+
+    @property
+    def tags(self):
+        """
+        Get the device tags as list of strings.
+        """
+        tags = self._all_properties.get('TAGS', '').split(':')
+        return [t for t in tags if t]
+
+    @property
+    def device_node(self):
+        """
+        Get the device node path as string, or ``None`` if the device has no
+        device node.
+        """
+        return self._udevadm.query_device(self.device_path, 'name')
+
+    @property
+    def device_links(self):
+        """
+        Get the device links as list of strings.
+        """
+        links = self._udevadm.query_device(self.device_path, 'symlink')
+        return links.split() if links else []
+
+    @property
+    def device_number(self):
+        """
+        Get the device number as integer or 0 if the device has no device
+        number.
+        """
+        if self.device_node:
+            return os.stat(self.device_node).st_rdev
+        else:
+            return 0
+
+
+class DeviceDatabase(Iterable, Sized):
+    """
+    The udev device database.
+
+    This class is an iterable over :class:`DeviceData` objects that contain the
+    data associated with each device stored in the udev database.
+    """
+
     def __init__(self, udevadm):
         self._udevadm = udevadm
-        self._devices = self._udevadm.read_devices(self.PROPERTIES_BLACKLIST)
+        self._devices = self._udevadm.read_devices()
 
     def __iter__(self):
-        return iter(self._devices)
+        return (DeviceData(d, p, self._udevadm)
+                for d, p in self._devices.items())
 
     def __len__(self):
         return len(self._devices)
 
-    def get_device_properties(self, device_path):
+    def find_device_data(self, device_path):
         """
-        Get the properties of a device.
+        Find device data for the device designated by ``device_path``.
 
-        ``device_path`` is a string containing the path of a device.
+        ``device_path`` is a string containing the device path.
 
-        Return a mapping of property names as strings to property values as
-        strings.
+        Return a :class:`DeviceData` object containing the data for the given
+        device, or ``None`` if the device was not found.
         """
-        return dict(self._devices[device_path])
-
-    def get_device_attributes(self, device_path):
-        """
-        Get the attributes of a device.
-
-        ``device_path`` is a string containing the path of a device.
-
-        Return a mapping of attributes names as strings to property values as
-        byte strings.
-        """
-        return self._udevadm.read_device_attributes(
-            device_path, self.ATTRIBUTES_BLACKLIST)
-
-    def get_device_tags(self, device_path):
-        """
-        Get the tags of a device.
-
-        ``device_path`` is a string containing the path of a device.
-
-        Return the tags as list of strings.
-        """
-        properties = self.get_device_properties(device_path)
-        return [t for t in properties.get('TAGS', '').split(':') if t]
-
-    def get_device_node(self, device_path):
-        """
-        Get the device node of a device.
-
-        ``device_path`` is a string containing the path of a device.
-
-        Return the path of the device node as string, or ``None`` if the device
-        has no device node.
-        """
-        return self._udevadm.query_device(device_path, 'name')
-
-    def get_device_links(self, device_path):
-        """
-        Get the device links.
-
-        ``device_path`` is a string containing the path of a device.
-
-        Return a list of device links.
-        """
-        links = self._udevadm.query_device(device_path, 'symlink')
-        return links.split() if links else []
-
-    def get_device_number(self, device_path):
-        """
-        Get the device number of a device.
-
-        ``device_path`` is a string containing the path of a device.
-
-        Return the device number as integer or 0 if the device has no device
-        number.
-        """
-        node = self.get_device_node(device_path)
-        if node:
-            return os.stat(node).st_rdev
-        else:
-            return 0
+        try:
+            properties = self._devices[device_path]
+            return DeviceData(device_path, properties, self._udevadm)
+        except KeyError:
+            return None
 
 
 def _get_device_sample(config):
@@ -237,10 +262,15 @@ def _get_device_sample(config):
     Compute a sample of the udev device database based on the given pytest
     ``config``.
     """
-    if config.getvalue('device'):
-        return [config.getvalue('device')]
-    if config.getvalue('all_devices'):
-        return config.udev_database
+    if config.option.device is not None:
+        device_data = config.udev_database.find_device_data(
+            config.option.device)
+        if not device_data:
+            raise ValueError('{0} does not exist'.format(
+                config.option.device))
+        return [device_data]
+    if config.option.all_devices:
+        return list(config.udev_database)
     else:
         device_sample_size = config.getvalue('device_sample_size')
         actual_size = min(device_sample_size, len(config.udev_database))
