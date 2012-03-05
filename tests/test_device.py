@@ -536,6 +536,15 @@ class TestTags(object):
         assert set(device.tags) == set(device_data.tags)
         assert all(pytest.is_unicode_string(t) for t in device.tags)
 
+    @with_devices
+    def test_iteration_mock(self, device):
+        with pytest.libudev_list('udev_device_get_tags_list_entry',
+                                 [b'spam', b'eggs']):
+            tags = list(device.tags)
+            assert tags == ['spam', 'eggs']
+            f = libudev.udev_device_get_tags_list_entry
+            f.assert_called_with(device)
+
     @with_device_data
     def test_contains(self, device, device_data):
         if not device_data.tags:
