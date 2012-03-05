@@ -30,7 +30,7 @@ from itertools import count
 from datetime import timedelta
 
 import pytest
-import mock
+from mock import sentinel
 
 from pyudev import (Device,
                     DeviceNotFoundAtPathError,
@@ -38,6 +38,7 @@ from pyudev import (Device,
                     DeviceNotFoundByNumberError,
                     DeviceNotFoundInEnvironmentError)
 from pyudev.device import Attributes, Tags
+from pyudev._libudev import libudev
 
 
 with_device_data = pytest.mark.parametrize(
@@ -218,34 +219,29 @@ class TestDevice(object):
 
     @with_devices
     def test_find_parent_no_devtype_mock(self, device):
-        get_parent = 'udev_device_get_parent_with_subsystem_devtype'
-        ref = 'udev_device_ref'
-        with pytest.nested(pytest.patch_libudev(get_parent),
-                           pytest.patch_libudev(ref)) as (get_parent, ref):
-            get_parent.return_value = mock.sentinel.device
-            ref.return_value = mock.sentinel.referenced_device
+        calls = {'udev_device_get_parent_with_subsystem_devtype':
+                 [(device, b'subsystem', None)],
+                 'udev_device_ref': [(sentinel.parent_device,)]}
+        with pytest.calls_to_libudev(calls):
+            f = libudev.udev_device_get_parent_with_subsystem_devtype
+            f.return_value = sentinel.parent_device
+            libudev.udev_device_ref.return_value = sentinel.ref_device
             parent = device.find_parent('subsystem')
-            get_parent.assert_called_with(device, b'subsystem', None)
-            ref.assert_called_with(mock.sentinel.device)
-            assert isinstance(get_parent.call_args[0][1], bytes)
             assert isinstance(parent, Device)
-            assert parent._as_parameter_ is mock.sentinel.referenced_device
+            assert parent._as_parameter_ is sentinel.ref_device
 
     @with_devices
     def test_find_parent_with_devtype_mock(self, device):
-        get_parent = 'udev_device_get_parent_with_subsystem_devtype'
-        ref = 'udev_device_ref'
-        with pytest.nested(pytest.patch_libudev(get_parent),
-                           pytest.patch_libudev(ref)) as (get_parent, ref):
-            get_parent.return_value = mock.sentinel.device
-            ref.return_value = mock.sentinel.referenced_device
+        calls = {'udev_device_get_parent_with_subsystem_devtype':
+                 [(device, b'subsystem', b'devtype')],
+                 'udev_device_ref': [(sentinel.parent_device,)]}
+        with pytest.calls_to_libudev(calls):
+            f = libudev.udev_device_get_parent_with_subsystem_devtype
+            f.return_value = sentinel.parent_device
+            libudev.udev_device_ref.return_value = sentinel.ref_device
             parent = device.find_parent('subsystem', 'devtype')
-            get_parent.assert_called_with(device, b'subsystem', b'devtype')
-            ref.assert_called_with(mock.sentinel.device)
-            args = get_parent.call_args[0][1:]
-            assert all(isinstance(a, bytes) for a in args)
             assert isinstance(parent, Device)
-            assert parent._as_parameter_ is mock.sentinel.referenced_device
+            assert parent._as_parameter_ is sentinel.ref_device
 
     @with_devices
     def test_traverse(self, device):
@@ -311,21 +307,28 @@ class TestDevice(object):
     @with_devices
     def test_is_initialized(self, device):
         assert isinstance(device.is_initialized, bool)
-        get_is_initialized = 'udev_device_get_is_initialized'
-        with pytest.patch_libudev(get_is_initialized) as get_is_initialized:
-            get_is_initialized.return_value = True
-            assert device.is_initialized
-            get_is_initialized.assert_called_with(device)
+
+
+    @pytest.mark.udev_version('>= 165')
+    @with_devices
+    def test_is_initialized_mock(self, device):
+        calls = {'udev_device_get_is_initialized': [(device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_get_is_initialized.return_value = False
+            assert not device.is_initialized
 
     @pytest.mark.udev_version('>= 165')
     @with_devices
     def test_time_since_initialized(self, device):
         assert isinstance(device.time_since_initialized, timedelta)
-        usec_since_init = 'udev_device_get_usec_since_initialized'
-        with pytest.patch_libudev(usec_since_init) as usec_since_init:
-            usec_since_init.return_value = 100
+
+    @pytest.mark.udev_version('>= 165')
+    @with_devices
+    def test_time_since_initialized_mock(self, device):
+        calls = {'udev_device_get_usec_since_initialized': [(device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_get_usec_since_initialized.return_value = 100
             assert device.time_since_initialized.microseconds == 100
-            usec_since_init.assert_called_with(device)
 
     @with_device_data
     def test_links(self, context, device, device_data):
@@ -465,11 +468,11 @@ class TestAttributes(object):
     def test_iteration_mock(self, device):
         attributes = [b'spam', b'eggs']
         get_sysattr_list = 'udev_device_get_sysattr_list_entry'
-        with pytest.patch_libudev_list(attributes,
-                                       get_sysattr_list) as get_sysattr_list:
+        with pytest.libudev_list(get_sysattr_list, attributes):
             attrs = list(device.attributes)
             assert attrs == ['spam', 'eggs']
-            get_sysattr_list.assert_called_with(device)
+            f = libudev.udev_device_get_sysattr_list_entry
+            f.assert_called_with(device)
 
     @with_device_data
     def test_contains(self, device, device_data):
@@ -544,8 +547,7 @@ class TestTags(object):
         """
         Test that ``udev_device_has_tag`` is called if available.
         """
-        has_tag = 'udev_device_has_tag'
-        with pytest.patch_libudev(has_tag) as has_tag:
-            has_tag.return_value = 1
+        calls = {'udev_device_has_tag': [(device, b'foo')]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_has_tag.return_value = 1
             assert 'foo' in device.tags
-            has_tag.assert_called_with(device, b'foo')

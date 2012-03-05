@@ -105,14 +105,11 @@ class TestEnumerator(object):
 
     @pytest.mark.udev_version('>= 154')
     def test_match_tag_mock(self, context):
-        add_match_tag = 'udev_enumerate_add_match_tag'
         enumerator = context.list_devices()
-        with pytest.patch_libudev(add_match_tag) as add_match_tag:
+        calls = {'udev_enumerate_add_match_tag': [(enumerator, b'spam')]}
+        with pytest.calls_to_libudev(calls):
             retval = enumerator.match_tag('spam')
             assert retval is enumerator
-            add_match_tag.assert_called_with(enumerator, b'spam')
-            args, _ = add_match_tag.call_args
-            assert isinstance(args[1], bytes)
 
     @pytest.mark.udev_version('>= 154')
     def test_match_tag(self, context):
@@ -132,11 +129,11 @@ class TestEnumerator(object):
             assert parent in children
 
     @pytest.mark.udev_version('>= 165')
-    def test_match_is_initialized(self, context):
-        match_is_initialized = 'udev_enumerate_add_match_is_initialized'
-        with pytest.patch_libudev(match_is_initialized) as match_is_initialized:
-            context.list_devices().match_is_initialized()
-            assert match_is_initialized.called
+    def test_match_is_initialized_mock(self, context):
+        enumerator = context.list_devices()
+        calls = {'udev_enumerate_add_match_is_initialized': [(enumerator,)]}
+        with pytest.calls_to_libudev(calls):
+            enumerator.match_is_initialized()
 
     def test_combined_matches_of_same_type(self, context):
         """

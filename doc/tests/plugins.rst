@@ -10,6 +10,7 @@ The following plugins are provided and enabled:
    udev_database
    privileged
    fake_monitor
+   mock_libudev
 
 The main plugin is :mod:`~tests.plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
@@ -151,6 +152,17 @@ Funcargs
 The plugin provides the following :ref:`funcargs <funcargs>`:
 
 .. autofunction:: pytest_funcarg__fake_monitor
+
+
+:mod:`~tests.plugins.mock_libudev` – Mock calls to libudev
+----------------------------------------------------------
+
+.. automodule:: tests.plugins.mock_libudev
+
+.. autofunction:: calls_to_libudev(function_calls)
+
+.. autofunction:: libudev_list(function, items)
+
 
 
 .. _pytest: http://pytest.org

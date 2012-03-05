@@ -22,10 +22,11 @@ from __future__ import (print_function, division, unicode_literals,
 import random
 import syslog
 
-import mock
 import pytest
+from mock import sentinel
 
 from pyudev import udev_version
+from pyudev._libudev import libudev
 
 
 def test_udev_version():
@@ -56,17 +57,15 @@ class TestContext(object):
         assert syslog.LOG_EMERG <= context.log_priority <= syslog.LOG_DEBUG
 
     def test_log_priority_get_mock(self, context):
-        get_prio = 'udev_get_log_priority'
-        with pytest.patch_libudev(get_prio) as get_prio:
-            get_prio.return_value = mock.sentinel.log_priority
-            assert context.log_priority is mock.sentinel.log_priority
-            get_prio.assert_called_with(context)
+        calls = {'udev_get_log_priority': [(context,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_get_log_priority.return_value = sentinel.log_priority
+            assert context.log_priority is sentinel.log_priority
 
     def test_log_priority_set_mock(self, context):
-        set_prio = 'udev_set_log_priority'
-        with pytest.patch_libudev(set_prio) as set_prio:
-            context.log_priority = mock.sentinel.log_priority
-            set_prio.assert_called_with(context, mock.sentinel.log_priority)
+        calls = {'udev_set_log_priority': [(context, sentinel.log_priority)]}
+        with pytest.calls_to_libudev(calls):
+            context.log_priority = sentinel.log_priority
 
     def test_log_priority_roundtrip(self, context):
         old_priority = context.log_priority

@@ -32,8 +32,6 @@ from functools import wraps
 from collections import namedtuple
 from contextlib import contextmanager
 from subprocess import call
-if sys.version_info[:2] < (3, 2):
-    from contextlib import nested
 
 import mock
 import pytest
@@ -44,46 +42,9 @@ import pyudev
 pytest_plugins = [
     str('tests.plugins.udev_database'),
     str('tests.plugins.fake_monitor'),
-    str('tests.plugins.privileged')
+    str('tests.plugins.privileged'),
+    str('tests.plugins.mock_libudev'),
 ]
-
-
-if sys.version_info[:2] >= (3, 2):
-    @contextmanager
-    def nested(*managers):
-        """
-        Copy of contextlib.nested from python 2.7 with slight adaptions to
-        Python 3.2 to use nested() on python 3.2 and thus retain backwards
-        compatibility with Python 2.6 (with doesn't support the new nesting
-        syntax), while being able to run the test suite on Python 3.2 as
-        well (which doesn't provide contextlib.nested anymore).
-        """
-        exits = []
-        vars = []
-        exc = None
-        try:
-            for mgr in managers:
-                exit = mgr.__exit__
-                enter = mgr.__enter__
-                vars.append(enter())
-                exits.append(exit)
-            yield vars
-        except BaseException as e:
-            exc = e
-        finally:
-            while exits:
-                exit = exits.pop()
-                try:
-                    if exc:
-                        args = (type(exc), exc, exc.__traceback__)
-                    else:
-                        args = (None, None, None)
-                    if exit(*args):
-                        exc = None
-                except BaseException as e:
-                    exc = e
-            if exc:
-                raise exc
 
 
 def assert_env_error(error, errno, filename=None):
@@ -92,56 +53,6 @@ def assert_env_error(error, errno, filename=None):
     assert error.strerror == os.strerror(errno)
     assert error.filename == filename
 
-
-@contextmanager
-def patch_libudev(funcname):
-    with mock.patch('pyudev._libudev.libudev.{0}'.format(funcname)) as func:
-        yield func
-
-
-class Node(namedtuple('Node', 'name next')):
-    """
-    Node in a :class:`LinkedList`.
-    """
-    @property
-    def value(self):
-        return 'value of {0}'.format(self.name)
-
-
-class LinkedList(object):
-    """
-    Linked list class to mock libudev list functions.
-    """
-
-    @classmethod
-    def from_sequence(cls, items):
-        next_node = None
-        for item in reversed(items):
-            node = Node(item, next_node)
-            next_node = node
-        return cls(next_node)
-
-    def __init__(self, first):
-        self.first = first
-
-
-@contextmanager
-def patch_libudev_list(items, list_func):
-    linked_list = LinkedList.from_sequence(items)
-    get_next = 'udev_list_entry_get_next'
-    get_name = 'udev_list_entry_get_name'
-    get_value = 'udev_list_entry_get_value'
-    with pytest.nested(pytest.patch_libudev(get_next),
-                       pytest.patch_libudev(get_name),
-                       pytest.patch_libudev(get_value),
-                       pytest.patch_libudev(list_func)) as (get_next, get_name,
-                                                            get_value,
-                                                            list_func):
-        list_func.return_value = linked_list.first
-        get_name.side_effect = lambda e: e.name
-        get_value.side_effect = lambda e: e.value
-        get_next.side_effect = lambda e: e.next
-        yield list_func
 
 
 def is_unicode_string(value):
@@ -158,8 +69,7 @@ def is_unicode_string(value):
 
 def pytest_namespace():
     return dict((func.__name__, func) for func in
-                (patch_libudev, nested, is_unicode_string,
-                 patch_libudev_list, assert_env_error))
+                (is_unicode_string, assert_env_error))
 
 
 def pytest_funcarg__context(request):

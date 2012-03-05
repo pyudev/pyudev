@@ -26,9 +26,10 @@ from contextlib import contextmanager
 from select import select
 
 import pytest
-import mock
+from mock import sentinel
 
 from pyudev import Monitor, MonitorObserver, Device
+from pyudev._libudev import libudev
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -52,17 +53,6 @@ def pytest_funcarg__monitor(request):
 
 def pytest_funcarg__fake_monitor_device(request):
     return request.getfuncargvalue('platform_device')
-
-
-def _assert_from_netlink_called(context, *args):
-    new_from_netlink = 'udev_monitor_new_from_netlink'
-    with pytest.patch_libudev(new_from_netlink) as new_from_netlink:
-        source = args[0].encode('ascii') if args else b'udev'
-        new_from_netlink.return_value = mock.sentinel.pointer
-        monitor = Monitor.from_netlink(context, *args)
-        new_from_netlink.assert_called_with(context, source)
-        assert isinstance(new_from_netlink.call_args[0][1], bytes)
-        assert monitor._as_parameter_ is mock.sentinel.pointer
 
 
 @contextmanager
@@ -92,43 +82,47 @@ class TestMonitor(object):
         assert monitor._as_parameter_
 
     def test_from_netlink_source_udev_mock(self, context):
-        _assert_from_netlink_called(context)
-        _assert_from_netlink_called(context, 'udev')
+        calls = {'udev_monitor_new_from_netlink':
+                 [(context, b'udev'), (context, b'udev')]}
+        with pytest.calls_to_libudev(calls):
+             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+             monitor = Monitor.from_netlink(context)
+             assert monitor._as_parameter_ is sentinel.monitor
+             monitor = Monitor.from_netlink(context, 'udev')
+             assert monitor._as_parameter_ is sentinel.monitor
 
     def test_from_netlink_source_kernel(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
         assert monitor._as_parameter_
 
     def test_from_netlink_source_kernel_mock(self, context):
-        _assert_from_netlink_called(context, 'kernel')
+        calls = {'udev_monitor_new_from_netlink': [(context, b'kernel')]}
+        with pytest.calls_to_libudev(calls):
+             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+             monitor = Monitor.from_netlink(context, 'kernel')
+             assert monitor._as_parameter_ is sentinel.monitor
 
     def test_from_socket(self, context, socket_path):
         monitor = Monitor.from_socket(context, str(socket_path))
         assert monitor._as_parameter_
 
-    def test_from_socket_mock(self, context, socket_path):
-        socket_path = str(socket_path)
+    def test_from_socket_mock(self, context):
+        calls = {'udev_monitor_new_from_socket': [(context, b'spam')]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_monitor_new_from_socket.return_value = sentinel.monitor
+            monitor = Monitor.from_socket(context, 'spam')
+            assert monitor._as_parameter_ is sentinel.monitor
         new_from_socket = 'udev_monitor_new_from_socket'
-        with pytest.patch_libudev(new_from_socket) as new_from_socket:
-            new_from_socket.return_value = mock.sentinel.pointer
-            monitor = Monitor.from_socket(context, socket_path)
-            new_from_socket.assert_called_with(
-                context, socket_path.encode(sys.getfilesystemencoding()))
-            assert monitor._as_parameter_ is mock.sentinel.pointer
-            Monitor.from_socket(context, 'foobar')
-            new_from_socket.assert_called_with(context, b'foobar')
-            assert isinstance(new_from_socket.call_args[0][1], bytes)
 
     def test_fileno(self, monitor):
         # we can't do more than check that no exception is thrown
         monitor.fileno()
 
     def test_fileno_mock(self, monitor):
-        get_fd = 'udev_monitor_get_fd'
-        with pytest.patch_libudev(get_fd) as get_fd:
-            get_fd.return_value = mock.sentinel.fileno
-            assert monitor.fileno() is mock.sentinel.fileno
-            get_fd.assert_called_with(monitor)
+        calls = {'udev_monitor_get_fd': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_monitor_get_fd.return_value = sentinel.fileno
+            assert monitor.fileno() is sentinel.fileno
 
     def test_filter_by_no_subsystem(self, monitor):
         with pytest.raises(AttributeError):
@@ -139,28 +133,22 @@ class TestMonitor(object):
         monitor.filter_by('input')
 
     def test_filter_by_subsystem_no_dev_type_mock(self, monitor):
-        with patch_filter_by('subsystem_devtype') as (add_match, filter_update):
-            monitor.filter_by(b'input')
-            add_match.assert_called_with(monitor, b'input', None)
-            filter_update.assert_called_with(monitor)
+        calls = {'udev_monitor_filter_add_match_subsystem_devtype':
+                 [(monitor, b'input', None)],
+                 'udev_monitor_filter_update': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
             monitor.filter_by('input')
-            add_match.assert_called_with(monitor, b'input', None)
-            filter_update.assert_called_with(monitor)
-            assert isinstance(add_match.call_args[0][1], bytes)
 
     def test_filter_by_subsystem_dev_type(self, monitor):
         monitor.filter_by('input', b'usb_interface')
         monitor.filter_by('input', 'usb_interface')
 
     def test_filter_by_subsystem_dev_type_mock(self, monitor):
-        with patch_filter_by('subsystem_devtype') as (add_match, filter_update):
-            monitor.filter_by(b'input', b'usb_interface')
-            add_match.assert_called_with(monitor, b'input', b'usb_interface')
-            filter_update.assert_called_with(monitor)
+        calls = {'udev_monitor_filter_add_match_subsystem_devtype':
+                 [(monitor, b'input', b'usb_interface')],
+                 'udev_monitor_filter_update': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
             monitor.filter_by('input', 'usb_interface')
-            add_match.assert_called_with(monitor, b'input', b'usb_interface')
-            filter_update.assert_called_with(monitor)
-            assert isinstance(add_match.call_args[0][2], bytes)
 
     @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag(self, monitor):
@@ -168,15 +156,10 @@ class TestMonitor(object):
 
     @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag_mock(self, monitor):
-        with patch_filter_by('tag') as (match_tag, filter_update):
-            match_tag.return_value = 0
-            monitor.filter_by_tag(b'spam')
-            match_tag.assert_called_with(monitor, b'spam')
-            filter_update.assert_called_with(monitor)
+        calls = {'udev_monitor_filter_add_match_tag': [(monitor, b'eggs')],
+                 'udev_monitor_filter_update': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
             monitor.filter_by_tag('eggs')
-            match_tag.assert_called_with(monitor, b'eggs')
-            filter_update.assert_called_with(monitor)
-            assert isinstance(match_tag.call_args[0][1], bytes)
 
     def test_remove_filter(self, monitor):
         """
@@ -187,15 +170,10 @@ class TestMonitor(object):
             monitor.remove_filter()
 
     def test_remove_filter_mock(self, monitor):
-        remove = 'udev_monitor_filter_remove'
-        update = 'udev_monitor_filter_update'
-        with pytest.patch_libudev(remove) as remove:
-            remove.return_value = 0
-            with pytest.patch_libudev(update) as update:
-                update.return_value = 0
-                monitor.remove_filter()
-                update.assert_called_with(monitor)
-                remove.assert_called_with(monitor)
+        calls = {'udev_monitor_filter_remove': [(monitor,)],
+                 'udev_monitor_filter_update': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
+            monitor.remove_filter()
 
     def test_enable_receiving_netlink_kernel_source(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
@@ -219,20 +197,16 @@ class TestMonitor(object):
         assert Monitor.start == Monitor.enable_receiving
 
     def test_enable_receiving_mock(self, monitor):
-        with pytest.patch_libudev('udev_monitor_enable_receiving') as func:
-            func.return_value = 0
+        calls = {'udev_monitor_enable_receiving': [(monitor,)]}
+        with pytest.calls_to_libudev(calls):
             monitor.enable_receiving()
-            func.assert_called_with(monitor)
 
     def test_set_receive_buffer_size_mock(self, monitor):
-        set_receive_buffer_size = 'udev_monitor_set_receive_buffer_size'
-        with pytest.patch_libudev(set_receive_buffer_size) as func:
-            func.return_value = 0
+        calls = {'udev_monitor_set_receive_buffer_size': [(monitor, 1000)]}
+        with pytest.calls_to_libudev(calls):
             monitor.set_receive_buffer_size(1000)
-            func.assert_called_with(monitor, 1000)
 
-    def test_set_receive_buffer_size_privilege_error(self, monitor,
-                                                     socket_path):
+    def test_set_receive_buffer_size_privilege_error(self, monitor):
         with pytest.raises(EnvironmentError) as exc_info:
             monitor.set_receive_buffer_size(1000)
         pytest.assert_env_error(exc_info.value, errno.EPERM)
@@ -258,21 +232,17 @@ class TestMonitor(object):
         assert device.device_path == '/devices/virtual/net/dummy0'
 
     def test_receive_device_mock(self, monitor):
-        receive_device = 'udev_monitor_receive_device'
-        get_action = 'udev_device_get_action'
-        with pytest.nested(pytest.patch_libudev(receive_device),
-                           pytest.patch_libudev(get_action)) as (receive_device,
-                                                                 get_action):
-            receive_device.return_value = mock.sentinel.pointer
-            get_action.return_value = b'action'
+        calls = {'udev_monitor_receive_device': [(monitor,)],
+                 'udev_device_get_action': [(sentinel.device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_monitor_receive_device.return_value = sentinel.device
+            libudev.udev_device_get_action.return_value = b'spam'
             action, device = monitor.receive_device()
-            assert action == 'action'
+            assert action == 'spam'
             assert pytest.is_unicode_string(action)
             assert isinstance(device, Device)
             assert device.context is monitor.context
-            assert device._as_parameter_ is mock.sentinel.pointer
-            get_action.assert_called_with(mock.sentinel.pointer)
-            receive_device.assert_called_with(monitor)
+            assert device._as_parameter_ is sentinel.device
 
     @pytest.mark.privileged
     def test_iter(self, monitor):

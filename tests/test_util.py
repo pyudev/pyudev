@@ -102,15 +102,13 @@ def test_udev_list_iterate_no_entry():
 
 
 def test_udev_list_iterate_mock():
-    test_list = ['spam', 'eggs', 'foo', 'bar']
+    from pyudev._libudev import libudev
+    items = [('spam', 'eggs'), ('foo', 'bar')]
     get_list_entry = 'udev_enumerate_get_list_entry'
-    with pytest.patch_libudev_list(test_list, get_list_entry) as get_list_entry:
-        items = list(_util.udev_list_iterate(get_list_entry()))
-        assert items == [
-            ('spam', 'value of spam'),
-            ('eggs', 'value of eggs'),
-            ('foo', 'value of foo'),
-            ('bar', 'value of bar')]
+    with pytest.libudev_list('udev_enumerate_get_list_entry', items):
+        udev_list = libudev.udev_enumerate_get_list_entry()
+        assert list(_util.udev_list_iterate(udev_list)) == [
+            ('spam', 'eggs'), ('foo', 'bar')]
 
 
 def raise_valueerror():
