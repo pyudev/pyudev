@@ -52,7 +52,9 @@ def pytest_funcarg__monitor(request):
 
 
 def pytest_funcarg__fake_monitor_device(request):
-    return request.getfuncargvalue('platform_device')
+    from pyudev import Device
+    context = request.getfuncargvalue('context')
+    return Device.from_path(context, '/devices/platform')
 
 
 @contextmanager

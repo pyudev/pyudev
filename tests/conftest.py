@@ -63,13 +63,3 @@ def pytest_funcarg__context(request):
     with session scope.
     """
     return request.cached_setup(setup=pyudev.Context, scope='session')
-
-
-def pytest_funcarg__platform_device(request):
-    """
-    Return the platform device at ``/sys/devices/platform``.  This device
-    object exists on all systems, and is therefore suited to for testing
-    purposes.
-    """
-    context = request.getfuncargvalue('context')
-    return pyudev.Device.from_sys_path(context, '/sys/devices/platform')

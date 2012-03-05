@@ -440,9 +440,10 @@ class TestDevice(object):
     @pytest.mark.parametrize(
         'operator', ORDERING_OPERATORS,
         ids=[f.__name__ for f in ORDERING_OPERATORS])
-    def test_device_ordering(self, platform_device, operator):
+    def test_device_ordering(self, context, operator):
+        device = Device.from_path(context, '/devices/platform')
         with pytest.raises(TypeError) as exc_info:
-            operator(platform_device, platform_device)
+            operator(device, device)
         assert str(exc_info.value) == 'Device not orderable'
 
 

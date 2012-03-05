@@ -31,6 +31,12 @@ def pytest_funcarg__monitor(request):
     return Monitor.from_netlink(request.getfuncargvalue('context'))
 
 
+def pytest_funcarg__fake_monitor_device(request):
+    from pyudev import Device
+    context = request.getfuncargvalue('context')
+    return Device.from_path(context, '/devices/platform')
+
+
 class BaseBinding(object):
     def trigger_observer(self, action, monitor, action_trigger):
         mainloop = self.create_mainloop()
@@ -229,10 +235,6 @@ def pytest_generate_tests(metafunc):
                                      id=id + ',' + action)
             else:
                 metafunc.addcall(funcargs=funcargs, id=id)
-
-
-def pytest_funcarg__fake_monitor_device(request):
-    return request.getfuncargvalue('platform_device')
 
 
 def test_fake_monitor(fake_monitor, fake_monitor_device):
