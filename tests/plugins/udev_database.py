@@ -269,7 +269,7 @@ def _get_device_sample(config):
             raise ValueError('{0} does not exist'.format(
                 config.option.device))
         return [device_data]
-    if config.option.all_devices:
+    elif config.option.all_devices:
         return list(config.udev_database)
     else:
         device_sample_size = config.getvalue('device_sample_size')
