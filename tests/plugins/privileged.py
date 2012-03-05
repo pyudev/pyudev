@@ -37,9 +37,10 @@ import pytest
 
 
 def pytest_addoption(parser):
-    parser.addoption('--enable-privileged', action='store_true',
-                     help='Enable tests that required privileged operations',
-                     default=False)
+    group = parser.getgroup('privileged', 'tests with privileged operations')
+    group.addoption('--enable-privileged', action='store_true',
+                    help='Enable tests that required privileged operations',
+                    default=False)
 
 
 def check_privileges_or_skip():

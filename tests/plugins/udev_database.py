@@ -291,16 +291,17 @@ def pytest_runtest_setup(item):
 
 
 def pytest_addoption(parser):
-    parser.addoption('--all-devices', action='store_true',
-                     help='Run device tests against *all* devices in the '
-                     'database.  By default, only a random sample will be '
-                     'checked.', default=False)
-    parser.addoption('--device', metavar='DEVICE',
-                     help='Run the device tests only against the given '
-                     'DEVICE', default=None)
-    parser.addoption('--device-sample-size', type='int', metavar='N',
-                     help='Use a random sample of N elements (default: 10)',
-                     default=10)
+    group = parser.getgroup('udev_database', 'udev database configuration')
+    group.addoption('--all-devices', action='store_true',
+                    help='Run device tests against *all* devices in the '
+                    'database.  By default, only a random sample will be '
+                    'checked.', default=False)
+    group.addoption('--device', metavar='DEVICE',
+                    help='Run the device tests only against the given '
+                    'DEVICE', default=None)
+    group.addoption('--device-sample-size', type='int', metavar='N',
+                    help='Use a random sample of N elements (default: 10)',
+                    default=10)
 
 
 def pytest_configure(config):
