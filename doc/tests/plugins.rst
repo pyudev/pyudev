@@ -123,8 +123,37 @@ The plugin adds the following command line options to :program:`py.test`:
 
 .. option:: --enable-privileged
 
-   Enable privileged tests.  You'll need to have ``sudo`` configured correctly
-   in order to run tests with this option.
+   Enable privileged tests.  You'll need to have :program:`sudo` configured
+   correctly in order to run tests with this option.
+
+
+Configuration
+~~~~~~~~~~~~~
+
+In order to execute these tests without failure, you need to configure :program:`sudo`
+to allow the user that executes the test to run the following commands:
+
+- ``modprobe dummy``
+- ``modprobe -r dummy``
+
+To do so, create a file ``/etc/sudoers.d/20pyudev-tests`` with the following
+content::
+
+   me ALL = (root) NOPASSWD: /sbin/modprobe dummy, /sbin/modprobe -r dummy
+
+Replace ``me`` with your actual user name.  ``NOPASSWD:`` tells :program:`sudo`
+not to ask for a password when executing these commands.  This is simply for
+the sake of convenience and to allow unattended test execution.  Remove this
+word if you want to be asked for a password.
+
+Make sure to change the owner and group to ``root:root`` and the permissions of
+this file to ``440`` afterwards, other :program:`sudo` will refuse to load the
+file.  Also check the file with :program:`visudo` to prevent syntactic errors:
+
+   $ chown root:root /etc/sudoers.d/20pyudev-tests
+   $ chmod 440 /etc/sudoers.d/20pyudev-tests
+   $ visudo -c -f /etc/sudoers.d/20pyudev-tests
+
 
 
 :mod:`pytest` namespace
