@@ -79,7 +79,6 @@ Contents
    guide
    api/index
    tests/index
-   testing
    changes
    licencing
 
