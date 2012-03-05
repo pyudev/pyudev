@@ -18,23 +18,8 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import select
-from contextlib import closing
-
-import sys
 import os
-import re
-import random
-import subprocess
-import socket
-import errno
-from functools import wraps
-from collections import namedtuple
-from contextlib import contextmanager
-from subprocess import call
-
-import mock
-import pytest
+import sys
 
 import pyudev
 
