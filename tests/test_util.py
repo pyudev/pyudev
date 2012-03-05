@@ -150,6 +150,4 @@ def test_get_device_type_not_existing(tmpdir):
     assert not tmpdir.check(file=True)
     with pytest.raises(EnvironmentError) as excinfo:
         _util.get_device_type(str(filename))
-    assert excinfo.value.errno == errno.ENOENT
-    assert excinfo.value.strerror == os.strerror(errno.ENOENT)
-    assert excinfo.value.filename == str(filename)
+    pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
