@@ -267,7 +267,7 @@ using :meth:`~Monitor.filter_by()`.  In the above example only events from the
 
    Always prefer :meth:`~Monitor.filter_by()` and
    :meth:`~Monitor.filter_by_tag()` over manually filtering devices (e.g. by
-   `device.subsystem == 'block'`` or ``tag in device.tags``).  These methods
+   ``device.subsystem == 'block'`` or ``tag in device.tags``).  These methods
    install the filter on the *kernel side*.  A process waiting for events is
    thus only woken up for events that match these filters.  This is much nicer
    in terms of power consumption and system load than executing filters in the
