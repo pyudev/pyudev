@@ -11,6 +11,7 @@ The following plugins are provided and enabled:
    privileged
    fake_monitor
    mock_libudev
+   build_bindings
 
 The main plugin is :mod:`~tests.plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
@@ -191,6 +192,37 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 .. autofunction:: calls_to_libudev(function_calls)
 
 .. autofunction:: libudev_list(function, items)
+
+
+:mod:`~tests.plugins.build_bindings` – Build native bindings
+------------------------------------------------------------
+
+.. automodule:: tests.plugins.build_bindings
+
+Command line options
+--------------------
+
+.. program:: py.test
+
+.. option:: --build-bindings
+
+   Build and install native bindings required by the tests.  If this option is
+   not given, bindings won't be installed.  Tests that required these bindings
+   are skipped.
+
+.. option:: --bindings-download-dir=DIRECTORY
+
+   Download source archives of bindings to ``DIRECTORY``.  If not given,
+   bindings are downloaded to a temporary directory.
+
+.. option:: --bindings-build-dir=DIRECTORY
+
+   Build source archives of bindings within ``DIRECTORY``.  If not given,
+   bindings are built within a temporary directory.
+
+.. option:: --force-build
+
+   Force a re-build of bindings even if they are already installed.
 
 
 
