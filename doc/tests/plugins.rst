@@ -177,7 +177,7 @@ The plugin adds the following functions to the :mod:`pytest` namespace:
 
 
 Funcargs
---------
+~~~~~~~~
 
 The plugin provides the following :ref:`funcargs <funcargs>`:
 
@@ -200,7 +200,7 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 .. automodule:: plugins.build_bindings
 
 Command line options
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 .. program:: py.test
 
