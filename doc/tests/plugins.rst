@@ -1,7 +1,7 @@
-:mod:`tests.plugins` – Testsuite plugins
-========================================
+:mod:`plugins` – Testsuite plugins
+==================================
 
-.. automodule:: tests.plugins
+.. automodule:: plugins
 
 The following plugins are provided and enabled:
 
@@ -13,7 +13,7 @@ The following plugins are provided and enabled:
    mock_libudev
    build_bindings
 
-The main plugin is :mod:`~tests.plugins.udev_database` that extracts the
+The main plugin is :mod:`~plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
 sample of this database.  It also supports to restrict tests to certain udev
 versions.
@@ -22,10 +22,10 @@ The other plugins only provide support for specific test cases by tuning some
 hooks or adding some additional funcargs.
 
 
-:mod:`~tests.plugins.udev_database` – pytest_ plugin to access the udev device database
----------------------------------------------------------------------------------------
+:mod:`~plugins.udev_database` – pytest_ plugin to access the udev device database
+---------------------------------------------------------------------------------
 
-.. automodule:: tests.plugins.udev_database
+.. automodule:: plugins.udev_database
 
 .. autoclass:: DeviceDatabase()
    :members:
@@ -109,10 +109,10 @@ The plugin adds the following command line options to :program:`py.test`:
    The size of the random sample.  Defaults to 10.
 
 
-:mod:`~tests.plugins.privileged` – Privileged operations
---------------------------------------------------------
+:mod:`~plugins.privileged` – Privileged operations
+--------------------------------------------------
 
-.. automodule:: tests.plugins.privileged
+.. automodule:: plugins.privileged
 
 
 Command line options
@@ -167,10 +167,10 @@ The plugin adds the following functions to the :mod:`pytest` namespace:
 .. autofunction:: unload_dummy
 
 
-:mod:`~tests.plugins.fake_monitor` – A fake :class:`Monitor`
-------------------------------------------------------------
+:mod:`~plugins.fake_monitor` – A fake :class:`Monitor`
+------------------------------------------------------
 
-.. automodule:: tests.plugins.fake_monitor
+.. automodule:: plugins.fake_monitor
 
 .. autoclass:: FakeMonitor
    :members:
@@ -184,20 +184,20 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 .. autofunction:: pytest_funcarg__fake_monitor
 
 
-:mod:`~tests.plugins.mock_libudev` – Mock calls to libudev
-----------------------------------------------------------
+:mod:`~plugins.mock_libudev` – Mock calls to libudev
+----------------------------------------------------
 
-.. automodule:: tests.plugins.mock_libudev
+.. automodule:: plugins.mock_libudev
 
 .. autofunction:: calls_to_libudev(function_calls)
 
 .. autofunction:: libudev_list(function, items)
 
 
-:mod:`~tests.plugins.build_bindings` – Build native bindings
-------------------------------------------------------------
+:mod:`~plugins.build_bindings` – Build native bindings
+------------------------------------------------------
 
-.. automodule:: tests.plugins.build_bindings
+.. automodule:: plugins.build_bindings
 
 Command line options
 --------------------

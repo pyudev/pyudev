@@ -1,8 +1,6 @@
 Testsuite documentation
 =======================
 
-.. automodule:: tests
-
 This document explains the pyudev test suite and how to add new tests to this
 suite.
 

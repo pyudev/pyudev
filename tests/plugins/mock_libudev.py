@@ -17,8 +17,8 @@
 
 
 """
-    tests.plugins.mock_libudev
-    ==========================
+    plugins.mock_libudev
+    ====================
 
     Plugin to mock calls to libudev.
 

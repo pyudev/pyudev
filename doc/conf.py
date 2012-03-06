@@ -29,6 +29,9 @@ from docutils.parsers.rst import Directive
 doc_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.normpath(
     os.path.join(doc_directory, os.pardir)))
+# add the tests directory to our path to point autodoc on the testsuite plugins
+sys.path.append(os.path.normpath(
+    os.path.join(doc_directory, os.pardir, 'tests')))
 
 
 class Mock(object):

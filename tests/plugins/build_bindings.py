@@ -16,8 +16,8 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    tests.plugins.build_bindings
-    ============================
+    plugins.build_bindings
+    ======================
 
     Plugin to build native bindings before test execution.
 

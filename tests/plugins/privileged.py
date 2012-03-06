@@ -16,8 +16,8 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    tests.plugins.privileged
-    ========================
+    plugins.privileged
+    ==================
 
     Support privileged operations to trigger real udev events.
 
