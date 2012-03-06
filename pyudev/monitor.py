@@ -51,7 +51,7 @@ class Monitor(object):
 
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
-    >>> monitor.filter_by(subsystem='input')
+    >>> monitor.filter_by('input')
     >>> for action, device in monitor:
     ...     print('{0}: {1}'.format(action, device))
     ...
