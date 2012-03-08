@@ -39,7 +39,7 @@ hooks or adding some additional funcargs.
 
 
 Test markers
-------------
+~~~~~~~~~~~~
 
 .. function:: pytest.mark.udev_version(version_spec)
 
