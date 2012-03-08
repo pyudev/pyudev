@@ -1,6 +1,8 @@
 0.16 (in development)
 =====================
 
+- #43: Fixed test failures on Python 2.6
+
 
 0.15 (Mar 1, 2012)
 ==================

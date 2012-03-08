@@ -35,6 +35,11 @@ pytest_plugins = [
 
 def assert_env_error(error, errno, filename=None):
     __tracebackhide__ = True
+    # work around an apparent limitation in pytest.raises, which gives use
+    # tuple representations of exceptions instead of exception objects.  See
+    # pyudev issue #43
+    if isinstance(error, tuple):
+        error = OSError(*error)
     assert error.errno == errno
     assert error.strerror == os.strerror(errno)
     assert error.filename == filename
