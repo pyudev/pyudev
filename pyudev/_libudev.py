@@ -84,7 +84,7 @@ dev_t = c_ulonglong
 SIGNATURES = {
     # context
     'udev': dict(
-        new=(None, udev_p),
+        new=([], udev_p),
         unref=([udev_p], None),
         ref=([udev_p], udev_p),
         get_sys_path=([udev_p], c_char_p),
