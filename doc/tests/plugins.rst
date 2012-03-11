@@ -11,6 +11,7 @@ The following plugins are provided and enabled:
    privileged
    fake_monitor
    mock_libudev
+   libudev
    build_bindings
 
 The main plugin is :mod:`~plugins.udev_database` that extracts the
@@ -194,6 +195,90 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 .. autofunction:: libudev_list(function, items)
 
 
+:mod:`~plugins.libudev` – Parse ``libudev.h``
+---------------------------------------------
+
+.. automodule:: plugins.libudev
+
+
+Configuration values
+~~~~~~~~~~~~~~~~~~~~
+
+This plugin attaches the following attribute to :data:`pytest.config`:
+
+.. attribute:: libudev_functions
+
+   All libudev functions as list of :class:`Function` objects.
+
+
+Funcargs
+~~~~~~~~
+
+This plugin provides the the following :ref:`funcarg <funcargs>`:
+
+.. autofunction:: pytest_funcarg__libudev_function
+
+
+Types
+~~~~~
+
+.. autoclass:: GCCXMLParser
+   :members:
+
+.. autoclass:: Unit
+   :members:
+
+.. rubric:: Symbol classes
+
+.. class:: Function
+
+   A function.
+
+   .. attribute:: name
+
+      The function name as string
+
+   .. attribute:: arguments
+
+      A tuple providing with the argument types of this function
+
+   .. attribute:: return_type
+
+      The return type of this function
+
+.. class:: Struct
+
+   A structure.
+
+   .. attribute:: name
+
+      The struct name as string
+
+.. class:: FundamentalType
+
+   A fundamental type.
+
+   .. attribute:: name
+
+      The type name as string
+
+.. class:: CvQualifiedType
+
+   A constant-qualified type.
+
+   .. attribute:: type
+
+      The underlying type
+
+.. class:: PointerType
+
+   A pointer type.
+
+   .. attribute:: type
+
+      The underyling type
+
+
 :mod:`~plugins.build_bindings` – Build native bindings
 ------------------------------------------------------
 
@@ -223,7 +308,6 @@ Command line options
 .. option:: --force-build
 
    Force a re-build of bindings even if they are already installed.
-
 
 
 .. _pytest: http://pytest.org

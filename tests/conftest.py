@@ -30,6 +30,7 @@ pytest_plugins = [
     str('plugins.fake_monitor'),
     str('plugins.privileged'),
     str('plugins.mock_libudev'),
+    str('plugins.libudev'),
 ]
 
 
