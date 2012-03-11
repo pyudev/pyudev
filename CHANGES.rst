@@ -3,6 +3,7 @@
 
 - #43: Fixed test failures on Python 2.6
 - #44: Test wrapped signatures with help of ``gccxml``
+- Fixed signature in declaration of ``udev_monitor_set_receive_buffer_size``
 
 
 0.15 (Mar 1, 2012)
