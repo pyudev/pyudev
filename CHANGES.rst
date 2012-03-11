@@ -2,6 +2,7 @@
 =====================
 
 - #43: Fixed test failures on Python 2.6
+- #44: Test wrapped signatures with help of ``gccxml``
 
 
 0.15 (Mar 1, 2012)
