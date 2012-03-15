@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -37,8 +37,9 @@ from __future__ import (print_function, division, unicode_literals,
 
 from PySide.QtCore import QSocketNotifier, QObject, Signal
 
-from pyudev._qt_base import QUDevMonitorObserverMixin
+from pyudev._util import text_type
 from pyudev.core import Device
+from pyudev._qt_base import QUDevMonitorObserverMixin
 
 
 class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
@@ -59,7 +60,7 @@ class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
     """
 
     #: emitted upon arbitrary device events
-    deviceEvent = Signal(unicode, Device)
+    deviceEvent = Signal(text_type, Device)
     #: emitted, if a device was added
     deviceAdded = Signal(Device)
     #: emitted, if a device was removed

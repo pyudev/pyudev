@@ -62,7 +62,7 @@ def ensure_unicode_string(value):
     decoded with the filesystem encoding (as in
     :func:`sys.getfilesystemencoding()`).
     """
-    if not isinstance(value, unicode):
+    if not isinstance(value, text_type):
         value = value.decode(sys.getfilesystemencoding())
     return value
 
@@ -85,7 +85,7 @@ def property_value_to_bytes(value):
     if isinstance(value, bytes):
         return value
     else:
-        return ensure_byte_string(unicode(value))
+        return ensure_byte_string(text_type(value))
 
 
 def string_to_bool(value):

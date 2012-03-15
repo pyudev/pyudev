@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -23,6 +23,13 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """
+
+
+__all__ = ['reraise', 'text_type']
+
+
+#: Type representing text data on Python 3
+text_type = str
 
 
 def reraise(exc, traceback):

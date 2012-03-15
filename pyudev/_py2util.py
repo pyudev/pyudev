@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2011 Sebastian Wiesner <lunaryorn@googlemail.com>
+# Copyright (C) 2011, 2012 Sebastian Wiesner <lunaryorn@googlemail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -28,7 +28,11 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 
-__all__ = ['reraise']
+__all__ = ['reraise', 'text_type']
+
+
+#: Type representing text data on Python 2
+text_type = unicode
 
 
 def reraise(exc, traceback):

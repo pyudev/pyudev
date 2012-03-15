@@ -250,7 +250,7 @@ class Enumerator(object):
         parent = kwargs.pop('parent', None)
         if parent is not None:
             self.match_parent(parent)
-        for property, value in kwargs.iteritems():
+        for property, value in kwargs.items():
             self.match_property(property, value)
         return self
 
