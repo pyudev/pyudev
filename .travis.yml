@@ -1,0 +1,12 @@
+language: python
+python:
+  - 2.6
+  - 2.7
+  - 3.1
+  - 3.2
+before_install:
+  - sudo apt-get install libudev-dev gccxml
+install:
+  - pip install --use-mirrors -r requirements.txt
+  - pip install --use-mirrors .
+script: py.test --junitxml=tests.xml
