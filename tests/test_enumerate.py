@@ -125,7 +125,7 @@ class TestEnumerator(object):
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
         for device in devices:
-            assert 'seat' in d.tags
+            assert 'seat' in device.tags
 
     @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
     @pytest.mark.udev_version('>= 172')
