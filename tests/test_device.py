@@ -380,7 +380,7 @@ class TestDevice(object):
     @with_device_data
     def test_getitem(self, device, device_data):
         for property in device_data.properties:
-            assert device[property] == device_data.properties[p]
+            assert device[property] == device_data.properties[property]
 
     @with_device_data
     def test_getitem_devname(self, context, device, device_data):
@@ -490,7 +490,7 @@ class TestAttributes(object):
         for attribute, value in device_data.attributes.items():
             raw_value = value.encode(sys.getfilesystemencoding())
             assert isinstance(device.attributes[attribute], bytes)
-            assert device.attributes[a] == raw_value
+            assert device.attributes[attribute] == raw_value
 
     @with_devices
     def test_getitem_nonexisting(self, device):
