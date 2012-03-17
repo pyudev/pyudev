@@ -36,11 +36,13 @@ class TestEnumerator(object):
 
     def test_match_subsystem(self, context):
         devices = context.list_devices().match_subsystem('input')
-        assert all(d.subsystem == 'input' for d in devices)
+        for device in devices:
+            assert device.subsystem == 'input'
 
     def test_match_subsystem_nomatch(self, context):
         devices = context.list_devices().match_subsystem('input', nomatch=True)
-        assert all(d.subsystem != 'input' for d in devices)
+        for device in devices:
+            assert device.subsystem != 'input'
 
     def test_match_subsystem_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
@@ -50,29 +52,34 @@ class TestEnumerator(object):
 
     def test_match_sys_name(self, context):
         devices = context.list_devices().match_sys_name('sda')
-        assert all(d.sys_name == 'sda' for d in devices)
+        for device in devices:
+            assert device.sys_name == 'sda'
 
     def test_match_property_string(self, context):
         devices = list(context.list_devices().match_property('DRIVER', 'usb'))
-        assert all(d['DRIVER'] == 'usb' for d in devices)
-        assert all(d.driver == 'usb' for d in devices)
+        for device in devices:
+            assert device['DRIVER'] == 'usb'
+            assert device.driver == 'usb'
 
     def test_match_property_int(self, context):
         devices = list(context.list_devices().match_property(
             'ID_INPUT_KEY', 1))
-        assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
-        assert all(d.asint('ID_INPUT_KEY') == 1 for d in devices)
+        for device in devices:
+            assert device['ID_INPUT_KEY'] == '1'
+            assert device.asint('ID_INPUT_KEY') == 1
 
     def test_match_property_bool(self, context):
         devices = list(context.list_devices().match_property(
             'ID_INPUT_KEY', True))
-        assert all(d['ID_INPUT_KEY'] == '1' for d in devices)
-        assert all(d.asbool('ID_INPUT_KEY') for d in devices)
+        for device in devices:
+            assert device['ID_INPUT_KEY'] == '1'
+            assert device.asbool('ID_INPUT_KEY')
 
     def test_match_attribute_nomatch(self, context):
         devices = context.list_devices().match_attribute(
             'driver', 'usb', nomatch=True)
-        assert all(d.attributes.get('driver') != 'usb' for d in devices)
+        for device in devices:
+            assert device.attributes.get('driver') != 'usb'
 
     def test_match_attribute_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
@@ -82,7 +89,8 @@ class TestEnumerator(object):
 
     def test_match_attribute_string(self, context):
         devices = list(context.list_devices().match_attribute('driver', 'usb'))
-        assert all(d.attributes['driver'] == b'usb' for d in devices)
+        for device in devices:
+            assert device.attributes['driver'] == b'usb'
 
     def test_match_attribute_int(self, context):
         # busnum gives us the number of a USB bus.  And any decent system
@@ -92,16 +100,18 @@ class TestEnumerator(object):
         # possible.  Still it may fail because the attribute isn't present on
         # any device at all on the system running the test
         devices = list(context.list_devices().match_attribute('busnum', 2))
-        assert all(d.attributes['busnum'] == b'2' for d in devices)
-        assert all(d.attributes.asint('busnum') == 2 for d in devices)
+        for device in devices:
+            assert device.attributes['busnum'] == b'2'
+            assert device.attribtues.asint('busnum') == 2
 
     def test_match_attribute_bool(self, context):
         # ro tells us whether a volumne is mounted read-only or not.  And any
         # developers system should have at least one readable volume, thus this
         # test should work on all systems these tests are ever run on
         devices = list(context.list_devices().match_attribute('ro', False))
-        assert all(d.attributes['ro'] == b'0' for d in devices)
-        assert all(not d.attributes.asbool('ro') for d in devices)
+        for device in devices:
+            assert device.attributes['ro'] == b'0'
+            assert not device.attributes.asbool('ro')
 
     @pytest.mark.udev_version('>= 154')
     def test_match_tag_mock(self, context):
@@ -114,7 +124,8 @@ class TestEnumerator(object):
     @pytest.mark.udev_version('>= 154')
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
-        assert all('seat' in d.tags for d in devices)
+        for device in devices:
+            assert 'seat' in d.tags
 
     @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
     @pytest.mark.udev_version('>= 172')
@@ -143,7 +154,9 @@ class TestEnumerator(object):
         devices = context.list_devices()
         for property in properties:
             devices.match_property(property, 'disk')
-        assert all(any(d.get(p) == 'disk' for p in properties) for d in devices)
+        for device in devices:
+            assert (device.get('DEVTYPE') == 'disk' or
+                    device.get('ID_TYPE') == 'disk')
 
     def test_combined_matches_of_different_types(self, context):
         properties = ('DEVTYPE', 'ID_TYPE')
@@ -156,9 +169,10 @@ class TestEnumerator(object):
     def test_match(self, context):
         devices = list(context.list_devices().match(
             subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0'))
-        assert all(d.subsystem == 'input' for d in devices)
-        assert all(d.asbool('ID_INPUT_MOUSE') for d in devices)
-        assert all(d.sys_name == 'mouse0' for d in devices)
+        for device in devices:
+            assert device.subsystem == 'input'
+            assert device.asbool('ID_INPUT_MOUSE')
+            assert device.sys_name == 'mouse0'
 
     def test_match_passthrough_subsystem(self, enumerator):
         with mock.patch.object(enumerator, 'match_subsystem',
@@ -201,9 +215,10 @@ class TestContext(object):
     def test_list_devices(self, context):
         devices = list(context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
                                             sys_name='mouse0'))
-        assert all(d.subsystem == 'input' for d in devices)
-        assert all(d.asbool('ID_INPUT_MOUSE') for d in devices)
-        assert all(d.sys_name == 'mouse0' for d in devices)
+        for device in devices:
+            assert device.subsystem == 'input'
+            assert device.asbool('ID_INPUT_MOUSE')
+            assert device.sys_name == 'mouse0'
 
     @pytest.mark.match
     def test_list_devices_passthrough(self, context):

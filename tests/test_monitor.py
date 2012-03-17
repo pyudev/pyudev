@@ -309,5 +309,6 @@ class TestMonitorObserver(object):
         if observer.is_alive():
             observer.stop()
         assert [e[0] for e in self.events] == ['add', 'remove']
-        assert all(device.device_path == '/devices/virtual/net/dummy0' for _, device in self.events)
+        for _, device in self.events:
+            assert device.device_path == '/devices/virtual/net/dummy0'
 

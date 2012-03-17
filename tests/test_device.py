@@ -206,8 +206,9 @@ class TestDevice(object):
         if not children:
             pytest.skip('Device {0!r} has no children'.format(device))
         else:
-            assert all(c != device for c in children)
-            assert all(c.parent == device for c in children)
+            for child in children:
+                assert child != device
+                assert child.parent == device
 
     @with_devices
     def test_find_parent(self, device):
@@ -333,7 +334,8 @@ class TestDevice(object):
     @with_device_data
     def test_links(self, context, device, device_data):
         assert sorted(device.device_links) == sorted(device_data.device_links)
-        assert all(pytest.is_unicode_string(l) for l in device.device_links)
+        for link in device.device_links:
+            assert pytest.is_unicode_string(link)
 
     @with_devices
     def test_attributes(self, device):
@@ -364,10 +366,12 @@ class TestDevice(object):
 
     @with_device_data
     def test_iteration(self, device, device_data):
+        for property in device:
+            assert pytest.is_unicode_string(property)
+        # test that iteration really yields all properties
         device_properties = set(device)
-        assert all(p in device_properties for p in device_data.properties)
-        assert all(pytest.is_unicode_string(p)
-                   for p in device_data.properties)
+        for property in device_data.properties:
+            assert property in device_properties
 
     @with_device_data
     def test_length(self, device, device_data):
@@ -375,8 +379,8 @@ class TestDevice(object):
 
     @with_device_data
     def test_getitem(self, device, device_data):
-        assert all(device[p] == device_data.properties[p]
-                   for p in device_data.properties)
+        for property in device_data.properties:
+            assert device[property] == device_data.properties[p]
 
     @with_device_data
     def test_getitem_devname(self, context, device, device_data):
@@ -458,11 +462,12 @@ class TestAttributes(object):
 
     @with_device_data
     def test_iteration(self, device, device_data):
-        # creating a set from the attributes implicitly iterates over all
-        # attributes
+        for attribute in device.attributes:
+            assert pytest.is_unicode_string(attribute)
+        # check that iteration really yields all attributes
         device_attributes = set(device.attributes)
-        assert all(a in device_attributes for a in device_data.attributes)
-        assert all(pytest.is_unicode_string(a) for a in device_attributes)
+        for attribute in device_data.attributes:
+            assert attribute in device_attributes
 
     @pytest.mark.udev_version('>= 167')
     @with_devices
@@ -477,14 +482,15 @@ class TestAttributes(object):
 
     @with_device_data
     def test_contains(self, device, device_data):
-        assert all(a in device.attributes for a in device_data.attributes)
+        for attribute in device_data.attributes:
+            assert attribute in device.attributes
 
     @with_device_data
     def test_getitem(self, device, device_data):
-        assert all(isinstance(device.attributes[a], bytes)
-                   for a in device_data.attributes)
-        assert all(device.attributes[a] == v.encode(sys.getfilesystemencoding())
-                   for a, v in device_data.attributes.items())
+        for attribute, value in device_data.attributes.items():
+            raw_value = value.encode(sys.getfilesystemencoding())
+            assert isinstance(device.attributes[attribute], bytes)
+            assert device.attributes[a] == raw_value
 
     @with_devices
     def test_getitem_nonexisting(self, device):
@@ -495,10 +501,10 @@ class TestAttributes(object):
 
     @with_device_data
     def test_asstring(self, device, device_data):
-        assert all(pytest.is_unicode_string(device.attributes.asstring(a))
-                   for a in device_data.attributes)
-        assert all(device.attributes.asstring(a) == v
-                   for a, v in device_data.attributes.items())
+        for attribute, value in device_data.attributes.items():
+            assert pytest.is_unicode_string(
+                device.attributes.asstring(attribute))
+            assert device.attributes.assstring(attribute) == value
 
     @with_device_data
     def test_asint(self, device, device_data):
@@ -534,7 +540,8 @@ class TestTags(object):
         if not device_data.tags:
             pytest.skip('no tags on device')
         assert set(device.tags) == set(device_data.tags)
-        assert all(pytest.is_unicode_string(t) for t in device.tags)
+        for tag in device.tags:
+            assert pytest.is_unicode_string(tag)
 
     @with_devices
     def test_iteration_mock(self, device):
@@ -549,7 +556,8 @@ class TestTags(object):
     def test_contains(self, device, device_data):
         if not device_data.tags:
             pytest.skip('no tags on device')
-        assert all(t in device.tags for t in device_data.tags)
+        for tag in device_data.tags:
+            assert tag in device.tags
 
     @pytest.mark.udev_version('>= 172')
     @with_devices
