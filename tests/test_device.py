@@ -504,7 +504,7 @@ class TestAttributes(object):
         for attribute, value in device_data.attributes.items():
             assert pytest.is_unicode_string(
                 device.attributes.asstring(attribute))
-            assert device.attributes.assstring(attribute) == value
+            assert device.attributes.asstring(attribute) == value
 
     @with_device_data
     def test_asint(self, device, device_data):
