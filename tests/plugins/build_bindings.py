@@ -187,21 +187,6 @@ class Binding(object):
     def build(self):
         raise NotImplementedError()
 
-    def autotools_configure(self, extra_args):
-        command = ['./configure', '--prefix', sys.prefix] + extra_args
-        self.check_call(command)
-
-    def cmake_configure(self, extra_args):
-        # cmake uses out of source builds
-        self.build_directory = os.path.join(self.build_directory, 'build')
-        ensure_directory(self.build_directory)
-        command = [self.env.programs['cmake'],
-                   '-DBUILD_TESTS=OFF', '-DCMAKE_BUILD_TYPE=RelWithDebInfo',
-                   '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix)]
-        command += extra_args
-        command += ['..']
-        self.check_call(command)
-
     def make(self, target=None):
         command = [self.env.programs['make']]
         # build on all cores
@@ -238,6 +223,10 @@ class AutotoolsBinding(Binding):
             python += '{0}.{1}'.format(*sys.version_info)
         env['PYTHON'] = python
         return env
+
+    def autotools_configure(self, extra_args):
+        command = ['./configure', '--prefix', sys.prefix] + extra_args
+        self.check_call(command)
 
     def build(self):
         self.autotools_configure(self.CONFIGURE_EXTRA_ARGS)
@@ -298,6 +287,17 @@ class PyQt4QtCore(Binding):
 
 class CMakeBinding(Binding):
     CMAKE_EXTRA_ARGS = []
+
+    def cmake_configure(self, extra_args):
+        # cmake uses out of source builds
+        self.build_directory = os.path.join(self.build_directory, 'build')
+        ensure_directory(self.build_directory)
+        command = [self.env.programs['cmake'],
+                   '-DBUILD_TESTS=OFF', '-DCMAKE_BUILD_TYPE=RelWithDebInfo',
+                   '-DCMAKE_INSTALL_PREFIX={0}'.format(sys.prefix)]
+        command += extra_args
+        command += ['..']
+        self.check_call(command)
 
     def build(self):
         self.cmake_configure(self.CMAKE_EXTRA_ARGS)
