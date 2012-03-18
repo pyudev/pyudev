@@ -241,12 +241,7 @@ class TestGlibObserver(ObserverTestBase):
 class TestWxObserver(ObserverTestBase):
 
     def setup(self):
-        self.timers = []
         self.wx = pytest.importorskip('wx')
-
-    def teardown(self):
-        for timer in self.timers:
-            timer.Stop()
 
     def create_observer(self, monitor):
         from pyudev import wx
@@ -261,24 +256,26 @@ class TestWxObserver(ObserverTestBase):
     def connect_signal(self, callback, action=None):
         if action is None:
             from pyudev.wx import EVT_DEVICE_EVENT
-            self.observer.Bind(EVT_DEVICE_EVENT,
-                               lambda e: callback(e.action, e.device))
+            def _wrapper(event):
+                return callback(event.action, event.device)
+            self.observer.Bind(EVT_DEVICE_EVENT, _wrapper)
         else:
-            self.observer.Bind(self.action_event_map[action],
-                               lambda e: callback(e.device))
+            def _wrapper(event):
+                return callback(event.device)
+            self.observer.Bind(self.action_event_map[action], _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.app = self.wx.App(False)
+        # need to create a dummy Frame to get the mainloop running. Praise the
+        # broken wx API…
         self.app.frame = self.wx.Frame(None)
         timer = self.wx.PyTimer(self.stop_event_loop)
         timer.Start(self_stop_timeout, True)
-        self.timers.append(timer)
 
     def start_event_loop(self, start_callback):
         timer = self.wx.PyTimer(start_callback)
         timer.Start(0, True)
-        self.timers.append(timer)
         self.app.MainLoop()
 
     def stop_event_loop(self):
-        self.app.frame.Close()
+        self.app.Exit()
