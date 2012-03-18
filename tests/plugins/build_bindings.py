@@ -366,7 +366,33 @@ class PySideQtCore(CMakeBinding):
         return have_module('PySide.QtCore')
 
 
-BINDINGS = [PyGObject, PyQt4QtCore, PySideQtCore]
+class WxPython(Binding):
+    NAME = 'wxPython-src-2.8.12.1'
+    SOURCE_URL = ('http://downloads.sourceforge.net/wxpython/'
+                  '{0}.tar.bz2'.format(NAME))
+
+    @property
+    def can_build(self):
+        # wx doesn't support Python 3
+        return IS_CPYTHON and sys.version_info[0] == 2
+
+    @property
+    def is_installed(self):
+        return have_module('wx')
+
+    def build(self):
+        self.build_directory = os.path.join(
+            self.build_directory, 'wxPython')
+        cmd = [sys.executable, 'setup.py', 'WXPORT=gtk2', 'UNICODE=1',
+               # need to invoke install commands individually, because
+               # "install" invokes "install_headers" which insists on
+               # installing headers to system directories despite of a
+               # virtualenv prefix.  Praise wx…
+               'build', 'install_lib', 'install_data']
+        self.check_call(cmd)
+
+
+BINDINGS = [PyGObject, PyQt4QtCore, PySideQtCore, WxPython]
 
 
 def pytest_addoption(parser):
