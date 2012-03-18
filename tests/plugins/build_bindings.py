@@ -151,6 +151,15 @@ class Binding(object):
     def build_environment(self):
         return dict(self.env.environ)
 
+    @property
+    def number_of_builds(self):
+        # build on all cores if possible
+        try:
+            from multiprocessing import cpu_count
+            return cpu_count()
+        except (NotImplementedError, ImportError):
+            return 1
+
     def have_pkg_config_package(self, package):
         command = [self.env.programs['pkg-config'], '--exists', package]
         return call(command, env=self.env.environ) == 0
@@ -188,15 +197,8 @@ class Binding(object):
         raise NotImplementedError()
 
     def make(self, target=None):
-        command = [self.env.programs['make']]
-        # build on all cores
-        try:
-            from multiprocessing import cpu_count
-            no_jobs = cpu_count()
-        except (NotImplementedError, ImportError):
-            pass
-        else:
-            command.append('-j{0}'.format(no_jobs))
+        command = [self.env.programs['make'],
+                   '-j{0}'.format(self.number_of_builds)]
         if target:
             command.append(target)
         self.check_call(command)
