@@ -133,26 +133,10 @@ class UDevAdm(object):
             return None
 
 
-def _filter_dict(d, blacklisted_attributes):
-    return dict((k, v) for k, v in d.items()
-                if k not in blacklisted_attributes)
-
-
 class DeviceData(object):
     """
     Data for a single device.
     """
-
-    # these are volatile, frequently changing properties and attributes, which
-    # lead to bogus failures during tests, and therefore they are masked and
-    # shall be ignored for test runs.
-    PROPERTIES_BLACKLIST = frozenset(
-        ['POWER_SUPPLY_CURRENT_NOW', 'POWER_SUPPLY_VOLTAGE_NOW',
-         'POWER_SUPPLY_CHARGE_NOW'])
-
-    ATTRIBUTES_BLACKLIST = frozenset(
-        ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
-         'urbnum'])
 
     def __init__(self, device_path, udevadm):
         self.device_path = device_path
@@ -169,16 +153,12 @@ class DeviceData(object):
         return '/sys' + self.device_path
 
     @property
-    def _all_properties(self):
-        return self._udevadm.read_device_properties(self.device_path)
-
-    @property
     def properties(self):
         """
         Get the device properties as mapping of property names as strings to
         property values as strings.
         """
-        return _filter_dict(self._all_properties, self.PROPERTIES_BLACKLIST)
+        return self._udevadm.read_device_properties(self.device_path)
 
     @property
     def attributes(self):
@@ -192,15 +172,14 @@ class DeviceData(object):
            incomplete!  Do *not* compare this dictionary directly to a
            attributes dictionary received through pyudev!
         """
-        attrs = self._udevadm.read_device_attributes(self.device_path)
-        return _filter_dict(attrs, self.ATTRIBUTES_BLACKLIST)
+        return self._udevadm.read_device_attributes(self.device_path)
 
     @property
     def tags(self):
         """
         Get the device tags as list of strings.
         """
-        tags = self._all_properties.get('TAGS', '').split(':')
+        tags = self.properties.get('TAGS', '').split(':')
         return [t for t in tags if t]
 
     @property
