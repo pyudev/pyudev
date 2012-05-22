@@ -53,7 +53,9 @@ class UDevAdm(object):
         for candidate in cls.CANDIDATES:
             try:
                 udevadm = cls(candidate)
-                udevadm.read_version()
+                # try to execute udev to make sure that it's actually
+                # executable
+                udevadm.query_udev_version()
                 return udevadm
             except EnvironmentError as error:
                 if error.errno != errno.ENOENT:
@@ -68,7 +70,7 @@ class UDevAdm(object):
         """
         self.udevadm = udevadm
 
-    def read_version(self):
+    def query_udev_version(self):
         return int(self._execute('--version'))
 
     def _execute(self, *args):
@@ -84,7 +86,7 @@ class UDevAdm(object):
                                '--query', query_type)
         return output.decode(sys.getfilesystemencoding())
 
-    def read_devices(self):
+    def query_devices(self):
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
         for line in database:
@@ -95,7 +97,7 @@ class UDevAdm(object):
             if type == 'P':
                 yield value
 
-    def read_device_properties(self, device_path):
+    def query_device_properties(self, device_path):
         properties = {}
         for line in self._execute_query(device_path, 'property').splitlines():
             line = line.strip()
@@ -103,7 +105,7 @@ class UDevAdm(object):
             properties[property] = value
         return properties
 
-    def read_device_attributes(self, device_path):
+    def query_device_attributes(self, device_path):
         output = self._execute(
             'info', '--attribute-walk', '--path', device_path)
         attribute_dump = output.decode(
@@ -158,7 +160,7 @@ class DeviceData(object):
         Get the device properties as mapping of property names as strings to
         property values as strings.
         """
-        return self._udevadm.read_device_properties(self.device_path)
+        return self._udevadm.query_device_properties(self.device_path)
 
     @property
     def attributes(self):
@@ -172,7 +174,7 @@ class DeviceData(object):
            incomplete!  Do *not* compare this dictionary directly to a
            attributes dictionary received through pyudev!
         """
-        return self._udevadm.read_device_attributes(self.device_path)
+        return self._udevadm.query_device_attributes(self.device_path)
 
     @property
     def tags(self):
@@ -220,7 +222,7 @@ class DeviceDatabase(Iterable, Sized):
 
     def __init__(self, udevadm):
         self._udevadm = udevadm
-        self._devices = set(self._udevadm.read_devices())
+        self._devices = set(self._udevadm.query_devices())
 
     def __iter__(self):
         return (DeviceData(d, self._udevadm) for d in self._devices)
@@ -297,7 +299,7 @@ def pytest_configure(config):
         'version matches the given version spec')
 
     udevadm = UDevAdm.find()
-    config.udev_version = udevadm.read_version()
+    config.udev_version = udevadm.query_udev_version()
     config.udev_database = DeviceDatabase(udevadm)
     config.udev_device_sample = _get_device_sample(config)
 
