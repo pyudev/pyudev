@@ -68,6 +68,7 @@ class TestContext(object):
             context.log_priority = sentinel.log_priority
 
     def test_log_priority_roundtrip(self, context):
+        # FIXME: This adds UDEV_LOG properties?!
         old_priority = context.log_priority
         available_levels = [
             l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)

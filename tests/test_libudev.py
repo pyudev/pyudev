@@ -42,7 +42,11 @@ WRAPPER_BLACKLIST_PATTERNS = [
     # undocumented in libudev manual
     'udev_device_get_seqnum',
     # all queue functions (queue interface is not wrapped)
-    re.compile('^udev_queue_.*')
+    re.compile('^udev_queue_.*'),
+
+    # XXX: I've no clue what these functions actually do
+    'udev_enumerate_add_syspath',
+    'udev_enumerate_scan_subsystems',
 ]
 
 
