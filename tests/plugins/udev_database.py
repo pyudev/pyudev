@@ -63,8 +63,8 @@ class UDevAdm(object):
         """
         Create a new ``udevadm`` wrapper for the given udevadm executable.
 
-        ``udevadm`` is the path to udevadm as string.  If relative, ``udevadm`` is
-        looked up in ``$PATH``.
+        ``udevadm`` is the path to udevadm as string.  If relative, ``udevadm``
+        is looked up in ``$PATH``.
         """
         self.udevadm = udevadm
 
@@ -79,29 +79,38 @@ class UDevAdm(object):
             raise subprocess.CalledProcessError(proc.returncode, command)
         return output
 
+    def _execute_query(self, device_path, query_type='all'):
+        output = self._execute('info', '--root', '--path', device_path,
+                               '--query', query_type)
+        return output.decode(sys.getfilesystemencoding())
+
     def read_devices(self):
-        database = self._execute('info', '--export-db').splitlines()
-        devices = {}
-        current_properties = None
+        database = self._execute('info', '--export-db').decode(
+            sys.getfilesystemencoding()).splitlines()
         for line in database:
-            line = line.strip().decode(sys.getfilesystemencoding())
+            line = line.strip()
             if not line:
                 continue
             type, value = line.split(': ', 1)
             if type == 'P':
-                current_properties = devices.setdefault(value, {})
-            elif type == 'E':
-                property, value = value.split('=', 1)
-                current_properties[property] = value
-        return devices
+                yield value
+
+    def read_device_properties(self, device_path):
+        properties = {}
+        for line in self._execute_query(device_path, 'property').splitlines():
+            line = line.strip()
+            property, value = line.split('=', 1)
+            properties[property] = value
+        return properties
 
     def read_device_attributes(self, device_path):
-        output = self._execute('info', '--attribute-walk',
-                               '--path', device_path)
-        attribute_dump = output.splitlines()
+        output = self._execute(
+            'info', '--attribute-walk', '--path', device_path)
+        attribute_dump = output.decode(
+            sys.getfilesystemencoding()).splitlines()
         attributes = {}
         for line in attribute_dump:
-            line = line.strip().decode(sys.getfilesystemencoding())
+            line = line.strip()
             if line.startswith('looking at parent device'):
                 # we don't continue with attributes of parent devices, we only
                 # want the attributes of the given device
@@ -119,12 +128,9 @@ class UDevAdm(object):
         if query_type not in ('symlink', 'name'):
             raise ValueError(query_type)
         try:
-            output = self._execute('info', '--root', '--path', device_path,
-                                   '--query', query_type)
+            return self._execute_query(device_path, query_type)
         except subprocess.CalledProcessError:
             return None
-        else:
-            return output.decode(sys.getfilesystemencoding())
 
 
 def _filter_dict(d, blacklisted_attributes):
@@ -148,9 +154,8 @@ class DeviceData(object):
         ['power_on_acct', 'temp1_input', 'charge_now', 'current_now',
          'urbnum'])
 
-    def __init__(self, device_path, properties, udevadm):
+    def __init__(self, device_path, udevadm):
         self.device_path = device_path
-        self._all_properties = properties
         self._udevadm = udevadm
 
     def __repr__(self):
@@ -162,6 +167,10 @@ class DeviceData(object):
         Get the ``sysfs`` path of the device.
         """
         return '/sys' + self.device_path
+
+    @property
+    def _all_properties(self):
+        return self._udevadm.read_device_properties(self.device_path)
 
     @property
     def properties(self):
@@ -232,11 +241,10 @@ class DeviceDatabase(Iterable, Sized):
 
     def __init__(self, udevadm):
         self._udevadm = udevadm
-        self._devices = self._udevadm.read_devices()
+        self._devices = set(self._udevadm.read_devices())
 
     def __iter__(self):
-        return (DeviceData(d, p, self._udevadm)
-                for d, p in self._devices.items())
+        return (DeviceData(d, self._udevadm) for d in self._devices)
 
     def __len__(self):
         return len(self._devices)
@@ -250,10 +258,9 @@ class DeviceDatabase(Iterable, Sized):
         Return a :class:`DeviceData` object containing the data for the given
         device, or ``None`` if the device was not found.
         """
-        try:
-            properties = self._devices[device_path]
-            return DeviceData(device_path, properties, self._udevadm)
-        except KeyError:
+        if device_path in self._devices:
+            return DeviceData(device_path, self._udevadm)
+        else:
             return None
 
 
