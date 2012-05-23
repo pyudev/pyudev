@@ -59,7 +59,6 @@ try:
 except ImportError:
     from urllib.parse import urlparse
 
-import pytest
 import py.path
 
 

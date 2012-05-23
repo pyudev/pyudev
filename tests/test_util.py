@@ -18,7 +18,6 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import os
 import sys
 import errno
 
@@ -104,7 +103,6 @@ def test_udev_list_iterate_no_entry():
 def test_udev_list_iterate_mock():
     from pyudev._libudev import libudev
     items = [('spam', 'eggs'), ('foo', 'bar')]
-    get_list_entry = 'udev_enumerate_get_list_entry'
     with pytest.libudev_list('udev_enumerate_get_list_entry', items):
         udev_list = libudev.udev_enumerate_get_list_entry()
         assert list(_util.udev_list_iterate(udev_list)) == [

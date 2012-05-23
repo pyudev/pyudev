@@ -19,7 +19,6 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import sys
 import socket
 import errno
 from contextlib import contextmanager
@@ -52,7 +51,6 @@ def pytest_funcarg__monitor(request):
 
 
 def pytest_funcarg__fake_monitor_device(request):
-    from pyudev import Device
     context = request.getfuncargvalue('context')
     return Device.from_path(context, '/devices/platform')
 
@@ -114,7 +112,6 @@ class TestMonitor(object):
             libudev.udev_monitor_new_from_socket.return_value = sentinel.monitor
             monitor = Monitor.from_socket(context, 'spam')
             assert monitor._as_parameter_ is sentinel.monitor
-        new_from_socket = 'udev_monitor_new_from_socket'
 
     def test_fileno(self, monitor):
         # we can't do more than check that no exception is thrown
