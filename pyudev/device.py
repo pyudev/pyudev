@@ -395,6 +395,15 @@ class Device(Mapping):
 
         .. note::
 
+           In udev, parent-child relationships are generally ambiguous, i.e.
+           a parent can have multiple children, *and* a child can have multiple
+           parents. Hence, `child.parent == parent` does generally *not* hold
+           for all `child` objects in `parent.children`. In other words,
+           the :attr:`parent` of a device in this property can be different
+           from this device!
+
+        .. note::
+
            As the underlying library does not provide any means to directly
            query the children of a device, this property performs a linear
            search through all devices.

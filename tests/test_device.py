@@ -209,7 +209,7 @@ class TestDevice(object):
         else:
             for child in children:
                 assert child != device
-                assert child.parent == device
+                assert device in child.ancestors
 
     @with_devices
     def test_ancestors(self, device):
