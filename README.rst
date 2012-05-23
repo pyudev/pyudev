@@ -2,6 +2,8 @@
 pyudev
 ######
 
+.. image:: https://secure.travis-ci.org/lunaryorn/pyudev.png
+
 http://pyudev.readthedocs.org
 
 pyudev is a LGPL_ licensed, pure Python_ binding for libudev_, the device and
