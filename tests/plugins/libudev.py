@@ -191,7 +191,8 @@ LIBUDEV_H = '/usr/include/libudev.h'
 def pytest_configure(config):
     try:
         libudev_h = Unit.parse(LIBUDEV_H)
-        config.libudev_functions = [f for f in libudev_h.functions if f.name.startswith('udev_')]
+        config.libudev_functions = [f for f in libudev_h.functions
+                                    if f.name.startswith('udev_')]
         config.libudev_error = None
     except (EnvironmentError, LookupError) as error:
         config.libudev_functions = []
@@ -206,7 +207,8 @@ def pytest_generate_tests(metafunc):
             metafunc.parametrize('libudev_function', functions, indirect=True,
                                  ids=[f.name for f in functions])
         else:
-            metafunc.parametrize('libudev_function', [metafunc.config.libudev_error],
+            metafunc.parametrize('libudev_function',
+                                 [metafunc.config.libudev_error],
                                  indirect=True)
 
 

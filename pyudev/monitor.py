@@ -335,7 +335,8 @@ class Monitor(object):
 
 class MonitorObserver(Thread):
     """
-    A :class:`~threading.Thread` class to observe a :class:`Monitor` in background:
+    A :class:`~threading.Thread` class to observe a :class:`Monitor` in
+    background:
 
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)

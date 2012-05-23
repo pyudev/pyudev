@@ -112,6 +112,7 @@ def test_udev_list_iterate_mock():
 def raise_valueerror():
     raise ValueError('from function')
 
+
 def test_reraise():
     with pytest.raises(ValueError) as excinfo:
         try:

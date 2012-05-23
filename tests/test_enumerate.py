@@ -211,8 +211,8 @@ class TestContext(object):
 
     @pytest.mark.match
     def test_list_devices(self, context):
-        devices = list(context.list_devices(subsystem='input', ID_INPUT_MOUSE=True,
-                                            sys_name='mouse0'))
+        devices = list(context.list_devices(
+            subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0'))
         for device in devices:
             assert device.subsystem == 'input'
             assert device.asbool('ID_INPUT_MOUSE')

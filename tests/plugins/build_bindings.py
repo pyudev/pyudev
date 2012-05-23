@@ -31,7 +31,7 @@
     .. warning::
 
        The directory pointed to by ``os.path.join(sys.prefix, 'lib')`` must be
-       contained to the load path of shared libraries, otherwise bindings may
+       contained in the load path of shared libraries, otherwise bindings may
        fail to load.  The tox_ configuration of pyudev implicitly sets
        ``LD_LIBRARY_PATH`` accordingly, but in your own virtual environments
        you need to do this yourself.  A convenient way to accomplish this is
@@ -60,7 +60,6 @@ except ImportError:
     from urllib.parse import urlparse
 
 import py.path
-
 
 
 IS_CPYTHON = platform.python_implementation() == 'CPython'
@@ -248,6 +247,7 @@ class PyGObject(AutotoolsBinding):
 
 RIVERBANK_DOWNLOADS = 'http://www.riverbankcomputing.com/static/Downloads'
 
+
 class Sip4(Binding):
     NAME = 'sip-4.13.2'
     SOURCE_URL = '{0}/sip4/{1}.tar.gz'.format(RIVERBANK_DOWNLOADS, NAME)
@@ -334,14 +334,16 @@ class Shiboken(CMakeBinding):
 
     DEPENDS = [GeneratorRunner]
 
-    CMAKE_EXTRA_ARGS = ['-DPython_ADDITIONAL_VERSIONS={0}.{1}'.format(*sys.version_info)]
+    CMAKE_EXTRA_ARGS = [
+        '-DPython_ADDITIONAL_VERSIONS={0}.{1}'.format(*sys.version_info)
+    ]
+
     if sys.version_info[0] == 3:
         CMAKE_EXTRA_ARGS += ['-DUSE_PYTHON3=ON']
 
     @property
     def is_installed(self):
         return self.have_pkg_config_package('shiboken')
-
 
 
 DISABLED_QT_MODULES = [

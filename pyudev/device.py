@@ -338,7 +338,6 @@ class Device(Mapping):
         device_number = os.stat(filename).st_rdev
         return cls.from_device_number(context, device_type, device_number)
 
-
     @classmethod
     def from_environment(cls, context):
         """

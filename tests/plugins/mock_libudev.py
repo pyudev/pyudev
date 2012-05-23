@@ -109,7 +109,8 @@ def libudev_list(function, items):
     """
     from pyudev._libudev import libudev
     functions_to_patch = [function, 'udev_list_entry_get_next',
-                          'udev_list_entry_get_name', 'udev_list_entry_get_value']
+                          'udev_list_entry_get_name',
+                          'udev_list_entry_get_value']
     mocks = dict((f, mock.DEFAULT) for f in functions_to_patch)
     with mock.patch.multiple(libudev, **mocks):
         udev_list = LinkedList.from_iterable(items)

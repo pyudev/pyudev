@@ -46,7 +46,6 @@ def assert_env_error(error, errno, filename=None):
     assert error.filename == filename
 
 
-
 def is_unicode_string(value):
     """
     Return ``True``, if ``value`` is of a real unicode string type

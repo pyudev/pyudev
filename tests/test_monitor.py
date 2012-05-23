@@ -85,11 +85,11 @@ class TestMonitor(object):
         calls = {'udev_monitor_new_from_netlink':
                  [(context, b'udev'), (context, b'udev')]}
         with pytest.calls_to_libudev(calls):
-             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
-             monitor = Monitor.from_netlink(context)
-             assert monitor._as_parameter_ is sentinel.monitor
-             monitor = Monitor.from_netlink(context, 'udev')
-             assert monitor._as_parameter_ is sentinel.monitor
+            libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+            monitor = Monitor.from_netlink(context)
+            assert monitor._as_parameter_ is sentinel.monitor
+            monitor = Monitor.from_netlink(context, 'udev')
+            assert monitor._as_parameter_ is sentinel.monitor
 
     def test_from_netlink_source_kernel(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
@@ -98,9 +98,9 @@ class TestMonitor(object):
     def test_from_netlink_source_kernel_mock(self, context):
         calls = {'udev_monitor_new_from_netlink': [(context, b'kernel')]}
         with pytest.calls_to_libudev(calls):
-             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
-             monitor = Monitor.from_netlink(context, 'kernel')
-             assert monitor._as_parameter_ is sentinel.monitor
+            libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+            monitor = Monitor.from_netlink(context, 'kernel')
+            assert monitor._as_parameter_ is sentinel.monitor
 
     def test_from_socket(self, context, socket_path):
         monitor = Monitor.from_socket(context, str(socket_path))
@@ -190,7 +190,8 @@ class TestMonitor(object):
         monitor = Monitor.from_socket(context, str(socket_path))
         with pytest.raises(EnvironmentError) as exc_info:
             monitor.enable_receiving()
-        pytest.assert_env_error(exc_info.value, errno.EADDRINUSE, str(socket_path))
+        pytest.assert_env_error(exc_info.value, errno.EADDRINUSE,
+                                str(socket_path))
 
     def test_enable_receiving_alias(self):
         assert Monitor.start == Monitor.enable_receiving
@@ -308,4 +309,3 @@ class TestMonitorObserver(object):
         assert [e[0] for e in self.events] == ['add', 'remove']
         for _, device in self.events:
             assert device.device_path == '/devices/virtual/net/dummy0'
-

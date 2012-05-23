@@ -72,6 +72,7 @@ Mock.mock_modules('PyQt4', 'PyQt4.QtCore', 'PySide', 'PySide.QtCore',
                   'glib', 'gobject', 'wx', 'wx.lib', 'wx.lib.newevent',
                   'pyudev._libudev')
 
+
 # mock out the NewEvent function of wxPython.  Let's praise the silly wx API
 def NewEventMock():
     yield 'event_class'
@@ -123,7 +124,8 @@ class UDevVersion(Directive):
         udevversion = self.arguments[0]
         para = nodes.paragraph(udevversion, '', classes=['udevversion'])
         text = 'Required udev version: {0}'.format(*self.arguments)
-        para.append(nodes.inline(udevversion, text, classes=['versionmodified']))
+        node = nodes.inline(udevversion, text, classes=['versionmodified'])
+        para.append(node)
         return [para]
 
 

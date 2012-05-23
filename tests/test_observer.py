@@ -100,7 +100,8 @@ class ObserverTestBase(object):
         assert self.observer.monitor is fake_monitor
 
     @pytest.mark.parametrize('action', ACTIONS, ids=ACTIONS)
-    def test_events_fake_monitor(self, action, fake_monitor, fake_monitor_device):
+    def test_events_fake_monitor(self, action, fake_monitor,
+                                 fake_monitor_device):
         self.prepare_test(fake_monitor)
         event_callback = Mock(side_effect=self.stop_when_done)
         action_callback = Mock(side_effect=self.stop_when_done)

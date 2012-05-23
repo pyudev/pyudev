@@ -276,8 +276,9 @@ def pytest_runtest_setup(item):
         version_spec = marker.args[0]
         actual_version = item.config.udev_version
         if not eval('{0} {1}'.format(actual_version, version_spec)):
-            pytest.skip('udev version mismatch: {0} required, {1} found'.format(
-                version_spec, actual_version))
+            msg = 'udev version mismatch: {0} required, {1} found'.format(
+                version_spec, actual_version)
+            pytest.skip(msg)
 
 
 def pytest_addoption(parser):
