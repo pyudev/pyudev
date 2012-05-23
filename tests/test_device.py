@@ -115,7 +115,8 @@ class TestDevice(object):
             pytest.skip('no device node, no device number')
         mode = os.stat(device_data.device_node).st_mode
         type = 'block' if stat.S_ISBLK(mode) else 'char'
-        device = Device.from_device_number(context, type, device_data.device_number)
+        device = Device.from_device_number(
+            context, type, device_data.device_number)
         assert device.device_number == device_data.device_number
         # make sure, we are really referring to the same device
         assert device.device_path == device_data.device_path
@@ -309,7 +310,6 @@ class TestDevice(object):
     def test_is_initialized(self, device):
         assert isinstance(device.is_initialized, bool)
 
-
     @pytest.mark.udev_version('>= 165')
     @with_devices
     def test_is_initialized_mock(self, device):
@@ -386,8 +386,10 @@ class TestDevice(object):
     def test_getitem_devname(self, context, device, device_data):
         if 'DEVNAME' not in device_data.properties:
             pytest.skip('%r has no DEVNAME' % device)
-        assert os.path.join(context.device_path, device['DEVNAME']) == \
-               os.path.join(context.device_path, device_data.properties['DEVNAME'])
+        data_devname = os.path.join(
+            context.device_path, device_data.properties['DEVNAME'])
+        device_devname = os.path.join(context.device_path, device['DEVNAME'])
+        assert device_devname == data_devname
 
     @with_devices
     def test_getitem_nonexisting(self, device):
