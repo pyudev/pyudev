@@ -2,6 +2,7 @@ pyudev -- pure Python libudev_ binding
 ======================================
 
 .. image:: https://secure.travis-ci.org/lunaryorn/pyudev.png
+   :target: http://travis-ci.org/#!/lunaryorn/pyudev
 
 pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ binding to libudev_,
 the device and hardware management and information library of Linux.
