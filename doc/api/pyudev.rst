@@ -133,6 +133,8 @@
 
    .. autoattribute:: parent
 
+   .. autoattribute:: ancestors
+
    .. autoattribute:: children
 
    .. automethod:: traverse

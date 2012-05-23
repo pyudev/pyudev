@@ -6,6 +6,8 @@
 - Fixed signature in declaration of ``udev_monitor_set_receive_buffer_size``
 - #45: Got rid of 2to3
 - #46: Continuous testing provided by travis-ci.org
+- Added :attr:`pyudev.Device.ancestors`
+- Deprecated :meth:`pyudev.Device.traverse()`
 
 
 0.15 (Mar 1, 2012)

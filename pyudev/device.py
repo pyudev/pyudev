@@ -411,6 +411,21 @@ class Device(Mapping):
             if device != self:
                 yield device
 
+    @property
+    def ancestors(self):
+        """
+        Yield all ancestors of this device from bottom to top.
+
+        Return an iterator yielding a :class:`Device` object for each
+        ancestor of this device from bottom to top.
+
+        .. versionadded:: 0.16
+        """
+        parent = self.parent
+        while parent:
+            yield parent
+            parent = parent.parent
+
     def find_parent(self, subsystem, device_type=None):
         """
         Find the parent device with the given ``subsystem`` and
@@ -446,11 +461,13 @@ class Device(Mapping):
         Return an iterable yielding all parent devices as :class:`Device`
         objects, *not* including the current device.  The last yielded
         :class:`Device` is the top of the device hierarchy.
+
+        .. deprecated:: 0.16
+           Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
-        parent = self.parent
-        while parent:
-            yield parent
-            parent = parent.parent
+        import warnings
+        warnings.warn('Use Device.ancestors instead', DeprecationWarning)
+        return self.ancestors
 
     @property
     def sys_path(self):

@@ -212,12 +212,19 @@ class TestDevice(object):
                 assert child.parent == device
 
     @with_devices
+    def test_ancestors(self, device):
+        child = device
+        for ancestor in device.ancestors:
+            assert ancestor == child.parent
+            child = ancestor
+
+    @with_devices
     def test_find_parent(self, device):
         parent = device.find_parent(device.subsystem)
         if not parent:
             pytest.skip('no parent within the same subsystem')
         assert parent.subsystem == device.subsystem
-        assert parent in device.traverse()
+        assert parent in device.ancestors
 
     @with_devices
     def test_find_parent_no_devtype_mock(self, device):
@@ -247,10 +254,7 @@ class TestDevice(object):
 
     @with_devices
     def test_traverse(self, device):
-        child = device
-        for parent in device.traverse():
-            assert parent == child.parent
-            child = parent
+        pytest.deprecated_call(device.traverse)
 
     @with_device_data
     def test_sys_path(self, device, device_data):
