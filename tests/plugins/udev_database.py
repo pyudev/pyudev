@@ -269,6 +269,8 @@ def pytest_runtest_setup(item):
     """
     Evaluate the ``udev_version`` marker before running a test.
     """
+    if not hasattr(item, 'obj'):
+        return
     marker = getattr(item.obj, 'udev_version', None)
     if marker is not None:
         version_spec = marker.args[0]
