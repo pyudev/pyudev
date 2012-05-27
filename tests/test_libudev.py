@@ -39,6 +39,8 @@ WRAPPER_BLACKLIST_PATTERNS = [
     'udev_enumerate_get_udev', 'udev_monitor_get_udev', 'udev_device_get_udev',
     # superfluous, because Python provides already tools to filter lists
     'udev_list_entry_get_by_name',
+    # superfluous because of ".encode('string-escape')"
+    'udev_util_encode_string',
     # undocumented in libudev manual
     'udev_device_get_seqnum',
     # all queue functions (queue interface is not wrapped)
