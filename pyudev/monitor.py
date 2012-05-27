@@ -285,8 +285,7 @@ class Monitor(object):
 
         If a device was available, return ``(action, device)``.  ``device``
         is the :class:`Device` object describing the device.  ``action`` is
-        a string describing the action.  udev informs about the following
-        actions:
+        a string describing the action.  Usual actions are:
 
         ``'add'``
           A device has been added (e.g. a USB device was plugged in)
@@ -294,8 +293,10 @@ class Monitor(object):
           A device has been removed (e.g. a USB device was unplugged)
         ``'change'``
           Something about the device changed (e.g. a device property)
-        ``'move'``
-          The device was renamed, moved, or re-parented
+        ``'online'``
+          The device is online now
+        ``'offline'``
+          The device is offline now
 
         Raise :exc:`~exceptions.EnvironmentError`, if no device could be
         read.
