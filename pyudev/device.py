@@ -680,6 +680,31 @@ class Device(Mapping):
             yield ensure_unicode_string(name)
 
     @property
+    def action(self):
+        """
+        The device event action as string, or ``None``, if this device was not
+        received from a :class:`Monitor`.
+
+        Usual actions are:
+
+        ``'add'``
+          A device has been added (e.g. a USB device was plugged in)
+        ``'remove'``
+          A device has been removed (e.g. a USB device was unplugged)
+        ``'change'``
+          Something about the device changed (e.g. a device property)
+        ``'online'``
+          The device is online now
+        ``'offline'``
+          The device is offline now
+
+        .. versionadded:: 0.16
+        """
+        action = libudev.udev_device_get_action(self)
+        if action:
+            return ensure_unicode_string(action)
+
+    @property
     def attributes(self):
         """
         The system attributes of this device as read-only

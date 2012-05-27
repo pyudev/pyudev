@@ -222,12 +222,14 @@ class TestMonitor(object):
         select([monitor], [], [])
         action, device = monitor.receive_device()
         assert action == 'add'
+        assert device.action == 'add'
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         # and unload again
         pytest.unload_dummy()
         action, device = monitor.receive_device()
         assert action == 'remove'
+        assert device.action == 'remove'
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
 
@@ -239,6 +241,7 @@ class TestMonitor(object):
             libudev.udev_device_get_action.return_value = b'spam'
             action, device = monitor.receive_device()
             assert action == 'spam'
+            assert device.action == 'spam'
             assert pytest.is_unicode_string(action)
             assert isinstance(device, Device)
             assert device.context is monitor.context
@@ -253,11 +256,13 @@ class TestMonitor(object):
         iterator = iter(monitor)
         action, device = next(iterator)
         assert action == 'add'
+        assert device.action == 'add'
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         pytest.unload_dummy()
         action, device = next(iterator)
         assert action == 'remove'
+        assert device.action == 'remove'
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         iterator.close()
@@ -307,5 +312,6 @@ class TestMonitorObserver(object):
         if observer.is_alive():
             observer.stop()
         assert [e[0] for e in self.events] == ['add', 'remove']
+        assert [e[1].action for e in self.events] == ['add', 'remove']
         for _, device in self.events:
             assert device.device_path == '/devices/virtual/net/dummy0'

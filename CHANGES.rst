@@ -8,6 +8,7 @@
 - #46: Continuous testing provided by travis-ci.org
 - Added :attr:`pyudev.Device.ancestors`
 - Deprecated :meth:`pyudev.Device.traverse()`
+- Added :attr:`pyudev.Device.action`
 
 
 0.15 (Mar 1, 2012)

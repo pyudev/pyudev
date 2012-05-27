@@ -141,6 +141,10 @@
 
    .. automethod:: find_parent
 
+   .. rubric:: Device events
+
+   .. autoattribute:: action
+
    .. rubric:: Device properties
 
    .. automethod:: __iter__

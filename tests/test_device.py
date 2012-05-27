@@ -342,6 +342,10 @@ class TestDevice(object):
             assert pytest.is_unicode_string(link)
 
     @with_devices
+    def test_action(self, device):
+        assert device.action is None
+
+    @with_devices
     def test_attributes(self, device):
         # see TestAttributes for complete attribute tests
         assert isinstance(device.attributes, Attributes)
