@@ -514,7 +514,6 @@ class TestAttributes(object):
     def test_getitem_nonexisting(self, device):
         with pytest.raises(KeyError) as excinfo:
             device.attributes['a non-existing attribute']
-        print(type(excinfo.value))
         assert str(excinfo.value) == repr('a non-existing attribute')
 
     @with_device_data
