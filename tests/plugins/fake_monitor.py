@@ -82,13 +82,11 @@ class FakeMonitor(object):
     def fileno(self):
         return self.client.fileno()
 
-    def enable_receiving(self):
-        pass
-
     def filter_by(self, *args):
         pass
 
-    start = enable_receiving
+    def start(self):
+        pass
 
     def receive_device(self):
         with self.client.makefile('r') as stream:

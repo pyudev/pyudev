@@ -25,7 +25,7 @@ from contextlib import contextmanager
 from select import select
 
 import pytest
-from mock import sentinel
+from mock import sentinel, patch
 
 from pyudev import Monitor, MonitorObserver, Device
 from pyudev._libudev import libudev
@@ -78,8 +78,10 @@ class TestMonitor(object):
     def test_from_netlink_source_udev(self, context):
         monitor = Monitor.from_netlink(context)
         assert monitor._as_parameter_
+        assert not monitor.started
         monitor = Monitor.from_netlink(context, source='udev')
         assert monitor._as_parameter_
+        assert not monitor.started
 
     def test_from_netlink_source_udev_mock(self, context):
         calls = {'udev_monitor_new_from_netlink':
@@ -88,12 +90,15 @@ class TestMonitor(object):
             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
             monitor = Monitor.from_netlink(context)
             assert monitor._as_parameter_ is sentinel.monitor
+            assert not monitor.started
             monitor = Monitor.from_netlink(context, 'udev')
             assert monitor._as_parameter_ is sentinel.monitor
+            assert not monitor.started
 
     def test_from_netlink_source_kernel(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
         assert monitor._as_parameter_
+        assert not monitor.started
 
     def test_from_netlink_source_kernel_mock(self, context):
         calls = {'udev_monitor_new_from_netlink': [(context, b'kernel')]}
@@ -101,10 +106,12 @@ class TestMonitor(object):
             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
             monitor = Monitor.from_netlink(context, 'kernel')
             assert monitor._as_parameter_ is sentinel.monitor
+            assert not monitor.started
 
     def test_from_socket(self, context, socket_path):
         monitor = Monitor.from_socket(context, str(socket_path))
         assert monitor._as_parameter_
+        assert not monitor.started
 
     def test_from_socket_mock(self, context):
         calls = {'udev_monitor_new_from_socket': [(context, b'spam')]}
@@ -112,6 +119,7 @@ class TestMonitor(object):
             libudev.udev_monitor_new_from_socket.return_value = sentinel.monitor
             monitor = Monitor.from_socket(context, 'spam')
             assert monitor._as_parameter_ is sentinel.monitor
+            assert not monitor.started
 
     def test_fileno(self, monitor):
         # we can't do more than check that no exception is thrown
@@ -174,32 +182,44 @@ class TestMonitor(object):
         with pytest.calls_to_libudev(calls):
             monitor.remove_filter()
 
-    def test_enable_receiving_netlink_kernel_source(self, context):
+    def test_start_netlink_kernel_source(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
-        monitor.enable_receiving()
+        assert not monitor.started
+        monitor.start()
+        assert monitor.started
 
-    def test_enable_receiving_socket(self, context, socket_path):
+    def test_start_socket(self, context, socket_path):
         monitor = Monitor.from_socket(context, str(socket_path))
-        monitor.enable_receiving()
+        assert not monitor.started
+        monitor.start()
+        assert monitor.started
 
-    def test_enable_receiving_bound_socket(self, context, socket_path):
+    def test_start_bound_socket(self, context, socket_path):
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
         # cause an error by binding the socket, thus testing error handling in
         # this method
         sock.bind(str(socket_path))
         monitor = Monitor.from_socket(context, str(socket_path))
         with pytest.raises(EnvironmentError) as exc_info:
-            monitor.enable_receiving()
+            monitor.start()
         pytest.assert_env_error(exc_info.value, errno.EADDRINUSE,
                                 str(socket_path))
+        assert not monitor.started
 
-    def test_enable_receiving_alias(self):
-        assert Monitor.start == Monitor.enable_receiving
-
-    def test_enable_receiving_mock(self, monitor):
+    def test_start_mock(self, monitor):
         calls = {'udev_monitor_enable_receiving': [(monitor,)]}
         with pytest.calls_to_libudev(calls):
-            monitor.enable_receiving()
+            assert not monitor.started
+            monitor.start()
+            assert monitor.started
+
+    def test_enable_receiving(self, monitor):
+        """
+        Test that enable_receiving() is deprecated and calls out to start().
+        """
+        with patch.object(monitor, 'start') as start:
+            pytest.deprecated_call(monitor.enable_receiving)
+            assert start.called
 
     def test_set_receive_buffer_size_mock(self, monitor):
         calls = {'udev_monitor_set_receive_buffer_size': [(monitor, 1000)]}
@@ -216,7 +236,7 @@ class TestMonitor(object):
         # forcibly unload the dummy module to avoid hangs
         pytest.unload_dummy()
         monitor.filter_by('net')
-        monitor.enable_receiving()
+        monitor.start()
         # load the dummy device to trigger an add event
         pytest.load_dummy()
         select([monitor], [], [])
@@ -260,7 +280,7 @@ class TestMonitor(object):
     def test_iter(self, monitor):
         pytest.unload_dummy()
         monitor.filter_by('net')
-        monitor.enable_receiving()
+        monitor.start()
         pytest.load_dummy()
         iterator = iter(monitor)
         action, device = next(iterator)
@@ -315,7 +335,7 @@ class TestMonitorObserver(object):
         observer = self.make_observer(monitor)
         pytest.unload_dummy()
         monitor.filter_by('net')
-        monitor.enable_receiving()
+        monitor.start()
         observer.start()
         pytest.load_dummy()
         pytest.unload_dummy()

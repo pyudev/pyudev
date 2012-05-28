@@ -116,7 +116,7 @@ class ObserverTestBase(object):
         # make sure that the module is unloaded initially
         pytest.unload_dummy()
         monitor.filter_by('net')
-        monitor.enable_receiving()
+        monitor.start()
         self.prepare_test(monitor)
         # setup signal handlers
         event_callback = Mock(side_effect=self.stop_when_done)

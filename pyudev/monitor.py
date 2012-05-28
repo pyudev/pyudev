@@ -82,6 +82,7 @@ class Monitor(object):
         self.context = context
         self._as_parameter_ = monitor_p
         self._socket_path = socket_path
+        self._started = False
 
     def _reraise_with_socket_path(self):
         _, exc_value, traceback = sys.exc_info()
@@ -147,6 +148,16 @@ class Monitor(object):
                                    '{0!r}'.format(socket_path))
         return cls(context, monitor, socket_path=socket_path)
 
+    @property
+    def started(self):
+        """
+        ``True``, if this monitor was started, ``False`` otherwise. Readonly.
+
+        .. versionadded:: 0.16
+        .. seealso:: :meth:`start()`.
+        """
+        return self._started
+
     def fileno(self):
         """
         Return the file description associated with this monitor as integer.
@@ -174,7 +185,7 @@ class Monitor(object):
         filters.
 
         .. versionchanged:: 0.15
-           This method can also be after :meth:`enable_receiving()` now
+           This method can also be after :meth:`start()` now.
         """
         subsystem = ensure_byte_string(subsystem)
         if device_type:
@@ -200,7 +211,7 @@ class Monitor(object):
         .. versionadded:: 0.9
 
         .. versionchanged:: 0.15
-           This method can also be after :meth:`enable_receiving()` now
+           This method can also be after :meth:`start()` now.
         """
         libudev.udev_monitor_filter_add_match_tag(
             self, ensure_byte_string(tag))
@@ -238,13 +249,33 @@ class Monitor(object):
            This method is implicitly called by :meth:`__iter__`.  You don't
            need to call it explicitly, if you are iterating over the
            monitor.
-        """
-        try:
-            libudev.udev_monitor_enable_receiving(self)
-        except EnvironmentError:
-            self._reraise_with_socket_path()
 
-    start = enable_receiving
+        .. deprecated:: 0.16
+           Will be removed in 1.0. Use :meth:`start()` instead.
+        """
+        import warnings
+        warnings.warn('Will be removed in 1.0. Use Monitor.start() instead.',
+                      DeprecationWarning)
+        self.start()
+
+    def start(self):
+        """
+        Start this monitor.
+
+        The monitor will not receive events until this method is called. This
+        method does nothing if called on an already started :class:`Monitor`.
+
+        .. versionchanged:: 0.16
+           This method does nothing if the :class:`Monitor` was already
+           started.
+        .. seealso:: :attr:`started`
+        """
+        if not self._started:
+            try:
+                libudev.udev_monitor_enable_receiving(self)
+                self._started = True
+            except EnvironmentError:
+                self._reraise_with_socket_path()
 
     def set_receive_buffer_size(self, size):
         """
@@ -315,9 +346,9 @@ class Monitor(object):
         """
         Wait for incoming events and receive them upon arrival.
 
-        This methods implicitly calls :meth:`enable_receiving`, and starts
-        polling the :meth:`fileno` of this monitor.  If a event comes in, it
-        receives the corresponding device and yields it to the caller.
+        This methods implicitly calls :meth:`start()`, and starts polling the
+        :meth:`fileno` of this monitor.  If a event comes in, it receives the
+        corresponding device and yields it to the caller.
 
         The returned iterator is endless, and continues receiving devices
         without ever stopping.
@@ -325,7 +356,7 @@ class Monitor(object):
         Yields ``(action, device)`` (see :meth:`receive_device` for a
         description).
         """
-        self.enable_receiving()
+        self.start()
         with closing(select.epoll()) as notifier:
             notifier.register(self, select.EPOLLIN)
             while True:
@@ -362,8 +393,7 @@ class MonitorObserver(Thread):
     .. versionadded:: 0.14
 
     .. versionchanged:: 0.15
-       :meth:`Monitor.enable_receiving()` is implicitly called when the thread
-       is started.
+       :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
     def __init__(self, monitor, event_handler, *args, **kwargs):
@@ -394,7 +424,7 @@ class MonitorObserver(Thread):
         self._handle_event = event_handler
 
     def run(self):
-        self.monitor.enable_receiving()
+        self.monitor.start()
         with closing(select.epoll()) as notifier:
             # poll on the stop event fd
             notifier.register(self._stop_event_source, select.EPOLLIN)

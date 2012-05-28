@@ -223,6 +223,8 @@
 
       .. versionadded:: 0.5
 
+   .. autoattribute:: started
+
    .. automethod:: fileno
 
    .. automethod:: filter_by
@@ -231,17 +233,17 @@
 
    .. automethod:: remove_filter
 
-   .. automethod:: enable_receiving
-
-   .. method:: start
-
-      Alias for :meth:`enable_receiving`
+   .. automethod:: start
 
    .. automethod:: set_receive_buffer_size
 
    .. automethod:: receive_device
 
    .. automethod:: __iter__
+
+   .. rubric:: Deprecated members
+
+   .. automethod:: enable_receiving
 
 
 :class:`MonitorObserver` – asynchronous device monitoring
