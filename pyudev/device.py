@@ -705,6 +705,16 @@ class Device(Mapping):
             return ensure_unicode_string(action)
 
     @property
+    def sequence_number(self):
+        """
+        The device event sequence number as integer, or ``0`` if this device
+        has no sequence number, i.e. was not received from a :class:`Monitor`.
+
+        .. versionadded:: 0.16
+        """
+        return libudev.udev_device_get_seqnum(self)
+
+    @property
     def attributes(self):
         """
         The system attributes of this device as read-only

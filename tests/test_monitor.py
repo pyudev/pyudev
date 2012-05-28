@@ -223,6 +223,7 @@ class TestMonitor(object):
         action, device = monitor.receive_device()
         assert action == 'add'
         assert device.action == 'add'
+        assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         # and unload again
@@ -230,6 +231,7 @@ class TestMonitor(object):
         action, device = monitor.receive_device()
         assert action == 'remove'
         assert device.action == 'remove'
+        assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
 
@@ -241,11 +243,18 @@ class TestMonitor(object):
             libudev.udev_device_get_action.return_value = b'spam'
             action, device = monitor.receive_device()
             assert action == 'spam'
-            assert device.action == 'spam'
             assert pytest.is_unicode_string(action)
             assert isinstance(device, Device)
             assert device.context is monitor.context
             assert device._as_parameter_ is sentinel.device
+        calls = {'udev_device_get_action': [(device,)],
+                 'udev_device_get_seqnum': [(device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_get_action.return_value = b'spam'
+            libudev.udev_device_get_seqnum.return_value = 42
+            assert device.action == 'spam'
+            assert pytest.is_unicode_string(action)
+            assert device.sequence_number == 42
 
     @pytest.mark.privileged
     def test_iter(self, monitor):
@@ -257,12 +266,14 @@ class TestMonitor(object):
         action, device = next(iterator)
         assert action == 'add'
         assert device.action == 'add'
+        assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         pytest.unload_dummy()
         action, device = next(iterator)
         assert action == 'remove'
         assert device.action == 'remove'
+        assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         iterator.close()

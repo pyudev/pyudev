@@ -346,6 +346,11 @@ class TestDevice(object):
         assert device.action is None
 
     @with_devices
+    @pytest.mark.seqnum
+    def test_sequence_number(self, device):
+        assert device.sequence_number == 0
+
+    @with_devices
     def test_attributes(self, device):
         # see TestAttributes for complete attribute tests
         assert isinstance(device.attributes, Attributes)

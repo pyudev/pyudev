@@ -9,6 +9,7 @@
 - Added :attr:`pyudev.Device.ancestors`
 - Deprecated :meth:`pyudev.Device.traverse()`
 - Added :attr:`pyudev.Device.action`
+- #10: Added :attr:`pyudev.Device.sequence_number`
 
 
 0.15 (Mar 1, 2012)

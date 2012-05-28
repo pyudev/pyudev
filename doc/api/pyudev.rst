@@ -145,6 +145,8 @@
 
    .. autoattribute:: action
 
+   .. autoattribute:: sequence_number
+
    .. rubric:: Device properties
 
    .. automethod:: __iter__
