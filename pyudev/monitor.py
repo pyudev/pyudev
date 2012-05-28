@@ -406,7 +406,8 @@ class Monitor(object):
             while True:
                 events = notifier.poll()
                 for event in events:
-                    yield self._receive_device()
+                    device = self._receive_device()
+                    yield device.action, device
 
 
 class MonitorObserver(Thread):
