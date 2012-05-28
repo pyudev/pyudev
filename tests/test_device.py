@@ -254,7 +254,10 @@ class TestDevice(object):
 
     @with_devices
     def test_traverse(self, device):
-        pytest.deprecated_call(device.traverse)
+        child = device
+        for parent in pytest.deprecated_call(device.traverse):
+            assert parent == child.parent
+            child = parent
 
     @with_device_data
     def test_sys_path(self, device, device_data):
