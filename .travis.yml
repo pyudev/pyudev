@@ -8,5 +8,4 @@ before_install:
   - sudo apt-get install libudev-dev gccxml
 install:
   - pip install --use-mirrors tox
-script: tox -- --junitxml=tests.xml --enable-privileged
-
+script: tox -- --junitxml=tests.xml --enable-privileged -rfEsxX
