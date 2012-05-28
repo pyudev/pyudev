@@ -33,7 +33,7 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import errno
 from ctypes import (CDLL, Structure, POINTER, get_errno,
-                    c_char, c_char_p, c_int, c_ulong, c_ulonglong)
+                    c_char, c_char_p, c_int, c_ulonglong)
 from ctypes.util import find_library
 
 
@@ -137,7 +137,7 @@ SIGNATURES = {
         get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
         get_devnum=([udev_device_p], dev_t),
         get_action=([udev_device_p], c_char_p),
-        get_seqnum=([udev_device_p], c_ulong),
+        get_seqnum=([udev_device_p], c_ulonglong),
         get_is_initialized=([udev_device_p], c_int),
         get_usec_since_initialized=([udev_device_p], c_ulonglong),
         get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
