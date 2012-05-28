@@ -154,7 +154,7 @@ class Monitor(object):
         ``True``, if this monitor was started, ``False`` otherwise. Readonly.
 
         .. versionadded:: 0.16
-        .. seealso:: :meth:`start()`.
+        .. seealso:: :meth:`start()`
         """
         return self._started
 
