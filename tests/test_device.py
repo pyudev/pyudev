@@ -349,6 +349,14 @@ class TestDevice(object):
         assert device.action is None
 
     @with_devices
+    def test_action_mock(self, device):
+        calls = {'udev_device_get_action': [(device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_get_action.return_value = b'spam'
+            assert device.action == 'spam'
+            assert pytest.is_unicode_string(device.action)
+
+    @with_devices
     @pytest.mark.seqnum
     def test_sequence_number(self, device):
         assert device.sequence_number == 0
