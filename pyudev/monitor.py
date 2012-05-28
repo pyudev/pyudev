@@ -266,6 +266,11 @@ class Monitor(object):
         The monitor will not receive events until this method is called. This
         method does nothing if called on an already started :class:`Monitor`.
 
+        .. note::
+
+           Typically you don't need to call this method. It is implicitly
+           called by :meth:`poll()` and :meth:`__iter__()`.
+
         .. seealso:: :attr:`started`
         .. versionchanged:: 0.16
            This method does nothing if the :class:`Monitor` was already
@@ -332,6 +337,10 @@ class Monitor(object):
         event is available. If ``0``, this method just polls and will never
         block.
 
+        .. note::
+
+           This method implicitly calls :meth:`start()`.
+
         Return the received :class:`Device`, or ``None`` if a timeout
         occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
         failed.
@@ -355,6 +364,10 @@ class Monitor(object):
     def receive_device(self):
         """
         Receive a single device from the monitor.
+
+        .. warning::
+
+           You *must* call :meth:`start()` before calling this method.
 
         The caller must make sure, that there are events available in the
         event queue.  The call blocks, until a device is available.
