@@ -11,6 +11,17 @@
 - Added :attr:`pyudev.Device.action`
 - #10: Added :attr:`pyudev.Device.sequence_number`
 
+Reworked the monitoring API
+---------------------------
+
+The monitoring API was reworked to remove the explicitly returned `action`
+everywhere, in favor of the new :attr:`pyudev.Device.action`:
+
+- Deprecated :attr:`pyudev.Monitor.enable_receiving` in favor of
+  :attr:`pyudev.Monitor.start`.
+- Added :attr:`pyudev.Monitor.started`, :attr:`pyudev.Monitor.start` can be
+  called repeatedly now
+
 
 0.15 (Mar 1, 2012)
 ==================
