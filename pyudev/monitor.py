@@ -153,8 +153,8 @@ class Monitor(object):
         """
         ``True``, if this monitor was started, ``False`` otherwise. Readonly.
 
-        .. versionadded:: 0.16
         .. seealso:: :meth:`start()`
+        .. versionadded:: 0.16
         """
         return self._started
 
@@ -265,10 +265,10 @@ class Monitor(object):
         The monitor will not receive events until this method is called. This
         method does nothing if called on an already started :class:`Monitor`.
 
+        .. seealso:: :attr:`started`
         .. versionchanged:: 0.16
            This method does nothing if the :class:`Monitor` was already
            started.
-        .. seealso:: :attr:`started`
         """
         if not self._started:
             try:
