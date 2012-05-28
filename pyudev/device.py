@@ -474,7 +474,8 @@ class Device(Mapping):
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
         import warnings
-        warnings.warn('Use Device.ancestors instead', DeprecationWarning)
+        warnings.warn('Will be removed in 1.0. Use Device.ancestors instead.',
+                      DeprecationWarning)
         return self.ancestors
 
     @property
