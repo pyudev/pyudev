@@ -137,8 +137,6 @@
 
    .. autoattribute:: children
 
-   .. automethod:: traverse
-
    .. automethod:: find_parent
 
    .. rubric:: Device events
@@ -162,6 +160,10 @@
    .. rubric:: Sysfs attributes
 
    .. autoattribute:: attributes
+
+   .. rubric:: Deprecated members
+
+   .. automethod:: traverse
 
 .. autoclass:: Attributes()
 
