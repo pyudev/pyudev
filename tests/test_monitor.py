@@ -21,11 +21,12 @@ from __future__ import (print_function, division, unicode_literals,
 
 import socket
 import errno
+from datetime import datetime, timedelta
 from contextlib import contextmanager
 from select import select
 
 import pytest
-from mock import sentinel, patch
+from mock import Mock, sentinel, patch
 
 from pyudev import Monitor, MonitorObserver, Device
 from pyudev._libudev import libudev
@@ -231,8 +232,14 @@ class TestMonitor(object):
             monitor.set_receive_buffer_size(1000)
         pytest.assert_env_error(exc_info.value, errno.EPERM)
 
+    def test_poll_timeout(self, monitor):
+        assert monitor.poll(timeout=0) is None
+        now = datetime.now()
+        assert monitor.poll(timeout=1) is None
+        assert datetime.now() - now >= timedelta(seconds=1)
+
     @pytest.mark.privileged
-    def test_receive_device(self, monitor):
+    def test_poll(self, monitor):
         # forcibly unload the dummy module to avoid hangs
         pytest.unload_dummy()
         monitor.filter_by('net')
@@ -240,41 +247,31 @@ class TestMonitor(object):
         # load the dummy device to trigger an add event
         pytest.load_dummy()
         select([monitor], [], [])
-        action, device = monitor.receive_device()
-        assert action == 'add'
+        device = monitor.poll()
         assert device.action == 'add'
         assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
         # and unload again
         pytest.unload_dummy()
-        action, device = monitor.receive_device()
-        assert action == 'remove'
+        device = monitor.poll()
         assert device.action == 'remove'
         assert device.sequence_number > 0
         assert device.subsystem == 'net'
         assert device.device_path == '/devices/virtual/net/dummy0'
 
-    def test_receive_device_mock(self, monitor):
-        calls = {'udev_monitor_receive_device': [(monitor,)],
-                 'udev_device_get_action': [(sentinel.device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_monitor_receive_device.return_value = sentinel.device
-            libudev.udev_device_get_action.return_value = b'spam'
-            action, device = monitor.receive_device()
-            assert action == 'spam'
-            assert pytest.is_unicode_string(action)
-            assert isinstance(device, Device)
-            assert device.context is monitor.context
-            assert device._as_parameter_ is sentinel.device
-        calls = {'udev_device_get_action': [(device,)],
-                 'udev_device_get_seqnum': [(device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_get_action.return_value = b'spam'
-            libudev.udev_device_get_seqnum.return_value = 42
-            assert device.action == 'spam'
-            assert pytest.is_unicode_string(action)
-            assert device.sequence_number == 42
+    def test_receive_device(self, monitor):
+        """
+        Test that Monitor.receive_device is deprecated and calls out to
+        _receive_device(), which in turn is tested by test_poll.
+        """
+        with patch.object(monitor, '_receive_device') as receive_device:
+            device = Mock(name='device')
+            device.action = 'spam'
+            receive_device.return_value = device
+            event = pytest.deprecated_call(monitor.receive_device)
+            assert event[0] == 'spam'
+            assert event[1] is device
 
     @pytest.mark.privileged
     def test_iter(self, monitor):
@@ -319,16 +316,16 @@ class TestMonitorObserver(object):
     def test_fake(self, fake_monitor, fake_monitor_device):
         observer = self.make_observer(fake_monitor)
         observer.start()
-        fake_monitor.trigger_action('add')
-        fake_monitor.trigger_action('remove')
+        fake_monitor.trigger_event()
+        fake_monitor.trigger_event()
         # fake one second for the tests to finish
         observer.join(1)
         # forcibly quit the thread if it is still alive
         if observer.is_alive():
             observer.stop()
         # check that we got two events
-        assert self.events == [('add', fake_monitor_device),
-                               ('remove', fake_monitor_device)]
+        assert self.events == [(None, fake_monitor_device),
+                               (None, fake_monitor_device)]
 
     @pytest.mark.privileged
     def test_real(self, context, monitor):

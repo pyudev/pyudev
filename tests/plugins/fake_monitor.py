@@ -36,7 +36,7 @@ from __future__ import (print_function, division, unicode_literals,
 
 import sys
 import os
-import socket
+from select import select
 
 
 class FakeMonitor(object):
@@ -50,57 +50,39 @@ class FakeMonitor(object):
     """
 
     def __init__(self, device_to_emit):
-        self.client, self.server = socket.socketpair(
-            socket.AF_UNIX, socket.SOCK_DGRAM)
-        if sys.version_info[0] >= 3:
-            # in python 3 sockets returned by socketpair() lack the
-            # ".makefile()" method, which is required by this class.  Work
-            # around this limitation by wrapping these sockets in real
-            # socket objects.
-            def _wrap_socket(sock):
-                wrapped = socket.socket(sock.family, sock.type,
-                                        fileno=os.dup(sock.fileno()))
-                sock.close()
-                return wrapped
-            self.client, self.server = (_wrap_socket(self.client),
-                                        _wrap_socket(self.server))
+        self._event_source, self._event_sink = os.pipe()
         self.device_to_emit = device_to_emit
+        self.started = False
 
-    def trigger_action(self, action):
+    def trigger_event(self):
         """
-        Trigger the given ``action`` on clients of this monitor.
-
-        ``action`` is a string containing the action name.  Though the real
-        :class:`~pyudev.Monitor` provides only four different actions, you can
-        pass arbitrary strings for this argument.
+        Trigger an event on clients of this monitor.
         """
-        with self.server.makefile('w') as stream:
-            stream.write(action)
-            stream.write('\n')
-            stream.flush()
+        os.write(self._event_sink, b'\x01')
 
     def fileno(self):
-        return self.client.fileno()
+        return self._event_source
 
     def filter_by(self, *args):
         pass
 
     def start(self):
-        pass
+        self.started = True
 
-    def receive_device(self):
-        with self.client.makefile('r') as stream:
-            action = stream.readline().strip()
-            return action, self.device_to_emit
+    def poll(self, timeout=None):
+        rlist, _, _ = select([self._event_source], [], [], timeout)
+        if self._event_source in rlist:
+            os.read(self._event_source, 1)
+            return self.device_to_emit
 
     def close(self):
         """
         Close sockets acquired by this monitor.
         """
         try:
-            self.client.close()
+            os.close(self._event_source)
         finally:
-            self.server.close()
+            os.close(self._event_sink)
 
 
 def pytest_funcarg__fake_monitor(request):

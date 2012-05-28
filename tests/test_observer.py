@@ -18,12 +18,11 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from functools import partial
-
 import pytest
 from mock import Mock
 
 from pyudev import Monitor, Device
+from pyudev._libudev import libudev
 
 
 def pytest_funcarg__monitor(request):
@@ -39,11 +38,10 @@ def test_fake_monitor(fake_monitor, fake_monitor_device):
     """
     Test the fake monitor just to make sure, that it works.
     """
-    for action in ('add', 'remove'):
-        fake_monitor.trigger_action(action)
-        received_action, device = fake_monitor.receive_device()
-        assert action == received_action
-        assert device == fake_monitor_device
+    assert fake_monitor.poll(timeout=0) is None
+    fake_monitor.trigger_event()
+    device = fake_monitor.poll()
+    assert device == fake_monitor_device
 
 
 ACTIONS = ('add', 'remove', 'change', 'move')
@@ -107,7 +105,11 @@ class ObserverTestBase(object):
         action_callback = Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
         self.connect_signal(action_callback, action=action)
-        self.start_event_loop(partial(fake_monitor.trigger_action, action))
+        calls = {'udev_device_get_action': [(fake_monitor_device,),
+                                            (fake_monitor_device,)]}
+        with pytest.calls_to_libudev(calls):
+            libudev.udev_device_get_action.return_value = action.encode('ascii')
+        self.start_event_loop(fake_monitor.trigger_event)
         event_callback.assert_called_with(action, fake_monitor_device)
         action_callback.assert_called_with(fake_monitor_device)
 

@@ -237,13 +237,15 @@
 
    .. automethod:: set_receive_buffer_size
 
-   .. automethod:: receive_device
+   .. automethod:: poll
 
    .. automethod:: __iter__
 
    .. rubric:: Deprecated members
 
    .. automethod:: enable_receiving
+
+   .. automethod:: receive_device
 
 
 :class:`MonitorObserver` – asynchronous device monitoring

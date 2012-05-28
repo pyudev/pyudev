@@ -52,8 +52,9 @@ class Monitor(object):
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by('input')
-    >>> for action, device in monitor:
-    ...     print('{0}: {1}'.format(action, device))
+    >>> device = monitor.poll(timeout=3)
+    >>> if device:
+    ...     print('{0.action}: {0}'.format(device))
     ...
 
     A :class:`Monitor` objects connects to the udev daemon and listens for
@@ -307,6 +308,50 @@ class Monitor(object):
         except EnvironmentError:
             self._reraise_with_socket_path()
 
+    def _receive_device(self):
+        """
+        Receive a single device from the monitor.
+
+        Return the received :class:`Device`. Raise
+        :exc:`~exceptions.EnvironmentError`, if no device could be read.
+        """
+        try:
+            device_p = libudev.udev_monitor_receive_device(self)
+        except EnvironmentError:
+            self._reraise_with_socket_path()
+        if not device_p:
+            raise EnvironmentError('Could not receive device')
+        return Device(self.context, device_p)
+
+    def poll(self, timeout=None):
+        """
+        Poll for a device event.
+
+        ``timeout`` is a floating point number that specifies a time-out in
+        seconds. If omitted or ``None``, this method blocks until a device
+        event is available. If ``0``, this method just polls and will never
+        block.
+
+        Return the received :class:`Device`, or ``None`` if a timeout
+        occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
+        failed.
+
+        .. seealso::
+
+           :attr:`Device.action`
+              The action that created this event.
+
+           :attr:`Device.sequence_number`
+              The sequence number of this event.
+
+        .. versionadded:: 0.16
+        """
+        rlist, _, _ = select.select([self], [], [], timeout)
+        if self in rlist:
+            return self._receive_device()
+        else:
+            return None
+
     def receive_device(self):
         """
         Receive a single device from the monitor.
@@ -331,16 +376,15 @@ class Monitor(object):
 
         Raise :exc:`~exceptions.EnvironmentError`, if no device could be
         read.
+
+        .. deprecated:: 0.16
+           Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
-        try:
-            device_p = libudev.udev_monitor_receive_device(self)
-        except EnvironmentError:
-            self._reraise_with_socket_path()
-        if not device_p:
-            raise EnvironmentError('Could not receive device')
-        action = ensure_unicode_string(
-            libudev.udev_device_get_action(device_p))
-        return action, Device(self.context, device_p)
+        import warnings
+        warnings.warn('Will be removed in 1.0. Use Monitor.poll() instead.',
+                      DeprecationWarning)
+        device = self._receive_device()
+        return device.action, device
 
     def __iter__(self):
         """
@@ -362,7 +406,7 @@ class Monitor(object):
             while True:
                 events = notifier.poll()
                 for event in events:
-                    yield self.receive_device()
+                    yield self._receive_device()
 
 
 class MonitorObserver(Thread):
@@ -403,9 +447,9 @@ class MonitorObserver(Thread):
         ``monitor`` is the :class:`Monitor` to observe.  ``event_handler`` is a
         callable with the signature ``event_handler(action, device)``, where
         ``action`` is a string describing the event (see
-        :meth:`Monitor.receive_device`), and ``device`` is the :class:`Device`
-        object that caused this event.  This callable is invoked for every
-        device event received through ``monitor``.
+        :attr:`Device.action`), and ``device`` is the :class:`Device` object
+        that caused this event.  This callable is invoked for every device
+        event received through ``monitor``.
 
         .. warning::
 
@@ -438,10 +482,9 @@ class MonitorObserver(Thread):
                         os.close(self._stop_event_source)
                         return
                     else:
-                        event = self.monitor.receive_device()
-                        if event:
-                            action, device = event
-                            self._handle_event(action, device)
+                        device = self.monitor.poll(timeout=0)
+                        if device:
+                            self._handle_event(device.action, device)
 
     def send_stop(self):
         """

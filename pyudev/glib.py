@@ -109,11 +109,10 @@ class GUDevMonitorObserver(gobject.GObject):
 
     def _process_udev_event(self, source, condition):
         if condition == glib.IO_IN:
-            event = self.monitor.receive_device()
-            if event:
-                action, device = event
-                self.emit('device-event', action, device)
-                self.emit(self._action_signal_map[action], device)
+            device = self.monitor.poll(timeout=0)
+            if device:
+                self.emit('device-event', device.action, device)
+                self.emit(self._action_signal_map[device.action], device)
         return True
 
 

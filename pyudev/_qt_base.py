@@ -65,11 +65,10 @@ class QUDevMonitorObserverMixin(object):
         Attempt to receive a single device event from the monitor, process
         the event and emit corresponding signals.
 
-        Called by ``QSocketNotifier``, if data is
-        available on the udev monitoring socket.
+        Called by ``QSocketNotifier``, if data is available on the udev
+        monitoring socket.
         """
-        event = self.monitor.receive_device()
-        if event:
-            action, device = event
-            self.deviceEvent.emit(action, device)
-            self._action_signal_map[action].emit(device)
+        device = self.monitor.poll(timeout=0)
+        if device:
+            self.deviceEvent.emit(device.action, device)
+            self._action_signal_map[device.action].emit(device)
