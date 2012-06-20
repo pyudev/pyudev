@@ -417,9 +417,9 @@ class MonitorObserver(Thread):
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
-    >>> def print_device_event(action, device):
-    ...     print('background event {0}: {1}'.format(action, device))
-    >>> observer = MonitorObserver(monitor, print_device_event, name='monitor-observer')
+    >>> def print_device_event(device):
+    ...     print('background event {0.action}: {0.device_path}'.format(device))
+    >>> observer = MonitorObserver(monitor, callback=print_device_event, name='monitor-observer')
     >>> observer.daemon
     True
     >>> observer.start()
