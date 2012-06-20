@@ -293,6 +293,23 @@ class Monitor(object):
         """
         Poll for a device event.
 
+        You can use this method together with :func:`iter()` to synchronously
+        monitor events in the current thread::
+
+           for device in iter(monitor.poll, None):
+               print('{0.action} on {0.device_path}'.format(device))
+
+        Since this method will never return ``None`` if no ``timeout`` is
+        specified, this is effectively an endless loop. With
+        :func:`functools.partial()` you can also create a loop that only waits
+        for a specified time:
+
+           for device in iter(partial(monitor.poll, 3), None):
+               print('{0.action} on {0.device_path}'.format(device))
+
+        This loop will only wait three seconds for a new device event. If no
+        device event occurred after three seconds, the loop will exit.
+
         ``timeout`` is a floating point number that specifies a time-out in
         seconds. If omitted or ``None``, this method blocks until a device
         event is available. If ``0``, this method just polls and will never
