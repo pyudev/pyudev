@@ -7,12 +7,15 @@
   :attr:`pyudev.Monitor.poll`.
 - #47: Deprecate :attr:`pyudev.Monitor.enable_receiving` in favor of
   :attr:`pyudev.Monitor.start`.
+- #49: Deprecate ``event_handler`` to :class:`pyudev.MonitorObserver` in favour
+  of ``callback`` argument.
 - #46: Continuously test pyudev on Travis-CI.
 - Add :attr:`pyudev.Device.ancestors`.
 - Add :attr:`pyudev.Device.action`.
 - #10: Add :attr:`pyudev.Device.sequence_number`.
 - #47: Add :meth:`pyudev.Monitor.poll`.
 - #47: Add :attr:`pyudev.Monitor.started`.
+- #49: Add ``callback`` argument to :class:`pyudev.Monitor`.
 - :meth:`pyudev.Monitor.start` can be called repeatedly.
 - #45: Get rid of 2to3
 - #43: Fix test failures on Python 2.6

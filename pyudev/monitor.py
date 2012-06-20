@@ -454,32 +454,45 @@ class MonitorObserver(Thread):
        :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
-    def __init__(self, monitor, event_handler, *args, **kwargs):
+    def __init__(self, monitor, event_handler=None, callback=None, *args,
+                 **kwargs):
         """
         Create a new observer for the given ``monitor``.
 
-        ``monitor`` is the :class:`Monitor` to observe.  ``event_handler`` is a
-        callable with the signature ``event_handler(action, device)``, where
-        ``action`` is a string describing the event (see
-        :attr:`Device.action`), and ``device`` is the :class:`Device` object
-        that caused this event.  This callable is invoked for every device
-        event received through ``monitor``.
+        ``monitor`` is the :class:`Monitor` to observe. ``callback`` is the
+        callable to invoke on events, with the signature ``callback(device)``
+        where ``device`` is the :class:`Device` that caused the event.
 
         .. warning::
 
-           ``event_handler`` is always invoked in this background thread, and
-           *not* in the calling thread.
+           ``callback`` is invoked in the observer thread, hence the observer
+           is blocked while callback executes.
 
-        ``args`` and ``kwargs`` are passed unchanged to the parent constructor
-        of :class:`~threading.Thread`.
+        ``args`` and ``kwargs`` are passed unchanged to the constructor of 
+        :class:`~threading.Thread`.
+
+        .. deprecated:: 0.16
+           The ``event_handler`` argument will be removed in 1.0. Use
+           ``callback`` instead.
+        .. versionchanged:: 0.16
+           Add ``callback`` argument.
         """
-        Thread.__init__(self, *args, **kwargs)
+        if callback is None and event_handler is None:
+            raise ValueError('callback missing')
+        elif callback is not None and event_handler is not None:
+            raise ValueError('Use either callback or event handler')
 
+        Thread.__init__(self, *args, **kwargs)
         self.monitor = monitor
         # observer threads should not keep the interpreter alive
         self.daemon = True
         self._stop_event_source, self._stop_event_sink = os.pipe()
-        self._handle_event = event_handler
+        if event_handler is not None:
+            import warnings
+            warnings.warn('"event_handler" argument will be removed in 1.0. '
+                          'Use Monitor.poll() instead.', DeprecationWarning)
+            callback = lambda d: event_handler(d.action, d)
+        self._callback = callback
 
     def run(self):
         self.monitor.start()
@@ -498,7 +511,7 @@ class MonitorObserver(Thread):
                     else:
                         device = self.monitor.poll(timeout=0)
                         if device:
-                            self._handle_event(device.action, device)
+                            self._callback(device)
 
     def send_stop(self):
         """
