@@ -30,13 +30,12 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-import sys
 import select
 from threading import Thread
 from contextlib import closing
 
 from pyudev._libudev import libudev
-from pyudev._util import ensure_byte_string, reraise
+from pyudev._util import ensure_byte_string
 
 from pyudev.core import Device
 
@@ -59,8 +58,6 @@ class Monitor(object):
     A :class:`Monitor` objects connects to the udev daemon and listens for
     changes to the device list.  A monitor is created by connecting to the
     kernel daemon through netlink (see :meth:`from_netlink`).
-    Alternatively, connections to arbitrary daemons can be made using
-    :meth:`from_socket`, which is however only seldom of use.
 
     Once the monitor is created, you can add a filter using :meth:`filter_by()`
     or :meth:`filter_by_tag()` to drop incoming events in subsystems, which are
@@ -76,18 +73,16 @@ class Monitor(object):
 
     Instances of this class can directly be given as ``udev_monitor *`` to
     functions wrapped through :mod:`ctypes`.
+
+    .. versionchanged:: 0.16
+       Remove :meth:`from_socket()` which is deprecated, and even removed in
+       recent udev versions.
     """
 
-    def __init__(self, context, monitor_p, socket_path=None):
+    def __init__(self, context, monitor_p):
         self.context = context
         self._as_parameter_ = monitor_p
-        self._socket_path = socket_path
         self._started = False
-
-    def _reraise_with_socket_path(self):
-        _, exc_value, traceback = sys.exc_info()
-        exc_value.filename = self._socket_path
-        reraise(exc_value, traceback)
 
     def __del__(self):
         libudev.udev_monitor_unref(self)
@@ -123,30 +118,6 @@ class Monitor(object):
         if not monitor:
             raise EnvironmentError('Could not create udev monitor')
         return cls(context, monitor)
-
-    @classmethod
-    def from_socket(cls, context, socket_path):
-        """
-        Connect to an arbitrary udev daemon using the given ``socket_path``.
-
-        ``context`` is the :class:`Context` to use. ``socket_path`` is a byte
-        or unicode string, pointing to an existing socket.  If the path starts
-        with a ``@``, use an abstract namespace socket.  If ``socket_path``
-        does not exist, fall back to an abstract namespace socket.
-
-        The caller is responsible for permissions and cleanup of the socket
-        file.
-
-        Return a new :class:`Monitor` object, which is connected to the given
-        socket.  Raise :exc:`~exceptions.EnvironmentError`, if the creation of
-        the monitor failed.
-        """
-        monitor = libudev.udev_monitor_new_from_socket(
-            context, ensure_byte_string(socket_path))
-        if not monitor:
-            raise EnvironmentError('Could not create monitor for socket: '
-                                   '{0!r}'.format(socket_path))
-        return cls(context, monitor, socket_path=socket_path)
 
     @property
     def started(self):
@@ -276,11 +247,8 @@ class Monitor(object):
            started.
         """
         if not self._started:
-            try:
-                libudev.udev_monitor_enable_receiving(self)
-                self._started = True
-            except EnvironmentError:
-                self._reraise_with_socket_path()
+            libudev.udev_monitor_enable_receiving(self)
+            self._started = True
 
     def set_receive_buffer_size(self, size):
         """
@@ -307,10 +275,7 @@ class Monitor(object):
 
         .. _python-prctl: http://packages.python.org/python-prctl
         """
-        try:
-            libudev.udev_monitor_set_receive_buffer_size(self, size)
-        except EnvironmentError:
-            self._reraise_with_socket_path()
+        libudev.udev_monitor_set_receive_buffer_size(self, size)
 
     def _receive_device(self):
         """
@@ -319,10 +284,7 @@ class Monitor(object):
         Return the received :class:`Device`. Raise
         :exc:`~exceptions.EnvironmentError`, if no device could be read.
         """
-        try:
-            device_p = libudev.udev_monitor_receive_device(self)
-        except EnvironmentError:
-            self._reraise_with_socket_path()
+        device_p = libudev.udev_monitor_receive_device(self)
         if not device_p:
             raise EnvironmentError('Could not receive device')
         return Device(self.context, device_p)

@@ -19,7 +19,6 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import socket
 import errno
 from datetime import datetime, timedelta
 from contextlib import contextmanager
@@ -36,15 +35,6 @@ from pyudev._libudev import libudev
 # return value.  Actual udev calls are difficult to test, as return values
 # and side effects are dynamic and environment-dependent.  It isn't
 # necessary anyway, libudev can just assumed to be correct.
-
-
-def pytest_funcarg__socket_path(request):
-    """
-    Return a socket path for :meth:`pyudev.Monitor.from_socket`.  The path
-    is unique for each test.
-    """
-    tmpdir = request.getfuncargvalue('tmpdir')
-    return tmpdir.join('monitor-socket')
 
 
 def pytest_funcarg__monitor(request):
@@ -106,19 +96,6 @@ class TestMonitor(object):
         with pytest.calls_to_libudev(calls):
             libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
             monitor = Monitor.from_netlink(context, 'kernel')
-            assert monitor._as_parameter_ is sentinel.monitor
-            assert not monitor.started
-
-    def test_from_socket(self, context, socket_path):
-        monitor = Monitor.from_socket(context, str(socket_path))
-        assert monitor._as_parameter_
-        assert not monitor.started
-
-    def test_from_socket_mock(self, context):
-        calls = {'udev_monitor_new_from_socket': [(context, b'spam')]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_monitor_new_from_socket.return_value = sentinel.monitor
-            monitor = Monitor.from_socket(context, 'spam')
             assert monitor._as_parameter_ is sentinel.monitor
             assert not monitor.started
 
@@ -188,24 +165,6 @@ class TestMonitor(object):
         assert not monitor.started
         monitor.start()
         assert monitor.started
-
-    def test_start_socket(self, context, socket_path):
-        monitor = Monitor.from_socket(context, str(socket_path))
-        assert not monitor.started
-        monitor.start()
-        assert monitor.started
-
-    def test_start_bound_socket(self, context, socket_path):
-        sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-        # cause an error by binding the socket, thus testing error handling in
-        # this method
-        sock.bind(str(socket_path))
-        monitor = Monitor.from_socket(context, str(socket_path))
-        with pytest.raises(EnvironmentError) as exc_info:
-            monitor.start()
-        pytest.assert_env_error(exc_info.value, errno.EADDRINUSE,
-                                str(socket_path))
-        assert not monitor.started
 
     def test_start_mock(self, monitor):
         calls = {'udev_monitor_enable_receiving': [(monitor,)]}

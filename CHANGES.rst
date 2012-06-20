@@ -1,6 +1,7 @@
 0.16 (in development)
 =====================
 
+- Remove :meth:`pyudev.Monitor.from_socket`.
 - Deprecate :meth:`pyudev.Device.traverse()` in favor of
   :attr:`pyudev.Device.ancestors`. 
 - #47: Deprecate :meth:`pyudev.Monitor.receive_device` in favor of

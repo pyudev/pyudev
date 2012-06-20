@@ -215,8 +215,6 @@
 
    .. automethod:: from_netlink
 
-   .. automethod:: from_socket
-
    .. attribute:: context
 
       The :class:`Context` to which this monitor is bound.

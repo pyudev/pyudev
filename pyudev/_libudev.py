@@ -150,7 +150,6 @@ SIGNATURES = {
         ref=([udev_monitor_p], udev_monitor_p),
         unref=([udev_monitor_p], None),
         new_from_netlink=([udev_p, c_char_p], udev_monitor_p),
-        new_from_socket=([udev_p, c_char_p], udev_monitor_p),
         enable_receiving=([udev_monitor_p], c_int),
         set_receive_buffer_size=([udev_monitor_p, c_int], c_int),
         get_fd=([udev_monitor_p], c_int),
