@@ -302,7 +302,7 @@ class Monitor(object):
         Since this method will never return ``None`` if no ``timeout`` is
         specified, this is effectively an endless loop. With
         :func:`functools.partial()` you can also create a loop that only waits
-        for a specified time:
+        for a specified time::
 
            for device in iter(partial(monitor.poll, 3), None):
                print('{0.action} on {0.device_path}'.format(device))
