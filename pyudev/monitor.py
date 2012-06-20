@@ -373,7 +373,15 @@ class Monitor(object):
 
         Yields ``(action, device)`` (see :meth:`receive_device` for a
         description).
+
+        .. deprecated:: 0.16
+           Will be removed in 1.0. Use an explicit loop over :meth:`poll()`
+           instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
+        import warnings
+        warnings.warn('Will be removed in 1.0. Use an explicit loop over '
+                      '"poll()" instead, or monitor asynchronously with '
+                      '"MonitorObserver".', DeprecationWarning)
         self.start()
         with closing(select.epoll()) as notifier:
             notifier.register(self, select.EPOLLIN)

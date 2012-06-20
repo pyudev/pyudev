@@ -239,7 +239,8 @@ class TestMonitor(object):
         monitor.start()
         pytest.load_dummy()
         iterator = iter(monitor)
-        action, device = next(iterator)
+        # DeprecationWarning triggered on first invocation of generator
+        action, device = pytest.deprecated_call(next, iterator)
         assert action == 'add'
         assert device.action == 'add'
         assert device.sequence_number > 0

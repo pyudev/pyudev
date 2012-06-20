@@ -8,6 +8,8 @@
   :attr:`pyudev.Monitor.poll`.
 - #47: Deprecate :attr:`pyudev.Monitor.enable_receiving` in favor of
   :attr:`pyudev.Monitor.start`.
+- #47: Deprecate :attr:`pyudev.Monitor.__iter__` in favor of explicit looping or
+  :class:`pyudev.MonitorObserver`.
 - #49: Deprecate ``event_handler`` to :class:`pyudev.MonitorObserver` in favour
   of ``callback`` argument.
 - #46: Continuously test pyudev on Travis-CI.

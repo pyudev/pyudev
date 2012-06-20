@@ -252,7 +252,7 @@ filesystems:
 
 >>> monitor = pyudev.Monitor.from_netlink(context)
 >>> monitor.filter_by('block')
->>> for action, device in monitor:
+>>> for device in iter(monitor.poll, None):
 ...     if 'ID_FS_TYPE' in device:
 ...         print('{0} partition {1}'.format(action, device.get('ID_FS_LABEL')))
 ...
