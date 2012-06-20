@@ -165,7 +165,7 @@ class TestDevice(object):
             link = os.path.join(context.device_path, link)
             device = Device.from_device_file(context, link)
             assert device.device_path == device_data.device_path
-            assert link in device_data.device_links
+            assert link in device.device_links
 
     def test_from_device_file_no_device_file(self, context, tmpdir):
         filename = tmpdir.join('test')

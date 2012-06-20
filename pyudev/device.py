@@ -675,6 +675,13 @@ class Device(Mapping):
         node, or to map a single device into multiple device hierarchies.
         The property provides access to all such symbolic links, which were
         created by UDev for this device.
+
+        .. warning::
+
+           Links are not necessarily resolved by
+           :meth:`Device.from_device_file()`. Hence do *not* rely on
+           ``Device.from_device_file(context, link).device_path ==
+           device.device_path`` from any ``link`` in ``device.device_links``.
         """
         devlinks = libudev.udev_device_get_devlinks_list_entry(self)
         for name, _ in udev_list_iterate(devlinks):
