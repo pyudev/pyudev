@@ -472,7 +472,7 @@ class MonitorObserver(Thread):
 
         .. deprecated:: 0.16
            The ``event_handler`` argument will be removed in 1.0. Use
-           ``callback`` instead.
+           the ``callback`` argument instead.
         .. versionchanged:: 0.16
            Add ``callback`` argument.
         """
