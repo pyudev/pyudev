@@ -37,7 +37,7 @@ from threading import Thread
 from contextlib import closing
 
 from pyudev._libudev import libudev
-from pyudev._util import ensure_byte_string, ensure_unicode_string, reraise
+from pyudev._util import ensure_byte_string, reraise
 
 from pyudev.core import Device
 
