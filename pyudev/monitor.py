@@ -434,6 +434,14 @@ class MonitorObserver(Thread):
        :attr:`~threading.Thread.daemon` to ``False`` before invoking
        :meth:`~threading.Thread.start()`.
 
+    .. seealso::
+
+       :attr:`Device.action`
+          The action that created this event.
+
+       :attr:`Device.sequence_number`
+          The sequence number of this event.
+
     .. versionadded:: 0.14
 
     .. versionchanged:: 0.15
