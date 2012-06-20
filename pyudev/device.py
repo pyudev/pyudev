@@ -49,7 +49,7 @@ class DeviceNotFoundError(LookupError):
     An error indicating that no :class:`Device` was found.
 
     .. versionchanged:: 0.5
-       Renamed from ``NoSuchDeviceError`` to its current name.
+       Rename from ``NoSuchDeviceError`` to its current name.
     """
 
 
@@ -214,10 +214,10 @@ class Device(Mapping):
 
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
-           no device was found for ``sys_path``
+           no device was found for ``sys_path``.
         .. versionchanged:: 0.5
            Raise :exc:`DeviceNotFoundAtPathError` instead of
-           :exc:`NoSuchDeviceError`
+           :exc:`NoSuchDeviceError`.
         """
         device = libudev.udev_device_new_from_syspath(
             context, ensure_byte_string(sys_path))

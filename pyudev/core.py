@@ -161,7 +161,7 @@ class Context(object):
         retrieve :class:`Device` objects representing matching devices.
 
         .. versionchanged:: 0.8
-           Accept keyword arguments now for easy matching
+           Accept keyword arguments now for easy matching.
         """
         return Enumerator(self).match(**kwargs)
 
@@ -236,7 +236,7 @@ class Enumerator(object):
         .. versionadded:: 0.8
 
         .. versionchanged:: 0.13
-           Added ``parent`` keyword
+           Add ``parent`` keyword.
         """
         subsystem = kwargs.pop('subsystem', None)
         if subsystem is not None:
