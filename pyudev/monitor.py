@@ -468,7 +468,7 @@ class MonitorObserver(Thread):
            ``callback`` is invoked in the observer thread, hence the observer
            is blocked while callback executes.
 
-        ``args`` and ``kwargs`` are passed unchanged to the constructor of 
+        ``args`` and ``kwargs`` are passed unchanged to the constructor of
         :class:`~threading.Thread`.
 
         .. deprecated:: 0.16
@@ -537,24 +537,30 @@ class MonitorObserver(Thread):
 
     def stop(self):
         """
-        Stop the background thread.
+        Synchronously stop the background thread.
 
-        .. warning::
+        .. note::
 
-           Calling this method from the ``event_handler`` results in a dead
-           lock.  If you need to stop the observer from ``event_handler``, use
-           :meth:`send_stop`, and be prepared to get some more events before
-           the observer actually exits.
+           This method can safely be called from the observer thread. In this
+           case it is equivalent to :meth:`send_stop()`.
 
-        Send a stop signal to the backgroud (see :meth:`send_stop`) and waits
-        for the background thread to exit (see :meth:`~threading.Thread.join`).
-        After this method returns, it is guaranteed that the ``event_handler``
-        passed to :meth:`MonitorObserver.__init__()` is not longer called for
-        any event from :attr:`monitor`.
+        Send a stop signal to the backgroud (see :meth:`send_stop`), and waits
+        for the background thread to exit (see :meth:`~threading.Thread.join`)
+        if the current thread is *not* the observer thread.
+
+        After this method returns in a thread *that is not the observer
+        thread*, the ``callback`` is guaranteed to not be invoked again
+        anymore.
 
         .. note::
 
            The underlying :attr:`monitor` is *not* stopped.
+
+        .. versionchanged:: 0.16
+           This method can be called from the observer thread.
         """
         self.send_stop()
-        self.join()
+        try:
+            self.join()
+        except RuntimeError:
+            pass
