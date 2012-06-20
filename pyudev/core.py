@@ -98,20 +98,23 @@ class Context(object):
     def sys_path(self):
         """
         The ``sysfs`` mount point defaulting to ``/sys'`` as unicode string.
-
-        The mount point can be overwritten using the environment variable
-        :envvar:`SYSFS_PATH`.  Use this for testing purposes.
         """
-        return ensure_unicode_string(libudev.udev_get_sys_path(self))
+        if hasattr(libudev, 'udev_get_sys_path'):
+            return ensure_unicode_string(libudev.udev_get_sys_path(self))
+        else:
+            # Fixed path since udev 183
+            return '/sys'
 
     @property
     def device_path(self):
         """
         The device directory path defaulting to ``/dev`` as unicode string.
-
-        This can be overridden in the udev configuration.
         """
-        return ensure_unicode_string(libudev.udev_get_dev_path(self))
+        if hasattr(libudev, 'udev_get_dev_path'):
+            return ensure_unicode_string(libudev.udev_get_dev_path(self))
+        else:
+            # Fixed path since udev 183
+            return '/dev'
 
     @property
     def run_path(self):
@@ -123,7 +126,10 @@ class Context(object):
 
         .. versionadded:: 0.10
         """
-        return ensure_unicode_string(libudev.udev_get_run_path(self))
+        if hasattr(libudev, 'udev_get_run_path'):
+            return ensure_unicode_string(libudev.udev_get_run_path(self))
+        else:
+            return '/run/udev'
 
     @property
     def log_priority(self):

@@ -21,6 +21,7 @@
 - #43: Fix test failures on Python 2.6
 - Fix signature in declaration of ``udev_monitor_set_receive_buffer_size``.
 - #44: Test wrapped signatures with help of ``gccxml``.
+- Fix compatibility with udev 183 and newer in :class:`pyudev.Context`.
 - :meth:`pyudev.MonitorObserver.stop` can be called from the observer thread.
 
 
