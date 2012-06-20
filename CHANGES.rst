@@ -17,11 +17,11 @@ Reworked the monitoring API
 The monitoring API was reworked to remove the explicitly returned `action`
 everywhere, in favor of the new :attr:`pyudev.Device.action`:
 
-- Deprecated :attr:`pyudev.Monitor.enable_receiving` in favor of
+- #47: Deprecated :attr:`pyudev.Monitor.enable_receiving` in favor of
   :attr:`pyudev.Monitor.start`.
-- Added :attr:`pyudev.Monitor.started`, :meth:`pyudev.Monitor.start` can be
-  called repeatedly now
-- Added :meth:`pyudev.Monitor.poll`, and deprecated
+- #47: Added :attr:`pyudev.Monitor.started`, :meth:`pyudev.Monitor.start` can
+  be called repeatedly now.
+- #47: Added :meth:`pyudev.Monitor.poll`, and deprecated
   :meth:`pyudev.Monitor.receive_device`
 
 
