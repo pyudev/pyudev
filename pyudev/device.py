@@ -273,7 +273,7 @@ class Device(Mapping):
         Use :func:`os.makedev` to construct a device number from a major and a
         minor device number, as shown in the example above.
 
-        .. note::
+        .. warning::
 
            Device numbers are not unique across different device types.
            Passing a correct number with a wrong type may silently yield a
