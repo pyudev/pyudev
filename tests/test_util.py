@@ -113,18 +113,6 @@ def raise_valueerror():
     raise ValueError('from function')
 
 
-def test_reraise():
-    with pytest.raises(ValueError) as excinfo:
-        try:
-            raise_valueerror()
-        except ValueError as error:
-            assert str(error) == 'from function'
-            tb = sys.exc_info()[2]
-            _util.reraise(ValueError('from except clause'), tb)
-    assert str(excinfo.value) == 'from except clause'
-    assert excinfo.traceback.getcrashentry().name == 'raise_valueerror'
-
-
 def test_get_device_type_character_device():
     assert _util.get_device_type('/dev/console') == 'char'
 
