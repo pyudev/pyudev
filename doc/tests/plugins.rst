@@ -150,7 +150,7 @@ word if you want to be asked for a password.
 
 Make sure to change the owner and group to ``root:root`` and the permissions of
 this file to ``440`` afterwards, other :program:`sudo` will refuse to load the
-file.  Also check the file with :program:`visudo` to prevent syntactic errors:
+file.  Also check the file with :program:`visudo` to prevent syntactic errors::
 
    $ chown root:root /etc/sudoers.d/20pyudev-tests
    $ chmod 440 /etc/sudoers.d/20pyudev-tests
