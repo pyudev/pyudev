@@ -42,17 +42,11 @@ pyudev, a detailled reference is provided by the :doc:`api/index`.
 Support
 -------
 
-.. rubric:: Mailing list
-
-Questions about usage and development of pyudev can be posted to the mailing
-list pyudev@librelist.com, which is hosted by `librelist.com`_.  To subscribe
-to this list, just send a mail to pyudev@librehost.com and reply to the
-confirmation mail.  To unsubscribe again, write to
-pyudev-unsubscribe@librelist.com and reply to the confirmation mail.  Past
-discussions and questions are available in the `list archives`_.
-
-
-.. rubric:: Issues
+Please ask questions about usage and development of pyudev to the mailing list at
+pyudev@librelist.com hosted by librelist.com_.  To subscribe to this list, send
+a mail to pyudev@librelist.com and reply to the confirmation email. To
+unsubscribe again, write to pyudev-unsubscribe@librelist.com and reply to the
+configuration mail. Past discussions are available in the `list archives`_.
 
 Please report issues and bugs to the `issue tracker`_, but respect the following
 guidelines:
@@ -87,10 +81,16 @@ features, but respect the following guidelines:
 - Add unit tests if possible (refer to the
   :doc:`testsuite documentation <tests/index>`).
 - Add API documentation in docstrings.
-- Do not break the API of existing code in your changes.
 - Open a `pull request <https://help.github.com/articles/using-pull-requests>`_
   that relates to but one subject with a clear title and description in
   grammatically correct, complete sentences.
+
+Complying to these guidelines greatly increase the change of getting your pull
+request merged.  You will be asked to improve your changeset if your pull
+request breaks any of the above guidelines.
+
+If you intend to make larger changes, especially if these changes break the ABI,
+please ask on the mailing list first.
 
 
 Contents
@@ -118,5 +118,4 @@ Contents
 .. _list archives: http://librelist.com/browser/pyudev/
 .. _issue tracker: https://github.com/lunaryorn/pyudev/issues
 .. _GitHub: https://github.com/lunaryorn/pyudev
-.. _git: http://www.git-scm.com/
 .. _pep8: http://pypi.python.org/pypi/pep8/
