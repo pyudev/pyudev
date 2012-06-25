@@ -133,7 +133,12 @@ def test_arguments(libudev_function):
 
 
 def test_return_type(libudev_function):
-    assert libudev_function.wrapper.restype == libudev_function.return_type
+    # Ignore the return type of *_unref() functions. The return value of these
+    # functions is unused in pyudev, so it doesn't need to be wrapped.
+    restype = (libudev_function.return_type
+               if not libudev_function.name.endswith('_unref')
+               else None)
+    assert libudev_function.wrapper.restype == restype
 
 
 def test_error_checker(libudev_function):
