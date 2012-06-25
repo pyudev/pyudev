@@ -64,16 +64,6 @@ def _is_blacklisted(function):
         return False
 
 
-def pytest_funcarg__libudev_function(request):
-    """
-    Override ``libudev_function`` to skip tests for blacklisted functions.
-    """
-    function = request.getfuncargvalue('libudev_function')
-    if _is_blacklisted(function):
-        pytest.skip('{0} is not wrapped'.format(function.name))
-    return function
-
-
 FUNDAMENTAL_TYPES = {
     'int': ctypes.c_int,
     'char': ctypes.c_char,
@@ -106,18 +96,50 @@ def _to_ctypes(libudev_type):
     return TYPE_CONVERTER[libudev_type.__class__.__name__](libudev_type)
 
 
-def test_wrapper_signature(libudev_function):
-    wrapped_function = getattr(libudev, libudev_function.name)
-    argtypes = [_to_ctypes(a) for a in libudev_function.arguments]
-    assert wrapped_function.argtypes == argtypes
-    restype = _to_ctypes(libudev_function.return_type)
-    assert wrapped_function.restype == restype
+class LibudevFunction(object):
+
+    def __init__(self, declaration):
+        self.declaration = declaration
+
+    @property
+    def name(self):
+        return self.declaration.name
+
+    @property
+    def wrapper(self):
+        return getattr(libudev, self.name)
+
+    @property
+    def argument_types(self):
+        return [_to_ctypes(a) for a in self.declaration.arguments]
+
+    @property
+    def return_type(self):
+        return _to_ctypes(self.declaration.return_type)
+
+
+def pytest_funcarg__libudev_function(request):
+    """
+    Override ``libudev_function`` to skip tests for blacklisted functions.
+    """
+    function = request.getfuncargvalue('libudev_function')
+    if _is_blacklisted(function):
+        pytest.skip('{0} is not wrapped'.format(function.name))
+    return LibudevFunction(function)
+
+
+def test_arguments(libudev_function):
+    assert libudev_function.wrapper.argtypes == libudev_function.argument_types
+
+
+def test_return_type(libudev_function):
+    assert libudev_function.wrapper.restype == libudev_function.return_type
 
 
 def test_error_checker(libudev_function):
-    func_name = libudev_function.name
-    if func_name in binding.ERROR_CHECKERS:
-        func = getattr(libudev, func_name)
-        assert func.errcheck == binding.ERROR_CHECKERS[func_name]
+    name = libudev_function.name
+    if name in binding.ERROR_CHECKERS:
+        assert libudev_function.wrapper.errcheck == \
+                binding.ERROR_CHECKERS[name]
     else:
-        pytest.skip('{0} has no error checker'.format(func_name))
+        pytest.skip('{0} has no error checker'.format(name))
