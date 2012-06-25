@@ -49,7 +49,7 @@ class GUDevMonitorObserver(gobject.GObject):
     >>> context = pyudev.Context()
     >>> monitor = pyudev.Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
-    >>> observer = pyudev.pygtk.GUDevMonitorObserver(monitor)
+    >>> observer = pyudev.glib.GUDevMonitorObserver(monitor)
     >>> def device_connected(observer, device):
     ...     print('{0!r} added'.format(device))
     >>> observer.connect('device-added', device_connected)
