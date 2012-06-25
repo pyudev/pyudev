@@ -37,6 +37,8 @@ The :doc:`guide` gives an introduction into the most common operations in
 pyudev, a detailled reference is provided by the :doc:`api/index`.
 
 
+.. _support:
+
 Support
 -------
 
@@ -52,9 +54,15 @@ discussions and questions are available in the `list archives`_.
 
 .. rubric:: Issues
 
-Issues and bugs can be reported to the `issue tracker`_ on GitHub_.  Please
-provide as much information as possible when reporting an issue.  Patches
-addressing new or existing issues are very welcome.
+Please report issues and bugs to the `issue tracker`_, but respect the following
+guidelines:
+
+- Check that the issue has not already been reported.
+- Check that the issue is not already fixed in the ``master`` branch.
+- Open issues with clear title and a detailed description in grammatically
+  correct, complete sentences.
+- Include the Python version and the udev version (see ``udevadm --version``) in
+  the description of your issue.
 
 
 .. _development:
@@ -66,9 +74,23 @@ The source code is hosted on GitHub_::
 
    git clone git://github.com/lunaryorn/pyudev.git
 
-Feel free to fork the repository and send pull requests or patches.  Please add
-unit tests for your code, if possible.  The :doc:`testsuite documentation
-<tests/index>` gives you an overview about the pyudev testsuite.
+Please fork the repository and send pull requests with your fixes or new
+features, but respect the following guidelines:
+
+- Read `how to properly contribute to open source projects on GitHub
+  <http://gun.io/blog/how-to-github-fork-branch-and-pull-request/>`_.
+- Use a topic branch to easily amend a pull request later, if necessary.
+- Write `good commit messages
+  <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_.
+- Squash commits on the topic branch before opening a pull request.
+- Respect :pep:`8` (use pep8_ to check your coding style compliance).
+- Add unit tests if possible (refer to the
+  :doc:`testsuite documentation <tests/index>`).
+- Add API documentation in docstrings.
+- Do not break the API of existing code in your changes.
+- Open a `pull request <https://help.github.com/articles/using-pull-requests>`_
+  that relates to but one subject with a clear title and description in
+  grammatically correct, complete sentences.
 
 
 Contents
@@ -97,4 +119,4 @@ Contents
 .. _issue tracker: https://github.com/lunaryorn/pyudev/issues
 .. _GitHub: https://github.com/lunaryorn/pyudev
 .. _git: http://www.git-scm.com/
-.. _changesets: https://github.com/lunaryorn/pyudev/commits/master
+.. _pep8: http://pypi.python.org/pypi/pep8/
