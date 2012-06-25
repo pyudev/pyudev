@@ -46,10 +46,12 @@ class GUDevMonitorObserver(gobject.GObject):
     Observe a :class:`~pyudev.Monitor` and emit Glib signals upon device
     events:
 
-    >>> context = pyudev.Context()
-    >>> monitor = pyudev.Monitor.from_netlink(context)
+    >>> from pyudev import Context, Monitor
+    >>> from pyudev.glib import GUDevMonitorObserver
+    >>> context = Context()
+    >>> monitor = Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
-    >>> observer = pyudev.glib.GUDevMonitorObserver(monitor)
+    >>> observer = GUDevMonitorObserver(monitor)
     >>> def device_connected(observer, device):
     ...     print('{0!r} added'.format(device))
     >>> observer.connect('device-added', device_connected)

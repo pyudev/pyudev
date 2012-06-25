@@ -47,8 +47,9 @@ class Monitor(object):
     """
     Monitor udev events:
 
-    >>> context = pyudev.Context()
-    >>> monitor = pyudev.Monitor.from_netlink(context)
+    >>> from pyudev import Context, Monitor
+    >>> context = Context()
+    >>> monitor = Monitor.from_netlink(context)
     >>> monitor.filter_by('input')
     >>> device = monitor.poll(timeout=3)
     >>> if device:
@@ -414,8 +415,9 @@ class MonitorObserver(Thread):
     A :class:`~threading.Thread` class to observe a :class:`Monitor` in
     background:
 
-    >>> context = pyudev.Context()
-    >>> monitor = pyudev.Monitor.from_netlink(context)
+    >>> from pyudev import Context, Monitor, MonitorObserver
+    >>> context = Context()
+    >>> monitor = Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
     >>> def print_device_event(device):
     ...     print('background event {0.action}: {0.device_path}'.format(device))

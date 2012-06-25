@@ -177,7 +177,8 @@ class Device(Mapping):
         Create a device from a device ``path``.  The ``path`` may or may not
         start with the ``sysfs`` mount point:
 
-        >>> context = pyudev.Context()
+        >>> from pyudev import Context, Device
+        >>> context = Context()
         >>> Device.from_path(context, '/devices/platform')
         Device(u'/sys/devices/platform')
         >>> Device.from_path(context, '/sys/devices/platform')
@@ -200,7 +201,8 @@ class Device(Mapping):
         """
         Create a new device from a given ``sys_path``:
 
-        >>> context = pyudev.Context()
+        >>> from pyudev import Context, Device
+        >>> context = Context()
         >>> Device.from_path(context, '/sys/devices/platform')
         Device(u'/sys/devices/platform')
 
@@ -231,11 +233,12 @@ class Device(Mapping):
         Create a new device from a given ``subsystem`` and a given
         ``sys_name``:
 
-        >>> context = pyudev.Context()
-        >>> sda = pyudev.Device.from_name(context, 'block', 'sda')
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> sda = Device.from_name(context, 'block', 'sda')
         >>> sda
         Device(u'/sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda')
-        >>> sda == pyudev.Device.from_path(context, '/block/sda')
+        >>> sda == Device.from_path(context, '/block/sda')
 
         ``context`` is the :class:`Context` in which to search the device.
         ``subsystem`` and ``sys_name`` are byte or unicode strings, which
@@ -261,6 +264,7 @@ class Device(Mapping):
         ``type``:
 
         >>> import os
+        >>> from pyudev import Context, Device
         >>> ctx = Context()
         >>> major, minor = 8, 0
         >>> device = Device.from_device_number(context, 'block',
@@ -306,6 +310,7 @@ class Device(Mapping):
         """
         Create a new device from the given device file:
 
+        >>> from pyudev import Context, Device
         >>> context = Context()
         >>> device = Device.from_device_file(context, '/dev/sda')
         >>> device
@@ -523,7 +528,9 @@ class Device(Mapping):
            The number is returned as unicode string to preserve the exact
            format of the number, especially any leading zeros:
 
-           >>> device = pyudev.Device.from_path(ctx, '/sys/devices/LNXSYSTM:00')
+           >>> from pyudev import Context, Device
+           >>> context = Context()
+           >>> device = Device.from_path(context, '/sys/devices/LNXSYSTM:00')
            >>> device.sys_number
            u'00'
 
@@ -544,6 +551,7 @@ class Device(Mapping):
         Device type as unicode string, or ``None``, if the device type is
         unknown.
 
+        >>> from pyudev import Context
         >>> context = Context()
         >>> for device in context.list_devices(subsystem='net'):
         ...     '{0} - {1}'.format(device.sys_name, device.device_type or 'ethernet')
@@ -602,6 +610,8 @@ class Device(Mapping):
         Use :func:`os.major` and :func:`os.minor` to decompose the device
         number into its major and minor number:
 
+        >>> import os
+        >>> from pyudev import Context, Device
         >>> context = Context()
         >>> sda = Device.from_name(context, 'block', 'sda')
         >>> sda.device_number
@@ -759,10 +769,13 @@ class Device(Mapping):
         The :class:`Tags` object supports a test for a single tag as well as
         iteration over all tags:
 
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> device = next(iter(context.list_devices(tag='systemd')))
         >>> 'systemd' in device.tags
         True
         >>> list(device.tags)
-        [u'systemd', u'seat']
+        [u'seat', u'systemd', u'uaccess']
 
         Tags are arbitrary classifiers that can be attached to devices by udev
         scripts and daemons.  For instance, systemd_ uses tags for multi-seat_
