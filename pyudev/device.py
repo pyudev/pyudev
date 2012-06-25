@@ -706,6 +706,12 @@ class Device(Mapping):
         ``'offline'``
           The device is offline now
 
+        .. warning::
+
+           Though the actions listed above are the most common, this property
+           *may* return other values, too, so be prepared to handle unknown
+           actions!
+
         .. versionadded:: 0.16
         """
         action = libudev.udev_device_get_action(self)
