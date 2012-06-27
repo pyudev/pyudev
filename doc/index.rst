@@ -1,10 +1,12 @@
 pyudev -- pure Python libudev_ binding
 ======================================
 
-pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ binding to libudev_,
-the device and hardware management and information library of Linux.
+pyudev |release| (:doc:`changes`, :doc:`installation <install>`)
 
-It exposes almost the complete libudev_ functionality.  You can:
+pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ 2/3 binding to
+libudev_, the device and hardware management and information library of Linux.
+
+Almost the complete libudev_ functionality is exposed. You can:
 
 * Enumerate devices, filtered by specific criteria (:class:`pyudev.Context`)
 * Query device information, properties and attributes,
@@ -13,13 +15,9 @@ It exposes almost the complete libudev_ functionality.  You can:
   :mod:`pyudev.pyside`), glib (:mod:`pyudev.glib`) and wxPython
   (:mod:`pyudev.wx`).
 
-pyudev supports CPython_ 2 (2.6 or newer) and 3 (3.1 or newer), and PyPy_ 1.5
-or newer.  It is tested against udev_ 151 or newer.  Older versions of udev_ as
-found on dated Linux systems may work, but are not officially supported.
 
-
-Usage
------
+Documentation
+-------------
 
 Thanks to the power of libudev_, usage of pyudev is very simple.  Getting the
 labels of all partitions just takes a few lines:
@@ -33,11 +31,16 @@ boot
 swap
 system
 
-The :doc:`guide` gives an introduction into the most common operations in
-pyudev, a detailled reference is provided by the :doc:`api/index`.
+A user guide gives an introduction into common operations and concepts of
+pyudev, the API documentation provides a detailed reference:
 
+.. toctree::
+   :maxdepth: 2
 
-.. _support:
+   install
+   guide
+   api/index
+
 
 Support
 -------
@@ -66,56 +69,30 @@ Development
 
 The source code is hosted on GitHub_::
 
-   git clone git://github.com/lunaryorn/pyudev.git
+   git clone https://github.com/lunaryorn/pyudev.git
 
-Please fork the repository and send pull requests with your fixes or new
-features, but respect the following guidelines:
-
-- Read `how to properly contribute to open source projects on GitHub
-  <http://gun.io/blog/how-to-github-fork-branch-and-pull-request/>`_.
-- Use a topic branch to easily amend a pull request later, if necessary.
-- Write `good commit messages
-  <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_.
-- Squash commits on the topic branch before opening a pull request.
-- Respect :pep:`8` (use pep8_ to check your coding style compliance).
-- Add unit tests if possible (refer to the
-  :doc:`testsuite documentation <tests/index>`).
-- Add API documentation in docstrings.
-- Open a `pull request <https://help.github.com/articles/using-pull-requests>`_
-  that relates to but one subject with a clear title and description in
-  grammatically correct, complete sentences.
-
-Complying to these guidelines greatly increase the change of getting your pull
-request merged.  You will be asked to improve your changeset if your pull
-request breaks any of the above guidelines.
-
-If you intend to make larger changes, especially if these changes break the ABI,
-please ask on the mailing list first.
-
-
-Contents
---------
+If you want to contribute to pyudev, please read the guidelines for contributes
+and the testsuite documentation.
 
 .. toctree::
 
-   guide
-   api/index
+   contribute
    tests/index
+
+
+Other reading
+-------------
+
+.. toctree::
+   :maxdepth: 1
+
    changes
    licencing
 
 
-.. _GNU LGPL 2.1: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
 .. _Python: http://www.python.org/
-.. _CPython: http://www.python.org/
-.. _PyPy: http://www.pypy.org/
-.. _PyQt4: http://www.riverbankcomputing.co.uk/software/pyqt/intro/
-.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
-.. _udev: http://git.kernel.org/?p=linux/hotplug/udev.git
-.. _Python Package Index: http://pypi.python.org/pypi/pyudev
-.. _ctypes: http://docs.python.org/library/ctypes.html
+.. _libudev: http://www.freedesktop.org/software/systemd/libudev/
 .. _librelist.com: http://librelist.com/
 .. _list archives: http://librelist.com/browser/pyudev/
 .. _issue tracker: https://github.com/lunaryorn/pyudev/issues
 .. _GitHub: https://github.com/lunaryorn/pyudev
-.. _pep8: http://pypi.python.org/pypi/pep8/
