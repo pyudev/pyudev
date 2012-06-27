@@ -5,6 +5,18 @@
    :platform: Linux
    :synopsis: libudev bindings
 
+.. autosummary::
+   :nosignatures:
+
+   Context
+   Device
+   Monitor
+   MonitorObserver
+
+
+Version information
+-------------------
+
 .. data:: __version__
 
    The version of :mod:`pyudev` as string.  This string contains a major and a
