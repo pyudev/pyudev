@@ -4,8 +4,11 @@ User guide
 .. currentmodule:: pyudev
 
 This guide gives an introduction in how to use pyudev for common operations
-like device enumeration or monitoring.  A detailled reference is provided in
-the :doc:`API documentation <api/index>`.
+like device enumeration or monitoring:
+
+.. contents::
+
+A detailled reference is provided in the :doc:`API documentation <api/index>`.
 
 
 Getting started
