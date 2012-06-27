@@ -8,26 +8,14 @@ like device enumeration or monitoring.  A detailled reference is provided in
 the :doc:`API documentation <api/index>`.
 
 
-Installation
-------------
-
-Before we can start, you need to install pyudev from PyPI_, which is as easy
-as::
-
-   pip install pyudev
-
-Thanks to :mod:`ctypes` pyudev is implemented in pure Python, and no compiler
-and no library headers are required for installation.
-
-
 Getting started
 ---------------
 
-Now you can import pyudev and do some version checks:
+Import pyudev and verify that you're using the latest version:
 
 >>> import pyudev
 >>> pyudev.__version__
-u'0.15'
+u'0.16'
 >>> pyudev.udev_version()
 181
 
