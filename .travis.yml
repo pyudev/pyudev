@@ -4,6 +4,7 @@ env:
   - TOXENV=py27
   - TOXENV=py31
   - TOXENV=py32
+  - TOXENV=pypy
 before_install:
   - sudo apt-get install libudev-dev gccxml
 install:
