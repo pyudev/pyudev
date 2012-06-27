@@ -22,7 +22,7 @@ u'0.16'
 >>> pyudev.udev_version()
 181
 
-This prints the version of pyudev itself and of the underlying libudev_
+This prints the version of pyudev itself and of the underlying libudev_.
 
 
 A note on versioning
