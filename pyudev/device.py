@@ -46,7 +46,7 @@ __all__ = ['Device', 'Attributes', 'Tags',
 
 class DeviceNotFoundError(LookupError):
     """
-    An error indicating that no :class:`Device` was found.
+    An exception indicating that no :class:`Device` was found.
 
     .. versionchanged:: 0.5
        Rename from ``NoSuchDeviceError`` to its current name.

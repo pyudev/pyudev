@@ -43,8 +43,10 @@ from pyudev._qt_base import QUDevMonitorObserverMixin
 
 class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
     """
-    Observe a :class:`~pyudev.Monitor` and emit Qt signals upon device
-    events:
+    An observer for device events integrating into the :mod:`PyQt4` mainloop.
+
+    This class inherits :class:`~PyQt4.QtCore.QObject` to turn device events
+    into Qt signals:
 
     >>> from pyudev import Context, Monitor
     >>> from pyudev.pyqt4 import QUDevMonitorObserver

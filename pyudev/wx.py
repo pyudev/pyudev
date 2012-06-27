@@ -43,7 +43,10 @@ DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
 
 class WxUDevMonitorObserver(EvtHandler):
     """
-    Observe a :class:`~pyudev.Monitor` and post wx events upon device events:
+    An observer for device events integrating into the :mod:`wx` mainloop.
+
+    This class inherits :class:`~wx.EvtHandler` to turn device events into
+    wx events:
 
     >>> from pyudev import Context, Device
     >>> from pyudev.wx import WxUDevMonitorObserver

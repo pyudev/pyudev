@@ -74,12 +74,15 @@ def udev_version():
 
 class Context(object):
     """
-    The udev context.
+    A device database connection.
 
-    This is *the* central object to access udev.  An instance of this class
-    must be created before anything else can be done.  It holds the udev
-    configuration and provides the interface to list devices (see
-    :meth:`list_devices`).
+    This class represents a connection to the udev device database, and is
+    really *the* central object to access udev.  You need an instance of this
+    class for almost anything else in pyudev.
+
+    This class itself gives access to various udev configuration data (e.g.
+    :attr:`sys_path`, :attr:`device_path`), and provides device enumeration
+    (:meth:`list_devices()`).
 
     Instances of this class can directly be given as ``udev *`` to functions
     wrapped through :mod:`ctypes`.
@@ -174,7 +177,7 @@ class Context(object):
 
 class Enumerator(object):
     """
-    Enumerate all available devices.
+    A filtered iterable of devices.
 
     To retrieve devices, simply iterate over an instance of this class.
     This operation yields :class:`Device` objects representing the available

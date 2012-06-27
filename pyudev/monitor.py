@@ -45,32 +45,35 @@ __all__ = ['Monitor', 'MonitorObserver']
 
 class Monitor(object):
     """
-    Monitor udev events:
+    A synchronous device event monitor.
+
+    A :class:`Monitor` objects connects to the udev daemon and listens for
+    changes to the device list.  A monitor is created by connecting to the
+    kernel daemon through netlink (see :meth:`from_netlink`):
 
     >>> from pyudev import Context, Monitor
     >>> context = Context()
     >>> monitor = Monitor.from_netlink(context)
+
+    Once the monitor is created, you can add a filter using :meth:`filter_by()`
+    or :meth:`filter_by_tag()` to drop incoming events in subsystems, which are
+    not of interest to the application:
+
     >>> monitor.filter_by('input')
+
+    When the monitor is eventually set up, you can either poll for events
+    synchronously:
+
     >>> device = monitor.poll(timeout=3)
     >>> if device:
     ...     print('{0.action}: {0}'.format(device))
     ...
 
-    A :class:`Monitor` objects connects to the udev daemon and listens for
-    changes to the device list.  A monitor is created by connecting to the
-    kernel daemon through netlink (see :meth:`from_netlink`).
+    Or you can monitor events asynchronously with :class:`MonitorObserver`.
 
-    Once the monitor is created, you can add a filter using :meth:`filter_by()`
-    or :meth:`filter_by_tag()` to drop incoming events in subsystems, which are
-    not of interest to the application.
-
-    If the monitor is eventually set up, you can either iterate over the
-    :class:`Monitor` object to synchronously receive events (see
-    :meth:`__iter__()`) or use a :class:`MonitorObserver` to asynchronously
-    react on events.  Moreover the monitor provides a real file descriptor (see
-    :meth:`fileno()`), which is :func:`selectable <select.select>`, so you can
-    also plug the monitor into custom notification mechanisms.  Do *not* read
-    or write on this file descriptor.
+    To integrate into various event processing frameworks, the monitor provides
+    a :func:`selectable <select.select>` file description by :meth:`fileno()`.
+    However, do *not*  read or write directly on this file descriptor.
 
     Instances of this class can directly be given as ``udev_monitor *`` to
     functions wrapped through :mod:`ctypes`.
@@ -412,8 +415,10 @@ class Monitor(object):
 
 class MonitorObserver(Thread):
     """
-    A :class:`~threading.Thread` class to observe a :class:`Monitor` in
-    background:
+    An asynchronous observer for device events.
+
+    This class subclasses :class:`~threading.Thread` class to asynchronously
+    observe a :class:`Monitor` in a background thread:
 
     >>> from pyudev import Context, Monitor, MonitorObserver
     >>> context = Context()

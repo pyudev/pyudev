@@ -43,8 +43,10 @@ import gobject
 
 class GUDevMonitorObserver(gobject.GObject):
     """
-    Observe a :class:`~pyudev.Monitor` and emit Glib signals upon device
-    events:
+    An observer for device events integrating into the :mod:`glib` mainloop.
+
+    This class inherits :class:`~gobject.GObject` to turn device events into
+    glib signals.
 
     >>> from pyudev import Context, Monitor
     >>> from pyudev.glib import GUDevMonitorObserver
