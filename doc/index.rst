@@ -42,9 +42,9 @@ pyudev, a detailled reference is provided by the :doc:`api/index`.
 Support
 -------
 
-Please ask questions about usage and development of pyudev to the mailing list at
-pyudev@librelist.com hosted by librelist.com_.  To subscribe to this list, send
-a mail to pyudev@librelist.com and reply to the confirmation email. To
+Please ask questions about usage and development of pyudev to the mailing list
+at pyudev@librelist.com hosted by librelist.com_.  To subscribe to this list,
+send a mail to pyudev@librelist.com and reply to the confirmation email. To
 unsubscribe again, write to pyudev-unsubscribe@librelist.com and reply to the
 configuration mail. Past discussions are available in the `list archives`_.
 
