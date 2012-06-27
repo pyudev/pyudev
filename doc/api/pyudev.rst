@@ -1,5 +1,5 @@
-:mod:`pyudev` - libudev_ binding
-================================
+:mod:`pyudev` - libudev binding
+===============================
 
 .. automodule:: pyudev
    :platform: Linux

@@ -70,6 +70,3 @@
    .. attribute:: device
 
       The :class:`~pyudev.Device` object that caused this event.
-
-
-.. _wxPython: http://www.wxpython.org

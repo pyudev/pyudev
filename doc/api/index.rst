@@ -4,11 +4,11 @@ API documentation
 This document provides API reference documentation for pyudev.  Refer to the
 :doc:`../guide` for an introduction into pyudev.
 
-.. toctree::
-   :maxdepth: 2
+.. autosummary::
+   :toctree: .
 
    pyudev
-   pyqt4
-   pyside
-   glib
-   wx
+   pyudev.pyqt4
+   pyudev.pyside
+   pyudev.glib
+   pyudev.wx
