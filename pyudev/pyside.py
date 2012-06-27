@@ -19,11 +19,13 @@
     pyudev.pyside
     =============
 
-    Provide :class:`~pyudev.pyside.QUDevMonitorObserver` to integrate a
-    :class:`~pyudev.Monitor` into the Qt event loop in applications using the
-    PySide_ binding to Qt.
+    PySide integration.
 
-    To use this module, :mod:`PySide.QtCore` from PySide_ must be available.
+    :class:`QUDevMonitorObserver` integrates device monitoring into the PySide_
+    mainloop by turing device events into Qt signals.
+
+    :mod:`PySide.QtCore` from PySide_ must be available when importing this
+    module.
 
     .. _PySide: http://www.pyside.org
 

@@ -20,18 +20,16 @@
     pyudev
     ======
 
-    A binding to libudev_.
+    A binding to libudev.
 
-    A :class:`Context` object is required for almost any functionality in
-    pyudev.  The context provides :class:`Device` enumeration with
-    :meth:`Context.list_devices()`.
+    The :class:`Context` provides the connection to the udev device database
+    and enumerates devices.  Individual devices are represented by the
+    :class:`Device` class.
 
     Device monitoring is provided by :class:`Monitor` and
     :class:`MonitorObserver`.  With :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`,
     :mod:`pyudev.glib` and :mod:`pyudev.wx` device monitoring can be integrated
     into the event loop of various GUI toolkits.
-
-    .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@googlemail.com>
 """

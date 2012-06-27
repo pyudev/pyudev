@@ -15,10 +15,14 @@
     pyudev.wx
     =========
 
-    Provides :class:`~pyudev.wx.WXUDevMonitorObserver` to integrate a
-    :class:`~pyudev.Monitor` into a :meth:`wx.App.MainLoop`.
+    Wx integration.
 
-    To use this module, :mod:`wx` from wxPython must be available.
+    :class:`WxUDevMonitorObserver` integrates device monitoring into the
+    wxPython_ mainloop by turing device events into wx events.
+
+    :mod:`wx` from wxPython_ must be available when importing this module.
+
+    .. _wxPython: http://wxpython.org/
 
     .. moduleauthor::  Tobias Eberle  <tobias.eberle@gmx.de>
     .. versionadded:: 0.14

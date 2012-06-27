@@ -19,11 +19,13 @@
     pyudev.pygtk
     ============
 
-    Provide :class:`~pyudev.glib.GUDevMonitorObserver` to integrate a
-    :class:`~pyudev.Monitor` into a :class:`glib.MainLoop`.
+    Glib integration.
 
-    To use this module, :mod:`glib` and :mod:`gobject` from PyGObject_ must be
-    available.  PyGtk is not required.
+    :class:`GUDevMonitorObserver` integrates device monitoring into the Glib
+    mainloop by turing device events into Glib signals.
+
+    :mod:`glib` and :mod:`gobject` from PyGObject_ must be available when
+    importing this module. PyGtk is not required.
 
     .. _PyGObject: http://www.pygtk.org/
 
