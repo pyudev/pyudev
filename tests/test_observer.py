@@ -109,7 +109,7 @@ class ObserverTestBase(object):
                                             (fake_monitor_device,)]}
         with pytest.calls_to_libudev(calls):
             libudev.udev_device_get_action.return_value = action.encode('ascii')
-        self.start_event_loop(fake_monitor.trigger_event)
+            self.start_event_loop(fake_monitor.trigger_event)
         event_callback.assert_called_with(action, fake_monitor_device)
         action_callback.assert_called_with(fake_monitor_device)
 
