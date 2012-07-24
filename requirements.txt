@@ -1,6 +1,6 @@
 # unit test requirements
 pytest>=2.2
-mock>=0.8
+mock>=1.0b1
 
 # documentation requirements
 sphinx>=1.0.7

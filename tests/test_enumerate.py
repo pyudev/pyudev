@@ -174,32 +174,32 @@ class TestEnumerator(object):
 
     def test_match_passthrough_subsystem(self, enumerator):
         with mock.patch.object(enumerator, 'match_subsystem',
-                               mocksignature=True) as match_subsystem:
+                               autospec=True) as match_subsystem:
             enumerator.match(subsystem=mock.sentinel.subsystem)
-            match_subsystem.assert_called_with(mock.sentinel.subsystem, False)
+            match_subsystem.assert_called_with(mock.sentinel.subsystem)
 
     def test_match_passthrough_sys_name(self, enumerator):
         with mock.patch.object(enumerator, 'match_sys_name',
-                               mocksignature=True) as match_sys_name:
+                               autospec=True) as match_sys_name:
             enumerator.match(sys_name=mock.sentinel.sys_name)
             match_sys_name.assert_called_with(mock.sentinel.sys_name)
 
     def test_match_passthrough_tag(self, enumerator):
         with mock.patch.object(enumerator, 'match_tag',
-                               mocksignature=True) as match_tag:
+                               autospec=True) as match_tag:
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
     @pytest.mark.udev_version('>= 172')
     def test_match_passthrough_parent(self, enumerator):
         with mock.patch.object(enumerator, 'match_parent',
-                               mocksignature=True) as match_parent:
+                               autospec=True) as match_parent:
             enumerator.match(parent=mock.sentinel.parent)
             match_parent.assert_called_with(mock.sentinel.parent)
 
     def test_match_passthrough_property(self, enumerator):
         with mock.patch.object(enumerator, 'match_property',
-                               mocksignature=True) as match_property:
+                               autospec=True) as match_property:
             enumerator.match(eggs=mock.sentinel.eggs, spam=mock.sentinel.spam)
             assert match_property.call_count == 2
             posargs = [args for args, _ in match_property.call_args_list]
