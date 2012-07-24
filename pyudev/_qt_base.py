@@ -71,4 +71,6 @@ class QUDevMonitorObserverMixin(object):
         device = self.monitor.poll(timeout=0)
         if device:
             self.deviceEvent.emit(device.action, device)
-            self._action_signal_map[device.action].emit(device)
+            signal = self._action_signal_map.get(device.action)
+            if signal is not None:
+                signal.emit(device)

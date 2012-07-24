@@ -120,5 +120,6 @@ class WxUDevMonitorObserver(EvtHandler):
 
     def _emit_events(self, action, device):
         PostEvent(self, DeviceEvent(action=action, device=device))
-        event_class = self._action_event_map[action]
-        PostEvent(self, event_class(device=device))
+        event_class = self._action_event_map.get(action)
+        if event_class is not None:
+            PostEvent(self, event_class(device=device))

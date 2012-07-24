@@ -118,7 +118,9 @@ class GUDevMonitorObserver(gobject.GObject):
             device = self.monitor.poll(timeout=0)
             if device:
                 self.emit('device-event', device.action, device)
-                self.emit(self._action_signal_map[device.action], device)
+                signal = self._action_signal_map.get(device.action)
+                if signal is not None:
+                    self.emit(signal, device)
         return True
 
 
