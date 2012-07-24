@@ -105,7 +105,8 @@ class WxUDevMonitorObserver(EvtHandler):
         if self._observer_thread is not None:
             return
         self._observer_thread = MonitorObserver(
-            self.monitor, self._emit_events, name='wx-observer-thread')
+            self.monitor, callback=self._emit_events,
+            name='wx-observer-thread')
         self._observer_thread.start()
 
     def stop(self):
@@ -118,8 +119,8 @@ class WxUDevMonitorObserver(EvtHandler):
             return
         self._observer_thread.stop()
 
-    def _emit_events(self, action, device):
-        PostEvent(self, DeviceEvent(action=action, device=device))
-        event_class = self._action_event_map.get(action)
+    def _emit_events(self, device):
+        PostEvent(self, DeviceEvent(action=device.action, device=device))
+        event_class = self._action_event_map.get(device.action)
         if event_class is not None:
             PostEvent(self, event_class(device=device))
