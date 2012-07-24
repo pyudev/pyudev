@@ -249,7 +249,7 @@ RIVERBANK_DOWNLOADS = 'http://www.riverbankcomputing.com/static/Downloads'
 
 
 class Sip4(Binding):
-    NAME = 'sip-4.13.2'
+    NAME = 'sip-4.13.3'
     SOURCE_URL = '{0}/sip4/{1}.tar.gz'.format(RIVERBANK_DOWNLOADS, NAME)
 
     @property
@@ -263,7 +263,7 @@ class Sip4(Binding):
 
 
 class PyQt4QtCore(Binding):
-    NAME = 'PyQt-x11-gpl-4.9.1'
+    NAME = 'PyQt-x11-gpl-4.9.4'
     SOURCE_URL = '{0}/PyQt4/{1}.tar.gz'.format(RIVERBANK_DOWNLOADS, NAME)
 
     DEPENDS = [Sip4]
@@ -308,31 +308,9 @@ class CMakeBinding(Binding):
 PYSIDE_DOWNLOADS = 'http://www.pyside.org/files'
 
 
-class ApiExtractor(CMakeBinding):
-    NAME = 'apiextractor-0.10.10'
-    SOURCE_URL = '{0}/{1}.tar.bz2'.format(PYSIDE_DOWNLOADS, NAME)
-
-    @property
-    def is_installed(self):
-        return self.have_pkg_config_package('apiextractor')
-
-
-class GeneratorRunner(CMakeBinding):
-    NAME = 'generatorrunner-0.6.16'
-    SOURCE_URL = '{0}/{1}.tar.bz2'.format(PYSIDE_DOWNLOADS, NAME)
-
-    DEPENDS = [ApiExtractor]
-
-    @property
-    def is_installed(self):
-        return self.have_pkg_config_package('generatorrunner')
-
-
 class Shiboken(CMakeBinding):
-    NAME = 'shiboken-1.1.0'
+    NAME = 'shiboken-1.1.1'
     SOURCE_URL = '{0}/{1}.tar.bz2'.format(PYSIDE_DOWNLOADS, NAME)
-
-    DEPENDS = [GeneratorRunner]
 
     CMAKE_EXTRA_ARGS = [
         '-DPython_ADDITIONAL_VERSIONS={0}.{1}'.format(*sys.version_info)
@@ -354,7 +332,7 @@ DISABLED_QT_MODULES = [
 
 
 class PySideQtCore(CMakeBinding):
-    NAME = 'pyside-qt4.7+1.1.0'
+    NAME = 'pyside-qt4.7+1.1.1'
     SOURCE_URL = '{0}/{1}.tar.bz2'.format(PYSIDE_DOWNLOADS, NAME)
 
     DEPENDS = [Shiboken]
