@@ -1,5 +1,5 @@
-0.16 (in development)
-=====================
+0.16 (Jul 25, 2012)
+===================
 
 - Remove :meth:`pyudev.Monitor.from_socket`.
 - Deprecate :meth:`pyudev.Device.traverse()` in favor of
