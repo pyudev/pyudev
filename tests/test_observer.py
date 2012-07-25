@@ -241,6 +241,8 @@ class TestGlibObserver(ObserverTestBase):
         return False
 
 
+@pytest.mark.skipif(str('"DISPLAY" not in os.environ'),
+                    reason='Display required for wxPython')
 class TestWxObserver(ObserverTestBase):
 
     def setup(self):
