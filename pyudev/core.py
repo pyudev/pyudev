@@ -35,7 +35,7 @@ except ImportError:
     from pyudev._compat import check_output
 
 from pyudev.device import Device
-from pyudev._libudev import libudev
+from pyudev._libudev import load_udev_library
 from pyudev._util import (ensure_unicode_string, ensure_byte_string,
                           udev_list_iterate, property_value_to_bytes)
 
@@ -92,18 +92,19 @@ class Context(object):
         """
         Create a new context.
         """
-        self._as_parameter_ = libudev.udev_new()
+        self._libudev = load_udev_library()
+        self._as_parameter_ = self._libudev.udev_new()
 
     def __del__(self):
-        libudev.udev_unref(self)
+        self._libudev.udev_unref(self)
 
     @property
     def sys_path(self):
         """
         The ``sysfs`` mount point defaulting to ``/sys'`` as unicode string.
         """
-        if hasattr(libudev, 'udev_get_sys_path'):
-            return ensure_unicode_string(libudev.udev_get_sys_path(self))
+        if hasattr(self._libudev, 'udev_get_sys_path'):
+            return ensure_unicode_string(self._libudev.udev_get_sys_path(self))
         else:
             # Fixed path since udev 183
             return '/sys'
@@ -113,8 +114,8 @@ class Context(object):
         """
         The device directory path defaulting to ``/dev`` as unicode string.
         """
-        if hasattr(libudev, 'udev_get_dev_path'):
-            return ensure_unicode_string(libudev.udev_get_dev_path(self))
+        if hasattr(self._libudev, 'udev_get_dev_path'):
+            return ensure_unicode_string(self._libudev.udev_get_dev_path(self))
         else:
             # Fixed path since udev 183
             return '/dev'
@@ -129,8 +130,8 @@ class Context(object):
 
         .. versionadded:: 0.10
         """
-        if hasattr(libudev, 'udev_get_run_path'):
-            return ensure_unicode_string(libudev.udev_get_run_path(self))
+        if hasattr(self._libudev, 'udev_get_run_path'):
+            return ensure_unicode_string(self._libudev.udev_get_run_path(self))
         else:
             return '/run/udev'
 
@@ -151,11 +152,11 @@ class Context(object):
 
         .. versionadded:: 0.9
         """
-        return libudev.udev_get_log_priority(self)
+        return self._libudev.udev_get_log_priority(self)
 
     @log_priority.setter
     def log_priority(self, value):
-        libudev.udev_set_log_priority(self, value)
+        self._libudev.udev_set_log_priority(self, value)
 
     def list_devices(self, **kwargs):
         """
@@ -214,10 +215,11 @@ class Enumerator(object):
         if not isinstance(context, Context):
             raise TypeError('Invalid context object')
         self.context = context
-        self._as_parameter_ = libudev.udev_enumerate_new(context)
+        self._as_parameter_ = context._libudev.udev_enumerate_new(context)
+        self._libudev = context._libudev
 
     def __del__(self):
-        libudev.udev_enumerate_unref(self)
+        self._libudev.udev_enumerate_unref(self)
 
     def match(self, **kwargs):
         """
@@ -274,9 +276,9 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (libudev.udev_enumerate_add_match_subsystem
+        match = (self._libudev.udev_enumerate_add_match_subsystem
                  if not nomatch else
-                 libudev.udev_enumerate_add_nomatch_subsystem)
+                 self._libudev.udev_enumerate_add_nomatch_subsystem)
         match(self, ensure_byte_string(subsystem))
         return self
 
@@ -290,7 +292,7 @@ class Enumerator(object):
 
         .. versionadded:: 0.8
         """
-        libudev.udev_enumerate_add_match_sysname(
+        self._libudev.udev_enumerate_add_match_sysname(
             self, ensure_byte_string(sys_name))
         return self
 
@@ -310,7 +312,7 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        libudev.udev_enumerate_add_match_property(
+        self._libudev.udev_enumerate_add_match_property(
             self, ensure_byte_string(property), property_value_to_bytes(value))
         return self
 
@@ -341,9 +343,9 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (libudev.udev_enumerate_add_match_sysattr
+        match = (self._libudev.udev_enumerate_add_match_sysattr
                  if not nomatch else
-                 libudev.udev_enumerate_add_nomatch_sysattr)
+                 self._libudev.udev_enumerate_add_nomatch_sysattr)
         match(self, ensure_byte_string(attribute),
               property_value_to_bytes(value))
         return self
@@ -360,7 +362,7 @@ class Enumerator(object):
 
         .. versionadded:: 0.6
         """
-        libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
+        self._libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):
@@ -381,7 +383,7 @@ class Enumerator(object):
 
         .. versionadded:: 0.8
         """
-        libudev.udev_enumerate_add_match_is_initialized(self)
+        self._libudev.udev_enumerate_add_match_is_initialized(self)
         return self
 
     def match_parent(self, parent):
@@ -398,7 +400,7 @@ class Enumerator(object):
 
         .. versionadded:: 0.13
         """
-        libudev.udev_enumerate_add_match_parent(self, parent)
+        self._libudev.udev_enumerate_add_match_parent(self, parent)
         return self
 
     def __iter__(self):
@@ -407,7 +409,7 @@ class Enumerator(object):
 
         Yield :class:`Device` objects.
         """
-        libudev.udev_enumerate_scan_devices(self)
-        entry = libudev.udev_enumerate_get_list_entry(self)
-        for name, _ in udev_list_iterate(entry):
+        self._libudev.udev_enumerate_scan_devices(self)
+        entry = self._libudev.udev_enumerate_get_list_entry(self)
+        for name, _ in udev_list_iterate(self._libudev, entry):
             yield Device.from_sys_path(self.context, name)

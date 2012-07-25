@@ -23,10 +23,9 @@ import random
 import syslog
 
 import pytest
-from mock import sentinel
+import mock
 
 from pyudev import udev_version
-from pyudev._libudev import libudev
 
 
 def test_udev_version():
@@ -57,15 +56,21 @@ class TestContext(object):
         assert syslog.LOG_EMERG <= context.log_priority <= syslog.LOG_DEBUG
 
     def test_log_priority_get_mock(self, context):
-        calls = {'udev_get_log_priority': [(context,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_get_log_priority.return_value = sentinel.log_priority
-            assert context.log_priority is sentinel.log_priority
+        spec = lambda c: None
+        funcname = 'udev_get_log_priority'
+        with mock.patch.object(context._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = mock.sentinel.log_priority
+            assert context.log_priority is mock.sentinel.log_priority
+            func.assert_called_once_with(context)
 
     def test_log_priority_set_mock(self, context):
-        calls = {'udev_set_log_priority': [(context, sentinel.log_priority)]}
-        with pytest.calls_to_libudev(calls):
-            context.log_priority = sentinel.log_priority
+        spec = lambda c, p: None
+        funcname = 'udev_set_log_priority'
+        with mock.patch.object(context._libudev, funcname,
+                               autospec=spec) as func:
+            context.log_priority = mock.sentinel.log_priority
+            func.assert_called_once_with(context, mock.sentinel.log_priority)
 
     def test_log_priority_roundtrip(self, context):
         # FIXME: This adds UDEV_LOG properties?!

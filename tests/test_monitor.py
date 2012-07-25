@@ -25,10 +25,9 @@ from contextlib import contextmanager
 from select import select
 
 import pytest
-from mock import Mock, sentinel, patch
+import mock
 
 from pyudev import Monitor, MonitorObserver, Device
-from pyudev._libudev import libudev
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -75,16 +74,20 @@ class TestMonitor(object):
         assert not monitor.started
 
     def test_from_netlink_source_udev_mock(self, context):
-        calls = {'udev_monitor_new_from_netlink':
-                 [(context, b'udev'), (context, b'udev')]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+        funcname = 'udev_monitor_new_from_netlink'
+        spec = lambda c, s: None
+        with mock.patch.object(context._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = mock.sentinel.monitor
             monitor = Monitor.from_netlink(context)
-            assert monitor._as_parameter_ is sentinel.monitor
+            assert monitor._as_parameter_ is mock.sentinel.monitor
             assert not monitor.started
+            func.assert_called_once_with(context, b'udev')
+            func.reset_mock()
             monitor = Monitor.from_netlink(context, 'udev')
-            assert monitor._as_parameter_ is sentinel.monitor
+            assert monitor._as_parameter_ is mock.sentinel.monitor
             assert not monitor.started
+            func.assert_called_once_with(context, b'udev')
 
     def test_from_netlink_source_kernel(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
@@ -92,22 +95,28 @@ class TestMonitor(object):
         assert not monitor.started
 
     def test_from_netlink_source_kernel_mock(self, context):
-        calls = {'udev_monitor_new_from_netlink': [(context, b'kernel')]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_monitor_new_from_netlink.return_value = sentinel.monitor
+        funcname = 'udev_monitor_new_from_netlink'
+        spec = lambda c, s: None
+        with mock.patch.object(context._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = mock.sentinel.monitor
             monitor = Monitor.from_netlink(context, 'kernel')
-            assert monitor._as_parameter_ is sentinel.monitor
+            assert monitor._as_parameter_ is mock.sentinel.monitor
             assert not monitor.started
+            func.assert_called_once_with(context, b'kernel')
 
     def test_fileno(self, monitor):
         # we can't do more than check that no exception is thrown
         monitor.fileno()
 
     def test_fileno_mock(self, monitor):
-        calls = {'udev_monitor_get_fd': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_monitor_get_fd.return_value = sentinel.fileno
-            assert monitor.fileno() is sentinel.fileno
+        funcname = 'udev_monitor_get_fd'
+        spec = lambda m: None
+        with mock.patch.object(monitor._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = mock.sentinel.fileno
+            assert monitor.fileno() is mock.sentinel.fileno
+            func.assert_called_once_with(monitor)
 
     def test_filter_by_no_subsystem(self, monitor):
         with pytest.raises(AttributeError):
@@ -118,22 +127,33 @@ class TestMonitor(object):
         monitor.filter_by('input')
 
     def test_filter_by_subsystem_no_dev_type_mock(self, monitor):
-        calls = {'udev_monitor_filter_add_match_subsystem_devtype':
-                 [(monitor, b'input', None)],
-                 'udev_monitor_filter_update': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
-            monitor.filter_by('input')
+        funcname = 'udev_monitor_filter_add_match_subsystem_devtype'
+        spec = lambda m, s, t: None
+        libudev = monitor._libudev
+        with mock.patch.object(libudev, funcname, autospec=spec) as match:
+            funcname = 'udev_monitor_filter_update'
+            spec = lambda m: None
+            with mock.patch.object(libudev, funcname, autospec=spec) as update:
+                monitor.filter_by('input')
+                match.assert_called_once_with(monitor, b'input', None)
+                update.assert_called_once_with(monitor)
 
     def test_filter_by_subsystem_dev_type(self, monitor):
         monitor.filter_by('input', b'usb_interface')
         monitor.filter_by('input', 'usb_interface')
 
     def test_filter_by_subsystem_dev_type_mock(self, monitor):
-        calls = {'udev_monitor_filter_add_match_subsystem_devtype':
-                 [(monitor, b'input', b'usb_interface')],
-                 'udev_monitor_filter_update': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
-            monitor.filter_by('input', 'usb_interface')
+        funcname = 'udev_monitor_filter_add_match_subsystem_devtype'
+        spec = lambda m, s, t: None
+        libudev = monitor._libudev
+        with mock.patch.object(libudev, funcname, autospec=spec) as match:
+            funcname = 'udev_monitor_filter_update'
+            spec = lambda m: None
+            with mock.patch.object(libudev, funcname, autospec=spec) as update:
+                monitor.filter_by('input', 'usb_interface')
+                match.assert_called_once_with(monitor, b'input',
+                                              b'usb_interface')
+                update.assert_called_once_with(monitor)
 
     @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag(self, monitor):
@@ -141,10 +161,16 @@ class TestMonitor(object):
 
     @pytest.mark.udev_version('>= 154')
     def test_filter_by_tag_mock(self, monitor):
-        calls = {'udev_monitor_filter_add_match_tag': [(monitor, b'eggs')],
-                 'udev_monitor_filter_update': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
-            monitor.filter_by_tag('eggs')
+        funcname = 'udev_monitor_filter_add_match_tag'
+        spec = lambda m, t: None
+        libudev = monitor._libudev
+        with mock.patch.object(libudev, funcname, autospec=spec) as match:
+            funcname = 'udev_monitor_filter_update'
+            spec = lambda m: None
+            with mock.patch.object(libudev, funcname, autospec=spec) as update:
+                monitor.filter_by_tag('eggs')
+                match.assert_called_once_with(monitor, b'eggs')
+                update.assert_called_once_with(monitor)
 
     def test_remove_filter(self, monitor):
         """
@@ -155,10 +181,15 @@ class TestMonitor(object):
             monitor.remove_filter()
 
     def test_remove_filter_mock(self, monitor):
-        calls = {'udev_monitor_filter_remove': [(monitor,)],
-                 'udev_monitor_filter_update': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
-            monitor.remove_filter()
+        funcname = 'udev_monitor_filter_remove'
+        libudev = monitor._libudev
+        spec = lambda m: None
+        with mock.patch.object(libudev, funcname, autospec=spec) as remove:
+            funcname = 'udev_monitor_filter_update'
+            with mock.patch.object(libudev, funcname, autospec=spec) as update:
+                monitor.remove_filter()
+                remove.assert_called_once_with(monitor)
+                update.assert_called_once_with(monitor)
 
     def test_start_netlink_kernel_source(self, context):
         monitor = Monitor.from_netlink(context, source='kernel')
@@ -167,24 +198,31 @@ class TestMonitor(object):
         assert monitor.started
 
     def test_start_mock(self, monitor):
-        calls = {'udev_monitor_enable_receiving': [(monitor,)]}
-        with pytest.calls_to_libudev(calls):
+        funcname = 'udev_monitor_enable_receiving'
+        spec = lambda m: None
+        with mock.patch.object(monitor._libudev, funcname,
+                               autospec=spec) as func:
             assert not monitor.started
             monitor.start()
             assert monitor.started
+            monitor.start()
+            func.assert_called_once_with(monitor)
 
     def test_enable_receiving(self, monitor):
         """
         Test that enable_receiving() is deprecated and calls out to start().
         """
-        with patch.object(monitor, 'start') as start:
+        with mock.patch.object(monitor, 'start') as start:
             pytest.deprecated_call(monitor.enable_receiving)
             assert start.called
 
     def test_set_receive_buffer_size_mock(self, monitor):
-        calls = {'udev_monitor_set_receive_buffer_size': [(monitor, 1000)]}
-        with pytest.calls_to_libudev(calls):
+        funcname = 'udev_monitor_set_receive_buffer_size'
+        spec = lambda m, s: None
+        with mock.patch.object(monitor._libudev, funcname,
+                               autospec=spec) as func:
             monitor.set_receive_buffer_size(1000)
+            func.assert_called_once_with(monitor, 1000)
 
     def test_set_receive_buffer_size_privilege_error(self, monitor):
         with pytest.raises(EnvironmentError) as exc_info:
@@ -224,8 +262,8 @@ class TestMonitor(object):
         Test that Monitor.receive_device is deprecated and calls out to
         _receive_device(), which in turn is tested by test_poll.
         """
-        with patch.object(monitor, '_receive_device') as receive_device:
-            device = Mock(name='device')
+        with mock.patch.object(monitor, '_receive_device') as receive_device:
+            device = mock.Mock(name='device')
             device.action = 'spam'
             receive_device.return_value = device
             event = pytest.deprecated_call(monitor.receive_device)

@@ -34,7 +34,6 @@ import select
 from threading import Thread
 from contextlib import closing
 
-from pyudev._libudev import libudev
 from pyudev._util import ensure_byte_string
 
 from pyudev.core import Device
@@ -86,10 +85,11 @@ class Monitor(object):
     def __init__(self, context, monitor_p):
         self.context = context
         self._as_parameter_ = monitor_p
+        self._libudev = context._libudev
         self._started = False
 
     def __del__(self):
-        libudev.udev_monitor_unref(self)
+        self._libudev.udev_monitor_unref(self)
 
     @classmethod
     def from_netlink(cls, context, source='udev'):
@@ -117,7 +117,7 @@ class Monitor(object):
         if source not in ('kernel', 'udev'):
             raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
                              'or "kernel"'.format(source))
-        monitor = libudev.udev_monitor_new_from_netlink(
+        monitor = context._libudev.udev_monitor_new_from_netlink(
             context, ensure_byte_string(source))
         if not monitor:
             raise EnvironmentError('Could not create udev monitor')
@@ -140,7 +140,7 @@ class Monitor(object):
         This is really a real file descriptor ;), which can be watched and
         :func:`select.select`\ ed.
         """
-        return libudev.udev_monitor_get_fd(self)
+        return self._libudev.udev_monitor_get_fd(self)
 
     def filter_by(self, subsystem, device_type=None):
         """
@@ -165,9 +165,9 @@ class Monitor(object):
         subsystem = ensure_byte_string(subsystem)
         if device_type:
             device_type = ensure_byte_string(device_type)
-        libudev.udev_monitor_filter_add_match_subsystem_devtype(
+        self._libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self, subsystem, device_type)
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def filter_by_tag(self, tag):
         """
@@ -188,9 +188,9 @@ class Monitor(object):
         .. versionchanged:: 0.15
            This method can also be after :meth:`start()` now.
         """
-        libudev.udev_monitor_filter_add_match_tag(
+        self._libudev.udev_monitor_filter_add_match_tag(
             self, ensure_byte_string(tag))
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def remove_filter(self):
         """
@@ -209,8 +209,8 @@ class Monitor(object):
 
         .. versionadded:: 0.15
         """
-        libudev.udev_monitor_filter_remove(self)
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_remove(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def enable_receiving(self):
         """
@@ -251,7 +251,7 @@ class Monitor(object):
            started.
         """
         if not self._started:
-            libudev.udev_monitor_enable_receiving(self)
+            self._libudev.udev_monitor_enable_receiving(self)
             self._started = True
 
     def set_receive_buffer_size(self, size):
@@ -279,7 +279,7 @@ class Monitor(object):
 
         .. _python-prctl: http://packages.python.org/python-prctl
         """
-        libudev.udev_monitor_set_receive_buffer_size(self, size)
+        self._libudev.udev_monitor_set_receive_buffer_size(self, size)
 
     def _receive_device(self):
         """
@@ -288,7 +288,7 @@ class Monitor(object):
         Return the received :class:`Device`. Raise
         :exc:`~exceptions.EnvironmentError`, if no device could be read.
         """
-        device_p = libudev.udev_monitor_receive_device(self)
+        device_p = self._libudev.udev_monitor_receive_device(self)
         if not device_p:
             raise EnvironmentError('Could not receive device')
         return Device(self.context, device_p)

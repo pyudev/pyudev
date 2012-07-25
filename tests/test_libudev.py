@@ -24,9 +24,7 @@ import ctypes
 
 import pytest
 
-from pyudev import _libudev as binding
-
-libudev = binding.libudev
+from pyudev import _libudev
 
 
 WRAPPER_BLACKLIST_PATTERNS = [
@@ -83,7 +81,7 @@ def _pointer_to_ctypes(pointer):
 
 TYPE_CONVERTER = {
     'FundamentalType': lambda t: FUNDAMENTAL_TYPES[t.name],
-    'Struct': lambda s: getattr(binding, s.name),
+    'Struct': lambda s: getattr(_libudev, s.name),
     'PointerType': _pointer_to_ctypes,
     # const qualifiers are ignored in ctypes
     'CvQualifiedType': lambda t: _to_ctypes(t.type),
@@ -105,8 +103,7 @@ class LibudevFunction(object):
     def name(self):
         return self.declaration.name
 
-    @property
-    def wrapper(self):
+    def get_wrapper(self, libudev):
         return getattr(libudev, self.name)
 
     @property
@@ -128,23 +125,32 @@ def pytest_funcarg__libudev_function(request):
     return LibudevFunction(function)
 
 
-def test_arguments(libudev_function):
-    assert libudev_function.wrapper.argtypes == libudev_function.argument_types
+def pytest_funcarg__libudev(request):
+    return _libudev.load_udev_library()
 
 
-def test_return_type(libudev_function):
+def pytest_funcarg__function(request):
+    libudev = request.getfuncargvalue('libudev')
+    libudev_function = request.getfuncargvalue('libudev_function')
+    return libudev_function.get_wrapper(libudev)
+
+
+def test_arguments(function, libudev_function):
+    assert function.argtypes == libudev_function.argument_types
+
+
+def test_return_type(function, libudev_function):
     # Ignore the return type of *_unref() functions. The return value of these
     # functions is unused in pyudev, so it doesn't need to be wrapped.
     restype = (libudev_function.return_type
                if not libudev_function.name.endswith('_unref')
                else None)
-    assert libudev_function.wrapper.restype == restype
+    assert function.restype == restype
 
 
-def test_error_checker(libudev_function):
+def test_error_checker(function, libudev_function):
     name = libudev_function.name
-    if name in binding.ERROR_CHECKERS:
-        assert libudev_function.wrapper.errcheck == \
-                binding.ERROR_CHECKERS[name]
+    if name in _libudev.ERROR_CHECKERS:
+        assert function.errcheck == _libudev.ERROR_CHECKERS[name]
     else:
         pytest.skip('{0} has no error checker'.format(name))

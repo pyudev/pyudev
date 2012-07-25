@@ -33,7 +33,6 @@ import os
 import sys
 import stat
 
-from pyudev._libudev import libudev
 
 if sys.version_info[0] == 2:
     text_type = unicode
@@ -101,7 +100,7 @@ def string_to_bool(value):
     return value == '1'
 
 
-def udev_list_iterate(entry):
+def udev_list_iterate(libudev, entry):
     """
     Iteration helper for udev list entry objects.
 

@@ -284,6 +284,3 @@ def load_udev_library():
                 if errorchecker:
                     func.errcheck = errorchecker
     return libudev
-
-
-libudev = load_udev_library()

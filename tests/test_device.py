@@ -30,7 +30,7 @@ from itertools import count
 from datetime import timedelta
 
 import pytest
-from mock import sentinel
+import mock
 
 from pyudev import (Device,
                     DeviceNotFoundAtPathError,
@@ -38,7 +38,6 @@ from pyudev import (Device,
                     DeviceNotFoundByNumberError,
                     DeviceNotFoundInEnvironmentError)
 from pyudev.device import Attributes, Tags
-from pyudev._libudev import libudev
 
 
 with_device_data = pytest.mark.parametrize(
@@ -228,29 +227,40 @@ class TestDevice(object):
 
     @with_devices
     def test_find_parent_no_devtype_mock(self, device):
-        calls = {'udev_device_get_parent_with_subsystem_devtype':
-                 [(device, b'subsystem', None)],
-                 'udev_device_ref': [(sentinel.parent_device,)]}
-        with pytest.calls_to_libudev(calls):
-            f = libudev.udev_device_get_parent_with_subsystem_devtype
-            f.return_value = sentinel.parent_device
-            libudev.udev_device_ref.return_value = sentinel.ref_device
-            parent = device.find_parent('subsystem')
-            assert isinstance(parent, Device)
-            assert parent._as_parameter_ is sentinel.ref_device
+        funcname = 'udev_device_get_parent_with_subsystem_devtype'
+        spec = lambda d, s, t: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as get_parent:
+            get_parent.return_value = mock.sentinel.parent_device
+            funcname = 'udev_device_ref'
+            spec = lambda d: None
+            with mock.patch.object(device._libudev, funcname,
+                                   autospec=spec) as device_ref:
+                device_ref.return_value = mock.sentinel.referenced_device
+                parent = device.find_parent('subsystem')
+                assert isinstance(parent, Device)
+                assert parent._as_parameter_ is mock.sentinel.referenced_device
+                get_parent.assert_called_once_with(device, b'subsystem', None)
+                device_ref.assert_called_once_with(mock.sentinel.parent_device)
 
     @with_devices
     def test_find_parent_with_devtype_mock(self, device):
-        calls = {'udev_device_get_parent_with_subsystem_devtype':
-                 [(device, b'subsystem', b'devtype')],
-                 'udev_device_ref': [(sentinel.parent_device,)]}
-        with pytest.calls_to_libudev(calls):
-            f = libudev.udev_device_get_parent_with_subsystem_devtype
-            f.return_value = sentinel.parent_device
-            libudev.udev_device_ref.return_value = sentinel.ref_device
-            parent = device.find_parent('subsystem', 'devtype')
-            assert isinstance(parent, Device)
-            assert parent._as_parameter_ is sentinel.ref_device
+        funcname = 'udev_device_get_parent_with_subsystem_devtype'
+        spec = lambda d, s, t: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as get_parent:
+            get_parent.return_value = mock.sentinel.parent_device
+            funcname = 'udev_device_ref'
+            spec = lambda d: None
+            with mock.patch.object(device._libudev, funcname,
+                                   autospec=spec) as device_ref:
+                device_ref.return_value = mock.sentinel.referenced_device
+                parent = device.find_parent('subsystem', 'devtype')
+                assert isinstance(parent, Device)
+                assert parent._as_parameter_ is mock.sentinel.referenced_device
+                get_parent.assert_called_once_with(
+                    device, b'subsystem', b'devtype')
+                device_ref.assert_called_once_with(mock.sentinel.parent_device)
 
     @with_devices
     def test_traverse(self, device):
@@ -320,10 +330,13 @@ class TestDevice(object):
     @pytest.mark.udev_version('>= 165')
     @with_devices
     def test_is_initialized_mock(self, device):
-        calls = {'udev_device_get_is_initialized': [(device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_get_is_initialized.return_value = False
+        funcname = 'udev_device_get_is_initialized'
+        spec = lambda d: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = False
             assert not device.is_initialized
+            func.assert_called_once_with(device)
 
     @pytest.mark.udev_version('>= 165')
     @with_devices
@@ -333,10 +346,13 @@ class TestDevice(object):
     @pytest.mark.udev_version('>= 165')
     @with_devices
     def test_time_since_initialized_mock(self, device):
-        calls = {'udev_device_get_usec_since_initialized': [(device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_get_usec_since_initialized.return_value = 100
+        funcname = 'udev_device_get_usec_since_initialized'
+        spec = lambda d: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = 100
             assert device.time_since_initialized.microseconds == 100
+            func.assert_called_once_with(device)
 
     @with_device_data
     def test_links(self, context, device, device_data):
@@ -350,11 +366,16 @@ class TestDevice(object):
 
     @with_devices
     def test_action_mock(self, device):
-        calls = {'udev_device_get_action': [(device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_get_action.return_value = b'spam'
+        funcname = 'udev_device_get_action'
+        spec = lambda d: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = b'spam'
             assert device.action == 'spam'
+            func.assert_called_once_with(device)
+            func.reset_mock()
             assert pytest.is_unicode_string(device.action)
+            func.assert_called_once_with(device)
 
     @with_devices
     @pytest.mark.seqnum
@@ -499,12 +520,12 @@ class TestAttributes(object):
     @with_devices
     def test_iteration_mock(self, device):
         attributes = [b'spam', b'eggs']
-        get_sysattr_list = 'udev_device_get_sysattr_list_entry'
-        with pytest.libudev_list(get_sysattr_list, attributes):
+        funcname = 'udev_device_get_sysattr_list_entry'
+        with pytest.libudev_list(device._libudev, funcname, attributes):
             attrs = list(device.attributes)
             assert attrs == ['spam', 'eggs']
-            f = libudev.udev_device_get_sysattr_list_entry
-            f.assert_called_with(device)
+            func = device._libudev.udev_device_get_sysattr_list_entry
+            func.assert_called_with(device)
 
     @with_device_data
     def test_contains(self, device, device_data):
@@ -570,12 +591,13 @@ class TestTags(object):
 
     @with_devices
     def test_iteration_mock(self, device):
-        with pytest.libudev_list('udev_device_get_tags_list_entry',
+        funcname = 'udev_device_get_tags_list_entry'
+        with pytest.libudev_list(device._libudev, funcname,
                                  [b'spam', b'eggs']):
             tags = list(device.tags)
             assert tags == ['spam', 'eggs']
-            f = libudev.udev_device_get_tags_list_entry
-            f.assert_called_with(device)
+            func = device._libudev.udev_device_get_tags_list_entry
+            func.assert_called_once_with(device)
 
     @with_device_data
     def test_contains(self, device, device_data):
@@ -590,7 +612,21 @@ class TestTags(object):
         """
         Test that ``udev_device_has_tag`` is called if available.
         """
-        calls = {'udev_device_has_tag': [(device, b'foo')]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_has_tag.return_value = 1
+        funcname = 'udev_device_has_tag'
+        spec = lambda d, t: None
+        with mock.patch.object(device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = 1
             assert 'foo' in device.tags
+            func.assert_called_once_with(device, b'foo')
+
+
+def test_garbage():
+    """
+    Make sure that all the device tests create no uncollectable objects.
+
+    This test must stick at the bottom of this test file to make sure that
+    ``py.test`` always executes it at last.
+    """
+    import gc
+    assert not gc.garbage
