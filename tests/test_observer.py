@@ -19,10 +19,9 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import pytest
-from mock import Mock
+import mock
 
 from pyudev import Monitor, Device
-from pyudev._libudev import libudev
 
 
 def pytest_funcarg__monitor(request):
@@ -101,15 +100,17 @@ class ObserverTestBase(object):
     def test_events_fake_monitor(self, action, fake_monitor,
                                  fake_monitor_device):
         self.prepare_test(fake_monitor)
-        event_callback = Mock(side_effect=self.stop_when_done)
-        action_callback = Mock(side_effect=self.stop_when_done)
+        event_callback = mock.Mock(side_effect=self.stop_when_done)
+        action_callback = mock.Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
         self.connect_signal(action_callback, action=action)
-        calls = {'udev_device_get_action': [(fake_monitor_device,),
-                                            (fake_monitor_device,)]}
-        with pytest.calls_to_libudev(calls):
-            libudev.udev_device_get_action.return_value = action.encode('ascii')
+        funcname = 'udev_device_get_action'
+        spec = lambda d: None
+        with mock.patch.object(fake_monitor_device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = action.encode('ascii')
             self.start_event_loop(fake_monitor.trigger_event)
+            func.assert_called_with(fake_monitor_device)
         event_callback.assert_called_with(action, fake_monitor_device)
         action_callback.assert_called_with(fake_monitor_device)
 
@@ -121,9 +122,9 @@ class ObserverTestBase(object):
         monitor.start()
         self.prepare_test(monitor)
         # setup signal handlers
-        event_callback = Mock(side_effect=self.stop_when_done)
-        added_callback = Mock(side_effect=self.stop_when_done)
-        removed_callback = Mock(side_effect=self.stop_when_done)
+        event_callback = mock.Mock(side_effect=self.stop_when_done)
+        added_callback = mock.Mock(side_effect=self.stop_when_done)
+        removed_callback = mock.Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
         self.connect_signal(added_callback, action='add')
         self.connect_signal(removed_callback, action='remove')

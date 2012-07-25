@@ -64,7 +64,6 @@ def pytest_namespace():
 
 def pytest_funcarg__context(request):
     """
-    Return a useable :class:`pyudev.Context` object.  The context is cached
-    with session scope.
+    Return a useable :class:`pyudev.Context` object.
     """
-    return request.cached_setup(setup=pyudev.Context, scope='session')
+    return pyudev.Context()

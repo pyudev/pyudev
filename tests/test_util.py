@@ -22,6 +22,7 @@ import sys
 import errno
 
 import pytest
+from mock import Mock
 
 from pyudev import _util
 
@@ -97,15 +98,15 @@ def test_string_to_bool_invalid_value():
 
 
 def test_udev_list_iterate_no_entry():
-    assert not list(_util.udev_list_iterate(None))
+    assert not list(_util.udev_list_iterate(Mock(), None))
 
 
 def test_udev_list_iterate_mock():
-    from pyudev._libudev import libudev
+    libudev = Mock(name='libudev')
     items = [('spam', 'eggs'), ('foo', 'bar')]
-    with pytest.libudev_list('udev_enumerate_get_list_entry', items):
+    with pytest.libudev_list(libudev, 'udev_enumerate_get_list_entry', items):
         udev_list = libudev.udev_enumerate_get_list_entry()
-        assert list(_util.udev_list_iterate(udev_list)) == [
+        assert list(_util.udev_list_iterate(libudev, udev_list)) == [
             ('spam', 'eggs'), ('foo', 'bar')]
 
 

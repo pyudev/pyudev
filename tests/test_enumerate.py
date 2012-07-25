@@ -114,10 +114,13 @@ class TestEnumerator(object):
     @pytest.mark.udev_version('>= 154')
     def test_match_tag_mock(self, context):
         enumerator = context.list_devices()
-        calls = {'udev_enumerate_add_match_tag': [(enumerator, b'spam')]}
-        with pytest.calls_to_libudev(calls):
+        funcname = 'udev_enumerate_add_match_tag'
+        spec = lambda e, t: None
+        with mock.patch.object(enumerator._libudev, funcname,
+                               autospec=spec) as func:
             retval = enumerator.match_tag('spam')
             assert retval is enumerator
+            func.assert_called_with(enumerator, b'spam')
 
     @pytest.mark.udev_version('>= 154')
     def test_match_tag(self, context):
@@ -140,9 +143,13 @@ class TestEnumerator(object):
     @pytest.mark.udev_version('>= 165')
     def test_match_is_initialized_mock(self, context):
         enumerator = context.list_devices()
-        calls = {'udev_enumerate_add_match_is_initialized': [(enumerator,)]}
-        with pytest.calls_to_libudev(calls):
-            enumerator.match_is_initialized()
+        funcname = 'udev_enumerate_add_match_is_initialized'
+        spec = lambda e: None
+        with mock.patch.object(enumerator._libudev, funcname,
+                               autospec=spec) as func:
+            retval = enumerator.match_is_initialized()
+            assert retval is enumerator
+            func.assert_called_with(enumerator)
 
     def test_combined_matches_of_same_type(self, context):
         """

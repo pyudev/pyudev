@@ -1,6 +1,8 @@
 0.17 (in development)
 =====================
 
+- #52: Remove global libudev object
+
 
 0.16 (Jul 25, 2012)
 ===================
