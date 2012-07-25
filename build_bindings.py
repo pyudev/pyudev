@@ -128,7 +128,7 @@ class Binding(object):
     def __init__(self, env, force=False):
         self.env = env
         self.build_directory = os.path.join(env.build_directory, self.NAME)
-        self.force = False
+        self.force = force
 
     @property
     def is_installed(self):
