@@ -71,8 +71,8 @@ The source code is hosted on GitHub_::
 
    git clone https://github.com/lunaryorn/pyudev.git
 
-If you want to contribute to pyudev, please read the guidelines for contributes
-and the testsuite documentation.
+If you want to contribute to pyudev, please read the guidelines for
+contributions and the testsuite documentation.
 
 .. toctree::
    :maxdepth: 2
