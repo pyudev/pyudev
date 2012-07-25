@@ -12,5 +12,5 @@ install:
   - pip install . --use-mirrors
   - pip install -r requirements.txt --use-mirrors
 after_install:
-  - python build_bindings.py --bindings pygobject
+  - python build_bindings.py --binding pygobject --force-build
 script: py.test --junitxml=tests.xml --enable-privileged -rfEsxX
