@@ -65,7 +65,10 @@ features, but respect the following guidelines:
 
 - Read `how to properly contribute to open source projects on GitHub
   <http://gun.io/blog/how-to-github-fork-branch-and-pull-request/>`_.
-- Use a topic branch to easily amend a pull request later, if necessary.
+- Understand the `branching model
+  <http://nvie.com/posts/a-successful-git-branching-model/>`_.
+- Use a topic branch based on the ``develop`` branch to easily amend a pull
+  request later, if necessary.
 - Write `good commit messages
   <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_.
 - Squash commits on the topic branch before opening a pull request.
