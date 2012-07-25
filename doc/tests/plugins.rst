@@ -12,7 +12,6 @@ The following plugins are provided and enabled:
    fake_monitor
    mock_libudev
    libudev
-   build_bindings
 
 The main plugin is :mod:`~plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
@@ -277,37 +276,6 @@ Types
    .. attribute:: type
 
       The underyling type
-
-
-:mod:`~plugins.build_bindings` – Build native bindings
-------------------------------------------------------
-
-.. automodule:: plugins.build_bindings
-
-Command line options
-~~~~~~~~~~~~~~~~~~~~
-
-.. program:: py.test
-
-.. option:: --build-bindings
-
-   Build and install native bindings required by the tests.  If this option is
-   not given, bindings won't be installed.  Tests that required these bindings
-   are skipped.
-
-.. option:: --bindings-download-dir=DIRECTORY
-
-   Download source archives of bindings to ``DIRECTORY``.  If not given,
-   bindings are downloaded to a temporary directory.
-
-.. option:: --bindings-build-dir=DIRECTORY
-
-   Build source archives of bindings within ``DIRECTORY``.  If not given,
-   bindings are built within a temporary directory.
-
-.. option:: --force-build
-
-   Force a re-build of bindings even if they are already installed.
 
 
 .. _pytest: http://pytest.org

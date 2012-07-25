@@ -16,14 +16,13 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    plugins.build_bindings
-    ======================
+    build_bindings
+    ==============
 
-    Plugin to build native bindings before test execution.
+    Script to build native bindings inside virtualenvs.
 
-    This plugin builds pygobject, PyQt4.QtCore and PySide.QtCore during test
-    configuration if these are not available and if this feature is enable via
-    :option:`py.test --build-bindings`.
+    This plugin builds pygobject, PyQt4.QtCore, PySide.QtCore and wxPython if
+    these are not available.
 
     This feature is mainly intented for use with tox_, but can be used in
     normal virtualenvs, too.
@@ -51,7 +50,6 @@ import platform
 import os
 import posixpath
 import errno
-from tempfile import mkdtemp
 from collections import defaultdict
 from subprocess import call, check_call
 try:
@@ -371,30 +369,38 @@ class WxPython(Binding):
         self.check_call(cmd)
 
 
-BINDINGS = [PyGObject, PyQt4QtCore, PySideQtCore, WxPython]
+AVAILABLE_BINDINGS = {
+    'pyqt4': PyQt4QtCore,
+    'pyside': PySideQtCore,
+    'pygobject': PyGObject,
+    'wxpython': WxPython,
+}
 
 
-def pytest_addoption(parser):
-    group = parser.getgroup('buildbindings', 'building of native bindings')
-    group.addoption('--build-bindings', action='store_true',
-                    help='Build native bindings')
-    group.addoption('--force-build', action='store_true',
-                    help='Force rebuild of bindings', default=False)
-    group.addoption('--binding-download-dir', help='Download directory',
-                    metavar='DIRECTORY')
-    group.addoption('--binding-build-dir', help='Build directory',
-                    metavar='DIRECTORY')
+def main():
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument('-d', '--download-directory',
+                        help='Download directory')
+    parser.add_argument('-b', '--build-directory', help='Build directory')
+    parser.add_argument('-f', '--force-build', action='store_true',
+                        help='Build even if the binding is already available')
+    parser.add_argument('--binding', action='append', dest='bindings',
+                        help='Binding to build', choices=AVAILABLE_BINDINGS)
+    parser.set_defaults(download_directory='/tmp/pyudev-build-bindings',
+                        build_directory='/tmp/pyudev-build-bindings')
+
+    args = parser.parse_args()
+    if not args.bindings:
+        args.bindings = AVAILABLE_BINDINGS.keys()
+
+    bindings = [AVAILABLE_BINDINGS[b] for b in args.bindings]
+
+    env = Environment(args.download_directory, args.build_directory)
+    env.prepare()
+    env.build_all(bindings, force=args.force_build)
 
 
-def pytest_configure(config):
-    if config.option.build_bindings:
-        download_dir = config.option.binding_download_dir
-        if not download_dir:
-            download_dir = mkdtemp('download', 'build_bindings')
-        build_dir = config.option.binding_build_dir
-        if not build_dir:
-            build_dir = mkdtemp('build', 'build_bindings')
-
-        env = Environment(download_dir, build_dir)
-        env.prepare()
-        env.build_all(BINDINGS, force=config.option.force_build)
+if __name__ == '__main__':
+    main()

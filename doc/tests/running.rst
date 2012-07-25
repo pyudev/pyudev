@@ -57,5 +57,28 @@ default.  Refer to :mod:`~tests.plugins.privileged` for more information on how
 to enable these tests and configure them properly.
 
 
+Native bindings
+~~~~~~~~~~~~~~~
+
+Some tests require native bindings to other libraries. These bindings cannot be
+installed by means of a ``requirements.txt`` file, but need to be build instead.
+Since building these bindings is cumbersome and difficult, especially inside
+virtualenvs, the ``build_bindings.py`` is provided to automate these builds.
+
+``tox`` is configured to execute this script before running the tests, so that
+tox tests will always have these bindings available.  For custom virtualenvs
+however you need to perform this step manually after virtualenv creation::
+
+   python build_bindings.py
+
+.. warning::
+
+   By default, builds are done under ``/tmp``, so make sure that there is enough
+   space available on this filesystem, especially if it is located on ``tmpfs``.
+   Use the ``--download-directory`` and ``--build-directory`` options to change
+   the corresponding directories if needed.
+
+See ``python build_bindings.py --help`` for more information.
+
 .. _virtualenv: http://www.virtualenv.org/en/latest/index.html
 .. _tox: http://tox.testrun.org/latest/

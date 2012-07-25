@@ -25,7 +25,6 @@ import pyudev
 
 
 pytest_plugins = [
-    str('plugins.build_bindings'),
     str('plugins.udev_database'),
     str('plugins.fake_monitor'),
     str('plugins.privileged'),
