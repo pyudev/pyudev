@@ -275,7 +275,9 @@ def pytest_runtest_setup(item):
     if marker is not None:
         version_spec = marker.args[0]
         actual_version = item.config.udev_version
-        if not eval('{0} {1}'.format(actual_version, version_spec)):
+        if actual_version is None:
+            pytest.skip('udev not found')
+        elif not eval('{0} {1}'.format(actual_version, version_spec)):
             msg = 'udev version mismatch: {0} required, {1} found'.format(
                 version_spec, actual_version)
             pytest.skip(msg)
@@ -302,13 +304,21 @@ def pytest_configure(config):
         'version matches the given version spec')
 
     udevadm = UDevAdm.find()
-    config.udev_version = udevadm.query_udev_version()
-    config.udev_database = DeviceDatabase(udevadm)
-    config.udev_device_sample = _get_device_sample(config)
+    if udevadm:
+        config.udev_version = udevadm.query_udev_version()
+        config.udev_database = DeviceDatabase(udevadm)
+        config.udev_device_sample = _get_device_sample(config)
+    else:
+        config.udev_version = None
+        config.udev_database = None
+        config.udev_device_sample = []
 
 
 def pytest_funcarg__udev_database(request):
     """
     The udev database as provided by :attr:`pytest.config.udev_database`.
     """
-    return request.config.udev_database
+    if request.config.udev_database is None:
+        pytest.skip('No udev database loaded')
+    else:
+        return request.config.udev_database
