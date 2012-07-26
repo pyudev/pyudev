@@ -21,6 +21,8 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import sys
 
+import pytest
+
 import pyudev
 
 
@@ -66,4 +68,7 @@ def pytest_funcarg__context(request):
     """
     Return a useable :class:`pyudev.Context` object.
     """
-    return pyudev.Context()
+    try:
+        return pyudev.Context()
+    except ImportError:
+        pytest.skip('udev not available')

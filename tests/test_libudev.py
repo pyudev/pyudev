@@ -126,7 +126,10 @@ def pytest_funcarg__libudev_function(request):
 
 
 def pytest_funcarg__libudev(request):
-    return _libudev.load_udev_library()
+    try:
+        return _libudev.load_udev_library()
+    except ImportError:
+        pytest.skip('udev not available')
 
 
 def pytest_funcarg__function(request):
