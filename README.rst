@@ -2,7 +2,7 @@
 pyudev
 ######
 
-.. image:: https://secure.travis-ci.org/lunaryorn/pyudev.png
+.. image:: https://secure.travis-ci.org/lunaryorn/pyudev.png?branch=develop
    :target: http://travis-ci.org/lunaryorn/pyudev
 
 http://pyudev.readthedocs.org
