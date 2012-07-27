@@ -136,8 +136,8 @@ class ObserverTestBase(object):
         added_callback.assert_called_with(device)
         assert not removed_callback.called
 
-        for mock in (event_callback, added_callback, removed_callback):
-            mock.reset_mock()
+        for callback in (event_callback, added_callback, removed_callback):
+            callback.reset_mock()
 
         self.start_event_loop(pytest.unload_dummy)
         event_callback.assert_called_with('remove', device)
