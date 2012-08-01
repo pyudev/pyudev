@@ -5,3 +5,4 @@ include build_bindings.py
 include tox.ini
 global-include requirements.txt
 include CHANGES.rst COPYING README.rst
+include setup.py setup.cfg
