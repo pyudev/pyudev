@@ -1,5 +1,5 @@
-0.16.1 (in development)
-=======================
+0.16.1 (Aug 08, 2012)
+=====================
 
 - #53: Fix source distribution
 - #54: Fix typo in test
