@@ -1,6 +1,7 @@
 recursive-include pyudev *.py
 recursive-include doc *.rst *.py *.html
 recursive-include tests *.py
+include build_bindings.py
 include tox.ini
 global-include requirements.txt
 include CHANGES.rst COPYING README.rst
