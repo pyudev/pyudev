@@ -100,7 +100,7 @@ class TestEnumerator(object):
         devices = list(context.list_devices().match_attribute('busnum', 2))
         for device in devices:
             assert device.attributes['busnum'] == b'2'
-            assert device.attribtues.asint('busnum') == 2
+            assert device.attributes.asint('busnum') == 2
 
     def test_match_attribute_bool(self, context):
         # ro tells us whether a volumne is mounted read-only or not.  And any
