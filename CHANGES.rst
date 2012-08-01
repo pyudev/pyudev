@@ -1,6 +1,8 @@
 0.16.1 (in development)
 =======================
 
+- #53: Fix source distribution
+
 
 0.16 (Jul 25, 2012)
 ===================
