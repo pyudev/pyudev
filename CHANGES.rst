@@ -4,7 +4,7 @@
 - #52: Remove global libudev object
 
 
-0.16.1 (Aug 08, 2012)
+0.16.1 (Aug 02, 2012)
 =====================
 
 - #53: Fix source distribution
