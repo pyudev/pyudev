@@ -4,6 +4,13 @@
 - #52: Remove global libudev object
 
 
+0.16.1 (Aug 08, 2012)
+=====================
+
+- #53: Fix source distribution
+- #54: Fix typo in test
+
+
 0.16 (Jul 25, 2012)
 ===================
 
