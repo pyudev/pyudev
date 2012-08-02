@@ -19,10 +19,13 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import sys
 import re
 import os
 import subprocess
 from distutils.filelist import FileList
+if sys.version_info[0] < 3:
+    from codecs import open
 
 import py.path
 import pytest
@@ -46,7 +49,7 @@ def _get_required_files():
         pytest.skip('git not available')
     ls_files = subprocess.Popen(['git', 'ls-files'], cwd=SOURCE_DIRECTORY,
                                 stdout=subprocess.PIPE)
-    output = ls_files.communicate()[0]
+    output = ls_files.communicate()[0].decode('utf-8')
     for filename in output.splitlines():
         if not any(re.search(p, filename) for p in REQUIRED_BLACKLIST):
             yield filename
@@ -60,7 +63,7 @@ def _get_manifest_files():
         filelist.findall()
     finally:
         os.chdir(old_wd)
-    with open(MANIFEST, 'r') as source:
+    with open(MANIFEST, 'r', encoding='utf-8') as source:
         for line in source:
             filelist.process_template_line(line.strip())
     return filelist.files
