@@ -20,6 +20,5 @@ doc/_build/*
 .vagrant
 
 # Chef
-Cheffile.lock
 cookbooks/
 tmp/
