@@ -6,3 +6,12 @@ pyudev.egg-info/*
 doc/_build/*
 .tox/*
 *-tests.xml
+
+# Vagrant files
+.vagrant
+
+# Chef
+Cheffile.lock
+cookbooks/
+tmp/
+
