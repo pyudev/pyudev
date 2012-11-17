@@ -31,6 +31,8 @@ def get_vagrant_ssh_config():
 
 @task
 def vagrant_up():
+    # Bring cookbooks in place
+    local('librarian-chef install')
     local('vagrant up')
     config = get_vagrant_ssh_config()
     env.key_filename = config['IdentityFile']
