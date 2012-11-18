@@ -189,8 +189,6 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 
 .. automodule:: plugins.mock_libudev
 
-.. autofunction:: calls_to_libudev(function_calls)
-
 .. autofunction:: libudev_list(function, items)
 
 
