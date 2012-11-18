@@ -1,37 +1,37 @@
 Test running
 ============
 
-Automatic execution using tox_
-------------------------------
+Virtual testing
+---------------
 
-The recommended way to run all tests is to use tox_.  This tool automatically
-creates virtual environments with virtualenv_ with all requirements installed
-and runs the tests.
+If you are on a non-Linux system install VirtualBox_, Vagrant_ and
+librarian-chef_ and run ``make vagrant-test``.
 
-Assuming that tox_ is installed, the following command will run the pyudev
-tests against Python 2.7, Python 3.2 and PyPy::
+You may specify arbitrary :program:`py.test` arguments by ``TESTARGS``::
+
+   make TESTARGS='--enable-privileged -k observer --verbose' vagrant-test
+
+Vagrant automatically fetches, installs and provisions a virtual machine based
+on Ubuntu Lucid.  This virtual machine has the pyudev source code linked in as
+shared folder under ``/vagrant``, and contains a virtualenv with all necessary
+tools under ``/home/vagrant/pyudev-env``.  Use ``vagrant ssh`` to get a shell on
+this machine.
+
+
+Direct testing using tox_
+-------------------------
+
+If you are on a Linux system run all tests with tox_.  This tool automatically
+creates virtualenvs (see virtualenv_), installs all packages required by the
+test suite, and runs the tests.
+
+Run all pyudev tests against Python 2.7, Python 3.2 and PyPy::
 
    tox -e py27,py32,pypy
 
-You can pass arbitrary :program:`py.test` arguments after two dashes ``--``::
+Pass any arguments you want to :program:`py.test` after two dashes ``--``::
 
    tox -e py27,py32,pypy -- --enable-privileged
-
-
-Manual execution
-----------------
-
-You can also run tests manually with :program:`py.test`.  It is recommended to
-setup a separate virtual environment for this purpose::
-
-   $ virtualenv pyudv
-   $ . pyudev/bin/activate.sh
-
-Then use the provided :file:`requirements.txt` file to install the necessary
-modules into this virtual environment by running the following command from the
-root of the pyudev source tree::
-
-   $ pip install -r requirements.txt
 
 
 Notes
@@ -80,5 +80,8 @@ however you need to perform this step manually after virtualenv creation::
 
 See ``python build_bindings.py --help`` for more information.
 
+.. _virtualbox: https://www.virtualbox.org/
+.. _vagrant: http://vagrantup.com/
+.. _librarian-chef: https://github.com/applicationsonline/librarian
 .. _virtualenv: http://www.virtualenv.org/en/latest/index.html
 .. _tox: http://tox.testrun.org/latest/
