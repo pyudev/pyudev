@@ -16,16 +16,15 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-"""
-    plugins.mock_libudev
+"""plugins.mock_libudev
     ====================
 
     Plugin to mock calls to libudev.
 
-    This plugin adds :func:`calls_to_libudev()` and :func:`libudev_list()` to
-    the :mod:`pytest` namespace.
+    This plugin adds :func:`libudev_list()` to the :mod:`pytest` namespace.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+
 """
 
 from __future__ import (print_function, division, unicode_literals,
