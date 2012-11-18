@@ -30,5 +30,6 @@ Vagrant::Config.run do |config|
     chef.add_recipe "apt"
     chef.add_recipe "git"
     chef.add_recipe "python"
+    chef.add_recipe "pyudev"
   end
 end
