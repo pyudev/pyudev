@@ -6,3 +6,6 @@ site 'http://community.opscode.com/api/v1'
 cookbook 'apt'
 cookbook 'git'
 cookbook 'python'
+
+cookbook 'pyudev',
+  :path => 'vendor/cookbooks/pyudev'

@@ -20,5 +20,5 @@ doc/_build/*
 .vagrant
 
 # Chef
-cookbooks/
-tmp/
+/cookbooks/
+/tmp/

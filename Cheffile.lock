@@ -15,8 +15,14 @@ SITE
     runit (0.15.0)
     yum (1.0.0)
 
+PATH
+  remote: vendor/cookbooks/pyudev
+  specs:
+    pyudev (0.1.0)
+
 DEPENDENCIES
   apt (>= 0)
   git (>= 0)
   python (>= 0)
+  pyudev (>= 0)
 
