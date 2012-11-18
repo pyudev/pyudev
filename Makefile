@@ -29,3 +29,7 @@ vagrant-up: chef-recipes
 .PHONY: vagrant-test
 vagrant-test: vagrant-up
 	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-env/bin/py.test $(TESTARGS)"
+
+.PHONY: upload-release
+upload-release:
+	python setup.py release register sdist upload
