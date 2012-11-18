@@ -43,17 +43,24 @@ if node[:instance_role] == "vagrant"
     action :create
   end
 
-  # Install unit testing packages
+  # Install test runner
   python_pip "pytest" do
     virtualenv virtualenv
     action :install
   end
 
+  # Install dependencies of tests (docutils is required by PyPI tests)
   python_pip "mock" do
     virtualenv virtualenv
     action :install
   end
 
+  python_pip "docutils" do
+    virtualenv virtualenv
+    action :install
+  end
+
+  # Install pyudev into virtualenv
   python_pip "/vagrant" do
     virtualenv virtualenv
     action :install
