@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -337,6 +337,8 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
+        if not self._started:
+            self.start()
         rlist, _, _ = select.select([self], [], [], timeout)
         if self in rlist:
             return self._receive_device()

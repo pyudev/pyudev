@@ -2,6 +2,7 @@
 =====================
 
 - #52: Remove global libudev object
+- #57: Really start the monitor on :meth:`pyudev.Monitor.poll()`
 
 
 0.16.1 (Aug 02, 2012)
@@ -16,7 +17,7 @@
 
 - Remove :meth:`pyudev.Monitor.from_socket`.
 - Deprecate :meth:`pyudev.Device.traverse()` in favor of
-  :attr:`pyudev.Device.ancestors`. 
+  :attr:`pyudev.Device.ancestors`.
 - #47: Deprecate :meth:`pyudev.Monitor.receive_device` in favor of
   :attr:`pyudev.Monitor.poll`.
 - #47: Deprecate :attr:`pyudev.Monitor.enable_receiving` in favor of
