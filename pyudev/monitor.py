@@ -337,8 +337,7 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
-        if not self._started:
-            self.start()
+        self.start()
         rlist, _, _ = select.select([self], [], [], timeout)
         if self in rlist:
             return self._receive_device()
