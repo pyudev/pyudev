@@ -512,9 +512,10 @@ class MonitorObserver(Thread):
         self._callback = callback
 
     def start(self):
-        source, sink = os.pipe()
-        self._stop_event_source = os.fdopen(source, 'rb', 0)
-        self._stop_event_sink = os.fdopen(sink, 'wb', 0)
+        if not self.is_alive():
+            source, sink = os.pipe()
+            self._stop_event_source = os.fdopen(source, 'rb', 0)
+            self._stop_event_sink = os.fdopen(sink, 'wb', 0)
         Thread.start(self)
 
     def run(self):
