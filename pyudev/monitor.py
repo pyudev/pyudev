@@ -32,6 +32,7 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import select
 import fcntl
+import errno
 from threading import Thread
 from contextlib import closing
 
@@ -285,23 +286,23 @@ class Monitor(object):
         """
         self._libudev.udev_monitor_set_receive_buffer_size(self, size)
 
-    def _receive_device(self, timeout):
+    def _receive_device(self):
         """Receive a single device from the monitor.
 
-        ``timeout`` is the time to block before returning ``None``.
-
-        Return the received :class:`Device`, or ``None`` if the timeout
-        occurred, or no device could be received.
+        Return the received :class:`Device`, or ``None`` if no device could be
+        received.
 
         """
-        # Wait before receiving the device
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            if notifier.poll(timeout=timeout, maxevents=1):
+        while True:
+            try:
                 device_p = self._libudev.udev_monitor_receive_device(self)
                 return Device(self.context, device_p) if device_p else None
-            else:
-                return None
+            except EnvironmentError as error:
+                if error.errno == errno.EAGAIN:
+                    # Try again if our system call was interrupted
+                    continue
+                else:
+                    raise
 
     def poll(self, timeout=None):
         """
@@ -350,7 +351,12 @@ class Monitor(object):
         if timeout is None:
             timeout = -1
         self.start()
-        return self._receive_device(timeout)
+        with closing(select.epoll()) as notifier:
+            notifier.register(self, select.EPOLLIN)
+            if notifier.poll(timeout=timeout, maxevents=1):
+                return self._receive_device()
+            else:
+                return None
 
     def receive_device(self):
         """
@@ -387,7 +393,7 @@ class Monitor(object):
         import warnings
         warnings.warn('Will be removed in 1.0. Use Monitor.poll() instead.',
                       DeprecationWarning)
-        device = self._receive_device(-1)
+        device = self.poll()
         return device.action, device
 
     def __iter__(self):
@@ -414,7 +420,7 @@ class Monitor(object):
                       '"MonitorObserver".', DeprecationWarning)
         self.start()
         while True:
-            device = self._receive_device(-1)
+            device = self.poll()
             if device:
                 yield device.action, device
 

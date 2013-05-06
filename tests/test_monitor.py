@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -260,12 +260,12 @@ class TestMonitor(object):
     def test_receive_device(self, monitor):
         """
         Test that Monitor.receive_device is deprecated and calls out to
-        _receive_device(), which in turn is tested by test_poll.
+        poll(), which in turn is tested by test_poll.
         """
-        with mock.patch.object(monitor, '_receive_device') as receive_device:
+        with mock.patch.object(monitor, 'poll') as poll:
             device = mock.Mock(name='device')
             device.action = 'spam'
-            receive_device.return_value = device
+            poll.return_value = device
             event = pytest.deprecated_call(monitor.receive_device)
             assert event[0] == 'spam'
             assert event[1] is device
