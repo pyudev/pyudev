@@ -38,7 +38,7 @@ export DEBIAN_FRONTEND='noninteractive'
 apt_update
 
 echo "Installing basic packages"
-apt unzip make \
+apt unzip make git \
   python python-pip python-virtualenv \
   python3
 
