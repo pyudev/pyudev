@@ -50,8 +50,7 @@ REQUIRED_BLACKLIST = [
     r'^MANIFEST\.in$',
     r'^Makefile$',
     r'^Vagrantfile$',
-    r'^Cheffile(\.lock)?$',
-    r'^vendor/cookbooks/.*$',
+    r'^vagrant/provision.sh$',
 ]
 
 
