@@ -31,6 +31,7 @@ from __future__ import (print_function, division, unicode_literals,
 
 import os
 import select
+import fcntl
 from threading import Thread
 from contextlib import closing
 
@@ -252,6 +253,9 @@ class Monitor(object):
         """
         if not self._started:
             self._libudev.udev_monitor_enable_receiving(self)
+            # Force FDs into non-blocking mode
+            flags = fcntl.fcntl(self, fcntl.F_GETFL, 0)
+            fcntl.fcntl(self, fcntl.F_SETFL, flags | os.O_NONBLOCK)
             self._started = True
 
     def set_receive_buffer_size(self, size):
@@ -281,17 +285,23 @@ class Monitor(object):
         """
         self._libudev.udev_monitor_set_receive_buffer_size(self, size)
 
-    def _receive_device(self):
-        """
-        Receive a single device from the monitor.
+    def _receive_device(self, timeout):
+        """Receive a single device from the monitor.
 
-        Return the received :class:`Device`. Raise
-        :exc:`~exceptions.EnvironmentError`, if no device could be read.
+        ``timeout`` is the time to block before returning ``None``.
+
+        Return the received :class:`Device`, or ``None`` if the timeout
+        occurred, or no device could be received.
+
         """
-        device_p = self._libudev.udev_monitor_receive_device(self)
-        if not device_p:
-            raise EnvironmentError('Could not receive device')
-        return Device(self.context, device_p)
+        # Wait before receiving the device
+        with closing(select.epoll()) as notifier:
+            notifier.register(self, select.EPOLLIN)
+            if notifier.poll(timeout=timeout, maxevents=1):
+                device_p = self._libudev.udev_monitor_receive_device(self)
+                return Device(self.context, device_p) if device_p else None
+            else:
+                return None
 
     def poll(self, timeout=None):
         """
@@ -340,12 +350,7 @@ class Monitor(object):
         if timeout is None:
             timeout = -1
         self.start()
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            if notifier.poll(timeout=timeout, maxevents=1):
-                return self._receive_device()
-            else:
-                return None
+        return self._receive_device(timeout)
 
     def receive_device(self):
         """
@@ -382,7 +387,7 @@ class Monitor(object):
         import warnings
         warnings.warn('Will be removed in 1.0. Use Monitor.poll() instead.',
                       DeprecationWarning)
-        device = self._receive_device()
+        device = self._receive_device(-1)
         return device.action, device
 
     def __iter__(self):
@@ -408,13 +413,10 @@ class Monitor(object):
                       '"poll()" instead, or monitor asynchronously with '
                       '"MonitorObserver".', DeprecationWarning)
         self.start()
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            while True:
-                events = notifier.poll()
-                for event in events:
-                    device = self._receive_device()
-                    yield device.action, device
+        while True:
+            device = self._receive_device(-1)
+            if device:
+                yield device.action, device
 
 
 class MonitorObserver(Thread):
