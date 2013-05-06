@@ -236,6 +236,7 @@ class TestMonitor(object):
         assert datetime.now() - now >= timedelta(seconds=1)
 
     @pytest.mark.privileged
+    @pytest.mark.not_on_travis
     def test_poll(self, monitor):
         # forcibly unload the dummy module to avoid hangs
         pytest.unload_dummy()
