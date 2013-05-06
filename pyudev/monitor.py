@@ -503,13 +503,19 @@ class MonitorObserver(Thread):
         self.monitor = monitor
         # observer threads should not keep the interpreter alive
         self.daemon = True
-        self._stop_event_source, self._stop_event_sink = os.pipe()
+        self._stop_event_sink = self._stop_event_source = None
         if event_handler is not None:
             import warnings
             warnings.warn('"event_handler" argument will be removed in 1.0. '
                           'Use Monitor.poll() instead.', DeprecationWarning)
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback
+
+    def start(self):
+        source, sink = os.pipe()
+        self._stop_event_source = os.fdopen(source, 'rb', 0)
+        self._stop_event_sink = os.fdopen(sink, 'wb', 0)
+        Thread.start(self)
 
     def run(self):
         self.monitor.start()
@@ -518,10 +524,10 @@ class MonitorObserver(Thread):
         notifier.register(self._stop_event_source, select.POLLIN)
         while True:
             for fd, _ in notifier.poll():
-                if fd == self._stop_event_source:
+                if fd == self._stop_event_source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
-                    os.close(self._stop_event_source)
+                    self._stop_event_source.close()
                     return
                 else:
                     device = self.monitor.poll(timeout=0)
@@ -543,11 +549,11 @@ class MonitorObserver(Thread):
         if self._stop_event_sink is None:
             return
         try:
-            # emit a stop event to the thread
-            os.write(self._stop_event_sink, b'\x01')
+            with self._stop_event_sink:
+                # emit a stop event to the thread
+                self._stop_event_sink.write(b'\x01')
+                self._stop_event_sink.flush()
         finally:
-            # close the out-of-thread side of the pipe
-            os.close(self._stop_event_sink)
             self._stop_event_sink = None
 
     def stop(self):
