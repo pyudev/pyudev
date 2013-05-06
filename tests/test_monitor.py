@@ -332,6 +332,7 @@ class TestMonitorObserver(object):
         observer.join(1)
         if observer.is_alive():
             observer.stop()
+        assert not observer.is_alive()
         assert self.events == [(None, fake_monitor_device)] * 2
 
     def test_fake(self, fake_monitor, fake_monitor_device):
@@ -344,6 +345,7 @@ class TestMonitorObserver(object):
         # forcibly quit the thread if it is still alive
         if observer.is_alive():
             observer.stop()
+        assert not observer.is_alive()
         # check that we got two events
         assert self.events == [fake_monitor_device] * 2
 
@@ -360,6 +362,7 @@ class TestMonitorObserver(object):
         observer.join(2)
         if observer.is_alive():
             observer.stop()
+        assert not observer.is_alive()
         assert [d.action for d in self.events] == ['add', 'remove']
         for device in self.events:
             assert device.device_path == '/devices/virtual/net/dummy0'
