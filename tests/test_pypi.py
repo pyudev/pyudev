@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -30,6 +30,7 @@ if sys.version_info[0] < 3:
 
 import py.path
 import pytest
+import docutils.utils  # Work around Docutils bug 214
 from docutils import io, readers
 from docutils.core import publish_doctree, Publisher
 from docutils.transforms import TransformError
