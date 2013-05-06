@@ -348,6 +348,7 @@ class TestMonitorObserver(object):
         assert self.events == [fake_monitor_device] * 2
 
     @pytest.mark.privileged
+    @pytest.mark.not_on_travis
     def test_real(self, context, monitor):
         observer = self.make_observer(monitor)
         pytest.unload_dummy()
