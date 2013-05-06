@@ -272,6 +272,7 @@ class TestMonitor(object):
             assert event[1] is device
 
     @pytest.mark.privileged
+    @pytest.mark.not_on_travis
     def test_iter(self, monitor):
         pytest.unload_dummy()
         monitor.filter_by('net')
