@@ -24,6 +24,8 @@
 
 import os
 
+import pytest
+
 
 def is_on_travis_ci():
     """Determine whether the tests run on Travis CI.
