@@ -3,6 +3,8 @@
 
 - #52: Remove global libudev object
 - #57: Really start the monitor on :meth:`pyudev.Monitor.poll()`
+- #60: Do not use :meth:`select.select` to avoid hitting its file descriptor
+  limit
 
 
 0.16.1 (Aug 02, 2012)

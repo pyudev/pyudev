@@ -337,12 +337,15 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
+        if timeout is None:
+            timeout = -1
         self.start()
-        rlist, _, _ = select.select([self], [], [], timeout)
-        if self in rlist:
-            return self._receive_device()
-        else:
-            return None
+        with closing(select.epoll()) as notifier:
+            notifier.register(self, select.EPOLLIN)
+            if notifier.poll(timeout=timeout, maxevents=1):
+                return self._receive_device()
+            else:
+                return None
 
     def receive_device(self):
         """
