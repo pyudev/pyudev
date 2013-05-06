@@ -1,4 +1,4 @@
-# Copyright (C) 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -15,20 +15,16 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 VAGRANT = vagrant
-LIBRARIAN-CHEF = librarian-chef
-TESTARGS =
-
-.PHONY: chef-recipes
-chef-recipes:
-	$(LIBRARIAN-CHEF) install
+TESTARGS = --enable-privileged
 
 .PHONY: vagrant-up
-vagrant-up: chef-recipes
+vagrant-up:
 	$(VAGRANT) up
 
 .PHONY: vagrant-test
 vagrant-test: vagrant-up
-	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-env/bin/py.test $(TESTARGS)"
+	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-py2/bin/py.test $(TESTARGS)"
+	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-py3/bin/py.test $(TESTARGS)"
 
 .PHONY: upload-release
 upload-release:

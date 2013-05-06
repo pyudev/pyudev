@@ -18,7 +18,3 @@ doc/_build/*
 
 # Vagrant files
 .vagrant
-
-# Chef
-/cookbooks/
-/tmp/

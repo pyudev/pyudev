@@ -4,8 +4,8 @@ Test running
 Virtual testing
 ---------------
 
-If you are on a non-Linux system install VirtualBox_, Vagrant_ and
-librarian-chef_ and run ``make vagrant-test``.
+If you are on a non-Linux system install VirtualBox_ and Vagrant_, and run
+``make vagrant-test``.
 
 You may specify arbitrary :program:`py.test` arguments by ``TESTARGS``::
 
@@ -13,9 +13,9 @@ You may specify arbitrary :program:`py.test` arguments by ``TESTARGS``::
 
 Vagrant automatically fetches, installs and provisions a virtual machine based
 on Ubuntu Lucid.  This virtual machine has the pyudev source code linked in as
-shared folder under ``/vagrant``, and contains a virtualenv with all necessary
-tools under ``/home/vagrant/pyudev-env``.  Use ``vagrant ssh`` to get a shell on
-this machine.
+shared folder under ``/vagrant``, and two virtualenvs for Python 2 and Python 3
+with all dependencies installed at ``~/pyudev-py2`` and ``~/pyudev-py3``
+respectively.  Use ``vagrant ssh`` to get a shell on this machine.
 
 
 Direct testing using tox_
@@ -56,32 +56,7 @@ kernel modules to trigger real udev events.  These tests are disabled by
 default.  Refer to :mod:`~tests.plugins.privileged` for more information on how
 to enable these tests and configure them properly.
 
-
-Native bindings
-~~~~~~~~~~~~~~~
-
-Some tests require native bindings to other libraries. These bindings cannot be
-installed by means of a ``requirements.txt`` file, but need to be build instead.
-Since building these bindings is cumbersome and difficult, especially inside
-virtualenvs, the ``build_bindings.py`` is provided to automate these builds.
-
-``tox`` is configured to execute this script before running the tests, so that
-tox tests will always have these bindings available.  For custom virtualenvs
-however you need to perform this step manually after virtualenv creation::
-
-   python build_bindings.py
-
-.. warning::
-
-   By default, builds are done under ``/tmp``, so make sure that there is enough
-   space available on this filesystem, especially if it is located on ``tmpfs``.
-   Use the ``--download-directory`` and ``--build-directory`` options to change
-   the corresponding directories if needed.
-
-See ``python build_bindings.py --help`` for more information.
-
 .. _virtualbox: https://www.virtualbox.org/
 .. _vagrant: http://vagrantup.com/
-.. _librarian-chef: https://github.com/applicationsonline/librarian
 .. _virtualenv: http://www.virtualenv.org/en/latest/index.html
 .. _tox: http://tox.testrun.org/latest/
