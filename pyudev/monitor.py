@@ -298,7 +298,10 @@ class Monitor(object):
                 device_p = self._libudev.udev_monitor_receive_device(self)
                 return Device(self.context, device_p) if device_p else None
             except EnvironmentError as error:
-                if error.errno == errno.EAGAIN:
+                if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+                    # No data available
+                    return None
+                elif error.errno == errno.EINTR:
                     # Try again if our system call was interrupted
                     continue
                 else:
