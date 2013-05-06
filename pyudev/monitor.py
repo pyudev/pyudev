@@ -351,15 +351,16 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
-        if timeout is None:
-            timeout = -1
+        if timeout is not None and timeout > 0:
+            # .poll() takes timeout in milliseconds
+            timeout = int(timeout * 1000)
         self.start()
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            if notifier.poll(timeout=timeout, maxevents=1):
-                return self._receive_device()
-            else:
-                return None
+        notifier = select.poll()
+        notifier.register(self, select.POLLIN)
+        if notifier.poll(timeout):
+            return self._receive_device()
+        else:
+            return None
 
     def receive_device(self):
         """
@@ -512,22 +513,20 @@ class MonitorObserver(Thread):
 
     def run(self):
         self.monitor.start()
-        with closing(select.epoll()) as notifier:
-            # poll on the stop event fd
-            notifier.register(self._stop_event_source, select.EPOLLIN)
-            # and on the monitor
-            notifier.register(self.monitor, select.EPOLLIN)
-            while True:
-                for fd, _ in notifier.poll():
-                    if fd == self._stop_event_source:
-                        # in case of a stop event, close our pipe side, and
-                        # return from the thread
-                        os.close(self._stop_event_source)
-                        return
-                    else:
-                        device = self.monitor.poll(timeout=0)
-                        if device:
-                            self._callback(device)
+        notifier = select.poll()
+        notifier.register(self.monitor, select.POLLIN)
+        notifier.register(self._stop_event_source, select.POLLIN)
+        while True:
+            for fd, _ in notifier.poll():
+                if fd == self._stop_event_source:
+                    # in case of a stop event, close our pipe side, and
+                    # return from the thread
+                    os.close(self._stop_event_source)
+                    return
+                else:
+                    device = self.monitor.poll(timeout=0)
+                    if device:
+                        self._callback(device)
 
     def send_stop(self):
         """
