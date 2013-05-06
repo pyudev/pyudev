@@ -5,6 +5,8 @@
 - #57: Really start the monitor on :meth:`pyudev.Monitor.poll()`
 - #60: Do not use :meth:`select.select` to avoid hitting its file descriptor
   limit
+- #58: Force non-blocking IO in :class:`pyudev.Monitor` to avoid blocking on
+  receiving the device
 
 
 0.16.1 (Aug 02, 2012)
