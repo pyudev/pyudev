@@ -9,6 +9,14 @@
   receiving the device
 - #63: Set proper flags on pipe fds.
 - #65: Handle irregular polling events properly.
+- #50: Add :class:`pyudev.wx.MonitorObserver` and deprecate
+  :class:`pyudev.wx.WxUDevMonitorObserver`
+- #50: Add :class:`pyudev.glib.MonitorObserver` and deprecate
+  :class:`pyudev.glib.GUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyqt4.MonitorObserver` and deprecate
+  :class:`pyudev.pyqt4.QUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyside.MonitorObserver` and deprecate
+  :class:`pyudev.pyside.QUDevMonitorObserver`
 
 
 0.16.1 (Aug 02, 2012)
