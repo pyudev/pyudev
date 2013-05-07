@@ -39,11 +39,8 @@ The website_ provides a detailed `user guide`_ and a complete `API reference`_.
 Support
 -------
 
-Please ask questions about pyudev on the mailing list at pyudev@librelist.com.
-To join this list, send a mail to pyudev@librelist.com and reply to the
-confirmation email.
-
-Please report issues to the issue tracker, but respect the following guidelines:
+Please report issues and questions to the issue tracker, but respect the
+following guidelines:
 
 - Check that the issue has not already been reported.
 - Check that the issue is not already fixed in the ``master`` branch.

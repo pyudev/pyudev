@@ -45,14 +45,8 @@ pyudev, the API documentation provides a detailed reference:
 Support
 -------
 
-Please ask questions about usage and development of pyudev to the mailing list
-at pyudev@librelist.com hosted by librelist.com_.  To subscribe to this list,
-send a mail to pyudev@librelist.com and reply to the confirmation email. To
-unsubscribe again, write to pyudev-unsubscribe@librelist.com and reply to the
-configuration mail. Past discussions are available in the `list archives`_.
-
-Please report issues and bugs to the `issue tracker`_, but respect the following
-guidelines:
+Please report issues, bugs and questions to the `issue tracker`_, but respect
+the following guidelines:
 
 - Check that the issue has not already been reported.
 - Check that the issue is not already fixed in the ``master`` branch.
