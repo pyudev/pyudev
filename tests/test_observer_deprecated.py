@@ -33,17 +33,10 @@ def pytest_funcarg__fake_monitor_device(request):
     return Device.from_path(context, '/devices/platform')
 
 
-def test_fake_monitor(fake_monitor, fake_monitor_device):
-    """
-    Test the fake monitor just to make sure, that it works.
-    """
-    assert fake_monitor.poll(timeout=0) is None
-    fake_monitor.trigger_event()
-    device = fake_monitor.poll()
-    assert device == fake_monitor_device
+ACTIONS = ('add', 'remove', 'change', 'move')
 
 
-class ObserverTestBase(object):
+class DeprecatedObserverTestBase(object):
 
     def setup_method(self, method):
         self.observer = None
@@ -79,6 +72,11 @@ class ObserverTestBase(object):
     def connect_signal(self, callback, action=None):
         raise NotImplementedError()
 
+    def stop_when_done(self, *args, **kwargs):
+        self.no_emitted_signals += 1
+        if self.no_emitted_signals >= 2:
+            self.stop_event_loop()
+
     def prepare_test(self, monitor):
         self.create_event_loop(self_stop_timeout=5000)
         self.create_observer(monitor)
@@ -88,14 +86,23 @@ class ObserverTestBase(object):
         # test that the monitor attribute is correct
         assert self.observer.monitor is fake_monitor
 
-    def test_events_fake_monitor(self, fake_monitor, fake_monitor_device):
+    @pytest.mark.parametrize('action', ACTIONS, ids=ACTIONS)
+    def test_events_fake_monitor(self, action, fake_monitor,
+                                 fake_monitor_device):
         self.prepare_test(fake_monitor)
-        event_callback = mock.Mock(
-            side_effect=lambda *args: self.stop_event_loop())
+        event_callback = mock.Mock(side_effect=self.stop_when_done)
+        action_callback = mock.Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
-
-        self.start_event_loop(fake_monitor.trigger_event)
-        event_callback.assert_called_with(fake_monitor_device)
+        self.connect_signal(action_callback, action=action)
+        funcname = 'udev_device_get_action'
+        spec = lambda d: None
+        with mock.patch.object(fake_monitor_device._libudev, funcname,
+                               autospec=spec) as func:
+            func.return_value = action.encode('ascii')
+            self.start_event_loop(fake_monitor.trigger_event)
+            func.assert_called_with(fake_monitor_device)
+        event_callback.assert_called_with(action, fake_monitor_device)
+        action_callback.assert_called_with(fake_monitor_device)
 
     @pytest.mark.privileged
     def test_events_real(self, context, monitor):
@@ -105,22 +112,37 @@ class ObserverTestBase(object):
         monitor.start()
         self.prepare_test(monitor)
         # setup signal handlers
-        event_callback = mock.Mock(
-            side_effect=lambda *args: self.stop_event_loop())
+        event_callback = mock.Mock(side_effect=self.stop_when_done)
+        added_callback = mock.Mock(side_effect=self.stop_when_done)
+        removed_callback = mock.Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
+        self.connect_signal(added_callback, action='add')
+        self.connect_signal(removed_callback, action='remove')
 
         # test add event
         self.start_event_loop(pytest.load_dummy)
         device = Device.from_path(context, '/devices/virtual/net/dummy0')
-        event_callback.assert_called_with(device)
+        event_callback.assert_called_with('add', device)
+        added_callback.assert_called_with(device)
+        assert not removed_callback.called
 
-        event_callback.reset_mock()
+        for callback in (event_callback, added_callback, removed_callback):
+            callback.reset_mock()
 
         self.start_event_loop(pytest.unload_dummy)
-        event_callback.assert_called_with(device)
+        event_callback.assert_called_with('remove', device)
+        assert not added_callback.called
+        removed_callback.assert_called_with(device)
 
 
-class QtObserverTestBase(ObserverTestBase):
+class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
+
+    ACTION_SIGNAL_MAP = {
+        'add': 'deviceAdded',
+        'remove': 'deviceRemoved',
+        'change': 'deviceChanged',
+        'move': 'deviceMoved',
+    }
 
     def setup(self):
         self.qtcore = pytest.importorskip('{0}.QtCore'.format(
@@ -129,10 +151,14 @@ class QtObserverTestBase(ObserverTestBase):
     def create_observer(self, monitor):
         name = self.BINDING_NAME.lower()
         mod = __import__('pyudev.{0}'.format(name), None, None, [name])
-        self.observer = mod.MonitorObserver(monitor)
+        self.observer = mod.QUDevMonitorObserver(monitor)
 
-    def connect_signal(self, callback):
-        self.observer.deviceEvent.connect(callback)
+    def connect_signal(self, callback, action=None):
+        if action is None:
+            self.observer.deviceEvent.connect(callback)
+        else:
+            signal = getattr(self.observer, self.ACTION_SIGNAL_MAP[action])
+            signal.connect(callback)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.app = self.qtcore.QCoreApplication.instance()
@@ -149,15 +175,22 @@ class QtObserverTestBase(ObserverTestBase):
         self.app.quit()
 
 
-class TestPysideObserver(QtObserverTestBase):
+class TestDeprecatedPysideObserver(DeprecatedQtObserverTestBase):
     BINDING_NAME = 'PySide'
 
 
-class TestPyQt4Observer(QtObserverTestBase):
+class TestDeprecatedPyQt4Observer(DeprecatedQtObserverTestBase):
     BINDING_NAME = 'PyQt4'
 
 
-class TestGlibObserver(ObserverTestBase):
+class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
+
+    ACTION_SIGNAL_MAP = {
+        'add': 'device-added',
+        'remove': 'device-removed',
+        'change': 'device-changed',
+        'move': 'device-moved',
+    }
 
     def setup(self):
         self.event_sources = []
@@ -170,15 +203,17 @@ class TestGlibObserver(ObserverTestBase):
             self.glib.source_remove(source)
 
     def create_observer(self, monitor):
-        from pyudev.glib import MonitorObserver
-        self.observer = MonitorObserver(monitor)
+        from pyudev.glib import GUDevMonitorObserver
+        self.observer = GUDevMonitorObserver(monitor)
 
-    def connect_signal(self, callback):
+    def connect_signal(self, callback, action=None):
         # drop the sender argument from glib signal connections
         def _wrapper(obj, *args, **kwargs):
             return callback(*args, **kwargs)
-
-        self.observer.connect('device-event', _wrapper)
+        if action is None:
+            self.observer.connect('device-event', _wrapper)
+        else:
+            self.observer.connect(self.ACTION_SIGNAL_MAP[action], _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.mainloop = self.glib.MainLoop()
@@ -199,22 +234,31 @@ class TestGlibObserver(ObserverTestBase):
 
 @pytest.mark.skipif(str('"DISPLAY" not in os.environ'),
                     reason='Display required for wxPython')
-class TestWxObserver(ObserverTestBase):
+class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
 
     def setup(self):
         self.wx = pytest.importorskip('wx')
 
     def create_observer(self, monitor):
         from pyudev import wx
-        self.observer = wx.MonitorObserver(monitor)
+        self.observer = wx.WxUDevMonitorObserver(monitor)
+        self.action_event_map = {
+                'add': wx.EVT_DEVICE_ADDED,
+                'remove': wx.EVT_DEVICE_REMOVED,
+                'change': wx.EVT_DEVICE_CHANGED,
+                'move': wx.EVT_DEVICE_MOVED
+        }
 
-    def connect_signal(self, callback):
-        from pyudev.wx import EVT_DEVICE_EVENT
-
-        def _wrapper(event):
-            return callback(event.device)
-
-        self.observer.Bind(EVT_DEVICE_EVENT, _wrapper)
+    def connect_signal(self, callback, action=None):
+        if action is None:
+            from pyudev.wx import EVT_DEVICE_EVENT
+            def _wrapper(event):
+                return callback(event.action, event.device)
+            self.observer.Bind(EVT_DEVICE_EVENT, _wrapper)
+        else:
+            def _wrapper(event):
+                return callback(event.device)
+            self.observer.Bind(self.action_event_map[action], _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.app = self.wx.App(False)

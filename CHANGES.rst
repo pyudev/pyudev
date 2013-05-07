@@ -7,6 +7,14 @@
   limit
 - #58: Force non-blocking IO in :class:`pyudev.Monitor` to avoid blocking on
   receiving the device
+- #50: Add :class:`pyudev.wx.MonitorObserver` and deprecate
+  :class:`pyudev.wx.WxUDevMonitorObserver`
+- #50: Add :class:`pyudev.glib.MonitorObserver` and deprecate
+  :class:`pyudev.glib.WxUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyqt4.MonitorObserver` and deprecate
+  :class:`pyudev.pyqt4.WxUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyside.MonitorObserver` and deprecate
+  :class:`pyudev.pyside.WxUDevMonitorObserver`
 
 
 0.16.1 (Aug 02, 2012)
