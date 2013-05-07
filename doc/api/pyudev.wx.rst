@@ -57,7 +57,8 @@ Deprecated API
 
 .. rubric:: Events
 
-:class:`WxUDevMonitorObserver` posts the following events:
+:class:`WxUDevMonitorObserver` posts the following events in addition to
+:data:`EVT_DEVICE_EVENT`:
 
 .. data:: EVT_DEVICE_ADDED
 
