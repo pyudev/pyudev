@@ -34,7 +34,7 @@ import select
 import fcntl
 import errno
 from threading import Thread
-from contextlib import closing
+from functools import partial
 
 from pyudev._util import ensure_byte_string
 
@@ -531,8 +531,8 @@ class MonitorObserver(Thread):
                     self._stop_event_source.close()
                     return
                 else:
-                    device = self.monitor.poll(timeout=0)
-                    if device:
+                    read_device = partial(self.monitor.poll, timeout=0)
+                    for device in iter(read_device, None):
                         self._callback(device)
 
     def send_stop(self):
