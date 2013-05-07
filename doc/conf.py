@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -104,8 +104,7 @@ html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
                         'sourcelink.html']}
 
 intersphinx_mapping = {'python': ('http://docs.python.org/', None),
-                       'pytest': ('http://pytest.org/latest', None),
-                       'pyside': ('http://www.pyside.org/docs/pyside/', None)}
+                       'pytest': ('http://pytest.org/latest', None)}
 
 issuetracker = 'github'
 issuetracker_project = 'lunaryorn/pyudev'
