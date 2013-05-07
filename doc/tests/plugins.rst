@@ -286,7 +286,7 @@ Types
 Test markers
 ~~~~~~~~~~~~
 
-.. attr:: pytest.mark.not_on_travis
+.. attribute:: pytest.mark.not_on_travis
 
    Do not run the decorated test on Travis CI::
 
