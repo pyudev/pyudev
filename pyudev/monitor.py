@@ -30,14 +30,13 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-import select
 import errno
 from threading import Thread
 from functools import partial
 
 from pyudev._util import ensure_byte_string
 from pyudev.core import Device
-from pyudev.os import Pipe, set_fd_status_flag
+from pyudev.os import Pipe, Poll, set_fd_status_flag
 
 
 __all__ = ['Monitor', 'MonitorObserver']
@@ -353,9 +352,7 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        notifier = select.poll()
-        notifier.register(self, select.POLLIN)
-        if notifier.poll(timeout):
+        if Poll.for_events((self, 'r')).poll(timeout):
             return self._receive_device()
         else:
             return None
@@ -517,20 +514,21 @@ class MonitorObserver(Thread):
 
     def run(self):
         self.monitor.start()
-        notifier = select.poll()
-        notifier.register(self.monitor, select.POLLIN)
-        notifier.register(self._stop_event.source, select.POLLIN)
+        notifier = Poll.for_events(
+            (self.monitor, 'r'), (self._stop_event.source, 'r'))
         while True:
-            for fd, _ in notifier.poll():
+            for fd, event in notifier.poll():
                 if fd == self._stop_event.source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                else:
+                elif fd == self.monitor.fileno() and event == 'r':
                     read_device = partial(self.monitor.poll, timeout=0)
                     for device in iter(read_device, None):
                         self._callback(device)
+                else:
+                    raise EnvironmentError('Observed monitor hung up')
 
     def send_stop(self):
         """

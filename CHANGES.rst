@@ -8,6 +8,7 @@
 - #58: Force non-blocking IO in :class:`pyudev.Monitor` to avoid blocking on
   receiving the device
 - #63: Set proper flags on pipe fds.
+- #65: Handle irregular polling events properly.
 
 
 0.16.1 (Aug 02, 2012)
