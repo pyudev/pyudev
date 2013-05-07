@@ -31,14 +31,13 @@ from __future__ import (print_function, division, unicode_literals,
 
 import os
 import select
-import fcntl
 import errno
 from threading import Thread
 from functools import partial
 
 from pyudev._util import ensure_byte_string
-
 from pyudev.core import Device
+from pyudev.os import Pipe, set_fd_status_flag
 
 
 __all__ = ['Monitor', 'MonitorObserver']
@@ -254,9 +253,8 @@ class Monitor(object):
         """
         if not self._started:
             self._libudev.udev_monitor_enable_receiving(self)
-            # Force FDs into non-blocking mode
-            flags = fcntl.fcntl(self, fcntl.F_GETFL, 0)
-            fcntl.fcntl(self, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            # Force monitor FD into non-blocking mode
+            set_fd_status_flag(self, os.O_NONBLOCK)
             self._started = True
 
     def set_receive_buffer_size(self, size):
@@ -503,7 +501,7 @@ class MonitorObserver(Thread):
         self.monitor = monitor
         # observer threads should not keep the interpreter alive
         self.daemon = True
-        self._stop_event_sink = self._stop_event_source = None
+        self._stop_event = None
         if event_handler is not None:
             import warnings
             warnings.warn('"event_handler" argument will be removed in 1.0. '
@@ -512,23 +510,22 @@ class MonitorObserver(Thread):
         self._callback = callback
 
     def start(self):
+        """Start the observer thread."""
         if not self.is_alive():
-            source, sink = os.pipe()
-            self._stop_event_source = os.fdopen(source, 'rb', 0)
-            self._stop_event_sink = os.fdopen(sink, 'wb', 0)
+            self._stop_event = Pipe.open()
         Thread.start(self)
 
     def run(self):
         self.monitor.start()
         notifier = select.poll()
         notifier.register(self.monitor, select.POLLIN)
-        notifier.register(self._stop_event_source, select.POLLIN)
+        notifier.register(self._stop_event.source, select.POLLIN)
         while True:
             for fd, _ in notifier.poll():
-                if fd == self._stop_event_source.fileno():
+                if fd == self._stop_event.source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
-                    self._stop_event_source.close()
+                    self._stop_event.source.close()
                     return
                 else:
                     read_device = partial(self.monitor.poll, timeout=0)
@@ -547,15 +544,12 @@ class MonitorObserver(Thread):
 
            The underlying :attr:`monitor` is *not* stopped.
         """
-        if self._stop_event_sink is None:
+        if self._stop_event is None:
             return
-        try:
-            with self._stop_event_sink:
-                # emit a stop event to the thread
-                self._stop_event_sink.write(b'\x01')
-                self._stop_event_sink.flush()
-        finally:
-            self._stop_event_sink = None
+        with self._stop_event.sink:
+            # emit a stop event to the thread
+            self._stop_event.sink.write(b'\x01')
+            self._stop_event.sink.flush()
 
     def stop(self):
         """
