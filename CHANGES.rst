@@ -10,11 +10,11 @@
 - #50: Add :class:`pyudev.wx.MonitorObserver` and deprecate
   :class:`pyudev.wx.WxUDevMonitorObserver`
 - #50: Add :class:`pyudev.glib.MonitorObserver` and deprecate
-  :class:`pyudev.glib.WxUDevMonitorObserver`
+  :class:`pyudev.glib.GUDevMonitorObserver`
 - #50: Add :class:`pyudev.pyqt4.MonitorObserver` and deprecate
-  :class:`pyudev.pyqt4.WxUDevMonitorObserver`
+  :class:`pyudev.pyqt4.QUDevMonitorObserver`
 - #50: Add :class:`pyudev.pyside.MonitorObserver` and deprecate
-  :class:`pyudev.pyside.WxUDevMonitorObserver`
+  :class:`pyudev.pyside.QUDevMonitorObserver`
 
 
 0.16.1 (Aug 02, 2012)
