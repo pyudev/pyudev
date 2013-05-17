@@ -774,7 +774,7 @@ class Device(Mapping):
         The :class:`Tags` object supports a test for a single tag as well as
         iteration over all tags:
 
-        >>> from pyudev import Context, Device
+        >>> from pyudev import Context
         >>> context = Context()
         >>> device = next(iter(context.list_devices(tag='systemd')))
         >>> 'systemd' in device.tags
