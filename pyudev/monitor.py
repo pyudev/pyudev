@@ -528,7 +528,7 @@ class MonitorObserver(Thread):
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
-                    raise EnvironmentException('Observed monitor hung up')
+                    raise EnvironmentError('Observed monitor hung up')
 
     def send_stop(self):
         """
