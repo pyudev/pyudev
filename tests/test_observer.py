@@ -157,6 +157,10 @@ class TestPyQt4Observer(QtObserverTestBase):
     BINDING_NAME = 'PyQt4'
 
 
+class TestPyQt5Observer(QtObserverTestBase):
+    BINDING_NAME = 'PyQt5'
+
+
 class TestGlibObserver(ObserverTestBase):
 
     def setup(self):
