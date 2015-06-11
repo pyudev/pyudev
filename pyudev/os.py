@@ -34,6 +34,7 @@ import select
 from functools import partial
 
 from pyudev._libc import load_c_library, fd_pair
+from pyudev._util import eintr_retry_call
 
 
 # Define O_CLOEXEC, if not present in os already
@@ -175,7 +176,7 @@ class Poll(object):
         for whether the channel is ready to be written to.
 
         """
-        notifier = select.poll()
+        notifier = eintr_retry_call(select.poll)
         for fd, event in events:
             mask = cls._EVENT_TO_MASK.get(event)
             if not mask:
@@ -209,7 +210,7 @@ class Poll(object):
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
-        return list(self._parse_events(self._notifier.poll(timeout)))
+        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
 
     def _parse_events(self, events):
         """Parse ``events``.

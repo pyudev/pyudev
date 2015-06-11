@@ -32,6 +32,7 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import sys
 import stat
+import errno
 
 
 if sys.version_info[0] == 2:
@@ -141,3 +142,37 @@ def get_device_type(filename):
         return 'block'
     else:
         raise ValueError('not a device file: {0!r}'.format(filename))
+
+
+def eintr_retry_call(func, *args, **kwargs):
+    """
+    Handle interruptions to an interruptible system call.
+
+    Run an interruptible system call in a loop and retry if it raises EINTR.
+    The signal calls that may raise EINTR prior to Python 3.5 are listed in
+    PEP 0475.  Any calls to these functions must be wrapped in eintr_retry_call
+    in order to handle EINTR returns in older versions of Python.
+
+    This function is safe to use under Python 3.5 and newer since the wrapped
+    function will simply return without raising EINTR.
+
+    This function is based on _eintr_retry_call in python's subprocess.py.
+    """
+
+    # select.error inherits from Exception instead of OSError in Python 2
+    import select
+
+    while True:
+        try:
+            return func(*args, **kwargs)
+        except (OSError, IOError, select.error) as e:
+            # If this is not an IOError or OSError, it's the old select.error
+            # type, which means that the errno is only accessible via subscript
+            if isinstance(e, (OSError, IOError)):
+                error_code = e.errno
+            else:
+                error_code = e.args[0]
+
+            if error_code == errno.EINTR:
+                continue
+            raise
