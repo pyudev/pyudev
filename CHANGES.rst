@@ -17,6 +17,7 @@
   :class:`pyudev.pyqt4.QUDevMonitorObserver`
 - #50: Add :class:`pyudev.pyside.MonitorObserver` and deprecate
   :class:`pyudev.pyside.QUDevMonitorObserver`
+- Add a wrapper function to retry interruptible system calls.
 
 
 0.16.1 (Aug 02, 2012)
