@@ -129,7 +129,7 @@ class TestEnumerator(object):
             assert 'seat' in device.tags
 
     @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
-    @pytest.mark.udev_version('>= 172')
+    @pytest.mark.udev_version('>= 217')
     def test_match_parent(self, context, device_data):
         device = Device.from_path(context, device_data.device_path)
         parent = device.parent
