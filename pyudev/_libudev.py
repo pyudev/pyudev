@@ -31,7 +31,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 from ctypes import (CDLL, Structure, POINTER,
-                    c_char, c_char_p, c_int, c_ulonglong)
+                    c_char, c_char_p, c_int, c_uint, c_ulonglong)
 from ctypes.util import find_library
 
 from pyudev._errorcheckers import (check_negative_errorcode,
@@ -79,6 +79,13 @@ class udev_monitor(Structure):
 
 udev_monitor_p = POINTER(udev_monitor)
 
+class udev_hwdb(Structure):
+    """
+    Dummy for ``udev_hwdb`` structure.
+    """
+
+udev_hwdb_p = POINTER(udev_hwdb)
+
 
 dev_t = c_ulonglong
 
@@ -123,6 +130,7 @@ SIGNATURES = {
         new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
                                     udev_device_p),
         new_from_devnum=([udev_p, c_char, dev_t], udev_device_p),
+        new_from_device_id=([udev_p, c_char_p], udev_device_p),
         new_from_environment=([udev_p], udev_device_p),
         get_parent=([udev_device_p], udev_device_p),
         get_parent_with_subsystem_devtype=([udev_device_p, c_char_p, c_char_p],
@@ -146,6 +154,7 @@ SIGNATURES = {
         get_tags_list_entry=([udev_device_p], udev_list_entry_p),
         get_properties_list_entry=([udev_device_p], udev_list_entry_p),
         get_sysattr_list_entry=([udev_device_p], udev_list_entry_p),
+        set_sysattr_value=([udev_device_p, c_char_p, c_char_p], c_int),
         has_tag=([udev_device_p, c_char_p], c_int)),
     # monitoring
     'udev_monitor': dict(
@@ -160,11 +169,18 @@ SIGNATURES = {
             [udev_monitor_p, c_char_p, c_char_p], c_int),
         filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
         filter_update=([udev_monitor_p], c_int),
-        filter_remove=([udev_monitor_p], c_int))
+        filter_remove=([udev_monitor_p], c_int)),
+    # hwdb
+    'udev_hwdb': dict(
+        ref=([udev_hwdb_p], udev_hwdb_p),
+        unref=([udev_hwdb_p], None),
+        new=([udev_p], udev_hwdb_p),
+        get_properties_list_entry=([udev_hwdb_p, c_char_p, c_uint], udev_list_entry_p))
 }
 
 
 ERROR_CHECKERS = dict(
+    udev_device_set_sysattr_value=check_negative_errorcode,
     udev_enumerate_add_match_parent=check_negative_errorcode,
     udev_enumerate_add_match_subsystem=check_negative_errorcode,
     udev_enumerate_add_nomatch_subsystem=check_negative_errorcode,
