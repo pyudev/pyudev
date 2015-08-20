@@ -584,8 +584,8 @@ class TestAttributes(object):
             else:
                 with pytest.raises(ValueError) as exc_info:
                     device.attributes.asbool(attribute)
-                message = 'Not a boolean value: {0!r}'
-                assert str(exc_info.value) == message.format(value)
+                message = 'Not a boolean value:'
+                assert str(exc_info.value).startswith(message)
 
 
 class TestTags(object):
