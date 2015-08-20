@@ -98,7 +98,7 @@ version = '.'.join(pyudev.__version__.split('.')[:2])
 release = pyudev.__version__
 
 templates_path = ['_templates']
-html_theme = 'default'
+html_theme = 'classic'
 html_static_path = []
 html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
                         'sourcelink.html']}
