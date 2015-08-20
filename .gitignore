@@ -22,3 +22,6 @@ doc/_build/*
 # coverage files
 htmlcov
 .coverage
+
+# pyreverse files
+_pyreverse

@@ -32,3 +32,11 @@ upload-release:
 
 pylint:
 	pylint pyudev --reports=no --disable=I
+
+PYREVERSE_OPTS = --output=pdf
+view:
+	-rm -Rf _pyreverse
+	mkdir _pyreverse
+	PYTHONPATH=. pyreverse ${PYREVERSE_OPTS} --project="pyudev" pyudev
+	mv classes_pyudev.pdf _pyreverse
+	mv packages_pyudev.pdf _pyreverse
