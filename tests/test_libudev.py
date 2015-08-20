@@ -67,6 +67,7 @@ FUNDAMENTAL_TYPES = {
     'char': ctypes.c_char,
     'long long unsigned int': ctypes.c_ulonglong,
     'long unsigned int': ctypes.c_ulong,
+    'unsigned int': ctypes.c_uint,
     'void': None,
 }
 
