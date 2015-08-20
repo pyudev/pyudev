@@ -134,6 +134,7 @@ class Monitor(object):
         return self._started
 
     def fileno(self):
+        # pylint: disable=anomalous-backslash-in-string
         """
         Return the file description associated with this monitor as integer.
 

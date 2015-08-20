@@ -29,3 +29,6 @@ vagrant-test: vagrant-up
 .PHONY: upload-release
 upload-release:
 	python setup.py release register sdist upload
+
+pylint:
+	pylint pyudev --reports=no --disable=I
