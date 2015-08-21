@@ -21,10 +21,10 @@
 
     PySide integration.
 
-    :class:`QUDevMonitorObserver` integrates device monitoring into the PySide_
+    :class:`QUDevMonitorObserver` integrates device monitoring into the PySide\_
     mainloop by turing device events into Qt signals.
 
-    :mod:`PySide.QtCore` from PySide_ must be available when importing this
+    :mod:`PySide.QtCore` from PySide\_ must be available when importing this
     module.
 
     .. _PySide: http://www.pyside.org

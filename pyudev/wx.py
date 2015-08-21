@@ -16,10 +16,10 @@
 
     Wx integration.
 
-    :class:`MonitorObserver` integrates device monitoring into the wxPython_
+    :class:`MonitorObserver` integrates device monitoring into the wxPython\_
     mainloop by turing device events into wx events.
 
-    :mod:`wx` from wxPython_ must be available when importing this module.
+    :mod:`wx` from wxPython\_ must be available when importing this module.
 
     .. _wxPython: http://wxpython.org/
 

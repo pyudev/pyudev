@@ -21,10 +21,10 @@
 
     PyQt4 integration.
 
-    :class:`MonitorObserver` integrates device monitoring into the PyQt4_
+    :class:`MonitorObserver` integrates device monitoring into the PyQt4\_
     mainloop by turing device events into Qt signals.
 
-    :mod:`PyQt4.QtCore` from PyQt4_ must be available when importing this
+    :mod:`PyQt4.QtCore` from PyQt4\_ must be available when importing this
     module.
 
     .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
