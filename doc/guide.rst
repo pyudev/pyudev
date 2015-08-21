@@ -344,7 +344,7 @@ For instance, the above example would look like this in a PySide_ application:
 
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
-.. _Qt: http://qt-project.org/
+.. _Qt: http://qt.io/developers/
 .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
 .. _PySide: http://www.pyside.org
 .. _PyGtk: http://www.pygtk.org/
