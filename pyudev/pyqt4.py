@@ -24,7 +24,7 @@
     PyQt4 integration.
 
     :class:`MonitorObserver` integrates device monitoring into the PyQt4\_
-    mainloop by turing device events into Qt signals.
+    mainloop by turning device events into Qt signals.
 
     :mod:`PyQt4.QtCore` from PyQt4\_ must be available when importing this
     module.
