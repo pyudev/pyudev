@@ -31,7 +31,13 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	pylint pyudev --reports=no --disable=I
+	pylint pyudev \
+		--reports=no \
+		--disable=I \
+		--disable=bad-continuation \
+		--disable=duplicate-code \
+		--exclude-protected=_libudev \
+		--no-docstring-rgx=_.*
 
 PYREVERSE_OPTS = --output=pdf
 view:
