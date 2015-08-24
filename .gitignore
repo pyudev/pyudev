@@ -18,3 +18,10 @@ doc/_build/*
 
 # Vagrant files
 .vagrant
+
+# coverage files
+htmlcov
+.coverage
+
+# pyreverse files
+_pyreverse

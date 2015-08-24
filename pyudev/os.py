@@ -81,7 +81,7 @@ def _get_pipe2_implementation():
 
 Return a function implementing ``pipe2``."""
     if hasattr(os, 'pipe2'):
-        return os.pipe2
+        return os.pipe2 # pylint: disable=no-member
     else:
         try:
             libc = load_c_library()
