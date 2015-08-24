@@ -29,3 +29,20 @@ vagrant-test: vagrant-up
 .PHONY: upload-release
 upload-release:
 	python setup.py release register sdist upload
+
+pylint:
+	pylint pyudev \
+		--reports=no \
+		--disable=I \
+		--disable=bad-continuation \
+		--disable=duplicate-code \
+		--exclude-protected=_libudev \
+		--no-docstring-rgx=_.*
+
+PYREVERSE_OPTS = --output=pdf
+view:
+	-rm -Rf _pyreverse
+	mkdir _pyreverse
+	PYTHONPATH=. pyreverse ${PYREVERSE_OPTS} --project="pyudev" pyudev
+	mv classes_pyudev.pdf _pyreverse
+	mv packages_pyudev.pdf _pyreverse

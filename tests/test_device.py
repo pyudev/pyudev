@@ -78,8 +78,11 @@ class TestDevice(object):
         assert device == Device.from_path(context, device_data.sys_path)
 
     def test_from_path_strips_leading_slash(self, context):
-        assert Device.from_path(context, 'devices/platform') == \
+        try:
+            assert Device.from_path(context, 'devices/platform') == \
                Device.from_path(context, '/devices/platform')
+        except DeviceNotFoundAtPathError:
+            pytest.skip('device not found')
 
     @with_device_data
     def test_from_sys_path(self, context, device_data):
@@ -503,7 +506,10 @@ class TestDevice(object):
         'operator', ORDERING_OPERATORS,
         ids=[f.__name__ for f in ORDERING_OPERATORS])
     def test_device_ordering(self, context, operator):
-        device = Device.from_path(context, '/devices/platform')
+        try:
+            device = Device.from_path(context, '/devices/platform')
+        except DeviceNotFoundAtPathError:
+            pytest.skip('device not found')
         with pytest.raises(TypeError) as exc_info:
             operator(device, device)
         assert str(exc_info.value) == 'Device not orderable'
@@ -584,8 +590,8 @@ class TestAttributes(object):
             else:
                 with pytest.raises(ValueError) as exc_info:
                     device.attributes.asbool(attribute)
-                message = 'Not a boolean value: {0!r}'
-                assert str(exc_info.value) == message.format(value)
+                message = 'Not a boolean value:'
+                assert str(exc_info.value).startswith(message)
 
 
 class TestTags(object):

@@ -7,12 +7,12 @@ The following plugins are provided and enabled:
 
 .. autosummary::
 
-   udev_database
-   privileged
-   fake_monitor
-   mock_libudev
-   libudev
-   travis
+   .udev_database
+   .privileged
+   .fake_monitor
+   .mock_libudev
+   .libudev
+   .travis
 
 The main plugin is :mod:`~plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a

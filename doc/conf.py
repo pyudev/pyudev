@@ -86,7 +86,7 @@ import pyudev
 needs_sphinx = '1.0'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
-              'sphinx.ext.intersphinx', 'sphinxcontrib.issuetracker']
+              'sphinx.ext.intersphinx']
 
 master_doc = 'index'
 exclude_patterns = ['_build/*']
@@ -98,16 +98,13 @@ version = '.'.join(pyudev.__version__.split('.')[:2])
 release = pyudev.__version__
 
 templates_path = ['_templates']
-html_theme = 'default'
+html_theme = 'classic'
 html_static_path = []
 html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
                         'sourcelink.html']}
 
 intersphinx_mapping = {'python': ('http://docs.python.org/', None),
                        'pytest': ('http://pytest.org/latest', None)}
-
-issuetracker = 'github'
-issuetracker_project = 'lunaryorn/pyudev'
 
 
 class UDevVersion(Directive):

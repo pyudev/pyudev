@@ -86,7 +86,7 @@ Other reading
 
 
 .. _Python: http://www.python.org/
-.. _libudev: http://www.freedesktop.org/software/systemd/libudev/
+.. _libudev: http://www.freedesktop.org/software/systemd/man/libudev.html
 .. _librelist.com: http://librelist.com/
 .. _list archives: http://librelist.com/browser/pyudev/
 .. _issue tracker: https://github.com/lunaryorn/pyudev/issues
