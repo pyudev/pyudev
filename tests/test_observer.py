@@ -21,7 +21,9 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from pyudev import Monitor, Device
+from pyudev import Device
+from pyudev import DeviceNotFoundAtPathError
+from pyudev import Monitor
 
 
 def pytest_funcarg__monitor(request):
@@ -30,7 +32,10 @@ def pytest_funcarg__monitor(request):
 
 def pytest_funcarg__fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    return Device.from_path(context, '/devices/platform')
+    try:
+        return Device.from_path(context, '/devices/platform')
+    except DeviceNotFoundAtPathError:
+        pytest.skip('device not found')
 
 
 def test_fake_monitor(fake_monitor, fake_monitor_device):
