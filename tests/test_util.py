@@ -140,3 +140,34 @@ def test_get_device_type_not_existing(tmpdir):
     with pytest.raises(EnvironmentError) as excinfo:
         _util.get_device_type(str(filename))
     pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
+
+
+def test_eintr_retry_call(tmpdir):
+    import os, signal, select
+
+    def handle_alarm(signum, frame):
+        pass
+    orig_alarm = signal.getsignal(signal.SIGALRM)
+
+    # Open an empty file and use it to wait for exceptions which should
+    # never happen
+    filename = tmpdir.join('test')
+    filename.ensure(file=True)
+    fd = os.open(str(filename), os.O_RDONLY)
+
+    try:
+        signal.signal(signal.SIGALRM, handle_alarm)
+
+        # Ensure that a signal raises EINTR on Python < 3.5
+        if sys.version_info < (3,5):
+            with pytest.raises(select.error) as e:
+                signal.alarm(1)
+                select.select([], [], [fd], 2)
+
+        # Ensure that wrapping the call does not raise EINTR
+        signal.alarm(1)
+        assert _util.eintr_retry_call(select.select, [], [], [3], 2) == ([], [], [])
+    finally:
+        os.close(fd)
+        signal.signal(signal.SIGALRM, orig_alarm)
+

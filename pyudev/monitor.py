@@ -34,6 +34,7 @@ import errno
 from threading import Thread
 from functools import partial
 
+from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
 from pyudev.core import Device
 from pyudev.os import Pipe, Poll, set_fd_status_flag
@@ -353,7 +354,7 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        if Poll.for_events((self, 'r')).poll(timeout):
+        if eintr_retry_call(Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
         else:
             return None
@@ -518,14 +519,14 @@ class MonitorObserver(Thread):
         notifier = Poll.for_events(
             (self.monitor, 'r'), (self._stop_event.source, 'r'))
         while True:
-            for fd, event in notifier.poll():
+            for fd, event in eintr_retry_call(notifier.poll):
                 if fd == self._stop_event.source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
                     self._stop_event.source.close()
                     return
                 elif fd == self.monitor.fileno() and event == 'r':
-                    read_device = partial(self.monitor.poll, timeout=0)
+                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
@@ -547,7 +548,7 @@ class MonitorObserver(Thread):
             return
         with self._stop_event.sink:
             # emit a stop event to the thread
-            self._stop_event.sink.write(b'\x01')
+            eintr_retry_call(self._stop_event.sink.write, b'\x01')
             self._stop_event.sink.flush()
 
     def stop(self):
