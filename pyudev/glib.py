@@ -23,10 +23,10 @@
     :class:`MonitorObserver` integrates device monitoring into the Glib
     mainloop by turing device events into Glib signals.
 
-    :mod:`glib` and :mod:`gobject` from PyGObject_ must be available when
-    importing this module. PyGtk is not required.
+    :mod:`GLib` and :mod:`GObject` from PyGObject_ must be available when
+    importing this module.
 
-    .. _PyGObject: http://www.pygtk.org/
+    .. _PyGObject: https://wiki.gnome.org/PyGObject
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
     .. versionadded:: 0.7
@@ -37,10 +37,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-# thanks to absolute imports, this really imports the glib binding and not this
-# module again
-import glib
-import gobject
+from gi.repository import GLib, GObject
 
 
 class _ObserverMixin(object):
@@ -66,13 +63,13 @@ class _ObserverMixin(object):
     @enabled.setter
     def enabled(self, value):
         if value and self.event_source is None:
-            self.event_source = glib.io_add_watch(
-                self.monitor, glib.IO_IN, self._process_udev_event)
+            self.event_source = GLib.io_add_watch(
+                self.monitor, GLib.IOCondition.IN, self._process_udev_event)
         elif not value and self.event_source is not None:
-            glib.source_remove(self.event_source)
+            GLib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
-        if condition == glib.IO_IN:
+        if condition == GLib.IOCondition.IN:
             device = self.monitor.poll(timeout=0)
             if device:
                 self._emit_event(device)
@@ -82,7 +79,7 @@ class _ObserverMixin(object):
         self.emit('device-event', device)
 
 
-class MonitorObserver(gobject.GObject, _ObserverMixin):
+class MonitorObserver(GObject.GObject, _ObserverMixin):
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -110,19 +107,19 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # python versions.  We could also remove the "unicode_literals" import,
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
+        str('device-event'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT,)),
     }
 
     def __init__(self, monitor):
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self._setup_observer(monitor)
 
 
-gobject.type_register(MonitorObserver)
+GObject.type_register(MonitorObserver)
 
 
-class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
+class GUDevMonitorObserver(GObject.GObject, _ObserverMixin):
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -135,20 +132,20 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
         'change': 'device-changed', 'move': 'device-moved'}
 
     __gsignals__ = {
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
-        str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT,)),
-        str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT,)),
-        str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
+        str('device-event'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
+        str('device-added'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT,)),
+        str('device-removed'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                                (GObject.TYPE_PYOBJECT,)),
+        str('device-changed'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                                (GObject.TYPE_PYOBJECT,)),
+        str('device-moved'): (GObject.SignalFlags.RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT,)),
     }
 
     def __init__(self, monitor):
-        gobject.GObject.__init__(self)
+        GObject.GObject.__init__(self)
         self._setup_observer(monitor)
         import warnings
         warnings.warn('Will be removed in 1.0. '
@@ -162,4 +159,4 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
             self.emit(signal, device)
 
 
-gobject.type_register(GUDevMonitorObserver)
+GObject.type_register(GUDevMonitorObserver)
