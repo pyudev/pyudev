@@ -1,4 +1,4 @@
-0.17 (in development)
+0.17 (Aug 26, 2015)
 =====================
 
 - #52: Remove global libudev object
