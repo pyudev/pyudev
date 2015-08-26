@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -30,14 +30,14 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import os
-import select
+import errno
 from threading import Thread
-from contextlib import closing
+from functools import partial
 
-from pyudev._libudev import libudev
+from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
-
 from pyudev.core import Device
+from pyudev.os import Pipe, Poll, set_fd_status_flag
 
 
 __all__ = ['Monitor', 'MonitorObserver']
@@ -86,10 +86,11 @@ class Monitor(object):
     def __init__(self, context, monitor_p):
         self.context = context
         self._as_parameter_ = monitor_p
+        self._libudev = context._libudev
         self._started = False
 
     def __del__(self):
-        libudev.udev_monitor_unref(self)
+        self._libudev.udev_monitor_unref(self)
 
     @classmethod
     def from_netlink(cls, context, source='udev'):
@@ -117,7 +118,7 @@ class Monitor(object):
         if source not in ('kernel', 'udev'):
             raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
                              'or "kernel"'.format(source))
-        monitor = libudev.udev_monitor_new_from_netlink(
+        monitor = context._libudev.udev_monitor_new_from_netlink(
             context, ensure_byte_string(source))
         if not monitor:
             raise EnvironmentError('Could not create udev monitor')
@@ -134,13 +135,14 @@ class Monitor(object):
         return self._started
 
     def fileno(self):
+        # pylint: disable=anomalous-backslash-in-string
         """
         Return the file description associated with this monitor as integer.
 
         This is really a real file descriptor ;), which can be watched and
         :func:`select.select`\ ed.
         """
-        return libudev.udev_monitor_get_fd(self)
+        return self._libudev.udev_monitor_get_fd(self)
 
     def filter_by(self, subsystem, device_type=None):
         """
@@ -165,9 +167,9 @@ class Monitor(object):
         subsystem = ensure_byte_string(subsystem)
         if device_type:
             device_type = ensure_byte_string(device_type)
-        libudev.udev_monitor_filter_add_match_subsystem_devtype(
+        self._libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self, subsystem, device_type)
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def filter_by_tag(self, tag):
         """
@@ -188,9 +190,9 @@ class Monitor(object):
         .. versionchanged:: 0.15
            This method can also be after :meth:`start()` now.
         """
-        libudev.udev_monitor_filter_add_match_tag(
+        self._libudev.udev_monitor_filter_add_match_tag(
             self, ensure_byte_string(tag))
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def remove_filter(self):
         """
@@ -209,8 +211,8 @@ class Monitor(object):
 
         .. versionadded:: 0.15
         """
-        libudev.udev_monitor_filter_remove(self)
-        libudev.udev_monitor_filter_update(self)
+        self._libudev.udev_monitor_filter_remove(self)
+        self._libudev.udev_monitor_filter_update(self)
 
     def enable_receiving(self):
         """
@@ -251,7 +253,9 @@ class Monitor(object):
            started.
         """
         if not self._started:
-            libudev.udev_monitor_enable_receiving(self)
+            self._libudev.udev_monitor_enable_receiving(self)
+            # Force monitor FD into non-blocking mode
+            set_fd_status_flag(self, os.O_NONBLOCK)
             self._started = True
 
     def set_receive_buffer_size(self, size):
@@ -279,19 +283,28 @@ class Monitor(object):
 
         .. _python-prctl: http://packages.python.org/python-prctl
         """
-        libudev.udev_monitor_set_receive_buffer_size(self, size)
+        self._libudev.udev_monitor_set_receive_buffer_size(self, size)
 
     def _receive_device(self):
-        """
-        Receive a single device from the monitor.
+        """Receive a single device from the monitor.
 
-        Return the received :class:`Device`. Raise
-        :exc:`~exceptions.EnvironmentError`, if no device could be read.
+        Return the received :class:`Device`, or ``None`` if no device could be
+        received.
+
         """
-        device_p = libudev.udev_monitor_receive_device(self)
-        if not device_p:
-            raise EnvironmentError('Could not receive device')
-        return Device(self.context, device_p)
+        while True:
+            try:
+                device_p = self._libudev.udev_monitor_receive_device(self)
+                return Device(self.context, device_p) if device_p else None
+            except EnvironmentError as error:
+                if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
+                    # No data available
+                    return None
+                elif error.errno == errno.EINTR:
+                    # Try again if our system call was interrupted
+                    continue
+                else:
+                    raise
 
     def poll(self, timeout=None):
         """
@@ -337,8 +350,11 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
-        rlist, _, _ = select.select([self], [], [], timeout)
-        if self in rlist:
+        if timeout is not None and timeout > 0:
+            # .poll() takes timeout in milliseconds
+            timeout = int(timeout * 1000)
+        self.start()
+        if eintr_retry_call(Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
         else:
             return None
@@ -378,7 +394,7 @@ class Monitor(object):
         import warnings
         warnings.warn('Will be removed in 1.0. Use Monitor.poll() instead.',
                       DeprecationWarning)
-        device = self._receive_device()
+        device = self.poll()
         return device.action, device
 
     def __iter__(self):
@@ -404,13 +420,10 @@ class Monitor(object):
                       '"poll()" instead, or monitor asynchronously with '
                       '"MonitorObserver".', DeprecationWarning)
         self.start()
-        with closing(select.epoll()) as notifier:
-            notifier.register(self, select.EPOLLIN)
-            while True:
-                events = notifier.poll()
-                for event in events:
-                    device = self._receive_device()
-                    yield device.action, device
+        while True:
+            device = self.poll()
+            if device:
+                yield device.action, device
 
 
 class MonitorObserver(Thread):
@@ -487,7 +500,7 @@ class MonitorObserver(Thread):
         self.monitor = monitor
         # observer threads should not keep the interpreter alive
         self.daemon = True
-        self._stop_event_source, self._stop_event_sink = os.pipe()
+        self._stop_event = None
         if event_handler is not None:
             import warnings
             warnings.warn('"event_handler" argument will be removed in 1.0. '
@@ -495,24 +508,29 @@ class MonitorObserver(Thread):
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback
 
+    def start(self):
+        """Start the observer thread."""
+        if not self.is_alive():
+            self._stop_event = Pipe.open()
+        Thread.start(self)
+
     def run(self):
         self.monitor.start()
-        with closing(select.epoll()) as notifier:
-            # poll on the stop event fd
-            notifier.register(self._stop_event_source, select.EPOLLIN)
-            # and on the monitor
-            notifier.register(self.monitor, select.EPOLLIN)
-            while True:
-                for fd, _ in notifier.poll():
-                    if fd == self._stop_event_source:
-                        # in case of a stop event, close our pipe side, and
-                        # return from the thread
-                        os.close(self._stop_event_source)
-                        return
-                    else:
-                        device = self.monitor.poll(timeout=0)
-                        if device:
-                            self._callback(device)
+        notifier = Poll.for_events(
+            (self.monitor, 'r'), (self._stop_event.source, 'r'))
+        while True:
+            for fd, event in eintr_retry_call(notifier.poll):
+                if fd == self._stop_event.source.fileno():
+                    # in case of a stop event, close our pipe side, and
+                    # return from the thread
+                    self._stop_event.source.close()
+                    return
+                elif fd == self.monitor.fileno() and event == 'r':
+                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
+                    for device in iter(read_device, None):
+                        self._callback(device)
+                else:
+                    raise EnvironmentError('Observed monitor hung up')
 
     def send_stop(self):
         """
@@ -526,15 +544,12 @@ class MonitorObserver(Thread):
 
            The underlying :attr:`monitor` is *not* stopped.
         """
-        if self._stop_event_sink is None:
+        if self._stop_event is None:
             return
-        try:
+        with self._stop_event.sink:
             # emit a stop event to the thread
-            os.write(self._stop_event_sink, b'\x01')
-        finally:
-            # close the out-of-thread side of the pipe
-            os.close(self._stop_event_sink)
-            self._stop_event_sink = None
+            eintr_retry_call(self._stop_event.sink.write, b'\x01')
+            self._stop_event.sink.flush()
 
     def stop(self):
         """

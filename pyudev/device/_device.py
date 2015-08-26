@@ -17,129 +17,39 @@
 
 
 """
-    pyudev.device
-    =============
+    pyudev.device._device
+    =====================
 
     Device class implementation of :mod:`pyudev`.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
-from collections import Mapping, Container, Iterable
+from collections import Container
+from collections import Iterable
+from collections import Mapping
 from datetime import timedelta
 
-from pyudev._libudev import libudev
-from pyudev._util import (ensure_byte_string, ensure_unicode_string,
-                          udev_list_iterate, string_to_bool,
-                          get_device_type)
+from pyudev.device._errors import DeviceNotFoundAtPathError
+from pyudev.device._errors import DeviceNotFoundByNameError
+from pyudev.device._errors import DeviceNotFoundByNumberError
+from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+from pyudev._util import ensure_byte_string
+from pyudev._util import ensure_unicode_string
+from pyudev._util import get_device_type
+from pyudev._util import string_to_bool
+from pyudev._util import udev_list_iterate
 
-
-__all__ = ['Device', 'Attributes', 'Tags',
-           'DeviceNotFoundError', 'DeviceNotFoundAtPathError',
-           'DeviceNotFoundByNameError', 'DeviceNotFoundByNumberError',
-           'DeviceNotFoundInEnvironmentError']
-
-
-class DeviceNotFoundError(LookupError):
-    """
-    An exception indicating that no :class:`Device` was found.
-
-    .. versionchanged:: 0.5
-       Rename from ``NoSuchDeviceError`` to its current name.
-    """
-
-
-class DeviceNotFoundAtPathError(DeviceNotFoundError):
-    """
-    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
-    found at a given path.
-    """
-
-    def __init__(self, sys_path):
-        DeviceNotFoundError.__init__(self, sys_path)
-
-    @property
-    def sys_path(self):
-        """
-        The path that caused this error as string.
-        """
-        return self.args[0]
-
-    def __str__(self):
-        return 'No device at {0!r}'.format(self.sys_path)
-
-
-class DeviceNotFoundByNameError(DeviceNotFoundError):
-    """
-    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
-    found with a given name.
-    """
-
-    def __init__(self, subsystem, sys_name):
-        DeviceNotFoundError.__init__(self, subsystem, sys_name)
-
-    @property
-    def subsystem(self):
-        """
-        The subsystem that caused this error as string.
-        """
-        return self.args[0]
-
-    @property
-    def sys_name(self):
-        """
-        The sys name that caused this error as string.
-        """
-        return self.args[1]
-
-    def __str__(self):
-        return 'No device {0.sys_name!r} in {0.subsystem!r}'.format(self)
-
-
-class DeviceNotFoundByNumberError(DeviceNotFoundError):
-    """
-    A :exc:`DeviceNotFoundError` indicating, that no :class:`Device` was found
-    for a given device number.
-    """
-
-    def __init__(self, type, number):
-        DeviceNotFoundError.__init__(self, type, number)
-
-    @property
-    def device_type(self):
-        """
-        The device type causing this error as string.  Either ``'char'`` or
-        ``'block'``.
-        """
-        return self.args[0]
-
-    @property
-    def device_number(self):
-        """
-        The device number causing this error as integer.
-        """
-        return self.args[1]
-
-    def __str__(self):
-        return ('No {0.device_type} device with number '
-                '{0.device_number}'.format(self))
-
-
-class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
-    """
-    A :exc:`DeviceNotFoundError` indicating, that no :class:`Device` could
-    be constructed from the process environment.
-    """
-
-    def __str__(self):
-        return 'No device found in environment'
-
+# pylint: disable=too-many-lines
 
 class Device(Mapping):
+    # pylint: disable=too-many-public-methods
     """
     A single device with attached attributes and properties.
 
@@ -221,7 +131,7 @@ class Device(Mapping):
            Raise :exc:`DeviceNotFoundAtPathError` instead of
            :exc:`NoSuchDeviceError`.
         """
-        device = libudev.udev_device_new_from_syspath(
+        device = context._libudev.udev_device_new_from_syspath(
             context, ensure_byte_string(sys_path))
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
@@ -250,7 +160,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.5
         """
-        device = libudev.udev_device_new_from_subsystem_sysname(
+        device = context._libudev.udev_device_new_from_subsystem_sysname(
             context, ensure_byte_string(subsystem),
             ensure_byte_string(sys_name))
         if not device:
@@ -258,7 +168,7 @@ class Device(Mapping):
         return cls(context, device)
 
     @classmethod
-    def from_device_number(cls, context, type, number):
+    def from_device_number(cls, context, typ, number):
         """
         Create a new device from a device ``number`` with the given device
         ``type``:
@@ -296,13 +206,13 @@ class Device(Mapping):
 
         .. versionadded:: 0.11
         """
-        if type not in ('char', 'block'):
+        if typ not in ('char', 'block'):
             raise ValueError('Invalid type: {0!r}. Must be one of "char" '
-                             'or "block".'.format(type))
-        device = libudev.udev_device_new_from_devnum(
-            context, ensure_byte_string(type[0]), number)
+                             'or "block".'.format(typ))
+        device = context._libudev.udev_device_new_from_devnum(
+            context, ensure_byte_string(typ[0]), number)
         if not device:
-            raise DeviceNotFoundByNumberError(type, number)
+            raise DeviceNotFoundByNumberError(typ, number)
         return cls(context, device)
 
     @classmethod
@@ -364,7 +274,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.6
         """
-        device = libudev.udev_device_new_from_environment(context)
+        device = context._libudev.udev_device_new_from_environment(context)
         if not device:
             raise DeviceNotFoundInEnvironmentError()
         return cls(context, device)
@@ -372,9 +282,10 @@ class Device(Mapping):
     def __init__(self, context, _device):
         self.context = context
         self._as_parameter_ = _device
+        self._libudev = context._libudev
 
     def __del__(self):
-        libudev.udev_device_unref(self)
+        self._libudev.udev_device_unref(self)
 
     def __repr__(self):
         return 'Device({0.sys_path!r})'.format(self)
@@ -385,12 +296,12 @@ class Device(Mapping):
         The parent :class:`Device` or ``None``, if there is no parent
         device.
         """
-        parent = libudev.udev_device_get_parent(self)
+        parent = self._libudev.udev_device_get_parent(self)
         if not parent:
             return None
         # the parent device is not referenced, thus forcibly acquire a
         # reference
-        return Device(self.context, libudev.udev_device_ref(parent))
+        return Device(self.context, self._libudev.udev_device_ref(parent))
 
     @property
     def children(self):
@@ -460,12 +371,12 @@ class Device(Mapping):
         subsystem = ensure_byte_string(subsystem)
         if device_type is not None:
             device_type = ensure_byte_string(device_type)
-        parent = libudev.udev_device_get_parent_with_subsystem_devtype(
+        parent = self._libudev.udev_device_get_parent_with_subsystem_devtype(
             self, subsystem, device_type)
         if not parent:
             return None
         # parent device is not referenced, thus forcibly acquire a reference
-        return Device(self.context, libudev.udev_device_ref(parent))
+        return Device(self.context, self._libudev.udev_device_ref(parent))
 
     def traverse(self):
         """
@@ -489,7 +400,8 @@ class Device(Mapping):
         Absolute path of this device in ``sysfs`` including the ``sysfs``
         mount point as unicode string.
         """
-        return ensure_unicode_string(libudev.udev_device_get_syspath(self))
+        return ensure_unicode_string(
+            self._libudev.udev_device_get_syspath(self))
 
     @property
     def device_path(self):
@@ -501,21 +413,24 @@ class Device(Mapping):
         mount point.  However, the path is absolute and starts with a slash
         ``'/'``.
         """
-        return ensure_unicode_string(libudev.udev_device_get_devpath(self))
+        return ensure_unicode_string(
+            self._libudev.udev_device_get_devpath(self))
 
     @property
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
         """
-        return ensure_unicode_string(libudev.udev_device_get_subsystem(self))
+        return ensure_unicode_string(
+            self._libudev.udev_device_get_subsystem(self))
 
     @property
     def sys_name(self):
         """
         Device file name inside ``sysfs`` as unicode string.
         """
-        return ensure_unicode_string(libudev.udev_device_get_sysname(self))
+        return ensure_unicode_string(
+            self._libudev.udev_device_get_sysname(self))
 
     @property
     def sys_number(self):
@@ -541,7 +456,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.11
         """
-        number = libudev.udev_device_get_sysnum(self)
+        number = self._libudev.udev_device_get_sysnum(self)
         if number is not None:
             return ensure_unicode_string(number)
 
@@ -563,7 +478,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.10
         """
-        device_type = libudev.udev_device_get_devtype(self)
+        device_type = self._libudev.udev_device_get_devtype(self)
         if device_type is not None:
             return ensure_unicode_string(device_type)
 
@@ -575,7 +490,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.5
         """
-        driver = libudev.udev_device_get_driver(self)
+        driver = self._libudev.udev_device_get_driver(self)
         if driver:
             return ensure_unicode_string(driver)
 
@@ -597,7 +512,7 @@ class Device(Mapping):
            this property is not necessary equal to the ``filename`` given to
            :meth:`from_device_file()`.
         """
-        node = libudev.udev_device_get_devnode(self)
+        node = self._libudev.udev_device_get_devnode(self)
         if node:
             return ensure_unicode_string(node)
 
@@ -627,7 +542,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.11
         """
-        return libudev.udev_device_get_devnum(self)
+        return self._libudev.udev_device_get_devnum(self)
 
     @property
     def is_initialized(self):
@@ -650,7 +565,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.8
         """
-        return bool(libudev.udev_device_get_is_initialized(self))
+        return bool(self._libudev.udev_device_get_is_initialized(self))
 
     @property
     def time_since_initialized(self):
@@ -667,7 +582,8 @@ class Device(Mapping):
 
         .. versionadded:: 0.8
         """
-        microseconds = libudev.udev_device_get_usec_since_initialized(self)
+        microseconds = self._libudev.udev_device_get_usec_since_initialized(
+            self)
         return timedelta(microseconds=microseconds)
 
     @property
@@ -693,8 +609,8 @@ class Device(Mapping):
            ``Device.from_device_file(context, link).device_path ==
            device.device_path`` from any ``link`` in ``device.device_links``.
         """
-        devlinks = libudev.udev_device_get_devlinks_list_entry(self)
-        for name, _ in udev_list_iterate(devlinks):
+        devlinks = self._libudev.udev_device_get_devlinks_list_entry(self)
+        for name, _ in udev_list_iterate(self._libudev, devlinks):
             yield ensure_unicode_string(name)
 
     @property
@@ -724,7 +640,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.16
         """
-        action = libudev.udev_device_get_action(self)
+        action = self._libudev.udev_device_get_action(self)
         if action:
             return ensure_unicode_string(action)
 
@@ -736,7 +652,7 @@ class Device(Mapping):
 
         .. versionadded:: 0.16
         """
-        return libudev.udev_device_get_seqnum(self)
+        return self._libudev.udev_device_get_seqnum(self)
 
     @property
     def attributes(self):
@@ -769,7 +685,7 @@ class Device(Mapping):
         The :class:`Tags` object supports a test for a single tag as well as
         iteration over all tags:
 
-        >>> from pyudev import Context, Device
+        >>> from pyudev import Context
         >>> context = Context()
         >>> device = next(iter(context.list_devices(tag='systemd')))
         >>> 'systemd' in device.tags
@@ -800,42 +716,39 @@ class Device(Mapping):
         Return a generator yielding the names of all properties of this
         device as unicode strings.
         """
-        properties = libudev.udev_device_get_properties_list_entry(self)
-        for name, _ in udev_list_iterate(properties):
+        properties = self._libudev.udev_device_get_properties_list_entry(self)
+        for name, _ in udev_list_iterate(self._libudev, properties):
             yield ensure_unicode_string(name)
 
     def __len__(self):
         """
         Return the amount of properties defined for this device as integer.
         """
-        properties = libudev.udev_device_get_properties_list_entry(self)
-        i = 0
-        for i, _ in enumerate(udev_list_iterate(properties), start=1):
-            pass
-        return i
+        properties = self._libudev.udev_device_get_properties_list_entry(self)
+        return sum(1 for _ in udev_list_iterate(self._libudev, properties))
 
-    def __getitem__(self, property):
+    def __getitem__(self, prop):
         """
-        Get the given ``property`` from this device.
+        Get the given property from this device.
 
-        ``property`` is a unicode or byte string containing the name of the
+        ``prop`` is a unicode or byte string containing the name of the
         property.
 
         Return the property value as unicode string, or raise a
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device.
         """
-        value = libudev.udev_device_get_property_value(
-            self, ensure_byte_string(property))
+        value = self._libudev.udev_device_get_property_value(
+            self, ensure_byte_string(prop))
         if value is None:
-            raise KeyError(property)
+            raise KeyError(prop)
         return ensure_unicode_string(value)
 
-    def asint(self, property):
+    def asint(self, prop):
         """
-        Get the given ``property`` from this device as integer.
+        Get the given property from this device as integer.
 
-        ``property`` is a unicode or byte string containing the name of the
+        ``prop`` is a unicode or byte string containing the name of the
         property.
 
         Return the property value as integer. Raise a
@@ -843,17 +756,17 @@ class Device(Mapping):
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
         """
-        return int(self[property])
+        return int(self[prop])
 
-    def asbool(self, property):
+    def asbool(self, prop):
         """
-        Get the given ``property`` from this device as boolean.
+        Get the given property from this device as boolean.
 
         A boolean property has either a value of ``'1'`` or of ``'0'``,
         where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
         other value causes a :exc:`~exceptions.ValueError` to be raised.
 
-        ``property`` is a unicode or byte string containing the name of the
+        ``prop`` is a unicode or byte string containing the name of the
         property.
 
         Return ``True``, if the property value is ``'1'`` and ``False``, if
@@ -861,7 +774,7 @@ class Device(Mapping):
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
         """
-        return string_to_bool(self[property])
+        return string_to_bool(self[prop])
 
     def __hash__(self):
         return hash(self.device_path)
@@ -890,47 +803,6 @@ class Device(Mapping):
     def __ge__(self, other):
         raise TypeError('Device not orderable')
 
-
-class Tags(Iterable, Container):
-    """
-    A iterable over :class:`Device` tags.
-
-    Subclasses the ``Container`` and the ``Iterable`` ABC.
-    """
-
-    def __init__(self, device):
-        self.device = device
-
-    if hasattr(libudev, 'udev_device_has_tag'):
-        def _has_tag(self, tag):
-            return bool(libudev.udev_device_has_tag(
-                self.device, ensure_byte_string(tag)))
-    else:
-        def _has_tag(self, tag):
-            return any(t == tag for t in self)
-
-    def __contains__(self, tag):
-        """
-        Check for existence of ``tag``.
-
-        ``tag`` is a tag as unicode string.
-
-        Return ``True``, if ``tag`` is attached to the device, ``False``
-        otherwise.
-        """
-        return self._has_tag(tag)
-
-    def __iter__(self):
-        """
-        Iterate over all tags.
-
-        Yield each tag as unicode string.
-        """
-        tags = libudev.udev_device_get_tags_list_entry(self.device)
-        for tag, _ in udev_list_iterate(tags):
-            yield ensure_unicode_string(tag)
-
-
 def _is_attribute_file(filepath):
     """
     Check, if ``filepath`` points to a valid udev attribute filename.
@@ -947,7 +819,6 @@ def _is_attribute_file(filepath):
                 filename in ('dev', 'uevent') or
                 os.path.islink(filepath))
 
-
 class Attributes(Mapping):
     """
     A mapping which holds udev attributes for :class:`Device` objects.
@@ -963,29 +834,29 @@ class Attributes(Mapping):
 
     def __init__(self, device):
         self.device = device
+        self._libudev = device._libudev
 
-    if hasattr(libudev, 'udev_device_get_sysattr_list_entry'):
-        @property
-        def _attributes(self):
-            attrs = libudev.udev_device_get_sysattr_list_entry(self.device)
-            for attribute, _ in udev_list_iterate(attrs):
+    def _get_attributes(self):
+        """
+        Yields attributes of device.
+        """
+        if hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
+            attrs = self._libudev.udev_device_get_sysattr_list_entry(
+                self.device)
+            for attribute, _ in udev_list_iterate(self._libudev, attrs):
                 yield ensure_unicode_string(attribute)
-    else:
-        @property
-        def _attributes(self):
+        else:
             sys_path = self.device.sys_path
-            return (fn for fn in os.listdir(sys_path) if
-                    _is_attribute_file(os.path.join(sys_path, fn)) and
-                    fn in self)
+            for filename in os.listdir(sys_path):
+                filepath = os.path.join(sys_path, filename)
+                if _is_attribute_file(filepath):
+                    yield filename
 
     def __len__(self):
         """
         Return the amount of attributes defined.
         """
-        i = 0
-        for i, _ in enumerate(self._attributes, start=1):
-            pass
-        return i
+        return sum(1 for _ in self._get_attributes())
 
     def __iter__(self):
         """
@@ -993,10 +864,10 @@ class Attributes(Mapping):
 
         Yield each attribute name as unicode string.
         """
-        return self._attributes
+        return self._get_attributes()
 
     def __contains__(self, attribute):
-        value = libudev.udev_device_get_sysattr_value(
+        value = self._libudev.udev_device_get_sysattr_value(
             self.device, ensure_byte_string(attribute))
         return value is not None
 
@@ -1011,7 +882,7 @@ class Attributes(Mapping):
         :exc:`~exceptions.KeyError`, if the given attribute is not defined
         for this device.
         """
-        value = libudev.udev_device_get_sysattr_value(
+        value = self._libudev.udev_device_get_sysattr_value(
             self.device, ensure_byte_string(attribute))
         if value is None:
             raise KeyError(attribute)
@@ -1065,3 +936,53 @@ class Attributes(Mapping):
         if the given attribute is not defined for this device.
         """
         return string_to_bool(self.asstring(attribute))
+
+class Tags(Iterable, Container):
+    """
+    A iterable over :class:`Device` tags.
+
+    Subclasses the ``Container`` and the ``Iterable`` ABC.
+    """
+
+    # pylint: disable=too-few-public-methods
+
+    def __init__(self, device):
+        self.device = device
+
+    def _has_tag(self, tag):
+        """
+            Whether ``tag`` exists.
+
+            :param tag: unicode string with name of tag
+            :rtype: bool
+        """
+        if hasattr(self._libudev, 'udev_device_has_tag'):
+            return bool(self._libudev.udev_device_has_tag(
+                self.device, ensure_byte_string(tag)))
+        else:
+            return any(t == tag for t in self)
+
+    @property
+    def _libudev(self):
+        return self.device._libudev
+
+    def __contains__(self, tag):
+        """
+        Check for existence of ``tag``.
+
+        ``tag`` is a tag as unicode string.
+
+        Return ``True``, if ``tag`` is attached to the device, ``False``
+        otherwise.
+        """
+        return self._has_tag(tag)
+
+    def __iter__(self):
+        """
+        Iterate over all tags.
+
+        Yield each tag as unicode string.
+        """
+        tags = self._libudev.udev_device_get_tags_list_entry(self.device)
+        for tag, _ in udev_list_iterate(self._libudev, tags):
+            yield ensure_unicode_string(tag)

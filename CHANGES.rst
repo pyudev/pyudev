@@ -1,4 +1,26 @@
-0.16.1 (Aug 08, 2012)
+0.17 (Aug 26, 2015)
+=====================
+
+- #52: Remove global libudev object
+- #57: Really start the monitor on :meth:`pyudev.Monitor.poll()`
+- #60: Do not use :meth:`select.select` to avoid hitting its file descriptor
+  limit
+- #58: Force non-blocking IO in :class:`pyudev.Monitor` to avoid blocking on
+  receiving the device
+- #63: Set proper flags on pipe fds.
+- #65: Handle irregular polling events properly.
+- #50: Add :class:`pyudev.wx.MonitorObserver` and deprecate
+  :class:`pyudev.wx.WxUDevMonitorObserver`
+- #50: Add :class:`pyudev.glib.MonitorObserver` and deprecate
+  :class:`pyudev.glib.GUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyqt4.MonitorObserver` and deprecate
+  :class:`pyudev.pyqt4.QUDevMonitorObserver`
+- #50: Add :class:`pyudev.pyside.MonitorObserver` and deprecate
+  :class:`pyudev.pyside.QUDevMonitorObserver`
+- Add a wrapper function to retry interruptible system calls.
+
+
+0.16.1 (Aug 02, 2012)
 =====================
 
 - #53: Fix source distribution
@@ -10,7 +32,7 @@
 
 - Remove :meth:`pyudev.Monitor.from_socket`.
 - Deprecate :meth:`pyudev.Device.traverse()` in favor of
-  :attr:`pyudev.Device.ancestors`. 
+  :attr:`pyudev.Device.ancestors`.
 - #47: Deprecate :meth:`pyudev.Monitor.receive_device` in favor of
   :attr:`pyudev.Monitor.poll`.
 - #47: Deprecate :attr:`pyudev.Monitor.enable_receiving` in favor of

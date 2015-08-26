@@ -22,6 +22,7 @@ import sys
 import errno
 
 import pytest
+from mock import Mock
 
 from pyudev import _util
 
@@ -97,15 +98,15 @@ def test_string_to_bool_invalid_value():
 
 
 def test_udev_list_iterate_no_entry():
-    assert not list(_util.udev_list_iterate(None))
+    assert not list(_util.udev_list_iterate(Mock(), None))
 
 
 def test_udev_list_iterate_mock():
-    from pyudev._libudev import libudev
+    libudev = Mock(name='libudev')
     items = [('spam', 'eggs'), ('foo', 'bar')]
-    with pytest.libudev_list('udev_enumerate_get_list_entry', items):
+    with pytest.libudev_list(libudev, 'udev_enumerate_get_list_entry', items):
         udev_list = libudev.udev_enumerate_get_list_entry()
-        assert list(_util.udev_list_iterate(udev_list)) == [
+        assert list(_util.udev_list_iterate(libudev, udev_list)) == [
             ('spam', 'eggs'), ('foo', 'bar')]
 
 
@@ -118,7 +119,10 @@ def test_get_device_type_character_device():
 
 
 def test_get_device_type_block_device():
-    assert _util.get_device_type('/dev/sda') == 'block'
+    try:
+        assert _util.get_device_type('/dev/sda') == 'block'
+    except EnvironmentError:
+        pytest.skip('device node not found')
 
 
 def test_get_device_type_no_device_file(tmpdir):
@@ -136,3 +140,33 @@ def test_get_device_type_not_existing(tmpdir):
     with pytest.raises(EnvironmentError) as excinfo:
         _util.get_device_type(str(filename))
     pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
+
+
+def test_eintr_retry_call(tmpdir):
+    import os, signal, select
+
+    def handle_alarm(signum, frame):
+        pass
+    orig_alarm = signal.getsignal(signal.SIGALRM)
+
+    # Open an empty file and use it to wait for exceptions which should
+    # never happen
+    filename = tmpdir.join('test')
+    filename.ensure(file=True)
+    fd = os.open(str(filename), os.O_RDONLY)
+
+    try:
+        signal.signal(signal.SIGALRM, handle_alarm)
+
+        # Ensure that a signal raises EINTR on Python < 3.5
+        if sys.version_info < (3,5):
+            with pytest.raises(select.error) as e:
+                signal.alarm(1)
+                select.select([], [], [fd], 2)
+
+        # Ensure that wrapping the call does not raise EINTR
+        signal.alarm(1)
+        assert _util.eintr_retry_call(select.select, [], [], [3], 2) == ([], [], [])
+    finally:
+        os.close(fd)
+        signal.signal(signal.SIGALRM, orig_alarm)

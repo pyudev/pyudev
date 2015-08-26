@@ -3,7 +3,7 @@ pyudev -- pure Python libudev_ binding
 
 pyudev |release| (:doc:`changes`, :doc:`installation <install>`)
 
-pyudev is a :doc:`LGPL licensed <licencing>`, pure Python_ 2/3 binding to
+pyudev is a :doc:`LGPL licenced <licencing>`, pure Python_ 2/3 binding to
 libudev_, the device and hardware management and information library of Linux.
 
 Almost the complete libudev_ functionality is exposed. You can:
@@ -45,14 +45,8 @@ pyudev, the API documentation provides a detailed reference:
 Support
 -------
 
-Please ask questions about usage and development of pyudev to the mailing list
-at pyudev@librelist.com hosted by librelist.com_.  To subscribe to this list,
-send a mail to pyudev@librelist.com and reply to the confirmation email. To
-unsubscribe again, write to pyudev-unsubscribe@librelist.com and reply to the
-configuration mail. Past discussions are available in the `list archives`_.
-
-Please report issues and bugs to the `issue tracker`_, but respect the following
-guidelines:
+Please report issues, bugs and questions to the `issue tracker`_, but respect
+the following guidelines:
 
 - Check that the issue has not already been reported.
 - Check that the issue is not already fixed in the ``master`` branch.
@@ -92,7 +86,7 @@ Other reading
 
 
 .. _Python: http://www.python.org/
-.. _libudev: http://www.freedesktop.org/software/systemd/libudev/
+.. _libudev: http://www.freedesktop.org/software/systemd/man/libudev.html
 .. _librelist.com: http://librelist.com/
 .. _list archives: http://librelist.com/browser/pyudev/
 .. _issue tracker: https://github.com/lunaryorn/pyudev/issues

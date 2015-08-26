@@ -11,21 +11,23 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-"""
-    pyudev.wx
+# pylint: disable=anomalous-backslash-in-string
+
+"""pyudev.wx
     =========
 
     Wx integration.
 
-    :class:`WxUDevMonitorObserver` integrates device monitoring into the
-    wxPython_ mainloop by turing device events into wx events.
+    :class:`MonitorObserver` integrates device monitoring into the wxPython\_
+    mainloop by turing device events into wx events.
 
-    :mod:`wx` from wxPython_ must be available when importing this module.
+    :mod:`wx` from wxPython\_ must be available when importing this module.
 
     .. _wxPython: http://wxpython.org/
 
     .. moduleauthor::  Tobias Eberle  <tobias.eberle@gmx.de>
     .. versionadded:: 0.14
+
 """
 
 
@@ -35,43 +37,34 @@ from __future__ import (print_function, division, unicode_literals,
 from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent
 
-from pyudev.monitor import MonitorObserver
+import pyudev
 
 
 DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
-DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
-DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
-DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
-DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
 
 
-class WxUDevMonitorObserver(EvtHandler):
+class MonitorObserver(EvtHandler):
     """
     An observer for device events integrating into the :mod:`wx` mainloop.
 
     This class inherits :class:`~wx.EvtHandler` to turn device events into
     wx events:
 
-    >>> from pyudev import Context, Device
-    >>> from pyudev.wx import WxUDevMonitorObserver
+    >>> from pyudev import Context, Monitor
+    >>> from pyudev.wx import MonitorObserver
     >>> context = Context()
     >>> monitor = Monitor.from_netlink(context)
     >>> monitor.filter_by(subsystem='input')
-    >>> observer = WxUDevMonitorObserver(monitor)
-    >>> def device_connected(event):
-    ...     print('{0!r} added'.format(event.device))
-    >>> observer.Bind(EVT_DEVICE_ADDED, device_connected)
+    >>> observer = MonitorObserver(monitor)
+    >>> def device_event(event):
+    ...     print('action {0} on device {1}'.format(event.device.action, event.device))
+    >>> observer.Bind(EVT_DEVICE_EVENT, device_event)
     >>> monitor.start()
 
     This class is a child of :class:`wx.EvtHandler`.
-    """
 
-    _action_event_map = {
-        'add': DeviceAddedEvent,
-        'remove': DeviceRemovedEvent,
-        'change': DeviceChangedEvent,
-        'move': DeviceMovedEvent
-    }
+    .. versionadded:: 0.17
+    """
 
     def __init__(self, monitor):
         EvtHandler.__init__(self)
@@ -104,8 +97,8 @@ class WxUDevMonitorObserver(EvtHandler):
         """
         if self._observer_thread is not None:
             return
-        self._observer_thread = MonitorObserver(
-            self.monitor, callback=self._emit_events,
+        self._observer_thread = pyudev.MonitorObserver(
+            self.monitor, callback=self._emit_event,
             name='wx-observer-thread')
         self._observer_thread.start()
 
@@ -119,7 +112,38 @@ class WxUDevMonitorObserver(EvtHandler):
             return
         self._observer_thread.stop()
 
-    def _emit_events(self, device):
+    def _emit_event(self, device):
+        PostEvent(self, DeviceEvent(device=device))
+
+
+DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
+DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
+DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
+DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
+
+
+class WxUDevMonitorObserver(MonitorObserver):
+    """An observer for device events integrating into the :mod:`wx` mainloop.
+
+    .. deprecated:: 0.17
+       Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
+    """
+
+    _action_event_map = {
+        'add': DeviceAddedEvent,
+        'remove': DeviceRemovedEvent,
+        'change': DeviceChangedEvent,
+        'move': DeviceMovedEvent
+    }
+
+    def __init__(self, monitor):
+        MonitorObserver.__init__(self, monitor)
+        import warnings
+        warnings.warn('Will be removed in 1.0. '
+                      'Use pyudev.wx.MonitorObserver instead.',
+                      DeprecationWarning)
+
+    def _emit_event(self, device):
         PostEvent(self, DeviceEvent(action=device.action, device=device))
         event_class = self._action_event_map.get(device.action)
         if event_class is not None:

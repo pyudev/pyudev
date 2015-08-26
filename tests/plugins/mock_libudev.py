@@ -16,16 +16,15 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-"""
-    plugins.mock_libudev
+"""plugins.mock_libudev
     ====================
 
     Plugin to mock calls to libudev.
 
-    This plugin adds :func:`calls_to_libudev()` and :func:`libudev_list()` to
-    the :mod:`pytest` namespace.
+    This plugin adds :func:`libudev_list()` to the :mod:`pytest` namespace.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+
 """
 
 from __future__ import (print_function, division, unicode_literals,
@@ -36,33 +35,6 @@ from contextlib import contextmanager
 from collections import namedtuple
 
 import mock
-
-
-@contextmanager
-def calls_to_libudev(function_calls):
-    """
-    Mock libudev functions and check calls to the mocked functions::
-
-       calls = {'udev_device_ref': [(device,)]}
-       with pytest.calls_to_libudev(calls):
-           device.parent
-
-    ``function_calls`` is a dictionary that maps libudev function names to a
-    list of calls, where each call is represented as tuple containing the
-    arguments expected to be passed to the function.
-
-    If any call in ``function_calls`` does not occur, the function triggers an
-    assertion.
-
-    All mocked functions are restored if the context exits.
-    """
-    from pyudev._libudev import libudev
-    mocks = dict((function, mock.DEFAULT) for function in function_calls)
-    with mock.patch.multiple(libudev, **mocks):
-        yield
-        for name, calls in function_calls.items():
-            function = getattr(libudev, name)
-            function.assert_has_calls([mock.call(*c) for c in calls])
 
 
 Node = namedtuple('Node', 'name value next')
@@ -93,11 +65,11 @@ class LinkedList(object):
 
 
 @contextmanager
-def libudev_list(function, items):
+def libudev_list(libudev, function, items):
     """
     Mock a libudev linked list::
 
-       with pytest.libudev_list('udev_device_get_tag_list_entry', ['foo', 'bar']):
+       with pytest.libudev_list(device._libudev, 'udev_device_get_tag_list_entry', ['foo', 'bar']):
            assert list(device.tags) == ['foo', 'bar']
 
     ``function`` is a string containing the name of the libudev function that
@@ -107,7 +79,6 @@ def libudev_list(function, items):
     the second the item value, or a single element, which is the item name.
     The item value is ``None`` in this case.
     """
-    from pyudev._libudev import libudev
     functions_to_patch = [function, 'udev_list_entry_get_next',
                           'udev_list_entry_get_name',
                           'udev_list_entry_get_value']
@@ -121,7 +92,7 @@ def libudev_list(function, items):
         yield
 
 
-EXPOSED_FUNCTIONS = [calls_to_libudev, libudev_list]
+EXPOSED_FUNCTIONS = [libudev_list]
 
 
 def pytest_namespace():

@@ -92,7 +92,7 @@ all devices with a specific filter criterion.  Instead, you can directly create
 :class:`Device` objects from a device path (:meth:`Device.from_path()`), by
 from a subsystem and device name (:meth:`Device.from_name()`) or from a device
 file (:meth:`Device.from_device_file()`).  The following code gets the
-:class:`Device` object for the first hard disc in thrww different ways:
+:class:`Device` object for the first hard disc in three different ways:
 
 >>> pyudev.Device.from_path(context, '/sys/block/sda')
 Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
@@ -123,7 +123,7 @@ Querying device information
 ---------------------------
 
 As you've seen, :class:`Device` represents a device in the udev database.  Each
-such device as a set of "device properties" (not to be confused with Python
+such device has a set of "device properties" (not to be confused with Python
 properties as created by :func:`property()`!) that describe the capabilities
 and features of this device as well as its relationship to other devices.
 
@@ -141,7 +141,7 @@ object.  For instance, you can directly query the :attr:`device_node` and the
 /dev/sda3 (partition)
 
 For all other properties, :class:`Device` provides a dictionary-like interface
-to directly access the device properties.  You'll get the same information has
+to directly access the device properties.  You'll get the same information as
 with the generic properties:
 
 >>> for device in context.list_devices(subsystem='block'):
@@ -344,7 +344,7 @@ For instance, the above example would look like this in a PySide_ application:
 
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
-.. _Qt: http://qt-project.org/
+.. _Qt: http://qt.io/developers/
 .. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
 .. _PySide: http://www.pyside.org
 .. _PyGtk: http://www.pygtk.org/

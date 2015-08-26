@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -21,6 +21,8 @@ from __future__ import (print_function, division, unicode_literals,
 import os
 import sys
 
+import pytest
+
 import pyudev
 
 
@@ -30,6 +32,7 @@ pytest_plugins = [
     str('plugins.privileged'),
     str('plugins.mock_libudev'),
     str('plugins.libudev'),
+    str('plugins.travis'),
 ]
 
 
@@ -64,7 +67,9 @@ def pytest_namespace():
 
 def pytest_funcarg__context(request):
     """
-    Return a useable :class:`pyudev.Context` object.  The context is cached
-    with session scope.
+    Return a useable :class:`pyudev.Context` object.
     """
-    return request.cached_setup(setup=pyudev.Context, scope='session')
+    try:
+        return pyudev.Context()
+    except ImportError:
+        pytest.skip('udev not available')

@@ -7,11 +7,12 @@ The following plugins are provided and enabled:
 
 .. autosummary::
 
-   udev_database
-   privileged
-   fake_monitor
-   mock_libudev
-   libudev
+   .udev_database
+   .privileged
+   .fake_monitor
+   .mock_libudev
+   .libudev
+   .travis
 
 The main plugin is :mod:`~plugins.udev_database` that extracts the
 real udev database using the ``udevadm`` utility and provides tests with a
@@ -189,8 +190,6 @@ The plugin provides the following :ref:`funcargs <funcargs>`:
 
 .. automodule:: plugins.mock_libudev
 
-.. autofunction:: calls_to_libudev(function_calls)
-
 .. autofunction:: libudev_list(function, items)
 
 
@@ -275,7 +274,35 @@ Types
 
    .. attribute:: type
 
-      The underyling type
+   The underyling type
+
+
+:mod:`~plugins.travis` – Support for Travis CI
+----------------------------------------------
+
+.. automodule:: plugins.travis
+
+
+Test markers
+~~~~~~~~~~~~
+
+.. attribute:: pytest.mark.not_on_travis
+
+   Do not run the decorated test on Travis CI::
+
+      @pytest.mark.not_on_travis
+      def test_foo():
+          assert True
+
+   ``test_foo`` will not be run on Travis CI.
+
+
+:mod:`pytest` namespace
+~~~~~~~~~~~~~~~~~~~~~~~
+
+The plugin adds the following functions to the :mod:`pytest` namespace:
+
+.. autofunction:: is_on_travis_ci
 
 
 .. _pytest: http://pytest.org
