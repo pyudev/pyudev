@@ -25,3 +25,6 @@ htmlcov
 
 # pyreverse files
 _pyreverse
+
+# hypothesis files
+.hypothesis
