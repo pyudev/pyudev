@@ -212,7 +212,8 @@ def pytest_generate_tests(metafunc):
                                  indirect=True)
 
 
-def pytest_funcarg__libudev_function(request):
+@pytest.fixture
+def libudev_function(request):
     """
     Return each :class:`Function` parsed from libudev.
 

@@ -24,11 +24,13 @@ import mock
 from pyudev import Monitor, Device
 
 
-def pytest_funcarg__monitor(request):
+@pytest.fixture
+def monitor(request):
     return Monitor.from_netlink(request.getfuncargvalue('context'))
 
 
-def pytest_funcarg__fake_monitor_device(request):
+@pytest.fixture
+def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
     return Device.from_path(context, '/devices/platform')
 

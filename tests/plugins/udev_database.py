@@ -318,7 +318,8 @@ def pytest_configure(config):
         config.udev_device_sample = []
 
 
-def pytest_funcarg__udev_database(request):
+@pytest.fixture
+def udev_database(request):
     """
     The udev database as provided by :attr:`pytest.config.udev_database`.
     """

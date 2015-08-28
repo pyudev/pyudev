@@ -1,6 +1,6 @@
 # unit test requirements
 docutils>=0.9
-pytest>=2.2
+pytest>=2.3
 mock>=1.0b1
 
 # documentation requirements

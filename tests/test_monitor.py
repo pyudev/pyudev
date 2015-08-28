@@ -39,11 +39,13 @@ from pyudev import MonitorObserver
 # necessary anyway, libudev can just assumed to be correct.
 
 
-def pytest_funcarg__monitor(request):
+@pytest.fixture
+def monitor(request):
     return Monitor.from_netlink(request.getfuncargvalue('context'))
 
 
-def pytest_funcarg__fake_monitor_device(request):
+@pytest.fixture
+def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
     try:
         return Device.from_path(context, '/devices/platform')
