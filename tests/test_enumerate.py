@@ -25,7 +25,8 @@ import mock
 from pyudev import Enumerator, Device
 
 
-def pytest_funcarg__enumerator(request):
+@pytest.fixture
+def enumerator(request):
     context = request.getfuncargvalue('context')
     return context.list_devices()
 

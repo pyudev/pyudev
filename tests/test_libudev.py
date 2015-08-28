@@ -122,7 +122,8 @@ class LibudevFunction(object):
         return _to_ctypes(self.declaration.return_type)
 
 
-def pytest_funcarg__libudev_function(request):
+@pytest.fixture
+def libudev_function(request):
     """
     Override ``libudev_function`` to skip tests for blacklisted functions.
     """
@@ -132,14 +133,16 @@ def pytest_funcarg__libudev_function(request):
     return LibudevFunction(function)
 
 
-def pytest_funcarg__libudev(request):
+@pytest.fixture
+def libudev(request):
     try:
         return _libudev.load_udev_library()
     except ImportError:
         pytest.skip('udev not available')
 
 
-def pytest_funcarg__function(request):
+@pytest.fixture
+def function(request):
     libudev = request.getfuncargvalue('libudev')
     libudev_function = request.getfuncargvalue('libudev_function')
     return libudev_function.get_wrapper(libudev)
