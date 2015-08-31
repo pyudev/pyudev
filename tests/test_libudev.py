@@ -51,6 +51,12 @@ WRAPPER_BLACKLIST_PATTERNS = [
 
 
 def _is_blacklisted(function):
+    """
+    Determine if the function is to be ignored in testing.
+
+    :returns: True if the function should be ignored, otherwise False.
+    :rtype: bool
+    """
     for pattern in WRAPPER_BLACKLIST_PATTERNS:
         if pytest.is_unicode_string(pattern):
             if function.name == pattern:
