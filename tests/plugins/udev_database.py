@@ -248,25 +248,30 @@ class DeviceDatabase(Iterable, Sized):
         else:
             return None
 
+def _get_device_sample(udev_database, device=None, sample_size=None):
+    """
+    Compute a sample of the udev device database.
 
-def _get_device_sample(config):
+    :param udev_database: the udev database
+    :param device: the unique device to compute the data for
+    :param sample_size: the size of the sample to compute
+    :type sample_size: int or NoneType
+    :returns: a sample of udev devices
+    :rtype: list of :class:`DeviceData`
+    :raises ValueError: if the specified device does not exist
+
+    If no sample size and no device specified, returns all devices.
     """
-    Compute a sample of the udev device database based on the given pytest
-    ``config``.
-    """
-    if config.option.device is not None:
-        device_data = config.udev_database.find_device_data(
-            config.option.device)
+    if device is not None:
+        device_data = udev_database.find_device_data(device)
         if not device_data:
-            raise ValueError('{0} does not exist'.format(
-                config.option.device))
+            raise ValueError('{0} does not exist'.format(device))
         return [device_data]
-    elif config.option.all_devices:
-        return list(config.udev_database)
+    elif sample_size is not None:
+        actual_size = min(sample_size, len(udev_database))
+        return random.sample(list(udev_database), actual_size)
     else:
-        device_sample_size = config.getvalue('device_sample_size')
-        actual_size = min(device_sample_size, len(config.udev_database))
-        return random.sample(list(config.udev_database), actual_size)
+        return list(udev_database)
 
 
 def pytest_runtest_setup(item):
@@ -311,7 +316,17 @@ def pytest_configure(config):
     if udevadm:
         config.udev_version = udevadm.query_udev_version()
         config.udev_database = DeviceDatabase(udevadm)
-        config.udev_device_sample = _get_device_sample(config)
+
+        if config.option.all_devices:
+            sample_size = None
+        else:
+            sample_size = config.option.device_sample_size
+
+        config.udev_device_sample = _get_device_sample(
+           config.udev_database,
+           config.option.device,
+           sample_size
+        )
     else:
         config.udev_version = None
         config.udev_database = None
