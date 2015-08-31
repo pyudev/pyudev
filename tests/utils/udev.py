@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -16,19 +16,20 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    plugins.udev_database
+    utils.udev
     =====================
 
     Provide access the udev device database.
 
-    This plugin parses the udev device database from :program:`udevadm` and
-    attaches it to the test configuration object.
+    Parses the udev device database from :program:`udevadm`.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+    .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import sys
 import os
@@ -38,18 +39,23 @@ import random
 import subprocess
 from collections import Iterable, Sized
 
-import pytest
-
-
 class UDevAdm(object):
     """
     Wrap ``udevadm`` utility.
     """
 
     CANDIDATES = ['/sbin/udevadm', 'udevadm']
+    _adm = None
 
     @classmethod
     def find(cls):
+        """
+        Construct a valid :class:`UDevAdm` object.
+
+        :returns: a working :class:`UDevAdm` object
+        :rtype: :class:`UDevAdm`
+        :raises EnvironmentError:
+        """
         for candidate in cls.CANDIDATES:
             try:
                 udevadm = cls(candidate)
@@ -61,6 +67,21 @@ class UDevAdm(object):
                 if error.errno != errno.ENOENT:
                     raise
 
+    @classmethod
+    def adm(cls):
+        """
+        Returns the singleton object of this class, if one can be found.
+
+        :returns: singleton :class:`UDevAdm` object
+        :rtype: :class:`UDevAdm`
+        """
+        if cls._adm is None:
+            try:
+                cls._adm = cls.find()
+            except EnvironmentError:
+                pass
+        return cls._adm
+
     def __init__(self, udevadm):
         """
         Create a new ``udevadm`` wrapper for the given udevadm executable.
@@ -71,6 +92,12 @@ class UDevAdm(object):
         self.udevadm = udevadm
 
     def query_udev_version(self):
+        """
+        Return the version of udevadm.
+
+        :returns: the udevadm version
+        :rtype: int
+        """
         return int(self._execute('--version'))
 
     def _execute(self, *args):
@@ -93,16 +120,22 @@ class UDevAdm(object):
             line = line.strip()
             if not line:
                 continue
-            type, value = line.split(': ', 1)
-            if type == 'P':
+            typ, value = line.split(': ', 1)
+            if typ == 'P':
                 yield value
 
     def query_device_properties(self, device_path):
+        """
+            Return map of properties.
+
+            :returns: a map of properties on the device
+            :rtype: dict of str * str
+        """
         properties = {}
         for line in self._execute_query(device_path, 'property').splitlines():
             line = line.strip()
-            property, value = line.split('=', 1)
-            properties[property] = value
+            prop, value = line.split('=', 1)
+            properties[prop] = value
         return properties
 
     def query_device_attributes(self, device_path):
@@ -216,9 +249,31 @@ class DeviceDatabase(Iterable, Sized):
     """
     The udev device database.
 
+    Takes a snapshot of the udev device database when it is initialized.
+    Consequently, some :class:`DeviceData` objects in the database may
+    not exist when the database is iterated over.
+
     This class is an iterable over :class:`DeviceData` objects that contain the
     data associated with each device stored in the udev database.
     """
+
+    _db = None
+
+    @classmethod
+    def db(cls, renew=False): # pylint: disable=invalid-name
+        """
+        Get a database object.
+
+        :param bool renew: if renew is True, get a new object
+        :returns: a database object
+        :rtype: :class:`DeviceDatabase`
+    """
+        if cls._db is None or renew:
+            udevadm = UDevAdm.adm()
+            if udevadm:
+                cls._db = DeviceDatabase(udevadm)
+        return cls._db
+
 
     def __init__(self, udevadm):
         self._udevadm = udevadm
@@ -244,82 +299,27 @@ class DeviceDatabase(Iterable, Sized):
         else:
             return None
 
+def get_device_sample(udev_database, device=None, sample_size=None):
+    """
+    Compute a sample of the udev device database.
 
-def _get_device_sample(config):
+    :param udev_database: the udev database
+    :param device: the unique device to compute the data for
+    :param sample_size: the size of the sample to compute
+    :type sample_size: int or NoneType
+    :returns: a sample of udev devices
+    :rtype: list of :class:`DeviceData`
+    :raises ValueError: if the specified device does not exist
+
+    If no sample size and no device specified, returns all devices.
     """
-    Compute a sample of the udev device database based on the given pytest
-    ``config``.
-    """
-    if config.option.device is not None:
-        device_data = config.udev_database.find_device_data(
-            config.option.device)
+    if device is not None:
+        device_data = udev_database.find_device_data(device)
         if not device_data:
-            raise ValueError('{0} does not exist'.format(
-                config.option.device))
+            raise ValueError('{0} does not exist'.format(device))
         return [device_data]
-    elif config.option.all_devices:
-        return list(config.udev_database)
+    elif sample_size is not None:
+        actual_size = min(sample_size, len(udev_database))
+        return random.sample(list(udev_database), actual_size)
     else:
-        device_sample_size = config.getvalue('device_sample_size')
-        actual_size = min(device_sample_size, len(config.udev_database))
-        return random.sample(list(config.udev_database), actual_size)
-
-
-def pytest_runtest_setup(item):
-    """
-    Evaluate the ``udev_version`` marker before running a test.
-    """
-    if not hasattr(item, 'obj'):
-        return
-    marker = getattr(item.obj, 'udev_version', None)
-    if marker is not None:
-        version_spec = marker.args[0]
-        actual_version = item.config.udev_version
-        if actual_version is None:
-            pytest.skip('udev not found')
-        elif not eval('{0} {1}'.format(actual_version, version_spec)):
-            msg = 'udev version mismatch: {0} required, {1} found'.format(
-                version_spec, actual_version)
-            pytest.skip(msg)
-
-
-def pytest_addoption(parser):
-    group = parser.getgroup('udev_database', 'udev database configuration')
-    group.addoption('--all-devices', action='store_true',
-                    help='Run device tests against *all* devices in the '
-                    'database.  By default, only a random sample will be '
-                    'checked.', default=False)
-    group.addoption('--device', metavar='DEVICE',
-                    help='Run the device tests only against the given '
-                    'DEVICE', default=None)
-    group.addoption('--device-sample-size', type='int', metavar='N',
-                    help='Use a random sample of N elements (default: 10)',
-                    default=10)
-
-
-def pytest_configure(config):
-    # register a marker for required udev versions
-    config.addinivalue_line(
-        'markers', 'udev_version(spec): mark test to run only if the udev '
-        'version matches the given version spec')
-
-    udevadm = UDevAdm.find()
-    if udevadm:
-        config.udev_version = udevadm.query_udev_version()
-        config.udev_database = DeviceDatabase(udevadm)
-        config.udev_device_sample = _get_device_sample(config)
-    else:
-        config.udev_version = None
-        config.udev_database = None
-        config.udev_device_sample = []
-
-
-@pytest.fixture
-def udev_database(request):
-    """
-    The udev database as provided by :attr:`pytest.config.udev_database`.
-    """
-    if request.config.udev_database is None:
-        pytest.skip('No udev database loaded')
-    else:
-        return request.config.udev_database
+        return list(udev_database)
