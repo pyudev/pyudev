@@ -354,14 +354,3 @@ def pytest_configure(config):
         config.udev_version = None
         config.udev_database = None
         config.udev_device_sample = []
-
-
-@pytest.fixture
-def udev_database(request):
-    """
-    The udev database as provided by :attr:`pytest.config.udev_database`.
-    """
-    if request.config.udev_database is None:
-        pytest.skip('No udev database loaded')
-    else:
-        return request.config.udev_database
