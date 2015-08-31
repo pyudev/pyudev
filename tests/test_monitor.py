@@ -27,10 +27,7 @@ from select import select
 import pytest
 import mock
 
-from pyudev import Device
-from pyudev import DeviceNotFoundAtPathError
-from pyudev import Monitor
-from pyudev import MonitorObserver
+from pyudev import Monitor, MonitorObserver, Device
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -47,10 +44,7 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    try:
-        return Device.from_path(context, '/devices/platform')
-    except DeviceNotFoundAtPathError:
-        pytest.skip('device not found')
+    return Device.from_path(context, '/devices/platform')
 
 
 @contextmanager
