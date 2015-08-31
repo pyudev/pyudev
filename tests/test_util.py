@@ -119,10 +119,7 @@ def test_get_device_type_character_device():
 
 
 def test_get_device_type_block_device():
-    try:
-        assert _util.get_device_type('/dev/sda') == 'block'
-    except EnvironmentError:
-        pytest.skip('device node not found')
+    assert _util.get_device_type('/dev/sda') == 'block'
 
 
 def test_get_device_type_no_device_file(tmpdir):
