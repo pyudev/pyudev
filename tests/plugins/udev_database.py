@@ -247,6 +247,24 @@ class DeviceDatabase(Iterable, Sized):
     data associated with each device stored in the udev database.
     """
 
+    _db = None
+
+    @classmethod
+    def db(cls, renew=False):
+        """
+        Get a database object.
+
+        :param bool renew: if renew is True, get a new object
+        :returns: a database object
+        :rtype: :class:`DeviceDatabase`
+    """
+        if cls._db is None or renew:
+            udevadm = UDevAdm.adm()
+            if udevadm:
+                cls._db = DeviceDatabase(udevadm)
+        return cls._db
+
+
     def __init__(self, udevadm):
         self._udevadm = udevadm
         self._devices = set(self._udevadm.query_devices())
@@ -338,7 +356,7 @@ def pytest_configure(config):
     udevadm = UDevAdm.adm()
     if udevadm:
         config.udev_version = udevadm.query_udev_version()
-        config.udev_database = DeviceDatabase(udevadm)
+        config.udev_database = DeviceDatabase.db()
 
         if config.option.all_devices:
             sample_size = None
