@@ -47,9 +47,17 @@ class UDevAdm(object):
     """
 
     CANDIDATES = ['/sbin/udevadm', 'udevadm']
+    _adm = None
 
     @classmethod
     def find(cls):
+        """
+        Construct a valid :class:`UDevAdm` object.
+
+        :returns: a working :class:`UDevAdm` object
+        :rtype: :class:`UDevAdm`
+        :raises EnvironmentError:
+        """
         for candidate in cls.CANDIDATES:
             try:
                 udevadm = cls(candidate)
@@ -60,6 +68,21 @@ class UDevAdm(object):
             except EnvironmentError as error:
                 if error.errno != errno.ENOENT:
                     raise
+
+    @classmethod
+    def adm(cls):
+        """
+        Returns the singleton object of this class, if one can be found.
+
+        :returns: singleton :class:`UDevAdm` object
+        :rtype: :class:`UDevAdm`
+        """
+        if cls._adm is None:
+            try:
+                cls._adm = cls.find()
+            except EnvironmentError:
+                pass
+        return cls._adm
 
     def __init__(self, udevadm):
         """
@@ -312,7 +335,7 @@ def pytest_configure(config):
         'markers', 'udev_version(spec): mark test to run only if the udev '
         'version matches the given version spec')
 
-    udevadm = UDevAdm.find()
+    udevadm = UDevAdm.adm()
     if udevadm:
         config.udev_version = udevadm.query_udev_version()
         config.udev_database = DeviceDatabase(udevadm)
