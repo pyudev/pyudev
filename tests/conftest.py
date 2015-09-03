@@ -27,12 +27,12 @@ import pyudev
 
 
 pytest_plugins = [
-    str('plugins.udev_database'),
-    str('plugins.fake_monitor'),
-    str('plugins.privileged'),
-    str('plugins.mock_libudev'),
-    str('plugins.libudev'),
-    str('plugins.travis'),
+    str('tests.plugins.udev_database'),
+    str('tests.plugins.fake_monitor'),
+    str('tests.plugins.privileged'),
+    str('tests.plugins.mock_libudev'),
+    str('tests.plugins.libudev'),
+    str('tests.plugins.travis'),
 ]
 
 
