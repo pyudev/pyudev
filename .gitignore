@@ -28,3 +28,6 @@ _pyreverse
 
 # hypothesis files
 .hypothesis
+
+# vim
+*.swp
