@@ -45,6 +45,7 @@ pylint-tests:
 		--disable=I \
 		--disable=bad-continuation \
 		--disable=duplicate-code \
+		--disable=no-self-use \
 		--exclude-protected=_libudev \
 		--no-docstring-rgx=_.*
 
