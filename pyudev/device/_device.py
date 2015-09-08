@@ -113,7 +113,7 @@ class Device(Mapping):
 
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> Device.from_path(context, '/sys/devices/platform')
+        >>> Device.from_sys_path(context, '/sys/devices/platform')
         Device(u'/sys/devices/platform')
 
         ``context`` is the :class:`Context` in which to search the device.
