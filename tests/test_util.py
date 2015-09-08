@@ -159,7 +159,7 @@ def test_eintr_retry_call(tmpdir):
         signal.signal(signal.SIGALRM, handle_alarm)
 
         # Ensure that a signal raises EINTR on Python < 3.5
-        if sys.version_info < (3,5):
+        if sys.version_info < (3, 5):
             with pytest.raises(select.error) as e:
                 signal.alarm(1)
                 select.select([], [], [fd], 2)
