@@ -232,11 +232,6 @@ class TestMonitor(object):
             monitor.set_receive_buffer_size(1000)
             func.assert_called_once_with(monitor, 1000)
 
-    def test_set_receive_buffer_size_privilege_error(self, monitor):
-        with pytest.raises(EnvironmentError) as exc_info:
-            monitor.set_receive_buffer_size(1000)
-        pytest.assert_env_error(exc_info.value, errno.EPERM)
-
     def test_poll_timeout(self, monitor):
         assert monitor.poll(timeout=0) is None
         now = datetime.now()
