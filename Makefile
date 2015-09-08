@@ -39,6 +39,16 @@ pylint:
 		--exclude-protected=_libudev \
 		--no-docstring-rgx=_.*
 
+pylint-tests:
+	pylint tests \
+		--reports=no \
+		--disable=I \
+		--disable=bad-continuation \
+		--disable=duplicate-code \
+		--disable=no-self-use \
+		--exclude-protected=_libudev \
+		--no-docstring-rgx=_.*
+
 PYREVERSE_OPTS = --output=pdf
 view:
 	-rm -Rf _pyreverse
