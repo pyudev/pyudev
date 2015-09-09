@@ -23,6 +23,8 @@ import mock
 
 from pyudev import Monitor, Device
 
+from tests.utils.udev import DeviceDatabase
+from tests.utils.udev import get_device_sample
 
 @pytest.fixture
 def monitor(request):
@@ -32,7 +34,8 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    return Device.from_path(context, '/devices/platform')
+    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    return Device.from_path(context, device.device_path)
 
 
 def test_fake_monitor(fake_monitor, fake_monitor_device):
