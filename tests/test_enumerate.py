@@ -22,8 +22,14 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
+from hypothesis import given
+from hypothesis import strategies
+from hypothesis import Settings
+
 from pyudev import Enumerator, Device
 
+from ._device_tests import _CONTEXT_STRATEGY
+from ._device_tests import _DEVICES
 
 @pytest.fixture
 def enumerator(request):
@@ -129,17 +135,23 @@ class TestEnumerator(object):
         for device in devices:
             assert 'seat' in device.tags
 
-    @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
-    @pytest.mark.udev_version('>= 220')
-    def test_match_parent(self, context, device_data):
-        device = Device.from_path(context, device_data.device_path)
-        parent = device.parent
-        if parent is None:
-            pytest.skip('Device {0!r} has no parent'.format(device))
-        else:
+    _devices = [d for d in _DEVICES if d.parent]
+    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
+           settings=Settings(max_examples=5)
+        )
+        @pytest.mark.udev_version('>= 220')
+        def test_match_parent(self, context, device):
+            parent = device.parent
             children = list(context.list_devices().match_parent(parent))
             assert device in children
             assert parent in children
+    else:
+        @pytest.mark.udev_version('>= 220')
+        def test_match_parent(self):
+            pytest.skip("not enough devices with parents")
 
     @pytest.mark.udev_version('>= 165')
     def test_match_is_initialized_mock(self, context):
