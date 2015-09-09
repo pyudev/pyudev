@@ -216,6 +216,10 @@ class DeviceDatabase(Iterable, Sized):
     """
     The udev device database.
 
+    Takes a snapshot of the udev device database when it is initialized.
+    Consequently, some :class:`DeviceData` objects in the database may
+    not exist when the database is iterated over.
+
     This class is an iterable over :class:`DeviceData` objects that contain the
     data associated with each device stored in the udev database.
     """
