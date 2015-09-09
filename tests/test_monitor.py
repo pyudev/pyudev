@@ -29,6 +29,9 @@ import mock
 
 from pyudev import Monitor, MonitorObserver, Device
 
+from tests.utils.udev import DeviceDatabase
+from tests.utils.udev import get_device_sample
+
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
 # return value.  Actual udev calls are difficult to test, as return values
@@ -44,7 +47,8 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    return Device.from_path(context, '/devices/platform')
+    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    return Device.from_path(context, device.device_path)
 
 
 @contextmanager
