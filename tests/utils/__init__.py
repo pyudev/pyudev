@@ -16,12 +16,13 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.tests.plugins.utils
+    pyudev.tests.utils
     ==========================
 
-    Utils to support the pyudev testsuite plugins.
+    Utils to support pyudev testing.
 
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
+from . import strategies
 from . import udev
