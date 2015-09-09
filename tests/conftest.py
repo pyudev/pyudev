@@ -64,8 +64,8 @@ def pytest_namespace():
     return dict((func.__name__, func) for func in
                 (is_unicode_string, assert_env_error))
 
-
-def pytest_funcarg__context(request):
+@pytest.fixture
+def context(request):
     """
     Return a useable :class:`pyudev.Context` object.
     """

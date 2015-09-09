@@ -31,3 +31,6 @@ _pyreverse
 
 # vim
 *.swp
+
+# zip
+*.gz

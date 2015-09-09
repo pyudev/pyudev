@@ -50,7 +50,8 @@ with_devices = pytest.mark.parametrize(
     indirect=True, ids=pytest.config.udev_device_sample)
 
 
-def pytest_funcarg__device_data(request):
+@pytest.fixture
+def device_data(request):
     # This funcarg kicks in if the "with_device_data" decorator was
     # parametrized with an empty list, in case of udev missing. Its main
     # purpose is to just skip the corresponding test.
@@ -61,7 +62,8 @@ def pytest_funcarg__device_data(request):
         return device_data
 
 
-def pytest_funcarg__device(request):
+@pytest.fixture
+def device(request):
     device_data = getattr(request, 'param', None) or \
                   request.getfuncargvalue('device_data')
     context = request.getfuncargvalue('context')
