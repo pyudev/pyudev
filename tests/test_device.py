@@ -129,9 +129,9 @@ class TestDevice(object):
         if not device_data.device_node:
             pytest.skip('no device node, no device number')
         mode = os.stat(device_data.device_node).st_mode
-        type = 'block' if stat.S_ISBLK(mode) else 'char'
+        typ = 'block' if stat.S_ISBLK(mode) else 'char'
         device = Device.from_device_number(
-            context, type, device_data.device_number)
+            context, typ, device_data.device_number)
         assert device.device_number == device_data.device_number
         # make sure, we are really referring to the same device
         assert device.device_path == device_data.device_path
@@ -143,19 +143,19 @@ class TestDevice(object):
         mode = os.stat(device_data.device_node).st_mode
         # deliberately use the wrong type here to cause either failure or at
         # least device mismatch
-        type = 'char' if stat.S_ISBLK(mode) else 'block'
+        typ = 'char' if stat.S_ISBLK(mode) else 'block'
         try:
             # this either fails, in which case the caught exception is raised,
             # or succeeds, but returns a wrong device (device numbers are not
             # unique across device types)
             device = Device.from_device_number(
-                context, type, device_data.device_number)
+                context, typ, device_data.device_number)
             # if it succeeds, the resulting device must not match the one, we
             # are actually looking for!
             assert device.device_path != device_data.device_path
         except DeviceNotFoundByNumberError as error:
             # check the correctness of the exception attributes
-            assert error.device_type == type
+            assert error.device_type == typ
             assert error.device_number == device_data.device_number
 
     def test_from_device_number_invalid_type(self, context):
@@ -371,7 +371,7 @@ class TestDevice(object):
             func.assert_called_once_with(device)
 
     @with_device_data
-    def test_links(self, context, device, device_data):
+    def test_links(self, device, device_data):
         assert sorted(device.device_links) == sorted(device_data.device_links)
         for link in device.device_links:
             assert pytest.is_unicode_string(link)
@@ -440,8 +440,8 @@ class TestDevice(object):
 
     @with_device_data
     def test_getitem(self, device, device_data):
-        for property in device_data.properties:
-            assert device[property] == device_data.properties[property]
+        for prop in device_data.properties:
+            assert device[prop] == device_data.properties[prop]
 
     @with_device_data
     def test_getitem_devname(self, context, device, device_data):
@@ -455,6 +455,7 @@ class TestDevice(object):
     @with_devices
     def test_getitem_nonexisting(self, device):
         with pytest.raises(KeyError) as excinfo:
+            # pylint: disable=pointless-statement
             device['a non-existing property']
         assert str(excinfo.value) == repr('a non-existing property')
 
@@ -471,14 +472,14 @@ class TestDevice(object):
 
     @with_device_data
     def test_asbool(self, device, device_data):
-        for property, value in device_data.properties.items():
+        for prop, value in device_data.properties.items():
             if value == '1':
-                assert device.asbool(property)
+                assert device.asbool(prop)
             elif value == '0':
-                assert not device.asbool(property)
+                assert not device.asbool(prop)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.asbool(property)
+                    device.asbool(prop)
                 message = 'Not a boolean value: {0!r}'
                 assert str(exc_info.value) == message.format(value)
 
@@ -493,10 +494,12 @@ class TestDevice(object):
         assert device == device.device_path
         assert device == device
         assert device.parent == device.parent
+        # pylint: disable=superfluous-parens
         assert not (device == device.parent)
 
     @with_devices
     def test_inequality(self, device):
+        # pylint: disable=superfluous-parens
         assert not (device != device.device_path)
         assert not (device != device)
         assert not (device.parent != device.parent)
@@ -561,6 +564,7 @@ class TestAttributes(object):
     @with_devices
     def test_getitem_nonexisting(self, device):
         with pytest.raises(KeyError) as excinfo:
+            # pylint: disable=pointless-statement
             device.attributes['a non-existing attribute']
         assert str(excinfo.value) == repr('a non-existing attribute')
 
@@ -647,5 +651,4 @@ def test_garbage():
     This test must stick at the bottom of this test file to make sure that
     ``py.test`` always executes it at last.
     """
-    import gc
     assert not gc.garbage
