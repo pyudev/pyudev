@@ -24,8 +24,16 @@ import errno
 import pytest
 from mock import Mock
 
-from pyudev import _util
+from hypothesis import given
+from hypothesis import strategies
+from hypothesis import Settings
 
+from pyudev import _util
+from pyudev import Context
+
+_CONTEXT = Context()
+
+_MIN_SATISFYING_EXAMPLES = Settings.default.min_satisfying_examples
 
 @pytest.mark.conversion
 def test_ensure_byte_string():
@@ -114,12 +122,43 @@ def raise_valueerror():
     raise ValueError('from function')
 
 
-def test_get_device_type_character_device():
-    assert _util.get_device_type('/dev/console') == 'char'
+_char_devices = list(_CONTEXT.list_devices(subsystem="tty"))
+if len(_char_devices) >= _MIN_SATISFYING_EXAMPLES:
+    @given(
+       strategies.sampled_from(_char_devices),
+       settings=Settings(max_examples=5)
+    )
+    def test_get_device_type_character_device(a_device):
+        """
+        Check that the device type of a character device is actually char.
+        """
+        assert _util.get_device_type(a_device.device_node) == 'char'
+else:
+    def test_get_device_type_character_device():
+        """
+        Skip this test because not enough appropriate devices.
+        """
+        pytest.skip("not enough tty devices")
 
 
-def test_get_device_type_block_device():
-    assert _util.get_device_type('/dev/sda') == 'block'
+
+_block_devices = list(_CONTEXT.list_devices(subsystem="block"))
+if len(_block_devices) >= _MIN_SATISFYING_EXAMPLES:
+    @given(
+       strategies.sampled_from(_block_devices),
+       settings=Settings(max_examples=5)
+    )
+    def test_get_device_type_block_device(a_device):
+        """
+        Check that the device type of a block device is actually block.
+        """
+        assert _util.get_device_type(a_device.device_node) == 'block'
+else:
+    def test_get_device_type_block_device():
+        """
+        Skip this test because not enough appropriate devices.
+        """
+        pytest.skip("not enough block devices")
 
 
 def test_get_device_type_no_device_file(tmpdir):
