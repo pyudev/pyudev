@@ -24,5 +24,4 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import strategies
 from . import udev
