@@ -2,6 +2,7 @@
 docutils>=0.9
 pytest>=2.3
 mock>=1.0b1
+hypothesis
 
 # documentation requirements
 sphinx>=1.0.7
