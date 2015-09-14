@@ -32,6 +32,8 @@ from pyudev import Monitor, MonitorObserver, Device
 from tests.utils.udev import DeviceDatabase
 from tests.utils.udev import get_device_sample
 
+from tests._device_tests import _UDEV_TEST
+
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
 # return value.  Actual udev calls are difficult to test, as return values
@@ -161,11 +163,11 @@ class TestMonitor(object):
                                               b'usb_interface')
                 update.assert_called_once_with(monitor)
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag(self, monitor):
         monitor.filter_by_tag('spam')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag_mock(self, monitor):
         funcname = 'udev_monitor_filter_add_match_tag'
         spec = lambda m, t: None

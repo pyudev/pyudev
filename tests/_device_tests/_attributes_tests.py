@@ -33,6 +33,7 @@ from pyudev import Device
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
+from ._device_tests import _UDEV_TEST
 
 class TestAttributes(object):
 
@@ -60,7 +61,7 @@ class TestAttributes(object):
         for attribute in device_datum.attributes:
             assert attribute in device_attributes
 
-    @pytest.mark.udev_version('>= 167')
+    @_UDEV_TEST(167, "test_iteration_mock")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)

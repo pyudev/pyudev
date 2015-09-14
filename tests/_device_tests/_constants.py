@@ -30,6 +30,8 @@ from __future__ import (print_function, division, unicode_literals,
 from hypothesis import strategies
 from hypothesis import Settings
 
+import pytest
+
 from pyudev import Context
 from pyudev import Device
 
@@ -42,3 +44,12 @@ _DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 _MIN_SATISFYING_EXAMPLES = Settings.default.min_satisfying_examples
 
 _CONTEXT_STRATEGY = strategies.just(_CONTEXT)
+
+_UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
+
+def _UDEV_TEST(version, node=None):
+    FMT_STR = "%s: udev version must be at least %s, is %s"
+    return pytest.mark.skipif(
+       _UDEV_VERSION < version,
+       reason=FMT_STR % (node, version, _UDEV_VERSION)
+    )
