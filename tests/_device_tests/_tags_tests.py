@@ -39,13 +39,14 @@ from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
 from ._device_tests import _MIN_SATISFYING_EXAMPLES
+from ._device_tests import _UDEV_TEST
 
 class TestTags(object):
     """
     Test methods of the ``Tags`` class.
     """
 
-    pytestmark = pytest.mark.udev_version('>= 154')
+    pytestmark = _UDEV_TEST(154, "TestTags")
 
     _device_data = [d for d in _DEVICE_DATA if d.tags]
     if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
@@ -90,7 +91,7 @@ class TestTags(object):
             func.assert_called_once_with(a_device)
 
 
-    @pytest.mark.udev_version('>= 172')
+    @_UDEV_TEST(172, "test_contans_mock")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)

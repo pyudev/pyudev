@@ -53,6 +53,7 @@ from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICE_DATA
 from ._constants import _DEVICES
 from ._constants import _MIN_SATISFYING_EXAMPLES
+from ._constants import _UDEV_TEST
 
 class TestDevice(object):
 
@@ -234,7 +235,7 @@ class TestDevice(object):
             Device.from_device_file(a_context, str(filename))
         pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
-    @pytest.mark.udev_version('>= 152')
+    @_UDEV_TEST(152, "test_from_environment")
     @given(_CONTEXT_STRATEGY)
     def test_from_environment(self, a_context):
         # there is no device in a standard environment
@@ -251,7 +252,7 @@ class TestDevice(object):
 
     _devices = [d for d in _DEVICES if d.parent]
     if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
-        @pytest.mark.udev_version('>= 172')
+        @_UDEV_TEST(172, "test_child_of_parents")
         @given(
            strategies.sampled_from(_devices),
            settings=Settings(max_examples=5)
@@ -259,14 +260,14 @@ class TestDevice(object):
         def test_child_of_parent(self, a_device):
             assert a_device in a_device.parent.children
     else:
-        @pytest.mark.udev_version('>= 172')
+        @_UDEV_TEST(172, "test_child_of_parents")
         def test_child_of_parent(self):
             # pylint: disable=missing-docstring
             pytest.skip("not enough devices with children")
 
     _devices = [d for d in _DEVICES if d.children]
     if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
-        @pytest.mark.udev_version('>= 172')
+        @_UDEV_TEST(172, "test_children")
         @given(
            strategies.sampled_from(_devices),
            settings=Settings(max_examples=5)
@@ -277,7 +278,7 @@ class TestDevice(object):
                 assert child != a_device
                 assert a_device in child.ancestors
     else:
-        @pytest.mark.udev_version('>= 172')
+        @_UDEV_TEST(172, "test_children")
         def test_children(self):
             # pylint: disable=missing-docstring
             pytest.skip("not enough devices with children")
@@ -463,7 +464,7 @@ class TestDevice(object):
         device = Device.from_path(a_context, device_datum.device_path)
         assert device.device_number == device_datum.device_number
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_is_initialized")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
@@ -471,7 +472,7 @@ class TestDevice(object):
     def test_is_initialized(self, a_device):
         assert isinstance(a_device.is_initialized, bool)
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_is_initialized_mock")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
@@ -485,7 +486,7 @@ class TestDevice(object):
             assert not a_device.is_initialized
             func.assert_called_once_with(a_device)
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_time_since_initialized")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
@@ -493,7 +494,7 @@ class TestDevice(object):
     def test_time_since_initialized(self, a_device):
         assert isinstance(a_device.time_since_initialized, timedelta)
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_time_since_initialized_mock")
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
