@@ -29,3 +29,5 @@ from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICE_DATA
 from ._constants import _DEVICES
 from ._constants import _MIN_SATISFYING_EXAMPLES
+from ._constants import _UDEV_VERSION
+from ._constants import _UDEV_TEST

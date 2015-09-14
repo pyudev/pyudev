@@ -27,6 +27,7 @@ import mock
 
 from pyudev import udev_version
 
+from tests._device_tests import _UDEV_TEST
 
 def test_udev_version():
     assert isinstance(udev_version(), int)
@@ -46,7 +47,7 @@ class TestContext(object):
         assert pytest.is_unicode_string(context.device_path)
         assert context.device_path == '/dev'
 
-    @pytest.mark.udev_version('>= 167')
+    @_UDEV_TEST(167, "test_run_path")
     def test_run_path(self, context):
         assert pytest.is_unicode_string(context.run_path)
         assert context.run_path == '/run/udev'
