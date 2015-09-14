@@ -21,10 +21,10 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from pyudev import Device
-from pyudev import DeviceNotFoundAtPathError
-from pyudev import Monitor
+from pyudev import Monitor, Device
 
+from tests.utils.udev import DeviceDatabase
+from tests.utils.udev import get_device_sample
 
 @pytest.fixture
 def monitor(request):
@@ -34,10 +34,8 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    try:
-        return Device.from_path(context, '/devices/platform')
-    except DeviceNotFoundAtPathError:
-        pytest.skip('device not found')
+    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    return Device.from_path(context, device.device_path)
 
 
 def test_fake_monitor(fake_monitor, fake_monitor_device):

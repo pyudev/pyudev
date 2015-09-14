@@ -16,12 +16,18 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.tests.utils
+    pyudev.tests._device_tests
     ==========================
 
-    Utils to support pyudev testing.
+    Tests on devices.
 
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import udev
+from ._constants import _CONTEXT
+from ._constants import _CONTEXT_STRATEGY
+from ._constants import _DEVICE_DATA
+from ._constants import _DEVICES
+from ._constants import _MIN_SATISFYING_EXAMPLES
+from ._constants import _UDEV_VERSION
+from ._constants import _UDEV_TEST

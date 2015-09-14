@@ -27,10 +27,12 @@ from select import select
 import pytest
 import mock
 
-from pyudev import Device
-from pyudev import DeviceNotFoundAtPathError
-from pyudev import Monitor
-from pyudev import MonitorObserver
+from pyudev import Monitor, MonitorObserver, Device
+
+from tests.utils.udev import DeviceDatabase
+from tests.utils.udev import get_device_sample
+
+from tests._device_tests import _UDEV_TEST
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -47,10 +49,8 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    try:
-        return Device.from_path(context, '/devices/platform')
-    except DeviceNotFoundAtPathError:
-        pytest.skip('device not found')
+    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    return Device.from_path(context, device.device_path)
 
 
 @contextmanager
@@ -163,11 +163,11 @@ class TestMonitor(object):
                                               b'usb_interface')
                 update.assert_called_once_with(monitor)
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag(self, monitor):
         monitor.filter_by_tag('spam')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag_mock(self, monitor):
         funcname = 'udev_monitor_filter_add_match_tag'
         spec = lambda m, t: None

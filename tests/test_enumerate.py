@@ -22,8 +22,16 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from pyudev import Enumerator, Device
+from hypothesis import given
+from hypothesis import strategies
+from hypothesis import Settings
 
+from pyudev import Enumerator
+
+from ._device_tests import _CONTEXT_STRATEGY
+from ._device_tests import _DEVICES
+from ._device_tests import _MIN_SATISFYING_EXAMPLES
+from ._device_tests import _UDEV_TEST
 
 @pytest.fixture
 def enumerator(request):
@@ -112,7 +120,7 @@ class TestEnumerator(object):
             assert device.attributes['ro'] == b'0'
             assert not device.attributes.asbool('ro')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_match_tag_mock")
     def test_match_tag_mock(self, context):
         enumerator = context.list_devices()
         funcname = 'udev_enumerate_add_match_tag'
@@ -123,25 +131,31 @@ class TestEnumerator(object):
             assert retval is enumerator
             func.assert_called_with(enumerator, b'spam')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_match_tag")
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
         for device in devices:
             assert 'seat' in device.tags
 
-    @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
-    @pytest.mark.udev_version('>= 220')
-    def test_match_parent(self, context, device_data):
-        device = Device.from_path(context, device_data.device_path)
-        parent = device.parent
-        if parent is None:
-            pytest.skip('Device {0!r} has no parent'.format(device))
-        else:
+    _devices = [d for d in _DEVICES if d.parent]
+    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+        @_UDEV_TEST(220, "test_match_parent")
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
+           settings=Settings(max_examples=5)
+        )
+        def test_match_parent(self, context, device):
+            parent = device.parent
             children = list(context.list_devices().match_parent(parent))
             assert device in children
             assert parent in children
+    else:
+        @_UDEV_TEST(220, "test_match_parent")
+        def test_match_parent(self):
+            pytest.skip("not enough devices with parents")
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_match_is_initialized_mock")
     def test_match_is_initialized_mock(self, context):
         enumerator = context.list_devices()
         funcname = 'udev_enumerate_add_match_is_initialized'
@@ -198,7 +212,7 @@ class TestEnumerator(object):
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
-    @pytest.mark.udev_version('>= 172')
+    @_UDEV_TEST(172, "test_match_passthrough_parent")
     def test_match_passthrough_parent(self, enumerator):
         with mock.patch.object(enumerator, 'match_parent',
                                autospec=True) as match_parent:
