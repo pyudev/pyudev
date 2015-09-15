@@ -222,11 +222,34 @@ class TestDevice(object):
            settings=Settings(max_examples=5)
         )
         def test_from_device_file_links(self, a_context, device_datum):
+            """
+            For each link in DEVLINKS, test that the constructed device's
+            path matches the orginal devices path.
+
+            This does not hold true in the case of multipath. In this case
+            udevadm's DEVLINKS fields holds some links that do not actually
+            point to the originating device.
+
+            See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
+            """
             for link in device_datum.device_links:
                 link = os.path.join(a_context.device_path, link)
-                device = Device.from_device_file(a_context, link)
-                assert device.device_path == device_datum.device_path
-                assert link in device.device_links
+                (linkdir, _) = os.path.split(link)
+                devnode = os.path.normpath(
+                   os.path.join(linkdir, os.readlink(link))
+                )
+
+                try:
+                    device = Device.from_device_file(a_context, link)
+                    assert device.device_path == device_datum.device_path
+                    assert link in device.device_links
+                except AssertionError:
+                    if devnode != device_datum.device_node:
+                        fmt_str = "link %s links to %s, not %s"
+                        fmt_args = (link, devnode, device_datum.device_node)
+                        pytest.xfail(fmt_str % fmt_args)
+                    else:
+                        raise
     else:
         def test_from_device_file_links(self):
             pytest.skip("not enough devices with links in data")
