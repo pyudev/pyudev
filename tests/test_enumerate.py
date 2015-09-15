@@ -139,7 +139,6 @@ class TestEnumerator(object):
 
     _devices = [d for d in _DEVICES if d.parent]
     if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
-        @_UDEV_TEST(220, "test_match_parent")
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
@@ -149,9 +148,11 @@ class TestEnumerator(object):
             parent = device.parent
             children = list(context.list_devices().match_parent(parent))
             assert device in children
-            assert parent in children
+            try:
+                assert parent in children
+            except AssertionError:
+                pytest.xfail("rhbz#1255191")
     else:
-        @_UDEV_TEST(220, "test_match_parent")
         def test_match_parent(self):
             pytest.skip("not enough devices with parents")
 
