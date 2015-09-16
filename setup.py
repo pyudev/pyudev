@@ -52,5 +52,5 @@ setuptools.setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['tests.*', 'tests']),
     )
