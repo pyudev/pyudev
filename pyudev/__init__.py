@@ -38,11 +38,11 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 
-__version__ = '0.17'
-__version_info__ = tuple(map(int, __version__.split('.')))
 __all__ = ['Context', 'Device']
 
 
 from pyudev.device import *
 from pyudev.core import *
 from pyudev.monitor import *
+from pyudev.version import __version__
+from pyudev.version import __version_info__
