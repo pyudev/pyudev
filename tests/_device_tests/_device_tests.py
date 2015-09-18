@@ -141,21 +141,24 @@ class TestDevice(object):
         assert str(error) == 'No device {0!r} in {1!r}'.format(
             error.sys_name, error.subsystem)
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
-    def test_from_device_number(self, a_context, device_datum):
-        if not device_datum.device_node:
-            pytest.skip('no device node, no device number')
-        mode = os.stat(device_datum.device_node).st_mode
-        typ = 'block' if stat.S_ISBLK(mode) else 'char'
-        device = Device.from_device_number(
-            a_context, typ, device_datum.device_number)
-        assert device.device_number == device_datum.device_number
-        # make sure, we are really referring to the same device
-        assert device.device_path == device_datum.device_path
+    _device_data = [d for d in _DEVICE_DATA if d.device_node]
+    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_device_data),
+           settings=Settings(max_examples=5)
+        )
+        def test_from_device_number(self, a_context, device_datum):
+            mode = os.stat(device_datum.device_node).st_mode
+            typ = 'block' if stat.S_ISBLK(mode) else 'char'
+            device = Device.from_device_number(
+                a_context, typ, device_datum.device_number)
+            assert device.device_number == device_datum.device_number
+            # make sure, we are really referring to the same device
+            assert device.device_path == device_datum.device_path
+    else:
+        def test_from_device_number(self):
+            pytest.skip("not enough devices with device nodes in data")
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
     if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
