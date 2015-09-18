@@ -17,25 +17,28 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+import os
 import sys
 import setuptools
 if sys.version_info[0] < 3:
     from codecs import open
 
-import pyudev
+def local_file(name):
+    return os.path.relpath(os.path.join(os.path.dirname(__file__), name))
 
-with open('README.rst', encoding='utf-8') as stream:
-    long_description = stream.read()
+README = local_file("README.rst")
 
+with open(local_file("src/pyudev/version.py")) as o:
+        exec(o.read())
 
 setuptools.setup(
     name='pyudev',
-    version=str(pyudev.__version__),
+    version=__version__,
     url='http://pyudev.readthedocs.org/',
     author='Sebastian Wiesner',
     author_email='lunaryorn@gmail.com',
     description='A libudev binding',
-    long_description=long_description,
+    long_description=open(README, encoding='utf-8').read(),
     platforms=['Linux'],
     license='LGPL 2.1+',
     classifiers=[
@@ -52,5 +55,6 @@ setuptools.setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    packages=setuptools.find_packages(),
+    package_dir={"": "src"},
+    packages=setuptools.find_packages("src"),
     )
