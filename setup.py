@@ -28,7 +28,7 @@ def local_file(name):
 
 README = local_file("README.rst")
 
-with open(local_file("pyudev/version.py")) as o:
+with open(local_file("src/pyudev/version.py")) as o:
         exec(o.read())
 
 setuptools.setup(
@@ -55,5 +55,6 @@ setuptools.setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
         ],
-    packages=setuptools.find_packages(),
+    package_dir={"": "src"},
+    packages=setuptools.find_packages("src"),
     )
