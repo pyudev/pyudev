@@ -24,4 +24,5 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
+from . import libudev
 from . import udev
