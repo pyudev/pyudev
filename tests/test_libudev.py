@@ -122,48 +122,59 @@ class LibudevFunction(object):
         return _to_ctypes(self.declaration.return_type)
 
 
-@pytest.fixture
-def libudev_function(request):
-    """
-    Override ``libudev_function`` to skip tests for blacklisted functions.
-    """
-    function = request.getfuncargvalue('libudev_function')
-    if _is_blacklisted(function):
-        pytest.skip('{0} is not wrapped'.format(function.name))
-    return LibudevFunction(function)
+from hypothesis import given
+from hypothesis import strategies
+from hypothesis import Settings
 
+from pyudev import Context
 
-@pytest.fixture
-def libudev(request):
-    try:
-        return _libudev.load_udev_library()
-    except ImportError:
-        pytest.skip('udev not available')
+from .utils import libudev
 
+_CONTEXT = Context()
+_FUNCTIONS = [
+   f for f in libudev.Unit.parse(libudev.LIBUDEV_H).functions if f.name.startswith('udev_')
+]
+_LIBUDEV_STRATEGY = strategies.just(_libudev.load_udev_library())
 
-@pytest.fixture
-def function(request):
-    libudev = request.getfuncargvalue('libudev')
-    libudev_function = request.getfuncargvalue('libudev_function')
-    return libudev_function.get_wrapper(libudev)
+_TEST_FUNCTIONS = [
+   LibudevFunction(f) for f in _FUNCTIONS if not _is_blacklisted(f)
+]
+_FUNCTION_STRATEGY = strategies.sampled_from(_TEST_FUNCTIONS)
 
-
-def test_arguments(function, libudev_function):
+@given(
+   _LIBUDEV_STRATEGY,
+   _FUNCTION_STRATEGY,
+   settings=Settings(max_examples=len(_TEST_FUNCTIONS))
+)
+def test_arguments(libudev, libudev_function):
+    function = libudev_function.get_wrapper(libudev)
     assert function.argtypes == libudev_function.argument_types
 
 
-def test_return_type(function, libudev_function):
+@given(
+   _LIBUDEV_STRATEGY,
+   _FUNCTION_STRATEGY,
+   settings=Settings(max_examples=len(_TEST_FUNCTIONS))
+)
+def test_return_type(libudev, libudev_function):
     # Ignore the return type of *_unref() functions. The return value of these
     # functions is unused in pyudev, so it doesn't need to be wrapped.
+    function = libudev_function.get_wrapper(libudev)
     restype = (libudev_function.return_type
                if not libudev_function.name.endswith('_unref')
                else None)
     assert function.restype == restype
 
 
-def test_error_checker(function, libudev_function):
+@given(
+   _LIBUDEV_STRATEGY,
+   _FUNCTION_STRATEGY,
+   settings=Settings(max_examples=len(_TEST_FUNCTIONS))
+)
+def test_error_checker(libudev, libudev_function):
+    function = libudev_function.get_wrapper(libudev)
     name = libudev_function.name
-    if name in _libudev.ERROR_CHECKERS:
+    try:
         assert function.errcheck == _libudev.ERROR_CHECKERS[name]
-    else:
+    except KeyError:
         pytest.skip('{0} has no error checker'.format(name))
