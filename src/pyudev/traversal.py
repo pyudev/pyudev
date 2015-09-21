@@ -86,6 +86,8 @@ def slaves(device, recursive=True):
     :param :class:`Context` context: udev context
     :param class:`Device` device: device to start from
     :param bool recursive: if False, only show immediate slaves
+
+    :returns: topology walk generator specialized for slaves
     """
     return topology_walk(device, True, recursive)
 
@@ -97,5 +99,7 @@ def holders(device, recursive=True):
     :param :class:`Context` context: udev context
     :param :class:`Device` device: device to start from
     :param bool recursive: if False, only show immediate holders
+
+    :returns: topology walk generator specialized for holders
     """
     return topology_walk(device, False, recursive)
