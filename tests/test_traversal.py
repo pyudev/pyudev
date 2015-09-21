@@ -52,6 +52,8 @@ HOLDERS = [
 
 BOTHS = list(set(SLAVES).intersection(set(HOLDERS)))
 
+EITHERS = list(set(SLAVES).union(set(HOLDERS)))
+
 NUM_TESTS = 5
 
 # Use conditional to avoid processing tests if number of examples is too small.
@@ -98,9 +100,9 @@ else:
             assert device not in pyudev.holders(_CONTEXT, device)
 
         @given(
-           strategies.sampled_from(BOTHS),
+           strategies.sampled_from(EITHERS),
            strategies.booleans(),
-           settings=Settings(max_examples=NUM_TESTS)
+           settings=Settings(max_examples=2 * NUM_TESTS)
         )
         def test_inverse(self, device, recursive):
             """
