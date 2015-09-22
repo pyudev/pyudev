@@ -26,8 +26,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os
+import stat
 import sys
-from itertools import count
 
 from hypothesis import given
 from hypothesis import strategies
@@ -60,54 +61,6 @@ class TestAttributes(object):
            if k not in cls._VOLATILE_ATTRIBUTES)
 
     @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
-    def test_length(self, a_device):
-        counter = count()
-        for _ in a_device.attributes:
-            next(counter)
-        assert len(a_device.attributes) == next(counter)
-
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
-    def test_iteration(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
-        for attribute in device.attributes:
-            assert pytest.is_unicode_string(attribute)
-        # check that iteration really yields all attributes
-        device_attributes = set(device.attributes)
-        for attribute in device_datum.attributes:
-            assert attribute in device_attributes
-
-    @_UDEV_TEST(167, "test_iteration_mock")
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
-    def test_iteration_mock(self, a_device):
-        attributes = [b'spam', b'eggs']
-        funcname = 'udev_device_get_sysattr_list_entry'
-        with pytest.libudev_list(a_device._libudev, funcname, attributes):
-            attrs = list(a_device.attributes)
-            assert attrs == ['spam', 'eggs']
-            func = a_device._libudev.udev_device_get_sysattr_list_entry
-            func.assert_called_with(a_device)
-
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
-    def test_contains(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
-        for attribute in device_datum.attributes:
-            assert attribute in device.attributes
-
-    @given(
        _CONTEXT_STRATEGY,
        strategies.sampled_from(_DEVICE_DATA),
        settings=Settings(max_examples=5)
@@ -116,18 +69,15 @@ class TestAttributes(object):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in self.non_volatile_items(device_datum.attributes):
             raw_value = value.encode(sys.getfilesystemencoding())
-            assert isinstance(device.attributes[key], bytes)
-            assert device.attributes[key] == raw_value
+            assert isinstance(device.attributes.get(key), bytes)
+            assert device.attributes.get(key) == raw_value
 
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
     )
     def test_getitem_nonexisting(self, a_device):
-        with pytest.raises(KeyError) as excinfo:
-            # pylint: disable=pointless-statement
-            a_device.attributes['a non-existing attribute']
-        assert str(excinfo.value) == repr('a non-existing attribute')
+        assert a_device.attributes.get('a non-existing attribute') is None
 
     @given(
        _CONTEXT_STRATEGY,
@@ -174,3 +124,29 @@ class TestAttributes(object):
                     device.attributes.asbool(key)
                 message = 'Not a boolean value:'
                 assert str(exc_info.value).startswith(message)
+
+    @_UDEV_TEST(167, "test_available_attributes")
+    @given(
+       strategies.sampled_from(_DEVICES),
+       settings=Settings(max_examples=5)
+    )
+    def test_available_attributes(self, a_device):
+        """
+        Test that the available attributes are exactly the names of files
+        in the sysfs directory that are regular files or softlinks.
+        """
+        available_attributes = sorted(a_device.attributes.available_attributes)
+
+        attribute_filenames = []
+        sys_path = a_device.sys_path
+        for filename in sorted(os.listdir(sys_path)):
+            filepath = os.path.join(sys_path, filename)
+            status = os.lstat(filepath)
+            mode = status.st_mode
+            if not stat.S_ISLNK(mode) and not stat.S_ISREG(mode):
+                continue
+            if not stat.S_IRUSR & mode:
+                continue
+            attribute_filenames.append(filename)
+
+        assert available_attributes == attribute_filenames
