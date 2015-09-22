@@ -444,7 +444,8 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_device_sys_name(self, a_device):
-        assert a_device.sys_name == os.path.basename(a_device.device_path)
+        assert a_device.sys_name.replace('/', '!') == \
+           os.path.basename(a_device.device_path)
         assert pytest.is_unicode_string(a_device.sys_name)
 
     @given(
