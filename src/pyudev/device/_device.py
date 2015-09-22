@@ -813,6 +813,10 @@ def _is_attribute_file(filepath):
 
     Return ``True``, if ``filepath`` refers to an attribute, ``False``
     otherwise.
+
+    Note that this method is a random ad-hoc mess, and the behavior is not
+    anything like the current behavior in ``print_all_attributes``. It is
+    retained only for backwards compatibility.
     """
     filename = os.path.basename(filepath)
     return not (filename.startswith('.') or
@@ -836,21 +840,50 @@ class Attributes(Mapping):
         self.device = device
         self._libudev = device._libudev
 
+    def _get_attributes_libudev(self):
+        """
+        Yields attributes of device using libudev.
+
+        Note that this method is correct wrt. libudev, but that libudev
+        methods return a superset of the attributes that actually possess
+        values.
+
+        Therefore it possible to have the following evaluate to ``True``:
+
+        >>> any(a in attributes if not a in attributes)
+
+        because the first ``in`` makes use of ``__iter__()``, but the second
+        make use of ``__contains__()``, which respectively rely on different
+        udev methods.
+        """
+        attrs = self._libudev.udev_device_get_sysattr_list_entry(self.device)
+        for attribute, _ in udev_list_iterate(self._libudev, attrs):
+            yield ensure_unicode_string(attribute)
+
+    def _get_attributes_sysfs(self):
+        """
+        Yields attributes of device by inspecting sysfs directories.
+
+        Should never end up being invoked where systemd version >= 167.
+
+        Its behavior barely resembles the behavior of _get_attributes_libudev()
+        which replaces it in all versions of systemd where
+        udev_device_get_sysattr_list_entry() is available.
+        """
+        sys_path = self.device.sys_path
+        for filename in os.listdir(sys_path):
+            filepath = os.path.join(sys_path, filename)
+            if _is_attribute_file(filepath):
+                yield filename
+
     def _get_attributes(self):
         """
         Yields attributes of device.
         """
         if hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
-            attrs = self._libudev.udev_device_get_sysattr_list_entry(
-                self.device)
-            for attribute, _ in udev_list_iterate(self._libudev, attrs):
-                yield ensure_unicode_string(attribute)
+            return self._get_attributes_libudev()
         else:
-            sys_path = self.device.sys_path
-            for filename in os.listdir(sys_path):
-                filepath = os.path.join(sys_path, filename)
-                if _is_attribute_file(filepath):
-                    yield filename
+            return self._get_attributes_sysfs()
 
     def __len__(self):
         """
