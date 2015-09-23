@@ -6,4 +6,3 @@ hypothesis
 
 # documentation requirements
 sphinx>=1.0.7
-sphinxcontrib-issuetracker>=0.9
