@@ -171,11 +171,14 @@ def test_get_device_type_no_device_file(tmpdir):
 
 
 def test_get_device_type_not_existing(tmpdir):
-    filename = tmpdir.join('test')
+    """
+    Test that an OSError is raised when checking device type using a file
+    that does not actually exist.
+    """
+    filename = tmpdir.join('test_get_device_type_not_existing')
     assert not tmpdir.check(file=True)
-    with pytest.raises(EnvironmentError) as excinfo:
+    with pytest.raises(OSError):
         _util.get_device_type(str(filename))
-    pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
 
 def test_eintr_retry_call(tmpdir):
