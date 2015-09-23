@@ -268,11 +268,14 @@ class TestDevice(object):
 
     @given(a_context=_CONTEXT_STRATEGY)
     def test_from_device_file_non_existing(self, tmpdir, a_context):
-        filename = tmpdir.join('test')
+        """
+        Test that an OSError is raised when constructing a ``Device`` from
+        a file that does not actually exist.
+        """
+        filename = tmpdir.join('test_from_device_file_non_existing')
         assert not tmpdir.check(file=True)
-        with pytest.raises(EnvironmentError) as excinfo:
+        with pytest.raises(OSError):
             Device.from_device_file(a_context, str(filename))
-        pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
     @_UDEV_TEST(152, "test_from_environment")
     @given(_CONTEXT_STRATEGY)
