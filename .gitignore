@@ -34,3 +34,6 @@ _pyreverse
 
 # zip
 *.gz
+
+# pytest
+.cache
