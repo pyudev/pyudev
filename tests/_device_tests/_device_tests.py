@@ -752,14 +752,13 @@ class TestDevice(object):
         assert not (a_device.parent != a_device.parent)
         assert a_device != a_device.parent
 
-    @given(
-       strategies.sampled_from(
-          [operator.ge, operator.gt, operator.le, operator.lt]
-       ),
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=4)
-    )
-    def test_device_ordering(self, an_operator, a_device):
-        with pytest.raises(TypeError) as exc_info:
-            an_operator(a_device, a_device)
-        assert str(exc_info.value) == 'Device not orderable'
+    @given(strategies.sampled_from(_DEVICES), settings=Settings(max_examples=1))
+    def test_device_ordering(self, a_device):
+        """
+        Verify that devices are incomparable.
+        """
+        operators = [operator.ge, operator.gt, operator.le, operator.lt]
+        for comp_op in operators:
+            with pytest.raises(TypeError) as exc_info:
+                comp_op(a_device, a_device)
+            assert str(exc_info.value) == 'Device not orderable'
