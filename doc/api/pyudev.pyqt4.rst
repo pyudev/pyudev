@@ -85,4 +85,4 @@ Deprecated API
       re-parented.
 
 
-.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
+.. _PyQt4: https://riverbankcomputing.co.uk/software/pyqt/intro

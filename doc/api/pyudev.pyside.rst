@@ -85,4 +85,4 @@ Deprecated API
       re-parented.
 
 
-.. _PySide: http://www.pyside.org
+.. _PySide: http://wiki.qt.io/PySide

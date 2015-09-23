@@ -63,7 +63,7 @@ Development
 
 The source code is hosted on GitHub_::
 
-   git clone https://github.com/lunaryorn/pyudev.git
+   git clone https://github.com/pyudev/pyudev.git
 
 If you want to contribute to pyudev, please read the guidelines for
 contributions and the testsuite documentation.
@@ -89,5 +89,5 @@ Other reading
 .. _libudev: http://www.freedesktop.org/software/systemd/man/libudev.html
 .. _librelist.com: http://librelist.com/
 .. _list archives: http://librelist.com/browser/pyudev/
-.. _issue tracker: https://github.com/lunaryorn/pyudev/issues
-.. _GitHub: https://github.com/lunaryorn/pyudev
+.. _issue tracker: https://github.com/pyudev/pyudev/issues
+.. _GitHub: https://github.com/pyudev/pyudev
