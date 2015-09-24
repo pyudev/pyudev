@@ -37,7 +37,8 @@ pylint:
 		--disable=bad-continuation \
 		--disable=duplicate-code \
 		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.*
+		--no-docstring-rgx=_.* \
+		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 pylint-tests:
 	PYTHONPATH=src pylint tests \
@@ -47,7 +48,8 @@ pylint-tests:
 		--disable=duplicate-code \
 		--disable=no-self-use \
 		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.*
+		--no-docstring-rgx=_.* \
+		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 PYREVERSE_OPTS = --output=pdf
 view:
