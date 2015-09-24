@@ -42,13 +42,11 @@ from hypothesis import Settings
 _CONTEXT = pyudev.Context()
 _DEVICES = _CONTEXT.list_devices()
 
-SLAVES = [
-   d for d in _DEVICES if list(pyudev.slaves(_CONTEXT, d, recursive=False))
-]
+# pylint: disable=too-many-function-args
 
-HOLDERS = [
-   d for d in _DEVICES if list(pyudev.holders(_CONTEXT, d, recursive=False))
-]
+SLAVES = [d for d in _DEVICES if list(pyudev.slaves(_CONTEXT, d, False))]
+
+HOLDERS = [d for d in _DEVICES if list(pyudev.holders(_CONTEXT, d, False))]
 
 BOTHS = list(set(SLAVES).intersection(set(HOLDERS)))
 
