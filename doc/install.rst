@@ -32,13 +32,13 @@ Install pyudev from the Cheeseshop_ with pip_::
 Installation from source code
 -----------------------------
 
-Close the public repository::
+Clone the public repository::
 
-   git clone https://github.com/lunaryorn/pyudev.git
+   git clone https://github.com/pyudev/pyudev.git
 
-Or download `tarball <https://github.com/lunaryorn/pyudev/tarball/master>`_::
+Or download `tarball <https://github.com/pyudev/pyudev/tarball/master>`_::
 
-   curl -OL https://github.com/lunaryorn/pyudev/tarball/master
+   curl -OL https://github.com/pyudev/pyudev/tarball/master
 
 Then install pyudev from the source code tree::
 

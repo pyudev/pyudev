@@ -18,7 +18,7 @@ Import pyudev and verify that you're using the latest version:
 
 >>> import pyudev
 >>> pyudev.__version__
-u'0.16'
+u'0.17'
 >>> pyudev.udev_version()
 181
 
@@ -80,7 +80,7 @@ tutorials in the net.
 
 The keyword arguments of :meth:`list_devices()` provide the most common filter
 operations.  You can apply other, less common filters by calling one of the
-``match_*`` methods on the :class:`Enumerator` returned by of
+``match_*`` methods on the :class:`Enumerator` returned by
 :meth:`list_devices()`.
 
 
@@ -345,8 +345,8 @@ For instance, the above example would look like this in a PySide_ application:
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
 .. _Qt: http://qt.io/developers/
-.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
-.. _PySide: http://www.pyside.org
+.. _PyQt4: https://riverbankcomputing.co.uk/software/pyqt/intro
+.. _PySide: http://wiki.qt.io/PySide
 .. _PyGtk: http://www.pygtk.org/
 .. _wxWidgets: http://wxwidgets.org
 .. _wxPython: http://www.wxpython.org

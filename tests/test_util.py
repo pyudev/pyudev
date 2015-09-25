@@ -33,7 +33,6 @@ from pyudev import Context
 
 _CONTEXT = Context()
 
-_MIN_SATISFYING_EXAMPLES = Settings.default.min_satisfying_examples
 
 @pytest.mark.conversion
 def test_ensure_byte_string():
@@ -123,7 +122,7 @@ def raise_valueerror():
 
 
 _char_devices = list(_CONTEXT.list_devices(subsystem="tty"))
-if len(_char_devices) >= _MIN_SATISFYING_EXAMPLES:
+if len(_char_devices) > 0:
     @given(
        strategies.sampled_from(_char_devices),
        settings=Settings(max_examples=5)
@@ -143,7 +142,7 @@ else:
 
 
 _block_devices = list(_CONTEXT.list_devices(subsystem="block"))
-if len(_block_devices) >= _MIN_SATISFYING_EXAMPLES:
+if len(_block_devices) > 0:
     @given(
        strategies.sampled_from(_block_devices),
        settings=Settings(max_examples=5)
@@ -171,11 +170,14 @@ def test_get_device_type_no_device_file(tmpdir):
 
 
 def test_get_device_type_not_existing(tmpdir):
-    filename = tmpdir.join('test')
+    """
+    Test that an OSError is raised when checking device type using a file
+    that does not actually exist.
+    """
+    filename = tmpdir.join('test_get_device_type_not_existing')
     assert not tmpdir.check(file=True)
-    with pytest.raises(EnvironmentError) as excinfo:
+    with pytest.raises(OSError):
         _util.get_device_type(str(filename))
-    pytest.assert_env_error(excinfo.value, errno.ENOENT, str(filename))
 
 
 def test_eintr_retry_call(tmpdir):

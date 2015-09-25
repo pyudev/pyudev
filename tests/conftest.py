@@ -34,18 +34,6 @@ pytest_plugins = [
 ]
 
 
-def assert_env_error(error, errno, filename=None):
-    __tracebackhide__ = True
-    # work around an apparent limitation in pytest.raises, which gives use
-    # tuple representations of exceptions instead of exception objects.  See
-    # pyudev issue #43
-    if isinstance(error, tuple):
-        error = OSError(*error)
-    assert error.errno == errno
-    assert error.strerror == os.strerror(errno)
-    assert error.filename == filename
-
-
 def is_unicode_string(value):
     """
     Return ``True``, if ``value`` is of a real unicode string type
@@ -59,8 +47,7 @@ def is_unicode_string(value):
 
 
 def pytest_namespace():
-    return dict((func.__name__, func) for func in
-                (is_unicode_string, assert_env_error))
+    return dict((func.__name__, func) for func in (is_unicode_string,))
 
 @pytest.fixture
 def context(request):
