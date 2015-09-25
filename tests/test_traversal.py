@@ -57,7 +57,7 @@ NUM_TESTS = 5
 # Use conditional to avoid processing tests if number of examples is too small.
 # pytest.mark.skipif allows the test to be built, resulting in a hypothesis
 # error if SLAVES or HOLDERS is empty.
-if len(BOTHS) < NUM_TESTS:
+if len(BOTHS) == 0:
     @pytest.mark.skipif(
        True,
        reason="no slaves or holders data for tests"

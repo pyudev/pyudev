@@ -41,8 +41,6 @@ _CONTEXT = Context()
 _DEVICE_DATA = list(udev.get_device_sample(udev.DeviceDatabase.db()))
 _DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 
-_MIN_SATISFYING_EXAMPLES = Settings.default.min_satisfying_examples
-
 _CONTEXT_STRATEGY = strategies.just(_CONTEXT)
 
 _UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
