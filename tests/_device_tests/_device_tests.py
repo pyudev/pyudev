@@ -42,7 +42,9 @@ import pytest
 import mock
 
 from pyudev import Device
+from pyudev import Devices
 from pyudev import DeviceNotFoundAtPathError
+from pyudev import DeviceNotFoundByFileError
 from pyudev import DeviceNotFoundByNameError
 from pyudev import DeviceNotFoundByNumberError
 from pyudev import DeviceNotFoundInEnvironmentError
@@ -62,11 +64,11 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_from_path(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device is not None
         assert device == \
-           Device.from_sys_path(a_context, device_datum.sys_path)
-        assert device == Device.from_path(a_context, device_datum.sys_path)
+           Devices.from_sys_path(a_context, device_datum.sys_path)
+        assert device == Devices.from_path(a_context, device_datum.sys_path)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -75,8 +77,8 @@ class TestDevice(object):
     )
     def test_from_path_strips_leading_slash(self, a_context, device_datum):
         path = device_datum.device_path
-        assert Device.from_path(a_context, path[1:]) == \
-               Device.from_path(a_context, path)
+        assert Devices.from_path(a_context, path[1:]) == \
+               Devices.from_path(a_context, path)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -84,7 +86,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_from_sys_path(self, a_context, device_datum):
-        device = Device.from_sys_path(a_context, device_datum.sys_path)
+        device = Devices.from_sys_path(a_context, device_datum.sys_path)
         assert device is not None
         assert device.sys_path == device_datum.sys_path
 
@@ -92,7 +94,7 @@ class TestDevice(object):
     def test_from_sys_path_device_not_found(self, a_context):
         sys_path = 'there_will_not_be_such_a_device'
         with pytest.raises(DeviceNotFoundAtPathError) as exc_info:
-            Device.from_sys_path(a_context, sys_path)
+            Devices.from_sys_path(a_context, sys_path)
         error = exc_info.value
         assert error.sys_path == sys_path
         assert str(error) == 'No device at {0!r}'.format(sys_path)
@@ -108,7 +110,7 @@ class TestDevice(object):
         yields an equivalent device.
         """
         try:
-            new_device = Device.from_name(
+            new_device = Devices.from_name(
                a_context,
                a_device.subsystem,
                a_device.sys_name
@@ -123,7 +125,7 @@ class TestDevice(object):
     @given(_CONTEXT_STRATEGY)
     def test_from_name_no_device_in_existing_subsystem(self, a_context):
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
-            Device.from_name(a_context, 'block', 'foobar')
+            Devices.from_name(a_context, 'block', 'foobar')
         error = exc_info.value
         assert error.subsystem == 'block'
         assert error.sys_name == 'foobar'
@@ -133,7 +135,7 @@ class TestDevice(object):
     @given(_CONTEXT_STRATEGY)
     def test_from_name_nonexisting_subsystem(self, a_context):
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
-            Device.from_name(a_context, 'no_such_subsystem', 'foobar')
+            Devices.from_name(a_context, 'no_such_subsystem', 'foobar')
         error = exc_info.value
         assert error.subsystem == 'no_such_subsystem'
         assert error.sys_name == 'foobar'
@@ -150,7 +152,7 @@ class TestDevice(object):
         def test_from_device_number(self, a_context, device_datum):
             mode = os.stat(device_datum.device_node).st_mode
             typ = 'block' if stat.S_ISBLK(mode) else 'char'
-            device = Device.from_device_number(
+            device = Devices.from_device_number(
                 a_context, typ, device_datum.device_number)
             assert device.device_number == device_datum.device_number
             # make sure, we are really referring to the same device
@@ -179,7 +181,7 @@ class TestDevice(object):
                 # this either fails, in which case the caught exception is
                 # raised, or succeeds, but returns a wrong device
                 # (device numbers are not unique across device types)
-                device = Device.from_device_number(
+                device = Devices.from_device_number(
                     a_context, typ, device_datum.device_number)
                 # if it succeeds, the resulting device must not match the
                 # one, we are actually looking for!
@@ -194,9 +196,8 @@ class TestDevice(object):
 
     @given(_CONTEXT_STRATEGY)
     def test_from_device_number_invalid_type(self, a_context):
-        with pytest.raises(ValueError) as exc_info:
-            Device.from_device_number(a_context, 'foobar', 100)
-        assert str(exc_info.value).startswith('Invalid type:')
+        with pytest.raises(DeviceNotFoundByNumberError):
+            Devices.from_device_number(a_context, 'foobar', 100)
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
     if len(_device_data) > 0:
@@ -206,7 +207,7 @@ class TestDevice(object):
            settings=Settings(max_examples=5)
         )
         def test_from_device_file(self, a_context, device_datum):
-            device = Device.from_device_file(
+            device = Devices.from_device_file(
                a_context,
                device_datum.device_node
             )
@@ -242,7 +243,7 @@ class TestDevice(object):
                 )
 
                 try:
-                    device = Device.from_device_file(a_context, link)
+                    device = Devices.from_device_file(a_context, link)
                     assert device.device_path == device_datum.device_path
                     assert link in device.device_links
                 except AssertionError:
@@ -260,8 +261,8 @@ class TestDevice(object):
     def test_from_device_file_no_device_file(self, tmpdir, a_context):
         filename = tmpdir.join('test')
         filename.ensure(file=True)
-        with pytest.raises(ValueError) as excinfo:
-            Device.from_device_file(a_context, str(filename))
+        with pytest.raises(DeviceNotFoundByFileError) as excinfo:
+            Devices.from_device_file(a_context, str(filename))
         message = 'not a device file: {0!r}'.format(str(filename))
         assert str(excinfo.value) == message
 
@@ -273,15 +274,15 @@ class TestDevice(object):
         """
         filename = tmpdir.join('test_from_device_file_non_existing')
         assert not tmpdir.check(file=True)
-        with pytest.raises(OSError):
-            Device.from_device_file(a_context, str(filename))
+        with pytest.raises(DeviceNotFoundByFileError):
+            Devices.from_device_file(a_context, str(filename))
 
     @_UDEV_TEST(152, "test_from_environment")
     @given(_CONTEXT_STRATEGY)
     def test_from_environment(self, a_context):
         # there is no device in a standard environment
         with pytest.raises(DeviceNotFoundInEnvironmentError):
-            Device.from_environment(a_context)
+            Devices.from_environment(a_context)
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -417,7 +418,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_sys_path(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.sys_path == device_datum.sys_path
         assert pytest.is_unicode_string(device.sys_path)
 
@@ -427,7 +428,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_device_path(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_path == device_datum.device_path
         assert pytest.is_unicode_string(device.device_path)
 
@@ -437,7 +438,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_subsystem(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.subsystem == device_datum.properties['SUBSYSTEM']
         assert pytest.is_unicode_string(device.subsystem)
 
@@ -470,7 +471,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_type(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_type == device_datum.properties.get('DEVTYPE')
         if device.device_type:
             assert pytest.is_unicode_string(device.device_type)
@@ -481,7 +482,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_driver(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.driver == device_datum.properties.get('DRIVER')
         if device.driver:
             assert pytest.is_unicode_string(device.driver)
@@ -492,7 +493,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_device_node(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_node == device_datum.device_node
         if device.device_node:
             assert pytest.is_unicode_string(device.device_node)
@@ -503,7 +504,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_device_number(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_number == device_datum.device_number
 
     @_UDEV_TEST(165, "test_is_initialized")
@@ -556,7 +557,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_links(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert sorted(device.device_links) == sorted(device_datum.device_links)
         for link in device.device_links:
             assert pytest.is_unicode_string(link)
@@ -631,7 +632,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_iteration(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for property in device:
             assert pytest.is_unicode_string(property)
         # test that iteration really yields all properties
@@ -645,7 +646,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_length(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert len(device) == len(device_datum.properties)
 
     @given(
@@ -654,7 +655,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_getitem(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
             assert device[prop] == device_datum.properties[prop]
 
@@ -666,7 +667,7 @@ class TestDevice(object):
            settings=Settings(max_examples=5)
         )
         def test_getitem_devname(self, a_context, device_datum):
-            device = Device.from_path(a_context, device_datum.device_path)
+            device = Devices.from_path(a_context, device_datum.device_path)
             data_devname = os.path.join(
                 a_context.device_path, device_datum.properties['DEVNAME'])
             device_devname = os.path.join(a_context.device_path, device['DEVNAME'])
@@ -692,7 +693,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_asint(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for property, value in device_datum.properties.items():
             try:
                 value = int(value)
@@ -708,7 +709,7 @@ class TestDevice(object):
        settings=Settings(max_examples=5)
     )
     def test_asbool(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for prop, value in device_datum.properties.items():
             if value == '1':
                 assert device.asbool(prop)
