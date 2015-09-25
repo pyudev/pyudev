@@ -52,7 +52,6 @@ from pyudev.device import Attributes, Tags
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICE_DATA
 from ._constants import _DEVICES
-from ._constants import _MIN_SATISFYING_EXAMPLES
 from ._constants import _UDEV_TEST
 
 class TestDevice(object):
@@ -142,7 +141,7 @@ class TestDevice(object):
             error.sys_name, error.subsystem)
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),
@@ -161,7 +160,7 @@ class TestDevice(object):
             pytest.skip("not enough devices with device nodes in data")
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),
@@ -200,7 +199,7 @@ class TestDevice(object):
         assert str(exc_info.value).startswith('Invalid type:')
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),
@@ -218,7 +217,7 @@ class TestDevice(object):
             pytest.skip("not enough devices with device nodes in data")
 
     _device_data = [d for d in _DEVICE_DATA if d.device_links]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),
@@ -293,7 +292,7 @@ class TestDevice(object):
            isinstance(a_device.parent, Device)
 
     _devices = [d for d in _DEVICES if d.parent]
-    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_devices) > 0:
         @_UDEV_TEST(172, "test_child_of_parents")
         @given(
            strategies.sampled_from(_devices),
@@ -308,7 +307,7 @@ class TestDevice(object):
             pytest.skip("not enough devices with children")
 
     _devices = [d for d in _DEVICES if d.children]
-    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_devices) > 0:
         @_UDEV_TEST(172, "test_children")
         @given(
            strategies.sampled_from(_devices),
@@ -336,7 +335,7 @@ class TestDevice(object):
             child = ancestor
 
     _devices = [d for d in _DEVICES if d.find_parent(d.subsystem)]
-    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_devices) > 0:
         @given(
            strategies.sampled_from(_devices),
            settings=Settings(max_examples=5)
@@ -660,7 +659,7 @@ class TestDevice(object):
             assert device[prop] == device_datum.properties[prop]
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),

@@ -33,11 +33,10 @@ import gc
 import pytest
 
 from ._device_tests import _DEVICE_DATA
-from ._device_tests import _MIN_SATISFYING_EXAMPLES
 
 # pylint: disable=too-few-public-methods
 
-if len(_DEVICE_DATA) >= _MIN_SATISFYING_EXAMPLES:
+if len(_DEVICE_DATA) > 0:
     # pylint: disable=unused-import
     from ._device_tests._device_tests import TestDevice
 else:
@@ -49,7 +48,7 @@ else:
             pytest.skip("skipping all device tests, not enough devices")
 
 
-if len(_DEVICE_DATA) >= _MIN_SATISFYING_EXAMPLES:
+if len(_DEVICE_DATA) > 0:
     # pylint: disable=unused-import
     from ._device_tests._attributes_tests import TestAttributes
 else:
@@ -60,7 +59,7 @@ else:
             """ Always skipped test. """
             pytest.skip("skipping all attributes tests, not enough devices")
 
-if len(_DEVICE_DATA) >= _MIN_SATISFYING_EXAMPLES:
+if len(_DEVICE_DATA) > 0:
     # pylint: disable=unused-import
     from ._device_tests._tags_tests import TestTags
 else:

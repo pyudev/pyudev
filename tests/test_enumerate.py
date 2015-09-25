@@ -30,7 +30,6 @@ from pyudev import Enumerator
 
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICES
-from ._device_tests import _MIN_SATISFYING_EXAMPLES
 from ._device_tests import _UDEV_TEST
 
 @pytest.fixture
@@ -138,7 +137,7 @@ class TestEnumerator(object):
             assert 'seat' in device.tags
 
     _devices = [d for d in _DEVICES if d.parent]
-    if len(_devices) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_devices) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
