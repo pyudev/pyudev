@@ -48,6 +48,205 @@ from pyudev._util import udev_list_iterate
 
 # pylint: disable=too-many-lines
 
+class Devices(object):
+    """
+    Class for constructing :class:`Device` objects from various kinds of data.
+    """
+
+    @classmethod
+    def from_path(cls, context, path):
+        """
+        Create a device from a device ``path``.  The ``path`` may or may not
+        start with the ``sysfs`` mount point:
+
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> Devices.from_path(context, '/devices/platform')
+        Device(u'/sys/devices/platform')
+        >>> Devices.from_path(context, '/sys/devices/platform')
+        Device(u'/sys/devices/platform')
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``path`` is a device path as unicode or byte string.
+
+        Return a :class:`Device` object for the device.  Raise
+        :exc:`DeviceNotFoundAtPathError`, if no device was found for ``path``.
+
+        .. versionadded:: 0.18
+        """
+        if not path.startswith(context.sys_path):
+            path = os.path.join(context.sys_path, path.lstrip(os.sep))
+        return cls.from_sys_path(context, path)
+
+    @classmethod
+    def from_sys_path(cls, context, sys_path):
+        """
+        Create a new device from a given ``sys_path``:
+
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> Devices.from_sys_path(context, '/sys/devices/platform')
+        Device(u'/sys/devices/platform')
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``sys_path`` is a unicode or byte string containing the path of the
+        device inside ``sysfs`` with the mount point included.
+
+        Return a :class:`Device` object for the device.  Raise
+        :exc:`DeviceNotFoundAtPathError`, if no device was found for
+        ``sys_path``.
+
+        .. versionadded:: 0.18
+        """
+        device = context._libudev.udev_device_new_from_syspath(
+            context, ensure_byte_string(sys_path))
+        if not device:
+            raise DeviceNotFoundAtPathError(sys_path)
+        return Device(context, device)
+
+    @classmethod
+    def from_name(cls, context, subsystem, sys_name):
+        """
+        Create a new device from a given ``subsystem`` and a given
+        ``sys_name``:
+
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> sda = Devices.from_name(context, 'block', 'sda')
+        >>> sda
+        Device(u'/sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda')
+        >>> sda == Devices.from_path(context, '/block/sda')
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``subsystem`` and ``sys_name`` are byte or unicode strings, which
+        denote the subsystem and the name of the device to create.
+
+        Return a :class:`Device` object for the device.  Raise
+        :exc:`DeviceNotFoundByNameError`, if no device was found with the given
+        name.
+
+        .. versionadded:: 0.18
+        """
+        device = context._libudev.udev_device_new_from_subsystem_sysname(
+            context, ensure_byte_string(subsystem),
+            ensure_byte_string(sys_name))
+        if not device:
+            raise DeviceNotFoundByNameError(subsystem, sys_name)
+        return Device(context, device)
+
+    @classmethod
+    def from_device_number(cls, context, typ, number):
+        """
+        Create a new device from a device ``number`` with the given device
+        ``type``:
+
+        >>> import os
+        >>> from pyudev import Context, Device
+        >>> ctx = Context()
+        >>> major, minor = 8, 0
+        >>> device = Devices.from_device_number(context, 'block',
+        ...     os.makedev(major, minor))
+        >>> device
+        Device(u'/sys/devices/pci0000:00/0000:00:11.0/host0/target0:0:0/0:0:0:0/block/sda')
+        >>> os.major(device.device_number), os.minor(device.device_number)
+        (8, 0)
+
+        Use :func:`os.makedev` to construct a device number from a major and a
+        minor device number, as shown in the example above.
+
+        .. warning::
+
+           Device numbers are not unique across different device types.
+           Passing a correct number with a wrong type may silently yield a
+           wrong device object, so make sure to pass the correct device type.
+
+        ``context`` is the :class:`Context`, in which to search the device.
+        ``type`` is either ``'char'`` or ``'block'``, according to whether the
+        device is a character or block device.  ``number`` is the device number
+        as integer.
+
+        Return a :class:`Device` object for the device with the given device
+        ``number``.  Raise :exc:`DeviceNotFoundByNumberError`, if no device was
+        found with the given device type and number.  Raise
+        :exc:`~exceptions.ValueError`, if ``type`` is any other string than
+        ``'char'`` or ``'block'``.
+
+        .. versionadded:: 0.18
+        """
+        if typ not in ('char', 'block'):
+            raise ValueError('Invalid type: {0!r}. Must be one of "char" '
+                             'or "block".'.format(typ))
+        device = context._libudev.udev_device_new_from_devnum(
+            context, ensure_byte_string(typ[0]), number)
+        if not device:
+            raise DeviceNotFoundByNumberError(typ, number)
+        return Device(context, device)
+
+    @classmethod
+    def from_device_file(cls, context, filename):
+        """
+        Create a new device from the given device file:
+
+        >>> from pyudev import Context, Device
+        >>> context = Context()
+        >>> device = Devices.from_device_file(context, '/dev/sda')
+        >>> device
+        Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
+        >>> device.device_node
+        u'/dev/sda'
+
+        .. warning::
+
+           Though the example seems to suggest that ``device.device_node ==
+           filename`` holds with ``device = Devices.from_device_file(context,
+           filename)``, this is only true in a majority of cases.  There *can*
+           be devices, for which this relation is actually false!  Thus, do
+           *not* expect :attr:`~Device.device_node` to be equal to the given
+           ``filename`` for the returned :class:`Device`.  Especially, use
+           :attr:`~Device.device_node` if you need the device file of a
+           :class:`Device` created with this method afterwards.
+
+        ``context`` is the :class:`Context` in which to search the device.
+        ``filename`` is a string containing the path of a device file.
+
+        Return a :class:`Device` representing the given device file.  Raise
+        :exc:`~exceptions.ValueError` if ``filename`` is no device file at all.
+        Raise :exc:`~exceptions.EnvironmentError` if ``filename`` does not
+        exist or if its metadata was inaccessible.
+
+        .. versionadded:: 0.18
+        """
+        device_type = get_device_type(filename)
+        device_number = os.stat(filename).st_rdev
+        return cls.from_device_number(context, device_type, device_number)
+
+    @classmethod
+    def from_environment(cls, context):
+        """
+        Create a new device from the process environment (as in
+        :data:`os.environ`).
+
+        This only works reliable, if the current process is called from an
+        udev rule, and is usually used for tools executed from ``IMPORT=``
+        rules.  Use this method to create device objects in Python scripts
+        called from udev rules.
+
+        ``context`` is the library :class:`Context`.
+
+        Return a :class:`Device` object constructed from the environment.
+        Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
+        created from the environment.
+
+        .. udevversion:: 152
+
+        .. versionadded:: 0.18
+        """
+        device = context._libudev.udev_device_new_from_environment(context)
+        if not device:
+            raise DeviceNotFoundInEnvironmentError()
+        return Device(context, device)
+
+
 class Device(Mapping):
     # pylint: disable=too-many-public-methods
     """
@@ -82,202 +281,63 @@ class Device(Mapping):
     """
 
     @classmethod
-    def from_path(cls, context, path):
+    def from_path(cls, context, path): #pragma: no cover
         """
-        Create a device from a device ``path``.  The ``path`` may or may not
-        start with the ``sysfs`` mount point:
-
-        >>> from pyudev import Context, Device
-        >>> context = Context()
-        >>> Device.from_path(context, '/devices/platform')
-        Device(u'/sys/devices/platform')
-        >>> Device.from_path(context, '/sys/devices/platform')
-        Device(u'/sys/devices/platform')
-
-        ``context`` is the :class:`Context` in which to search the device.
-        ``path`` is a device path as unicode or byte string.
-
-        Return a :class:`Device` object for the device.  Raise
-        :exc:`DeviceNotFoundAtPathError`, if no device was found for ``path``.
-
         .. versionadded:: 0.4
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_path` instead.
         """
-        if not path.startswith(context.sys_path):
-            path = os.path.join(context.sys_path, path.lstrip(os.sep))
-        return cls.from_sys_path(context, path)
+        return Devices.from_path(context, path)
 
     @classmethod
-    def from_sys_path(cls, context, sys_path):
+    def from_sys_path(cls, context, sys_path): #pragma: no cover
         """
-        Create a new device from a given ``sys_path``:
-
-        >>> from pyudev import Context, Device
-        >>> context = Context()
-        >>> Device.from_sys_path(context, '/sys/devices/platform')
-        Device(u'/sys/devices/platform')
-
-        ``context`` is the :class:`Context` in which to search the device.
-        ``sys_path`` is a unicode or byte string containing the path of the
-        device inside ``sysfs`` with the mount point included.
-
-        Return a :class:`Device` object for the device.  Raise
-        :exc:`DeviceNotFoundAtPathError`, if no device was found for
-        ``sys_path``.
-
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
            no device was found for ``sys_path``.
         .. versionchanged:: 0.5
            Raise :exc:`DeviceNotFoundAtPathError` instead of
            :exc:`NoSuchDeviceError`.
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_sys_path` instead.
         """
-        device = context._libudev.udev_device_new_from_syspath(
-            context, ensure_byte_string(sys_path))
-        if not device:
-            raise DeviceNotFoundAtPathError(sys_path)
-        return cls(context, device)
+        return Devices.from_sys_path(context, sys_path)
 
     @classmethod
-    def from_name(cls, context, subsystem, sys_name):
+    def from_name(cls, context, subsystem, sys_name): #pragma: no cover
         """
-        Create a new device from a given ``subsystem`` and a given
-        ``sys_name``:
-
-        >>> from pyudev import Context, Device
-        >>> context = Context()
-        >>> sda = Device.from_name(context, 'block', 'sda')
-        >>> sda
-        Device(u'/sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda')
-        >>> sda == Device.from_path(context, '/block/sda')
-
-        ``context`` is the :class:`Context` in which to search the device.
-        ``subsystem`` and ``sys_name`` are byte or unicode strings, which
-        denote the subsystem and the name of the device to create.
-
-        Return a :class:`Device` object for the device.  Raise
-        :exc:`DeviceNotFoundByNameError`, if no device was found with the given
-        name.
-
         .. versionadded:: 0.5
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_name` instead.
         """
-        device = context._libudev.udev_device_new_from_subsystem_sysname(
-            context, ensure_byte_string(subsystem),
-            ensure_byte_string(sys_name))
-        if not device:
-            raise DeviceNotFoundByNameError(subsystem, sys_name)
-        return cls(context, device)
+        return Devices.from_name(context, subsystem, sys_name)
 
     @classmethod
-    def from_device_number(cls, context, typ, number):
+    def from_device_number(cls, context, typ, number): #pragma: no cover
         """
-        Create a new device from a device ``number`` with the given device
-        ``type``:
-
-        >>> import os
-        >>> from pyudev import Context, Device
-        >>> ctx = Context()
-        >>> major, minor = 8, 0
-        >>> device = Device.from_device_number(context, 'block',
-        ...     os.makedev(major, minor))
-        >>> device
-        Device(u'/sys/devices/pci0000:00/0000:00:11.0/host0/target0:0:0/0:0:0:0/block/sda')
-        >>> os.major(device.device_number), os.minor(device.device_number)
-        (8, 0)
-
-        Use :func:`os.makedev` to construct a device number from a major and a
-        minor device number, as shown in the example above.
-
-        .. warning::
-
-           Device numbers are not unique across different device types.
-           Passing a correct number with a wrong type may silently yield a
-           wrong device object, so make sure to pass the correct device type.
-
-        ``context`` is the :class:`Context`, in which to search the device.
-        ``type`` is either ``'char'`` or ``'block'``, according to whether the
-        device is a character or block device.  ``number`` is the device number
-        as integer.
-
-        Return a :class:`Device` object for the device with the given device
-        ``number``.  Raise :exc:`DeviceNotFoundByNumberError`, if no device was
-        found with the given device type and number.  Raise
-        :exc:`~exceptions.ValueError`, if ``type`` is any other string than
-        ``'char'`` or ``'block'``.
-
         .. versionadded:: 0.11
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_device_number` instead.
         """
-        if typ not in ('char', 'block'):
-            raise ValueError('Invalid type: {0!r}. Must be one of "char" '
-                             'or "block".'.format(typ))
-        device = context._libudev.udev_device_new_from_devnum(
-            context, ensure_byte_string(typ[0]), number)
-        if not device:
-            raise DeviceNotFoundByNumberError(typ, number)
-        return cls(context, device)
+        return Devices.from_device_number(context, typ, number)
 
     @classmethod
-    def from_device_file(cls, context, filename):
+    def from_device_file(cls, context, filename): #pragma: no cover
         """
-        Create a new device from the given device file:
-
-        >>> from pyudev import Context, Device
-        >>> context = Context()
-        >>> device = Device.from_device_file(context, '/dev/sda')
-        >>> device
-        Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
-        >>> device.device_node
-        u'/dev/sda'
-
-        .. warning::
-
-           Though the example seems to suggest that ``device.device_node ==
-           filename`` holds with ``device = Device.from_device_file(context,
-           filename)``, this is only true in a majority of cases.  There *can*
-           be devices, for which this relation is actually false!  Thus, do
-           *not* expect :attr:`~Device.device_node` to be equal to the given
-           ``filename`` for the returned :class:`Device`.  Especially, use
-           :attr:`~Device.device_node` if you need the device file of a
-           :class:`Device` created with this method afterwards.
-
-        ``context`` is the :class:`Context` in which to search the device.
-        ``filename`` is a string containing the path of a device file.
-
-        Return a :class:`Device` representing the given device file.  Raise
-        :exc:`~exceptions.ValueError` if ``filename`` is no device file at all.
-        Raise :exc:`~exceptions.EnvironmentError` if ``filename`` does not
-        exist or if its metadata was inaccessible.
-
         .. versionadded:: 0.15
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_device_file` instead.
         """
-        device_type = get_device_type(filename)
-        device_number = os.stat(filename).st_rdev
-        return cls.from_device_number(context, device_type, device_number)
+        return Devices.from_device_file(context, filename)
 
     @classmethod
-    def from_environment(cls, context):
+    def from_environment(cls, context): #pragma: no cover
         """
-        Create a new device from the process environment (as in
-        :data:`os.environ`).
-
-        This only works reliable, if the current process is called from an
-        udev rule, and is usually used for tools executed from ``IMPORT=``
-        rules.  Use this method to create device objects in Python scripts
-        called from udev rules.
-
-        ``context`` is the library :class:`Context`.
-
-        Return a :class:`Device` object constructed from the environment.
-        Raise :exc:`DeviceNotFoundInEnvironmentError`, if no device could be
-        created from the environment.
-
-        .. udevversion:: 152
-
         .. versionadded:: 0.6
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_environment` instead.
         """
-        device = context._libudev.udev_device_new_from_environment(context)
-        if not device:
-            raise DeviceNotFoundInEnvironmentError()
-        return cls(context, device)
+        return Devices.from_environment(context)
 
     def __init__(self, context, _device):
         self.context = context
@@ -445,7 +505,7 @@ class Device(Mapping):
 
            >>> from pyudev import Context, Device
            >>> context = Context()
-           >>> device = Device.from_path(context, '/sys/devices/LNXSYSTM:00')
+           >>> device = Devices.from_path(context, '/sys/devices/LNXSYSTM:00')
            >>> device.sys_number
            u'00'
 
@@ -528,7 +588,7 @@ class Device(Mapping):
         >>> import os
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> sda = Device.from_name(context, 'block', 'sda')
+        >>> sda = Devices.from_name(context, 'block', 'sda')
         >>> sda.device_number
         2048L
         >>> (os.major(sda.device_number), os.minor(sda.device_number))
@@ -605,8 +665,8 @@ class Device(Mapping):
         .. warning::
 
            Links are not necessarily resolved by
-           :meth:`Device.from_device_file()`. Hence do *not* rely on
-           ``Device.from_device_file(context, link).device_path ==
+           :meth:`Devices.from_device_file()`. Hence do *not* rely on
+           ``Devices.from_device_file(context, link).device_path ==
            device.device_path`` from any ``link`` in ``device.device_links``.
         """
         devlinks = self._libudev.udev_device_get_devlinks_list_entry(self)

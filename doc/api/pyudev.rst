@@ -10,6 +10,7 @@
 
    Context
    Device
+   Devices
    Monitor
    MonitorObserver
 
@@ -80,6 +81,26 @@ Version information
    .. automethod:: match_is_initialized
 
    .. automethod:: __iter__
+
+
+:class:`Devices` – constructing `Device` objects
+------------------------------------------------
+
+.. autoclass:: Devices()
+
+   .. rubric:: Construction of device objects
+
+   .. automethod:: from_path
+
+   .. automethod:: from_sys_path
+
+   .. automethod:: from_name
+
+   .. automethod:: from_device_number
+
+   .. automethod:: from_device_file
+
+   .. automethod:: from_environment
 
 
 :class:`Device` – accessing device information

@@ -27,6 +27,7 @@
 __all__ = [
   'Attributes',
   'Device',
+  'Devices',
   'DeviceNotFoundAtPathError',
   'DeviceNotFoundByNameError',
   'DeviceNotFoundByNumberError',
@@ -37,6 +38,7 @@ __all__ = [
 
 from ._device import Attributes
 from ._device import Device
+from ._device import Devices
 from ._device import Tags
 from ._errors import DeviceNotFoundAtPathError
 from ._errors import DeviceNotFoundByNameError
