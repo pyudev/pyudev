@@ -31,7 +31,6 @@ from pyudev import Device
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
-from ._device_tests import _MIN_SATISFYING_EXAMPLES
 from ._device_tests import _UDEV_TEST
 
 class TestTags(object):
@@ -39,7 +38,7 @@ class TestTags(object):
     pytestmark = _UDEV_TEST(154, "TestTags")
 
     _device_data = [d for d in _DEVICE_DATA if d.tags]
-    if len(_device_data) >= _MIN_SATISFYING_EXAMPLES:
+    if len(_device_data) > 0:
         @given(
            _CONTEXT_STRATEGY,
            strategies.sampled_from(_device_data),
