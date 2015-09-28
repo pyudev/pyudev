@@ -83,6 +83,3 @@ Deprecated API
 
       Emitted if a :class:`~pyudev.Device` was renamed, moved or
       re-parented.
-
-
-.. _PyQt4: http://riverbankcomputing.co.uk/software/pyqt/intro
