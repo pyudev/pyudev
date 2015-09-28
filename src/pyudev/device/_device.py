@@ -268,9 +268,9 @@ class Device(Mapping):
 
     .. warning::
 
-       Do **never** use object identity (``is`` operator) to compare
+       **Never** use object identity (``is`` operator) to compare
        :class:`Device` objects.  :mod:`pyudev` may create multiple
-       :class:`Device` objects for the same device.  Instead simply compare
+       :class:`Device` objects for the same device.  Instead compare
        devices by value using ``==`` or ``!=``.
 
     :class:`Device` objects are hashable and can therefore be used as keys
