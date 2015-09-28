@@ -102,6 +102,8 @@ Version information
 
    .. automethod:: from_environment
 
+   .. automethod:: METHODS
+
 
 :class:`Device` – accessing device information
 ----------------------------------------------

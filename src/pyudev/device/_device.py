@@ -246,6 +246,25 @@ class Devices(object):
             raise DeviceNotFoundInEnvironmentError()
         return Device(context, device)
 
+    @classmethod
+    def METHODS(cls): # pylint: disable=invalid-name
+        """
+        Return methods that obtain a :class:`Device` from a variety of
+        different data.
+
+        :return: a list of from_* methods.
+        :rtype: list of class methods
+
+        .. versionadded:: 0.18
+        """
+        return [ #pragma: no cover
+           cls.from_device_file,
+           cls.from_device_number,
+           cls.from_name,
+           cls.from_path,
+           cls.from_sys_path
+        ]
+
 
 class Device(Mapping):
     # pylint: disable=too-many-public-methods
