@@ -101,7 +101,9 @@ class TestDevice(object):
 
     @given(
        _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICES),
+       strategies.sampled_from(_DEVICES).filter(
+          lambda x: len(x.sys_name.split('/')) == 1
+       ),
        settings=Settings(max_examples=20)
     )
     def test_from_name(self, a_context, a_device):
@@ -109,18 +111,32 @@ class TestDevice(object):
         Test that getting a new device based on the name and subsystem
         yields an equivalent device.
         """
-        try:
-            new_device = Devices.from_name(
-               a_context,
-               a_device.subsystem,
-               a_device.sys_name
-            )
-        except DeviceNotFoundByNameError:
-            if len(a_device.sys_name.split("/")) > 1:
-                pytest.xfail("rhbz#1263351")
-            else:
-                raise
+        new_device = Devices.from_name(
+           a_context,
+           a_device.subsystem,
+           a_device.sys_name
+        )
         assert new_device == a_device
+
+    _devices = [d for d in _DEVICES if len(d.sys_name.split('/')) > 1]
+    if len(_devices) > 0:
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_devices),
+           settings=Settings(max_examples=5)
+        )
+        def test_from_name_is_path(self, a_context, a_device):
+            """
+            Lookup using a sys_name which is actually a path should always fail.
+
+            See: rhbz#1263351.
+            """
+            with pytest.raises(DeviceNotFoundByNameError):
+                Devices.from_name(a_context, a_device.subsystem, a_device.sys_name)
+    else:
+        def test_from_name_is_path(self):
+            # pylint: disable=missing-docstring
+            pytest.skip("not enough devices with pathlike sysnames")
 
     @given(_CONTEXT_STRATEGY)
     def test_from_name_no_device_in_existing_subsystem(self, a_context):
