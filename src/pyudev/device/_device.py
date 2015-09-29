@@ -167,15 +167,10 @@ class Devices(object):
 
         Return a :class:`Device` object for the device with the given device
         ``number``.  Raise :exc:`DeviceNotFoundByNumberError`, if no device was
-        found with the given device type and number.  Raise
-        :exc:`~exceptions.ValueError`, if ``type`` is any other string than
-        ``'char'`` or ``'block'``.
+        found with the given device type and number.
 
         .. versionadded:: 0.18
         """
-        if typ not in ('char', 'block'):
-            raise ValueError('Invalid type: {0!r}. Must be one of "char" '
-                             'or "block".'.format(typ))
         device = context._libudev.udev_device_new_from_devnum(
             context, ensure_byte_string(typ[0]), number)
         if not device:

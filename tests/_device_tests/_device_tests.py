@@ -188,9 +188,8 @@ class TestDevice(object):
 
     @given(_CONTEXT_STRATEGY)
     def test_from_device_number_invalid_type(self, a_context):
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(DeviceNotFoundByNumberError):
             Devices.from_device_number(a_context, 'foobar', 100)
-        assert str(exc_info.value).startswith('Invalid type:')
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
     if len(_device_data) > 0:
