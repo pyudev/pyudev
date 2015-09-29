@@ -37,6 +37,7 @@ import mock
 from pyudev import Device
 from pyudev import Devices
 from pyudev import DeviceNotFoundAtPathError
+from pyudev import DeviceNotFoundByFileError
 from pyudev import DeviceNotFoundByNameError
 from pyudev import DeviceNotFoundByNumberError
 from pyudev import DeviceNotFoundInEnvironmentError
@@ -253,7 +254,7 @@ class TestDevice(object):
     def test_from_device_file_no_device_file(self, tmpdir, a_context):
         filename = tmpdir.join('test')
         filename.ensure(file=True)
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(DeviceNotFoundByFileError) as excinfo:
             Devices.from_device_file(a_context, str(filename))
         message = 'not a device file: {0!r}'.format(str(filename))
         assert str(excinfo.value) == message
@@ -266,7 +267,7 @@ class TestDevice(object):
         """
         filename = tmpdir.join('test_from_device_file_non_existing')
         assert not tmpdir.check(file=True)
-        with pytest.raises(OSError):
+        with pytest.raises(DeviceNotFoundByFileError):
             Devices.from_device_file(a_context, str(filename))
 
     @_UDEV_TEST(152, "test_from_environment")

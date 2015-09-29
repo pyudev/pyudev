@@ -37,6 +37,7 @@ from collections import Mapping
 from datetime import timedelta
 
 from pyudev.device._errors import DeviceNotFoundAtPathError
+from pyudev.device._errors import DeviceNotFoundByFileError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
@@ -205,13 +206,17 @@ class Devices(object):
         ``filename`` is a string containing the path of a device file.
 
         Return a :class:`Device` representing the given device file.  Raise
-        :exc:`~exceptions.ValueError` if ``filename`` is no device file at all.
-        Raise :exc:`~exceptions.EnvironmentError` if ``filename`` does not
-        exist or if its metadata was inaccessible.
+        :exc:`DeviceNotFoundByFileError` if ``filename`` is no device file
+        at all or if ``filename`` does not exist or if its metadata was
+        inaccessible.
 
         .. versionadded:: 0.18
         """
-        device_type = get_device_type(filename)
+        try:
+            device_type = get_device_type(filename)
+        except (EnvironmentError, ValueError) as err:
+            raise DeviceNotFoundByFileError(err)
+
         device_number = os.stat(filename).st_rdev
         return cls.from_device_number(context, device_type, device_number)
 
