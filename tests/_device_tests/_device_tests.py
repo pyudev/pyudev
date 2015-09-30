@@ -34,6 +34,7 @@ import gc
 import errno
 from datetime import timedelta
 
+from hypothesis import assume
 from hypothesis import given
 from hypothesis import strategies
 from hypothesis import Settings
@@ -251,6 +252,9 @@ class TestDevice(object):
 
             See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
             """
+            device = Devices.from_path(a_context, device_datum.device_path)
+            assume(not 'DM_MULTIPATH_DEVICE_PATH' in device)
+
             for link in device_datum.device_links:
                 link = os.path.join(a_context.device_path, link)
                 (linkdir, _) = os.path.split(link)
@@ -258,17 +262,9 @@ class TestDevice(object):
                    os.path.join(linkdir, os.readlink(link))
                 )
 
-                try:
-                    device = Devices.from_device_file(a_context, link)
-                    assert device.device_path == device_datum.device_path
-                    assert link in device.device_links
-                except AssertionError:
-                    if devnode != device_datum.device_node:
-                        fmt_str = "link %s links to %s, not %s"
-                        fmt_args = (link, devnode, device_datum.device_node)
-                        pytest.xfail(fmt_str % fmt_args)
-                    else:
-                        raise
+                device = Devices.from_device_file(a_context, link)
+                assert device.device_path == device_datum.device_path
+                assert link in device.device_links
     else:
         def test_from_device_file_links(self):
             pytest.skip("not enough devices with links in data")
