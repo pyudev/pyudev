@@ -58,6 +58,12 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
         return 'No device at {0!r}'.format(self.sys_path)
 
 
+class DeviceNotFoundByFileError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    found from the given filename.
+    """
+
 class DeviceNotFoundByNameError(DeviceNotFoundError):
     """
     A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
