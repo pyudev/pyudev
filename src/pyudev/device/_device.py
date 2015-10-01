@@ -35,6 +35,7 @@ import re
 from collections import Container
 from collections import Iterable
 from collections import Mapping
+from collections import Sized
 from datetime import timedelta
 
 from pyudev.device._errors import DeviceNotFoundAtPathError
@@ -944,7 +945,7 @@ class Device(Mapping):
     def __ge__(self, other):
         raise TypeError('Device not orderable')
 
-def _is_attribute_file(filepath):
+def _is_attribute_file(filepath): # pragma: no cover
     """
     Check, if ``filepath`` points to a valid udev attribute filename.
 
@@ -964,15 +965,15 @@ def _is_attribute_file(filepath):
                 filename in ('dev', 'uevent') or
                 os.path.islink(filepath))
 
-class Attributes(Mapping):
+class Attributes(Container, Iterable, Sized):
     """
-    A mapping which holds udev attributes for :class:`Device` objects.
+    udev attributes for :class:`Device` objects.
 
-    This class subclasses the ``Mapping`` ABC, providing a read-only
-    dictionary mapping attribute names to the corresponding values.
-    Therefore all well-known dicitionary methods and operators
-    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
-    attributes.
+    This class represents only a partial mapping between keys and values.
+
+    The underlying libudev methods return a set of keys which are a superset of
+    the set of keys which have values. Therefore, lookup with what libudev
+    documentation terms an 'available' key may still yield no value.
 
     .. versionadded:: 0.5
     """
@@ -983,27 +984,18 @@ class Attributes(Mapping):
 
     def _get_attributes_libudev(self):
         """
-        Yields attributes of device using libudev.
+        Yields attribute keys of device using libudev.
 
         Note that this method is correct wrt. libudev, but that libudev
-        methods return a superset of the attributes that actually possess
-        values.
-
-        Therefore it possible to have the following evaluate to ``True``:
-
-        >>> any(a in attributes if not a in attributes)
-
-        because the first ``in`` makes use of ``__iter__()``, but the second
-        make use of ``__contains__()``, which respectively rely on different
-        udev methods.
+        methods return a superset of the attribute keys that can be looked up.
         """
         attrs = self._libudev.udev_device_get_sysattr_list_entry(self.device)
         for attribute, _ in udev_list_iterate(self._libudev, attrs):
             yield ensure_unicode_string(attribute)
 
-    def _get_attributes_sysfs(self):
+    def _get_attributes_sysfs(self): # pragma: no cover
         """
-        Yields attributes of device by inspecting sysfs directories.
+        Yields attribute keys of device by inspecting sysfs directories.
 
         Should never end up being invoked where systemd version >= 167.
 
@@ -1019,31 +1011,32 @@ class Attributes(Mapping):
 
     def _get_attributes(self):
         """
-        Yields attributes of device.
+        Yields attribute keys of device.
         """
         if hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
             return self._get_attributes_libudev()
-        else:
+        else: # pragma: no cover
             return self._get_attributes_sysfs()
 
     def __len__(self):
         """
-        Return the amount of attributes defined.
+        Return the number of attribute keys defined.
         """
         return sum(1 for _ in self._get_attributes())
 
     def __iter__(self):
         """
-        Iterate over all attributes defined.
+        Iterate over all attribute keys defined.
 
-        Yield each attribute name as unicode string.
+        Yield each attribute key as unicode string.
         """
         return self._get_attributes()
 
     def __contains__(self, attribute):
-        value = self._libudev.udev_device_get_sysattr_value(
-            self.device, ensure_byte_string(attribute))
-        return value is not None
+        """
+        Whether the attribute key is considered available.
+        """
+        return attribute in self._get_attributes()
 
     def __getitem__(self, attribute):
         """
@@ -1052,13 +1045,16 @@ class Attributes(Mapping):
         ``attribute`` is a unicode or byte string containing the name of the
         system attribute.
 
-        Return the attribute value as byte string, or raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device.
+        :returns: the attribute value or None if no value
+        :rtype: byte string or NoneType
+        :raises `~exceptions.KeyError`: if there is no key for this device
+
+        Returns None if there is a key for the device but device lookup does
+        not yield a value.
         """
         value = self._libudev.udev_device_get_sysattr_value(
             self.device, ensure_byte_string(attribute))
-        if value is None:
+        if value is None and attribute not in self:
             raise KeyError(attribute)
         return value
 
@@ -1077,7 +1073,8 @@ class Attributes(Mapping):
         for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
-        return ensure_unicode_string(self[attribute])
+        value = self[attribute]
+        return ensure_unicode_string(value if value is not None else str(None))
 
     def asint(self, attribute):
         """
