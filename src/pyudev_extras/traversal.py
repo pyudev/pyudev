@@ -17,8 +17,8 @@
 
 
 """
-    pyudev.traversal
-    ================
+    pyudev_extras.traversal
+    =======================
 
     Traversing the sysfs hierarchy.
 

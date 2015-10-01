@@ -44,6 +44,5 @@ __all__ = ['Context', 'Device']
 from pyudev.device import *
 from pyudev.core import *
 from pyudev.monitor import *
-from pyudev.traversal import *
 from pyudev.version import __version__
 from pyudev.version import __version_info__

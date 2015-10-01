@@ -32,6 +32,8 @@ from __future__ import unicode_literals
 
 import pyudev
 
+from pyudev_extras import traversal
+
 import pytest
 
 from hypothesis import given
@@ -44,9 +46,9 @@ _DEVICES = _CONTEXT.list_devices()
 
 # pylint: disable=too-many-function-args
 
-SLAVES = [d for d in _DEVICES if list(pyudev.slaves(_CONTEXT, d, False))]
+SLAVES = [d for d in _DEVICES if list(traversal.slaves(_CONTEXT, d, False))]
 
-HOLDERS = [d for d in _DEVICES if list(pyudev.holders(_CONTEXT, d, False))]
+HOLDERS = [d for d in _DEVICES if list(traversal.holders(_CONTEXT, d, False))]
 
 BOTHS = list(set(SLAVES).intersection(set(HOLDERS)))
 
@@ -85,7 +87,7 @@ else:
             """
             Verify slaves do not contain originating device.
             """
-            assert device not in pyudev.slaves(_CONTEXT, device)
+            assert device not in traversal.slaves(_CONTEXT, device)
 
         @given(
            strategies.sampled_from(HOLDERS),
@@ -95,7 +97,7 @@ else:
             """
             Verify holders do not contain originating device.
             """
-            assert device not in pyudev.holders(_CONTEXT, device)
+            assert device not in traversal.holders(_CONTEXT, device)
 
         @given(
            strategies.sampled_from(EITHERS),
@@ -113,14 +115,14 @@ else:
             If recursive is True, test ancestor/descendant relationship.
             If recursive is False, tests parent/child relationship.
             """
-            slaves = list(pyudev.slaves(_CONTEXT, device, recursive))
+            slaves = list(traversal.slaves(_CONTEXT, device, recursive))
             for slave in slaves:
                 assert device in list(
-                   pyudev.holders(_CONTEXT, slave, recursive)
+                   traversal.holders(_CONTEXT, slave, recursive)
                 )
 
-            holders = list(pyudev.holders(_CONTEXT, device, recursive))
+            holders = list(traversal.holders(_CONTEXT, device, recursive))
             for holder in holders:
                 assert device in list(
-                   pyudev.slaves(_CONTEXT, holder, recursive)
+                   traversal.slaves(_CONTEXT, holder, recursive)
                 )

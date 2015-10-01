@@ -34,11 +34,11 @@ import os
 
 import pyudev
 
-from pyudev.discover import DeviceFileHypothesis
-from pyudev.discover import DeviceNameHypothesis
-from pyudev.discover import DeviceNumberHypothesis
-from pyudev.discover import DevicePathHypothesis
-from pyudev.discover import Discovery
+from pyudev_extras.discover import DeviceFileHypothesis
+from pyudev_extras.discover import DeviceNameHypothesis
+from pyudev_extras.discover import DeviceNumberHypothesis
+from pyudev_extras.discover import DevicePathHypothesis
+from pyudev_extras.discover import Discovery
 
 import pytest
 
