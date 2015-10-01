@@ -31,7 +31,7 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	pylint src/pyudev reproducers/*.py \
+	PYTHONPATH=src pylint src/pyudev reproducers/*.py \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
@@ -41,7 +41,7 @@ pylint:
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 pylint-tests:
-	pylint tests \
+	PYTHONPATH=src pylint tests \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
