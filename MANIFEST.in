@@ -1,4 +1,5 @@
 recursive-include src/pyudev *.py
+recursive-include src/pyudev_extras *.py
 recursive-include doc *.rst *.py *.html
 recursive-include tests *.py
 recursive-include reproducers *.c *.py

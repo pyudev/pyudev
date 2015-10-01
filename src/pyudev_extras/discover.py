@@ -17,8 +17,8 @@
 
 
 """
-    pyudev.discover
-    ===============
+    pyudev_extras.discover
+    ======================
 
     Tools to discover a device given limited information.
 

@@ -12,3 +12,5 @@ This document provides API reference documentation for pyudev.  Refer to the
    pyudev.pyside
    pyudev.glib
    pyudev.wx
+
+   pyudev_extras
