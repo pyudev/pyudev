@@ -281,7 +281,6 @@ class DeviceFileHypothesis(Hypothesis):
        '/dev/input/by-path',
        '/dev/mapper',
        '/dev/md',
-       '/dev/rhel_dhcp47-10',
        '/dev/vg'
     ]
 
