@@ -47,6 +47,18 @@ class TestAttributes(object):
     Test ``Attributes`` class methods.
     """
 
+    _VOLATILE_ATTRIBUTES = ['energy_uj', 'power_on_acct']
+
+    @classmethod
+    def non_volatile_items(cls, attributes):
+        """
+        Yields keys for non-volatile attributes only.
+
+        :param dict attributes: attributes dict obtained from udev
+        """
+        return ((k, v) for (k, v) in attributes.items() \
+           if k not in cls._VOLATILE_ATTRIBUTES)
+
     @given(
        strategies.sampled_from(_DEVICES),
        settings=Settings(max_examples=5)
@@ -102,10 +114,10 @@ class TestAttributes(object):
     )
     def test_getitem(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for attribute, value in device_datum.attributes.items():
+        for key, value in self.non_volatile_items(device_datum.attributes):
             raw_value = value.encode(sys.getfilesystemencoding())
-            assert isinstance(device.attributes[attribute], bytes)
-            assert device.attributes[attribute] == raw_value
+            assert isinstance(device.attributes[key], bytes)
+            assert device.attributes[key] == raw_value
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -124,10 +136,10 @@ class TestAttributes(object):
     )
     def test_asstring(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for attribute, value in device_datum.attributes.items():
+        for key, value in self.non_volatile_items(device_datum.attributes):
             assert pytest.is_unicode_string(
-                device.attributes.asstring(attribute))
-            assert device.attributes.asstring(attribute) == value
+                device.attributes.asstring(key))
+            assert device.attributes.asstring(key) == value
 
     @given(
        _CONTEXT_STRATEGY,
@@ -136,14 +148,14 @@ class TestAttributes(object):
     )
     def test_asint(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for attribute, value in device_datum.attributes.items():
+        for key, value in self.non_volatile_items(device_datum.attributes):
             try:
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.attributes.asint(attribute)
+                    device.attributes.asint(key)
             else:
-                assert device.attributes.asint(attribute) == value
+                assert device.attributes.asint(key) == value
 
     @given(
        _CONTEXT_STRATEGY,
@@ -152,13 +164,13 @@ class TestAttributes(object):
     )
     def test_asbool(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for attribute, value in device_datum.attributes.items():
+        for key, value in self.non_volatile_items(device_datum.attributes):
             if value == '1':
-                assert device.attributes.asbool(attribute)
+                assert device.attributes.asbool(key)
             elif value == '0':
-                assert not device.attributes.asbool(attribute)
+                assert not device.attributes.asbool(key)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.attributes.asbool(attribute)
+                    device.attributes.asbool(key)
                 message = 'Not a boolean value:'
                 assert str(exc_info.value).startswith(message)
