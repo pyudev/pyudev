@@ -31,6 +31,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
+import re
 from collections import Container
 from collections import Iterable
 from collections import Mapping
@@ -38,6 +39,8 @@ from datetime import timedelta
 
 from pyudev.device._errors import DeviceNotFoundAtPathError
 from pyudev.device._errors import DeviceNotFoundByFileError
+from pyudev.device._errors import DeviceNotFoundByInterfaceIndexError
+from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
@@ -219,6 +222,65 @@ class Devices(object):
 
         device_number = os.stat(filename).st_rdev
         return cls.from_device_number(context, device_type, device_number)
+
+
+    @classmethod
+    def from_interface_index(cls, context, ifindex):
+        """
+        Locate a device based on the interface index.
+
+        :param `Context` context: the libudev context
+        :param int ifindex: the interface index
+        :returns: the device corresponding to the interface index
+        :rtype: `Device`
+
+        This method is only appropriate for network devices.
+        """
+        network_devices = context.list_devices(subsystem='net')
+        dev = next(
+           (d for d in network_devices if d.attributes['ifindex'] == ifindex),
+           None
+        )
+        if dev:
+            return dev
+        else:
+            raise DeviceNotFoundByInterfaceIndexError(ifindex)
+
+
+    @classmethod
+    def from_kernel_device(cls, context, kernel_device):
+        """
+        Locate a device based on the kernel device.
+
+        :param `Context` context: the libudev context
+        :param str kernel_device: the kernel device
+        :returns: the device corresponding to ``kernel_device``
+        :rtype: `Device`
+        """
+        switch_char = kernel_device[0]
+        rest = kernel_device[1:]
+        if switch_char in ('b', 'c'):
+            number_re = re.compile(r'^(?P<major>\d+):(?P<minor>\d+)$')
+            match = number_re.match(rest)
+            if match:
+                number = os.makedev(
+                   int(match.group('major')),
+                   int(match.group('minor'))
+                )
+                return cls.from_device_number(context, switch_char, number)
+            else:
+                raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        elif switch_char == 'n':
+            return cls.from_interface_index(context, rest)
+        elif switch_char == '+':
+            (subsystem, _, kernel_device_name) = rest.partition(':')
+            if kernel_device_name and subsystem:
+                return cls.from_name(context, subsystem, kernel_device_name)
+            else:
+                raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        else:
+            raise DeviceNotFoundByKernelDeviceError(kernel_device)
+
 
     @classmethod
     def from_environment(cls, context):
