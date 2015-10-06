@@ -1071,7 +1071,7 @@ class Tags(Iterable, Container):
         if hasattr(self._libudev, 'udev_device_has_tag'):
             return bool(self._libudev.udev_device_has_tag(
                 self.device, ensure_byte_string(tag)))
-        else:
+        else: # pragma: no cover
             return any(t == tag for t in self)
 
     @property
