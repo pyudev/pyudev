@@ -38,6 +38,17 @@ from ._device_tests import _DEVICE_DATA
 
 if len(_DEVICE_DATA) > 0:
     # pylint: disable=unused-import
+    from ._device_tests._devices_tests import TestDevices
+else:
+    class TestDevices(object):
+        """ Not enough devices available. """
+
+        def test_all(self):
+            """ Always skipped test. """
+            pytest.skip("skipping all devices tests, not enough devices")
+
+if len(_DEVICE_DATA) > 0:
+    # pylint: disable=unused-import
     from ._device_tests._device_tests import TestDevice
 else:
     class TestDevice(object):
