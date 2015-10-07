@@ -3,6 +3,7 @@ docutils>=0.9
 pytest>=2.8
 mock>=1.0b1
 hypothesis
+networkx
 
 # documentation requirements
 sphinx>=1.0.7
