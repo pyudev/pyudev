@@ -200,3 +200,23 @@ class SysfsGraphs(object):
         devices = (d for d in context.list_devices(**kwargs))
         graphs = (cls.parents_and_children(context, d) for d in devices)
         return reduce(nx.compose, graphs, nx.DiGraph())
+
+
+class DisplayGraph(object):
+    """
+    Ways to display a graph.
+    """
+
+    # pylint: disable=too-few-public-methods
+
+    @classmethod
+    def to_dot(cls, graph, out):
+        """
+        Dot file from graph.
+
+        :param `DiGraph` graph: the graph
+        :param file out: output file to write graph to
+        """
+        dot_graph = nx.to_agraph(graph)
+        dot_graph.layout(prog="dot")
+        print(dot_graph.string(), file=out)
