@@ -125,8 +125,17 @@ class TestSysfsGraphs(object):
         """
         There is an equivalence between the nodes in the graph
         and the devices graphed.
+
+        Moreover, all nodes have node_type DEVICE_PATH and all edges have
+        type SLAVE.
         """
         graph = graphs.SysfsGraphs.complete(_CONTEXT, subsystem="block")
         devs = list(_CONTEXT.list_devices(subsystem="block"))
         assert nx.number_of_nodes(graph) == len(set(devs))
         assert set(nx.nodes(graph)) == set(d.device_path for d in devs)
+
+        types = nx.get_node_attributes(graph, "node_type")
+        assert all(t is graphs.NodeTypes.DEVICE_PATH for t in types.values())
+
+        types = nx.get_edge_attributes(graph, "edge_type")
+        assert all(t is graphs.EdgeTypes.SLAVE for t in types.values())

@@ -36,6 +36,52 @@ import networkx as nx
 
 from . import traversal
 
+class NodeType(object):
+    """
+    Abstract class that represents a node type.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+class DevicePath(NodeType):
+    """
+    A device, uniquely identified by its device path.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+DevicePath = DevicePath() # pylint: disable=invalid-name
+
+class NodeTypes(object):
+    """
+    Enumeration of node types.
+    """
+    # pylint: disable=too-few-public-methods
+    DEVICE_PATH = DevicePath
+
+class EdgeType(object):
+    """
+    Superclass of edge types.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+class Slave(EdgeType):
+    """
+    Encodes slaves/holders relationship.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+Slave = Slave() # pylint: disable=invalid-name
+
+class EdgeTypes(object):
+    """
+    Enumeration of edge types.
+    """
+    # pylint: disable=too-few-public-methods
+    SLAVE = Slave
+
 SysfsTraversalConfig = namedtuple(
    'SysfsTraversalConfig',
    ['recursive', 'slaves']
@@ -58,7 +104,10 @@ class SysfsTraversal(object):
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        graph.add_nodes_from([dev.device_path for dev in nodes])
+        graph.add_nodes_from(
+           [dev.device_path for dev in nodes],
+           node_type=NodeTypes.DEVICE_PATH
+        )
 
     @staticmethod
     def add_edges(graph, sources, targets):
@@ -76,8 +125,12 @@ class SysfsTraversal(object):
         """
         source_paths = [dev.device_path for dev in sources]
         target_paths = [dev.device_path for dev in targets]
+        graph.add_nodes_from(
+           source_paths + target_paths,
+           node_type=NodeTypes.DEVICE_PATH
+        )
         edges = ((x, y) for x in source_paths for y in target_paths)
-        graph.add_edges_from(edges)
+        graph.add_edges_from(edges, edge_type=EdgeTypes.SLAVE)
 
     @classmethod
     def do_level(cls, graph, context, device, config):
