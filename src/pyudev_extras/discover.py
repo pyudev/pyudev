@@ -94,7 +94,7 @@ class Hypothesis(object):
         :param key: a key with which to lookup the device
         :type key: the type of match's return value if not None
         :returns: a list of Devices obtained
-        :rtype: list of :class:`Device`
+        :rtype: frozenset of :class:`Device`
         """
         raise NotImplementedError()
 
@@ -114,10 +114,10 @@ class Hypothesis(object):
 
         :param str value: the value to look for
         :returns: a list of devices obtained
-        :rtype: list of :class:`Device`
+        :rtype: set of :class:`Device`
         """
         key = cls.match(value)
-        return cls.lookup(key) if key else []
+        return cls.lookup(key) if key else frozenset()
 
 
 class DeviceNumberHypothesis(Hypothesis):
@@ -183,11 +183,11 @@ class DeviceNumberHypothesis(Hypothesis):
 
         :param int key: the device number
         :returns: a list of matching devices
-        :rtype: list of :class:`Device`
+        :rtype: frozenset of :class:`Device`
         """
         func = wrap_exception(Devices.from_device_number)
         res = (func(cls._CONTEXT, s, key) for s in cls.find_subsystems())
-        return [r for r in res if r]
+        return frozenset(r for r in res if r)
 
 
 class DevicePathHypothesis(Hypothesis):
@@ -212,10 +212,10 @@ class DevicePathHypothesis(Hypothesis):
 
         :param str key: the device path
         :returns: a list of matching devices
-        :rtype: list of :class:`Device`
+        :rtype: frozenset of :class:`Device`
         """
         res = wrap_exception(Devices.from_path)(cls._CONTEXT, key)
-        return [res] if res else []
+        return frozenset((res,)) if res else frozenset()
 
 
 class DeviceNameHypothesis(Hypothesis):
@@ -230,14 +230,14 @@ class DeviceNameHypothesis(Hypothesis):
         """
         Find all subsystems in sysfs.
 
-        :rtype: set
+        :rtype: frozenset
         :returns: subsystems in sysfs
         """
         sys_path = cls._CONTEXT.sys_path
         dirnames = ('bus', 'class', 'subsystem')
         absnames = (os.path.join(sys_path, name) for name in dirnames)
         realnames = (d for d in absnames if os.path.isdir(d))
-        return set(n for d in realnames for n in os.listdir(d))
+        return frozenset(n for d in realnames for n in os.listdir(d))
 
     @classmethod
     def match(cls, value):
@@ -256,11 +256,11 @@ class DeviceNameHypothesis(Hypothesis):
 
         :param str key: the device path
         :returns: a list of matching devices
-        :rtype: list of :class:`Device`
+        :rtype: frozenset of :class:`Device`
         """
         func = wrap_exception(Devices.from_name)
         res = (func(cls._CONTEXT, s, key) for s in cls.find_subsystems())
-        return [r for r in res if r]
+        return frozenset(r for r in res if r)
 
 
 class DeviceFileHypothesis(Hypothesis):
@@ -328,11 +328,11 @@ class DeviceFileHypothesis(Hypothesis):
         func = wrap_exception(Devices.from_device_file)
         if '/' in key:
             device = func(cls._CONTEXT, key)
-            return [device] if device else []
+            return frozenset((device,)) if device else frozenset()
         else:
             files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
             devices = (func(cls._CONTEXT, f) for f in files)
-            return [d for d in devices if d]
+            return frozenset(d for d in devices if d)
 
 
 class Discovery(object):
@@ -366,6 +366,8 @@ class Discovery(object):
 
         :param str value: some identifier of the device
         :returns: a list of corresponding devices
-        :rtype: list of :class:`Device`
+        :rtype: frozenset of :class:`Device`
         """
-        return [d for h in self._hypotheses for d in h.get_devices(value)]
+        return frozenset(
+           d for h in self._hypotheses for d in h.get_devices(value)
+        )
