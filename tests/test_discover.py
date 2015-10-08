@@ -139,7 +139,7 @@ class TestDiscovery(object):
         """
         for path in TestUtilities.get_paths(a_device):
             res = DevicePathHypothesis.get_devices(path)
-            assert res == [a_device]
+            assert res == set((a_device,))
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -171,8 +171,10 @@ class TestDiscovery(object):
             """
             assume(not 'DM_MULTIPATH_DEVICE_PATH' in a_device)
             links = TestUtilities.get_files(a_device)
-            devs = [d for l in links for d in DeviceFileHypothesis.get_devices(l)]
-            assert list(set(devs)) == [a_device]
+            devs = frozenset(
+               d for l in links for d in DeviceFileHypothesis.get_devices(l)
+            )
+            assert devs == set((a_device,))
     else:
         def test_device_file(self):
             """
@@ -196,6 +198,8 @@ class TestDiscovery(object):
         values.append(a_device.sys_name)
         values.extend(TestUtilities.get_files(a_device))
 
-        results = [d for v in values for d in self._DISCOVER.get_devices(v)]
+        results = frozenset(
+           d for v in values for d in self._DISCOVER.get_devices(v)
+        )
 
         assert a_device in results
