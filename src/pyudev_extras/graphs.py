@@ -75,12 +75,22 @@ class Slave(EdgeType):
 
 Slave = Slave() # pylint: disable=invalid-name
 
+class Partition(EdgeType):
+    """
+    Encodes partition relationship.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+Partition = Partition() # pylint: disable=invalid-name
+
 class EdgeTypes(object):
     """
     Enumeration of edge types.
     """
     # pylint: disable=too-few-public-methods
     SLAVE = Slave
+    PARTITION = Partition
 
 SysfsTraversalConfig = namedtuple(
    'SysfsTraversalConfig',
@@ -265,6 +275,46 @@ class SysfsGraphs(object):
         # pylint: disable=star-args
         devices = (d for d in context.list_devices(**kwargs))
         graphs = (cls.parents_and_children(context, d) for d in devices)
+        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+
+
+class PartitionGraphs(object):
+    """
+    Build graphs of partition relationships.
+    """
+
+    @staticmethod
+    def partition_graph(device):
+        """
+        Make a graph of partition relationships.
+
+        :param `Device` device: the partition device
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        graph = nx.MultiDiGraph()
+        parent = device.parent
+        GraphMethods.add_edges(
+           graph,
+           [parent.device_path],
+           [device.device_path],
+           EdgeTypes.PARTITION,
+           NodeTypes.DEVICE_PATH
+        )
+        return graph
+
+    @classmethod
+    def complete(cls, context):
+        """
+        Build a complete graph of all partitions.
+
+        :param `Context` context: a udev context
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        block_devices = context.list_devices(subsystem="block")
+        partitions = block_devices.match_property('DEVTYPE', 'partition')
+        graphs = (cls.partition_graph(d) for d in partitions)
         return reduce(nx.compose, graphs, nx.MultiDiGraph())
 
 

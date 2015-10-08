@@ -139,3 +139,23 @@ class TestSysfsGraphs(object):
 
         types = nx.get_edge_attributes(graph, "edge_type")
         assert all(t is graphs.EdgeTypes.SLAVE for t in types.values())
+
+
+class TestPartitionGraphs(object):
+    """
+    Test the partition graph.
+    """
+
+    def test_complete(self):
+        """
+        The number of nodes in the graph is strictly greater than the number of
+        partition devices, as partitions have to belong to some device.
+        """
+        graph = graphs.PartitionGraphs.complete(_CONTEXT)
+        block_devices = _CONTEXT.list_devices(subsytem="block")
+        partitions = list(block_devices.match_property('DEVTYPE', 'partition'))
+        num_partitions = len(partitions)
+        num_nodes = nx.number_of_nodes(graph)
+
+        assert (num_partitions == 0 and num_nodes == 0) or \
+           nx.number_of_nodes(graph) > len(partitions)
