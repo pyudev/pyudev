@@ -51,7 +51,7 @@ class SysfsTraversal(object):
         """
         Add nodes in ``nodes`` to graph.
 
-        :param `DiGraph` graph: the graph
+        :param `MultiDiGraph` graph: the graph
         :param nodes: source nodes
         :type nodes: list of `Device`
 
@@ -65,7 +65,7 @@ class SysfsTraversal(object):
         """
         Add edges to graph from sources to targets.
 
-        :param `DiGraph` graph: the graph
+        :param `MultiDiGraph` graph: the graph
         :param sources: source nodes
         :type sources: list of `Device`
         :param targets: target nodes
@@ -84,7 +84,7 @@ class SysfsTraversal(object):
         """
         Recursively defined function to generate a graph from ``device``.
 
-        :param `DiGraph` graph: the graph
+        :param `MultiDiGraph` graph: the graph
         :param `Context` context: the libudev context
         :param `Device` device: the device
         :param `SysfsTraversalConfig` config: traversal configuration
@@ -118,9 +118,9 @@ class SysfsTraversal(object):
         :param `Device` device: the device
         :param `SysfsTraversalConfig` config: traversal configuration
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
-        graph = nx.DiGraph()
+        graph = nx.MultiDiGraph()
         cls.do_level(graph, context, device, config)
         return graph
 
@@ -133,7 +133,7 @@ class SysfsTraversal(object):
         :param `Device` device: the device
         :param bool recursive: True for recursive, False otherwise
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
         config = SysfsTraversalConfig(slaves=False, recursive=recursive)
         return cls.sysfs_traversal(context, device, config)
@@ -147,7 +147,7 @@ class SysfsTraversal(object):
         :param `Device` device: the device
         :param bool recursive: True for recursive, False otherwise
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
         config = SysfsTraversalConfig(slaves=True, recursive=recursive)
         return cls.sysfs_traversal(context, device, config)
@@ -167,7 +167,7 @@ class SysfsGraphs(object):
         :param `Device` device: the device
         :param bool recursive: True for recursive, False otherwise
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
         return nx.compose(
            SysfsTraversal.slaves(context, device, recursive),
@@ -182,7 +182,7 @@ class SysfsGraphs(object):
         :param `Context` context: the libudev context
         :param `Device` device: the device
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
         return cls.slaves_and_holders(context, device, recursive=False)
 
@@ -194,12 +194,12 @@ class SysfsGraphs(object):
         :param `Context` context: a udev context
         :param kwargs: arguments for filtering the devices.
         :returns: a graph
-        :rtype: `DiGraph`
+        :rtype: `MultiDiGraph`
         """
         # pylint: disable=star-args
         devices = (d for d in context.list_devices(**kwargs))
         graphs = (cls.parents_and_children(context, d) for d in devices)
-        return reduce(nx.compose, graphs, nx.DiGraph())
+        return reduce(nx.compose, graphs, nx.MultiDiGraph())
 
 
 class DisplayGraph(object):
@@ -214,7 +214,7 @@ class DisplayGraph(object):
         """
         Dot file from graph.
 
-        :param `DiGraph` graph: the graph
+        :param `MultiDiGraph` graph: the graph
         :param file out: output file to write graph to
         """
         dot_graph = nx.to_agraph(graph)
