@@ -41,7 +41,10 @@ class NodeType(object):
     Abstract class that represents a node type.
     """
     # pylint: disable=too-few-public-methods
-    pass
+
+    def __str__(self): # pragma: no cover
+        return self.__class__.__name__
+    __repr__ = __str__
 
 class DevicePath(NodeType):
     """
@@ -64,7 +67,10 @@ class EdgeType(object):
     Superclass of edge types.
     """
     # pylint: disable=too-few-public-methods
-    pass
+
+    def __str__(self): # pragma: no cover
+        return self.__class__.__name__
+    __repr__ = __str__
 
 class Slave(EdgeType):
     """
