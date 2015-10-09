@@ -87,50 +87,53 @@ SysfsTraversalConfig = namedtuple(
    ['recursive', 'slaves']
 )
 
-class SysfsTraversal(object):
+
+class GraphMethods(object):
     """
-    Build simple graph from the holders or slaves of a given device.
+    Generic graph methods.
     """
 
     @staticmethod
-    def add_nodes(graph, nodes):
+    def add_nodes(graph, nodes, node_type):
         """
         Add nodes in ``nodes`` to graph.
 
         :param `MultiDiGraph` graph: the graph
         :param nodes: source nodes
-        :type nodes: list of `Device`
+        :type nodes: list of object
+        :param `NodeType` node_type: a node type
 
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        graph.add_nodes_from(
-           [dev.device_path for dev in nodes],
-           node_type=NodeTypes.DEVICE_PATH
-        )
+        graph.add_nodes_from(nodes, node_type=node_type)
+
 
     @staticmethod
-    def add_edges(graph, sources, targets):
+    def add_edges(graph, sources, targets, edge_type, node_type):
         """
         Add edges to graph from sources to targets.
 
         :param `MultiDiGraph` graph: the graph
         :param sources: source nodes
-        :type sources: list of `Device`
+        :type sources: list of `object`
         :param targets: target nodes
-        :type targets: list of `Device`
+        :type targets: list of `object`
+        :param `EdgeType` edge_type: type for edges
+        :param `NodeType` node_type: type for nodes
 
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        source_paths = [dev.device_path for dev in sources]
-        target_paths = [dev.device_path for dev in targets]
-        graph.add_nodes_from(
-           source_paths + target_paths,
-           node_type=NodeTypes.DEVICE_PATH
-        )
-        edges = ((x, y) for x in source_paths for y in target_paths)
-        graph.add_edges_from(edges, edge_type=EdgeTypes.SLAVE)
+        graph.add_nodes_from(sources + targets, node_type=node_type)
+        edges = ((x, y) for x in sources for y in targets)
+        graph.add_edges_from(edges, edge_type=edge_type)
+
+
+class SysfsTraversal(object):
+    """
+    Build simple graph from the holders or slaves of a given device.
+    """
 
     @classmethod
     def do_level(cls, graph, context, device, config):
@@ -153,10 +156,20 @@ class SysfsTraversal(object):
             targets = [device]
 
         if not level:
-            cls.add_nodes(graph, [device])
+            GraphMethods.add_nodes(
+               graph,
+               [device.device_path],
+               NodeTypes.DEVICE_PATH
+            )
             return
 
-        cls.add_edges(graph, sources, targets)
+        GraphMethods.add_edges(
+           graph,
+           [dev.device_path for dev in sources],
+           [dev.device_path for dev in targets],
+           EdgeTypes.SLAVE,
+           NodeTypes.DEVICE_PATH
+        )
 
         if config.recursive:
             for dev in level:
