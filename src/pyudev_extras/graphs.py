@@ -62,6 +62,18 @@ class NodeTypes(object):
     # pylint: disable=too-few-public-methods
     DEVICE_PATH = DevicePath
 
+    @staticmethod
+    def is_type(node, node_type):
+        """
+        Whether ``node`` has type ``node_type``.
+
+        :param `agraph.Edge` node: the node
+        :param `EdgeType` node_type: an node type
+        :returns: True if ``node`` has type ``node_type``, otherwise False
+        :rtype: bool
+        """
+        return node.attr['node_type'] == str(node_type)
+
 class EdgeType(object):
     """
     Superclass of edge types.
@@ -97,6 +109,18 @@ class EdgeTypes(object):
     # pylint: disable=too-few-public-methods
     SLAVE = Slave
     PARTITION = Partition
+
+    @staticmethod
+    def is_type(edge, edge_type):
+        """
+        Whether ``edge`` has type ``edge_type``.
+
+        :param `agraph.Edge` edge: the edge
+        :param `EdgeType` edge_type: an edge type
+        :returns: True if ``edge`` has type ``edge_type``, otherwise False
+        :rtype: bool
+        """
+        return edge.attr['edge_type'] == str(edge_type)
 
 SysfsTraversalConfig = namedtuple(
    'SysfsTraversalConfig',
