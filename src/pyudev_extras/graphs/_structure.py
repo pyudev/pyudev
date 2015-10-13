@@ -278,6 +278,51 @@ class PartitionGraphs(object):
         return reduce(nx.compose, graphs, nx.MultiDiGraph())
 
 
+class SpindleGraphs(object):
+    """
+    Build graphs of relationships with actual physical disks.
+    """
+
+    @staticmethod
+    def spindle_graph(device):
+        """
+        Make a graph of spindle relationships.
+
+        :param `Device` device: the partition device
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        graph = nx.MultiDiGraph()
+
+        wwn = device.get('ID_WWN_WITH_EXTENSION')
+        if wwn is None:
+            return graph
+
+        GraphMethods.add_edges(
+           graph,
+           [device.device_path],
+           [wwn],
+           EdgeTypes.SPINDLE,
+           NodeTypes.DEVICE_PATH,
+           NodeTypes.WWN
+        )
+        return graph
+
+    @classmethod
+    def complete(cls, context):
+        """
+        Build a complete graph showing path/spindle relationships.
+
+        :param `Context` context: a udev context
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        block_devices = context.list_devices(subsystem="block")
+        disks = block_devices.match_property('DEVTYPE', 'disk')
+        graphs = (cls.spindle_graph(d) for d in disks)
+        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+
+
 class GraphNodeDecorations(object):
     """
     Find decorations for the nodes of a network graph.

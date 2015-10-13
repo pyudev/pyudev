@@ -54,12 +54,22 @@ class DevicePath(NodeType):
 
 DevicePath = DevicePath() # pylint: disable=invalid-name
 
+class WWN(NodeType):
+    """
+    WWN disk.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+WWN = WWN() # pylint: disable=invalid-name
+
 class NodeTypes(object):
     """
     Enumeration of node types.
     """
     # pylint: disable=too-few-public-methods
     DEVICE_PATH = DevicePath
+    WWN = WWN
 
     @staticmethod
     def is_type(node, node_type):
@@ -102,6 +112,15 @@ class Partition(EdgeType):
 
 Partition = Partition() # pylint: disable=invalid-name
 
+class Spindle(EdgeType):
+    """
+    Path to spindle relationship.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+Spindle = Spindle() # pylint: disable=invalid-name
+
 class EdgeTypes(object):
     """
     Enumeration of edge types.
@@ -109,6 +128,7 @@ class EdgeTypes(object):
     # pylint: disable=too-few-public-methods
     SLAVE = Slave
     PARTITION = Partition
+    SPINDLE = Spindle
 
     @staticmethod
     def is_type(edge, edge_type):

@@ -161,6 +161,19 @@ class TestPartitionGraphs(object):
            nx.number_of_nodes(graph) > len(partitions)
 
 
+class TestSpindleGraphs(object):
+    """
+    Test spindle graphs.
+    """
+
+    def test_complete(self):
+        """
+        Assert that the graph has no cycles.
+        """
+        graph = graphs.SpindleGraphs.complete(_CONTEXT)
+        assert nx.is_directed_acyclic_graph(graph)
+
+
 class TestGraphNodeDecorations(object):
     """
     Test decorating structure graphs.
