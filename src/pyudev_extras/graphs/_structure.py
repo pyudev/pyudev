@@ -373,3 +373,40 @@ class GraphNodeDecorations(object):
                 dicts[name][node] = props[name]
 
         return dicts
+
+
+class Graphs(object):
+    """
+    Assembles a super-graph composed of different kinds of graphs.
+    """
+
+    @staticmethod
+    def assemble(context, types):
+        """
+        Assemble a graph from a list of graph types.
+
+        :param `Context` context: the udev context
+        :param types: list of graph types
+        :type types: list of type
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        return reduce(
+           nx.compose,
+           (t.complete(context) for t in types),
+           nx.MultiDiGraph()
+        )
+
+    @staticmethod
+    def decorate(context, graph):
+        """
+        Decorate the graph.
+
+        :param `Context` context: the udev context
+        :param `MultiDiGraph` graph: the graph
+        """
+        properties = ['DEVPATH', 'DEVTYPE']
+        props = GraphNodeDecorations.udev_properties(context, graph, properties)
+
+        for property_name, value in props.items():
+            nx.set_node_attributes(graph, property_name, value)
