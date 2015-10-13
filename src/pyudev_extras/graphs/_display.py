@@ -32,8 +32,6 @@ from __future__ import unicode_literals
 
 import os
 
-import networkx as nx
-
 from ._types import EdgeTypes
 from ._types import NodeTypes
 
@@ -63,48 +61,12 @@ class GraphTransformers(object):
 
 
     @classmethod
-    def xform_partitioned(cls, graph, node):
-        """
-        Place a disk node w/edges to partitions in a subgraph
-        that contains it and the partitions.
-
-        :param `AGraph` graph: the graph
-        :param `Node` node: the node
-
-        :returns: the new cluster formed
-        :rtype: `AGraph`
-        """
-        # Find partitions of node
-        partition_edges = [e for e in graph.out_edges(node) if \
-           EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
-        partitions = [e[1] for e in partition_edges]
-
-        cluster = graph.add_subgraph(
-           partitions + [node],
-           name='cluster' + node.name,
-        )
-
-        node.attr['shape'] = "plaintext"
-        for edge in partition_edges:
-            edge.attr['color'] = 'white'
-
-        return cluster
-
-    @classmethod
     def xform_partitions(cls, graph):
         """
-        Transformations on partitions and their parents.
+        Transformations on partitions.
 
         :param `AGraph` graph: the graph
         """
-        partition_edges = [e for e in graph.iteredges() if \
-               EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
-
-        while partition_edges:
-            cluster = cls.xform_partitioned(graph, partition_edges[0][0])
-            partition_edges = [e for e in partition_edges \
-               if e not in cluster.edges()]
-
         partitions = (n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
            n.attr['DEVTYPE'] == 'partition')
@@ -113,14 +75,51 @@ class GraphTransformers(object):
             cls.xform_partition(partition)
 
     @classmethod
+    def xform_disk(cls, graph, node):
+        """
+        Make a cluster of a disk and its partitions.
+
+        :param `AGraph` graph: the graph
+        :param `Node` node: the node
+
+        If the disk is not partitioned, no cluster is made.
+
+        """
+
+        partition_edges = [e for e in graph.out_edges(node) if \
+           EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
+
+        if partition_edges:
+            partitions = [e[1] for e in partition_edges]
+            graph.add_subgraph(
+               partitions + [node],
+               name='cluster' + node.name,
+            )
+
+            node.attr['shape'] = "plaintext"
+            for edge in partition_edges:
+                edge.attr['color'] = 'white'
+
+    @classmethod
+    def xform_disks(cls, graph):
+        """
+        Transformations on disks.
+
+        :param `AGraph` graph: the graph
+        """
+        disks = [n for n in graph.iternodes() if \
+           NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
+           n.attr['DEVTYPE'] == 'disk']
+
+        for disk in disks:
+            cls.xform_disk(graph, disk)
+
+    @classmethod
     def xform(cls, graph):
         """
-        Transform a networkx multigraph to a graphviz graph.
+        Transform a graph for more helpful viewing.
 
-        :param `DiMultiGraph` graph: the networkx graph
-        :returns: the new graph
-        :rtype: `A_Graph`
+        :param `A_Graph` graph: the networkx graph
         """
-        res = nx.to_agraph(graph)
         cls.xform_partitions(graph)
-        return res
+        cls.xform_disks(graph)
