@@ -58,6 +58,7 @@ class GraphTransformers(object):
         Transform a partition device so that its label is just the device name.
         """
         node.attr['label'] = os.path.basename(node.attr['DEVPATH'])
+        node.attr['shape'] = "triangle"
 
 
     @classmethod
