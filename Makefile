@@ -31,7 +31,7 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	pylint src/pyudev reproducers/*.py \
+	PYTHONPATH=src pylint src/pyudev src/pyudev_extras reproducers/*.py \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
@@ -41,7 +41,7 @@ pylint:
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 pylint-tests:
-	pylint tests \
+	PYTHONPATH=src pylint tests \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
@@ -55,7 +55,7 @@ PYREVERSE_OPTS = --output=pdf
 view:
 	-rm -Rf _pyreverse
 	mkdir _pyreverse
-	PYTHONPATH=src pyreverse ${PYREVERSE_OPTS} --project="pyudev" src/pyudev
+	PYTHONPATH=src pyreverse ${PYREVERSE_OPTS} --project="pyudev" src/pyudev src/pyudev_extras
 	mv classes_pyudev.pdf _pyreverse
 	mv packages_pyudev.pdf _pyreverse
 

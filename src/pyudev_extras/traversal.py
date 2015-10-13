@@ -17,8 +17,8 @@
 
 
 """
-    pyudev.traversal
-    ================
+    pyudev_extras.traversal
+    =======================
 
     Traversing the sysfs hierarchy.
 
@@ -39,14 +39,14 @@ __all__ = ['topology_walk', 'slaves', 'holders']
 
 def topology_walk(top, follow_slaves=True, recursive=True):
     """
-        Walk the sysfs directory in depth first search,
-        yielding directories corresponding to devices in sysfs.
+    Walk the sysfs directory in depth first search,
+    yielding directories corresponding to devices in sysfs.
 
-        :param str top: directory to begin at
-        :param bool follow_slaves: if True, follow slaves, otherwise, holders
-        :param bool recursive: if False, only show one level
+    :param str top: directory to begin at
+    :param bool follow_slaves: if True, follow slaves, otherwise, holders
+    :param bool recursive: if False, only show one level
 
-        ``top`` itself is not in the result.
+    ``top`` itself is not in the result.
     """
     link_dir = os.path.join(top, 'slaves' if follow_slaves else 'holders')
 
@@ -69,8 +69,8 @@ def device_wrapper(func):
         """
         New function wraps yielded value in Device.
 
-        :param :class:`Context` context: udev context
-        :param :class:`Device` device: device to start from
+        :param `Context` context: udev context
+        :param `Device` device: device to start from
         :param bool recursive: if False, only show immediate slaves
         """
         for directory in func(device.sys_path, recursive):
@@ -83,8 +83,8 @@ def slaves(device, recursive=True):
     """
     Yield slaves of ``device``.
 
-    :param :class:`Context` context: udev context
-    :param class:`Device` device: device to start from
+    :param `Context` context: udev context
+    :param `Device` device: device to start from
     :param bool recursive: if False, only show immediate slaves
 
     :returns: topology walk generator specialized for slaves
@@ -96,8 +96,8 @@ def holders(device, recursive=True):
     """
     Yield holders of ``device``.
 
-    :param :class:`Context` context: udev context
-    :param :class:`Device` device: device to start from
+    :param `Context` context: udev context
+    :param `Device` device: device to start from
     :param bool recursive: if False, only show immediate holders
 
     :returns: topology walk generator specialized for holders
