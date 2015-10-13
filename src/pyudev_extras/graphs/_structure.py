@@ -17,10 +17,10 @@
 
 
 """
-    pyudev_extras.graphs
-    ====================
+    pyudev_extras.graphs._networkx_graphs
+    =====================================
 
-    Tools to build graphs of various kinds.
+    Tools to build and manipulate networkx graphs.
 
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
@@ -32,99 +32,14 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 
-import os
-
 import networkx as nx
 
 import pyudev
 
-from . import traversal
+from .. import traversal
 
-class NodeType(object):
-    """
-    Abstract class that represents a node type.
-    """
-    # pylint: disable=too-few-public-methods
-
-    def __str__(self): # pragma: no cover
-        return self.__class__.__name__
-    __repr__ = __str__
-
-class DevicePath(NodeType):
-    """
-    A device, uniquely identified by its device path.
-    """
-    # pylint: disable=too-few-public-methods
-    pass
-
-DevicePath = DevicePath() # pylint: disable=invalid-name
-
-class NodeTypes(object):
-    """
-    Enumeration of node types.
-    """
-    # pylint: disable=too-few-public-methods
-    DEVICE_PATH = DevicePath
-
-    @staticmethod
-    def is_type(node, node_type):
-        """
-        Whether ``node`` has type ``node_type``.
-
-        :param `agraph.Edge` node: the node
-        :param `EdgeType` node_type: an node type
-        :returns: True if ``node`` has type ``node_type``, otherwise False
-        :rtype: bool
-        """
-        return node.attr['node_type'] == str(node_type)
-
-class EdgeType(object):
-    """
-    Superclass of edge types.
-    """
-    # pylint: disable=too-few-public-methods
-
-    def __str__(self): # pragma: no cover
-        return self.__class__.__name__
-    __repr__ = __str__
-
-class Slave(EdgeType):
-    """
-    Encodes slaves/holders relationship.
-    """
-    # pylint: disable=too-few-public-methods
-    pass
-
-Slave = Slave() # pylint: disable=invalid-name
-
-class Partition(EdgeType):
-    """
-    Encodes partition relationship.
-    """
-    # pylint: disable=too-few-public-methods
-    pass
-
-Partition = Partition() # pylint: disable=invalid-name
-
-class EdgeTypes(object):
-    """
-    Enumeration of edge types.
-    """
-    # pylint: disable=too-few-public-methods
-    SLAVE = Slave
-    PARTITION = Partition
-
-    @staticmethod
-    def is_type(edge, edge_type):
-        """
-        Whether ``edge`` has type ``edge_type``.
-
-        :param `agraph.Edge` edge: the edge
-        :param `EdgeType` edge_type: an edge type
-        :returns: True if ``edge`` has type ``edge_type``, otherwise False
-        :rtype: bool
-        """
-        return edge.attr['edge_type'] == str(edge_type)
+from ._types import EdgeTypes
+from ._types import NodeTypes
 
 SysfsTraversalConfig = namedtuple(
    'SysfsTraversalConfig',
@@ -384,111 +299,3 @@ class GraphNodeDecorations(object):
                 dicts[name][node] = props[name]
 
         return dicts
-
-
-class GraphTransformers(object):
-    """
-    A collection of graph transformers.
-    """
-
-    @staticmethod
-    def copy_attr(attr):
-        """
-        Copy attr object to a dict of keys and values.
-
-        :param attr: the attributes oject
-        :returns: a dict of attributes
-        :rtype: dict
-        """
-        return dict([(k, attr[k]) for k in attr])
-
-    @staticmethod
-    def xform_partition(node):
-        """
-        Transform a partition device so that its label is just the device name.
-        """
-        node.attr['label'] = os.path.basename(node.attr['DEVPATH'])
-
-
-    @classmethod
-    def xform_partitioned(cls, graph, node):
-        """
-        Place a disk node w/edges to partitions in a subgraph
-        that contains it and the partitions.
-
-        :param `AGraph` graph: the graph
-        :param `Node` node: the node
-
-        :returns: the new cluster formed
-        :rtype: `AGraph`
-        """
-        # Find partitions of node
-        partition_edges = [e for e in graph.out_edges(node) if \
-           EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
-        partitions = [e[1] for e in partition_edges]
-
-        cluster = graph.add_subgraph(
-           partitions + [node],
-           name='cluster' + node.name,
-        )
-
-        node.attr['shape'] = "plaintext"
-        for edge in partition_edges:
-            edge.attr['color'] = 'white'
-
-        return cluster
-
-    @classmethod
-    def xform_partitions(cls, graph):
-        """
-        Transformations on partitions and their parents.
-
-        :param `AGraph` graph: the graph
-        """
-        partition_edges = [e for e in graph.iteredges() if \
-               EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
-
-        while partition_edges:
-            cluster = cls.xform_partitioned(graph, partition_edges[0][0])
-            partition_edges = [e for e in partition_edges \
-               if e not in cluster.edges()]
-
-        partitions = (n for n in graph.iternodes() if \
-           NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
-           n.attr['DEVTYPE'] == 'partition')
-
-        for partition in partitions:
-            cls.xform_partition(partition)
-
-    @classmethod
-    def xform(cls, graph):
-        """
-        Transform a networkx multigraph to a graphviz graph.
-
-        :param `DiMultiGraph` graph: the networkx graph
-        :returns: the new graph
-        :rtype: `A_Graph`
-        """
-        res = nx.to_agraph(graph)
-        cls.xform_partitions(graph)
-        return res
-
-
-class DisplayGraph(object):
-    """
-    Ways to display a graph.
-    """
-
-    # pylint: disable=too-few-public-methods
-
-    @classmethod
-    def to_dot(cls, graph, out):
-        """
-        Dot file from graph.
-
-        :param `MultiDiGraph` graph: the graph
-        :param file out: output file to write graph to
-        """
-        dot_graph = nx.to_agraph(graph)
-        dot_graph.layout(prog="dot")
-        print(dot_graph.string(), file=out)
