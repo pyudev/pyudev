@@ -159,3 +159,22 @@ class TestPartitionGraphs(object):
 
         assert (num_partitions == 0 and num_nodes == 0) or \
            nx.number_of_nodes(graph) > len(partitions)
+
+
+class TestGraphNodeDecorations(object):
+    """
+    Test decorating structure graphs.
+    """
+
+    def test_devpath(self):
+        """
+        Test that the value of DEVPATH is the same as the key of the node.
+        """
+        graph = graphs.PartitionGraphs.complete(_CONTEXT)
+        props = graphs.GraphNodeDecorations.udev_properties(
+           _CONTEXT,
+           graph,
+           ['DEVPATH']
+        )
+        devpaths = props['DEVPATH']
+        assert all(devpaths[k] == k for k in devpaths)
