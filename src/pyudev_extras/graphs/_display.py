@@ -145,4 +145,4 @@ class GraphTransformers(object):
         :param `A_Graph` graph: the networkx graph
         """
         cls.xform_partitions(graph)
-        cls.xform_disks(graph)
+        cls.xform_spindles(graph)
