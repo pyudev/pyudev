@@ -237,6 +237,24 @@ class SysfsGraphs(object):
         return reduce(nx.compose, graphs, nx.MultiDiGraph())
 
 
+class SysfsBlockGraphs(object): # pragma: no cover
+    """
+    Composes holders/slaves graphs for block devices.
+    """
+    # pylint: disable=too-few-public-methods
+
+    @staticmethod
+    def complete(context):
+        """
+        Build a complete graph showing all block devices.
+
+        :param `Context` context: a udev context
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        return SysfsGraphs.complete(context, subsystem="block")
+
+
 class PartitionGraphs(object):
     """
     Build graphs of partition relationships.
