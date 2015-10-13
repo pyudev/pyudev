@@ -115,6 +115,28 @@ class GraphTransformers(object):
         for disk in disks:
             cls.xform_disk(graph, disk)
 
+    @staticmethod
+    def xform_spindle(node):
+        """
+        Transform a spindle so that it is visually arresting.
+
+        :param `Node` node: the node
+        """
+        node.attr['shape'] = "doubleoctagon"
+
+    @classmethod
+    def xform_spindles(cls, graph):
+        """
+        Transformation on spindles.
+
+        :param `AGraph` graph: the graph
+        """
+        spindles = [n for n in graph.iternodes() if \
+           NodeTypes.is_type(n, NodeTypes.WWN)]
+
+        for spindle in spindles:
+            cls.xform_spindle(spindle)
+
     @classmethod
     def xform(cls, graph):
         """
