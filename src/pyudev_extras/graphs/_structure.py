@@ -69,7 +69,14 @@ class GraphMethods(object):
 
 
     @staticmethod
-    def add_edges(graph, sources, targets, edge_type, node_type):
+    def add_edges( # pylint: disable=too-many-arguments
+       graph,
+       sources,
+       targets,
+       edge_type,
+       source_node_type,
+       target_node_type
+    ):
         """
         Add edges to graph from sources to targets.
 
@@ -79,12 +86,14 @@ class GraphMethods(object):
         :param targets: target nodes
         :type targets: list of `object`
         :param `EdgeType` edge_type: type for edges
-        :param `NodeType` node_type: type for nodes
+        :param `NodeType` source_node_type: type for source nodes
+        :param `NodeType` target_node_type: type for target nodes
 
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        graph.add_nodes_from(sources + targets, node_type=node_type)
+        graph.add_nodes_from(sources, node_type=source_node_type)
+        graph.add_nodes_from(targets, node_type=target_node_type)
         edges = ((x, y) for x in sources for y in targets)
         graph.add_edges_from(edges, edge_type=edge_type)
 
@@ -127,6 +136,7 @@ class SysfsTraversal(object):
            [dev.device_path for dev in sources],
            [dev.device_path for dev in targets],
            EdgeTypes.SLAVE,
+           NodeTypes.DEVICE_PATH,
            NodeTypes.DEVICE_PATH
         )
 
@@ -248,6 +258,7 @@ class PartitionGraphs(object):
            [parent.device_path],
            [device.device_path],
            EdgeTypes.PARTITION,
+           NodeTypes.DEVICE_PATH,
            NodeTypes.DEVICE_PATH
         )
         return graph
