@@ -30,6 +30,11 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import abc
+
+import six
+
+@six.add_metaclass(abc.ABCMeta)
 class NodeType(object):
     """
     Abstract class that represents a node type.
@@ -68,6 +73,7 @@ class NodeTypes(object):
         """
         return node.attr['node_type'] == str(node_type)
 
+@six.add_metaclass(abc.ABCMeta)
 class EdgeType(object):
     """
     Superclass of edge types.
