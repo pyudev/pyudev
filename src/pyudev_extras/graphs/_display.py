@@ -35,6 +35,36 @@ import os
 from ._types import EdgeTypes
 from ._types import NodeTypes
 
+class HTMLUtils(object):
+    """
+    A class to handle HTML generation for HTML-style labels.
+    """
+
+    @staticmethod
+    def make_table(rows):
+        """
+        Make an HTML table from a list of rows.
+
+        :param rows: a list of rows as <td>...</td> strings
+        :type rows: list of str
+        :returns: HTML sring designating a table
+        :rtype: str
+        """
+        table_attributes = "border=\"0\" cellborder=\"1\" cellspacing=\"0\""
+        row_str = reduce(lambda x, y: x + y, rows, "")
+        return "<table %s>%s</table>" % (table_attributes, row_str)
+
+    @staticmethod
+    def set_html_label(node, label):
+        """
+        Set an html label on a node.
+
+        :param `Node` node: the node
+        :param str label: the label
+        """
+        node.attr['label'] = "<%s>" % label
+        node.attr['shape'] = 'none'
+
 
 class GraphTransformers(object):
     """
