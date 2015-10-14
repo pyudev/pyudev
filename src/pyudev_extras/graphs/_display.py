@@ -108,28 +108,53 @@ class GraphTransformers(object):
     @classmethod
     def xform_disk(cls, graph, node):
         """
-        Make a cluster of a disk and its partitions.
+        Make a special node of a disk and its partitions.
 
         :param `AGraph` graph: the graph
         :param `Node` node: the node
 
-        If the disk is not partitioned, no cluster is made.
+        If the disk is not partitioned, nothing is done.
 
         """
 
         partition_edges = [e for e in graph.out_edges(node) if \
            EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
 
-        if partition_edges:
-            partitions = [e[1] for e in partition_edges]
-            graph.add_subgraph(
-               partitions + [node],
-               name='cluster' + node.name,
-            )
+        # If there are no partitions in this disk, do nothing
+        if not partition_edges:
+            return
 
-            node.attr['shape'] = "plaintext"
-            for edge in partition_edges:
-                edge.attr['color'] = 'white'
+        # partitions to include in label
+        partitions = [e[1] for e in partition_edges]
+
+        # edges to partitions that are not partition edges from node
+        keep_edges = [e for e in graph.in_edges(partitions) \
+           if not e in partition_edges]
+
+        # Due to a a bug in pygraphviz, can not fix up edges to partitions.
+        # If additional edges exist, skip.
+        # See: https://github.com/pygraphviz/pygraphviz/issues/76
+        if keep_edges:
+            return
+
+        # No edges besides partition edges, so build HTML label
+        node_row = "<tr><td colspan=\"%s\">%s</td></tr>" % \
+           (len(partitions) + 1, node.attr['DEVPATH'])
+
+        partition_names = sorted(
+           os.path.basename(p.attr['DEVPATH']) for p in partitions
+        )
+        partition_data = reduce(
+           lambda x, y: x + y,
+           ("<td port=\"%s\">%s</td>" % (n, n) for n in partition_names),
+           ""
+        )
+        partition_row = "<tr>%s</tr>" % (partition_data + "<td> </td>")
+        table = HTMLUtils.make_table([node_row, partition_row])
+        HTMLUtils.set_html_label(node, table)
+
+        # delete partition nodes, since they are accounted for in label
+        graph.delete_nodes_from(partitions)
 
     @classmethod
     def xform_disks(cls, graph):
@@ -174,5 +199,6 @@ class GraphTransformers(object):
 
         :param `A_Graph` graph: the networkx graph
         """
-        cls.xform_partitions(graph)
+        cls.xform_disks(graph)
         cls.xform_spindles(graph)
+        cls.xform_partitions(graph)
