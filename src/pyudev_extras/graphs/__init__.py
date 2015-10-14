@@ -26,6 +26,7 @@
 """
 
 
+from ._structure import DMPartitionGraphs
 from ._structure import GraphNodeDecorations
 from ._structure import PartitionGraphs
 from ._structure import SpindleGraphs

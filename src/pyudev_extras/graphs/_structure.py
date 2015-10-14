@@ -341,6 +341,65 @@ class SpindleGraphs(object):
         return reduce(nx.compose, graphs, nx.MultiDiGraph())
 
 
+class DMPartitionGraphs(object):
+    """
+    Build graphs of relationships between device mapper devices and partitions.
+    """
+
+    @staticmethod
+    def congruence_graph(context, device):
+        """
+        Build a graph of congruence relation between device mapper devices and
+        partition devices.
+
+        :param `Context` context: a udev context
+        :param `Device` device: the partition device
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        graph = nx.MultiDiGraph()
+
+        id_part_entry_uuid = device.get('ID_PART_ENTRY_UUID')
+        if id_part_entry_uuid is None:
+            return graph
+
+        block_devices = context.list_devices(subsystem="block")
+        disks = block_devices.match_property('DEVTYPE', 'disk')
+
+        block_devices = context.list_devices(subsystem="block")
+        matches = block_devices.match_property(
+           'ID_PART_ENTRY_UUID',
+           id_part_entry_uuid
+        )
+
+        sources = set(disks) & set(matches)
+
+        GraphMethods.add_edges(
+           graph,
+           [dev.device_path for dev in sources],
+           [device.device_path],
+           EdgeTypes.CONGRUENCE,
+           NodeTypes.DEVICE_PATH,
+           NodeTypes.DEVICE_PATH
+        )
+
+        return graph
+
+    @classmethod
+    def complete(cls, context):
+        """
+        Build a complete graph showing device mapper, partition relationships.
+
+        :param `Context` context: a udev context
+        :returns: a graph
+        :rtype: `MultiDiGraph`
+        """
+        block_devices = context.list_devices(subsystem="block")
+        partitions = block_devices.match_property('DEVTYPE', 'partition')
+        graphs = (cls.congruence_graph(context, d) for d in partitions)
+        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+
+
 class GraphNodeDecorations(object):
     """
     Find decorations for the nodes of a network graph.

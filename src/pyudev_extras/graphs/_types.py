@@ -121,6 +121,15 @@ class Spindle(EdgeType):
 
 Spindle = Spindle() # pylint: disable=invalid-name
 
+class Congruence(EdgeType):
+    """
+    Congruence relationship between dm devices and partitions.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+Congruence = Congruence() # pylint: disable=invalid-name
+
 class EdgeTypes(object):
     """
     Enumeration of edge types.
@@ -129,6 +138,7 @@ class EdgeTypes(object):
     SLAVE = Slave
     PARTITION = Partition
     SPINDLE = Spindle
+    CONGRUENCE = Congruence
 
     @staticmethod
     def is_type(edge, edge_type):

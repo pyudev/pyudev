@@ -174,6 +174,19 @@ class TestSpindleGraphs(object):
         assert nx.is_directed_acyclic_graph(graph)
 
 
+class TestDMPartitionGraphs(object):
+    """
+    Test device mapper partition graphs.
+    """
+
+    def test_complete(self):
+        """
+        Assert that the graph has no cycles.
+        """
+        graph = graphs.DMPartitionGraphs.complete(_CONTEXT)
+        assert nx.is_directed_acyclic_graph(graph)
+
+
 class TestGraphNodeDecorations(object):
     """
     Test decorating structure graphs.
