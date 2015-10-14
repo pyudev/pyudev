@@ -68,10 +68,11 @@ class HTMLUtils(object):
         node.attr['shape'] = 'none'
 
 
-class GraphTransformers(object):
+class Utils(object):
     """
-    A collection of graph transformers.
+    General utilities for graph transformations.
     """
+    # pylint: disable=too-few-public-methods
 
     @staticmethod
     def copy_attr(attr):
@@ -83,6 +84,12 @@ class GraphTransformers(object):
         :rtype: dict
         """
         return dict([(k, attr[k]) for k in attr])
+
+
+class GraphTransformers(object):
+    """
+    A collection of graph transformers.
+    """
 
     @staticmethod
     def xform_partition(node):
