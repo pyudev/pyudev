@@ -192,6 +192,26 @@ class GraphTransformers(object):
         for spindle in spindles:
             cls.xform_spindle(spindle)
 
+    @staticmethod
+    def xform_partition_edge(edge):
+        """
+        Transform a partition edge.
+        """
+        edge.attr['style'] = 'dashed'
+
+    @classmethod
+    def xform_partition_edges(cls, graph):
+        """
+        Decorate partition edges a bit.
+
+        :param `A_Graph` graph: the networkx graph
+        """
+        partition_edges = (e for e in graph.iteredges() if \
+           EdgeTypes.is_type(e, EdgeTypes.PARTITION))
+
+        for edge in partition_edges:
+            cls.xform_partition_edge(edge)
+
     @classmethod
     def xform(cls, graph):
         """
@@ -202,3 +222,4 @@ class GraphTransformers(object):
         cls.xform_disks(graph)
         cls.xform_spindles(graph)
         cls.xform_partitions(graph)
+        cls.xform_partition_edges(graph)
