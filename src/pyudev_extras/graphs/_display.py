@@ -32,6 +32,8 @@ from __future__ import unicode_literals
 
 import os
 
+from functools import reduce # pylint: disable=redefined-builtin
+
 from ._types import EdgeTypes
 from ._types import NodeTypes
 

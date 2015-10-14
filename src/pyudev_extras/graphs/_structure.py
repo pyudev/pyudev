@@ -31,6 +31,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import namedtuple
+from functools import reduce # pylint: disable=redefined-builtin
 
 import networkx as nx
 
