@@ -26,8 +26,9 @@
 """
 
 
+from ._decorations import UdevProperties
+
 from ._structure import DMPartitionGraphs
-from ._structure import GraphNodeDecorations
 from ._structure import PartitionGraphs
 from ._structure import SpindleGraphs
 from ._structure import SysfsGraphs

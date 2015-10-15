@@ -197,7 +197,7 @@ class TestGraphNodeDecorations(object):
         Test that the value of DEVPATH is the same as the key of the node.
         """
         graph = graphs.PartitionGraphs.complete(_CONTEXT)
-        props = graphs.GraphNodeDecorations.udev_properties(
+        props = graphs.UdevProperties.udev_properties(
            _CONTEXT,
            graph,
            ['DEVPATH']

@@ -35,8 +35,6 @@ from functools import reduce # pylint: disable=redefined-builtin
 
 import networkx as nx
 
-import pyudev
-
 from .. import traversal
 
 from ._types import EdgeTypes
@@ -399,74 +397,3 @@ class DMPartitionGraphs(object):
         partitions = block_devices.match_property('DEVTYPE', 'partition')
         graphs = (cls.congruence_graph(context, d) for d in partitions)
         return reduce(nx.compose, graphs, nx.MultiDiGraph())
-
-
-class GraphNodeDecorations(object):
-    """
-    Find decorations for the nodes of a network graph.
-    """
-
-    # pylint: disable=too-few-public-methods
-
-    @staticmethod
-    def udev_properties(context, graph, properties):
-        """
-        Get udev properties for graph nodes that correspond to devices.
-
-        :param `Context` context: the udev context
-        :param graph: the graph
-        :param properties: a list of property keys
-        :type properties: list of str
-
-        :returns: dict of property name, node, property value
-        :rtype: dict
-        """
-        dicts = dict((k, dict()) for k in properties)
-        node_types = nx.get_node_attributes(graph, 'node_type')
-        device_nodes = (k for k in node_types \
-           if node_types[k] is NodeTypes.DEVICE_PATH)
-
-        for node in device_nodes:
-            device = pyudev.Devices.from_path(context, node)
-            props = dict((k, device[k]) for k in properties if k in device)
-            for name in props:
-                dicts[name][node] = props[name]
-
-        return dicts
-
-
-class Graphs(object):
-    """
-    Assembles a super-graph composed of different kinds of graphs.
-    """
-
-    @staticmethod
-    def assemble(context, types):
-        """
-        Assemble a graph from a list of graph types.
-
-        :param `Context` context: the udev context
-        :param types: list of graph types
-        :type types: list of type
-        :returns: a graph
-        :rtype: `MultiDiGraph`
-        """
-        return reduce(
-           nx.compose,
-           (t.complete(context) for t in types),
-           nx.MultiDiGraph()
-        )
-
-    @staticmethod
-    def decorate(context, graph):
-        """
-        Decorate the graph.
-
-        :param `Context` context: the udev context
-        :param `MultiDiGraph` graph: the graph
-        """
-        properties = ['DEVPATH', 'DEVTYPE']
-        props = GraphNodeDecorations.udev_properties(context, graph, properties)
-
-        for property_name, value in props.items():
-            nx.set_node_attributes(graph, property_name, value)
