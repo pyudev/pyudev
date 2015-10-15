@@ -25,6 +25,10 @@
     .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
+from ._graphs import DisplayGraph
+from ._graphs import GenerateGraph
+from ._graphs import PrintGraph
+from ._graphs import RewriteGraph
 
 from ._decorations import UdevProperties
 
