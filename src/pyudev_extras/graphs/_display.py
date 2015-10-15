@@ -237,6 +237,21 @@ class PartitionEdgeTransformer(GraphTransformer):
            EdgeTypes.is_type(e, EdgeTypes.PARTITION))
 
 
+class CongruenceEdgeTransformer(GraphTransformer):
+    """
+    Make congruence edges dotted.
+    """
+
+    @staticmethod
+    def xform_object(graph, obj):
+        obj.attr['style'] = 'dotted'
+
+    @classmethod
+    def objects(cls, graph):
+        return (e for e in graph.iteredges() if \
+           EdgeTypes.is_type(e, EdgeTypes.CONGRUENCE))
+
+
 class GraphTransformers(object):
     """
     A class that orders and does all graph transformations.
@@ -254,3 +269,4 @@ class GraphTransformers(object):
         SpindleTransformer.xform(graph)
         PartitionTransformer.xform(graph)
         PartitionEdgeTransformer.xform(graph)
+        CongruenceEdgeTransformer.xform(graph)
