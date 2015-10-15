@@ -30,9 +30,12 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import abc
 import os
 
 from functools import reduce # pylint: disable=redefined-builtin
+
+import six
 
 from ._types import EdgeTypes
 from ._types import NodeTypes
@@ -86,47 +89,79 @@ class Utils(object):
         return dict([(k, attr[k]) for k in attr])
 
 
-class GraphTransformers(object):
+@six.add_metaclass(abc.ABCMeta)
+class GraphTransformer(object):
     """
-    A collection of graph transformers.
+    Abstract superclass of graph transformers.
     """
 
     @staticmethod
-    def xform_partition(node):
+    @abc.abstractmethod
+    def xform_object(graph, obj):
         """
-        Transform a partition device so that its label is just the device name.
+        Transform ``obj``.
+
+        :param `AGraph` graph: the graph
+        :param obj: the object to transform
         """
-        node.attr['label'] = os.path.basename(node.attr['DEVPATH'])
-        node.attr['shape'] = "triangle"
+        raise NotImplementedError()
 
 
     @classmethod
-    def xform_partitions(cls, graph):
+    @abc.abstractmethod
+    def objects(cls, graph):
         """
-        Transformations on partitions.
+        Locate the objects to transform.
+
+        :param `AGraph` graph: the graph
+        :returns: an iterable of objects
+        :rtype: iterable
+        """
+        raise NotImplementedError()
+
+
+    @classmethod
+    def xform(cls, graph):
+        """
+        Do the transformation.
 
         :param `AGraph` graph: the graph
         """
-        partitions = (n for n in graph.iternodes() if \
+        for obj in cls.objects(graph):
+            cls.xform_object(graph, obj)
+
+
+class PartitionTransformer(GraphTransformer):
+    """
+    Transforms nodes that are partitions.
+
+    Sets node label to device name rather than device path.
+    Sets node shape to triangle.
+    """
+
+    @staticmethod
+    def xform_object(graph, obj):
+        obj.attr['label'] = os.path.basename(obj.attr['DEVPATH'])
+        obj.attr['shape'] = "triangle"
+
+    @classmethod
+    def objects(cls, graph):
+        return (n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
            n.attr['DEVTYPE'] == 'partition')
 
-        for partition in partitions:
-            cls.xform_partition(partition)
 
-    @classmethod
-    def xform_disk(cls, graph, node):
-        """
-        Make a special node of a disk and its partitions.
+class PartitionedDiskTransformer(GraphTransformer):
+    """
+    Transforms a partitioned disk into a partitioned node.
 
-        :param `AGraph` graph: the graph
-        :param `Node` node: the node
+    Does not do anything if the disk has no partitions or if some
+    non-partition edges point to any partitions.
+    """
 
-        If the disk is not partitioned, nothing is done.
-
-        """
-
-        partition_edges = [e for e in graph.out_edges(node) if \
+    @staticmethod
+    def xform_object(graph, obj):
+        partition_edges = [e for e in graph.out_edges(obj) if \
            EdgeTypes.is_type(e, EdgeTypes.PARTITION)]
 
         # If there are no partitions in this disk, do nothing
@@ -148,7 +183,7 @@ class GraphTransformers(object):
 
         # No edges besides partition edges, so build HTML label
         node_row = "<tr><td colspan=\"%s\">%s</td></tr>" % \
-           (len(partitions) + 1, node.attr['DEVPATH'])
+           (len(partitions) + 1, obj.attr['DEVPATH'])
 
         partition_names = sorted(
            os.path.basename(p.attr['DEVPATH']) for p in partitions
@@ -160,66 +195,53 @@ class GraphTransformers(object):
         )
         partition_row = "<tr>%s</tr>" % (partition_data + "<td> </td>")
         table = HTMLUtils.make_table([node_row, partition_row])
-        HTMLUtils.set_html_label(node, table)
+        HTMLUtils.set_html_label(obj, table)
 
         # delete partition nodes, since they are accounted for in label
         graph.delete_nodes_from(partitions)
 
     @classmethod
-    def xform_disks(cls, graph):
-        """
-        Transformations on disks.
-
-        :param `AGraph` graph: the graph
-        """
-        disks = [n for n in graph.iternodes() if \
+    def objects(cls, graph):
+        return (n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
-           n.attr['DEVTYPE'] == 'disk']
+           n.attr['DEVTYPE'] == 'disk')
 
-        for disk in disks:
-            cls.xform_disk(graph, disk)
+
+class SpindleTransformer(GraphTransformer):
+    """
+    Make every actual physical spindle into a double octagon.
+    """
 
     @staticmethod
-    def xform_spindle(node):
-        """
-        Transform a spindle so that it is visually arresting.
-
-        :param `Node` node: the node
-        """
-        node.attr['shape'] = "doubleoctagon"
+    def xform_object(graph, obj):
+        obj.attr['shape'] = "doubleoctagon"
 
     @classmethod
-    def xform_spindles(cls, graph):
-        """
-        Transformation on spindles.
-
-        :param `AGraph` graph: the graph
-        """
-        spindles = [n for n in graph.iternodes() if \
+    def objects(cls, graph):
+        return [n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.WWN)]
 
-        for spindle in spindles:
-            cls.xform_spindle(spindle)
+
+class PartitionEdgeTransformer(GraphTransformer):
+    """
+    Make partition edges dashed.
+    """
 
     @staticmethod
-    def xform_partition_edge(edge):
-        """
-        Transform a partition edge.
-        """
-        edge.attr['style'] = 'dashed'
+    def xform_object(graph, obj):
+        obj.attr['style'] = 'dashed'
 
     @classmethod
-    def xform_partition_edges(cls, graph):
-        """
-        Decorate partition edges a bit.
-
-        :param `A_Graph` graph: the networkx graph
-        """
-        partition_edges = (e for e in graph.iteredges() if \
+    def objects(cls, graph):
+        return (e for e in graph.iteredges() if \
            EdgeTypes.is_type(e, EdgeTypes.PARTITION))
 
-        for edge in partition_edges:
-            cls.xform_partition_edge(edge)
+
+class GraphTransformers(object):
+    """
+    A class that orders and does all graph transformations.
+    """
+    # pylint: disable=too-few-public-methods
 
     @classmethod
     def xform(cls, graph):
@@ -228,7 +250,7 @@ class GraphTransformers(object):
 
         :param `A_Graph` graph: the networkx graph
         """
-        cls.xform_disks(graph)
-        cls.xform_spindles(graph)
-        cls.xform_partitions(graph)
-        cls.xform_partition_edges(graph)
+        PartitionedDiskTransformer.xform(graph)
+        SpindleTransformer.xform(graph)
+        PartitionTransformer.xform(graph)
+        PartitionEdgeTransformer.xform(graph)
