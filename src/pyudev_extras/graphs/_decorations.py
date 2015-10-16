@@ -76,9 +76,7 @@ class UdevProperties(object):
         """
         dicts = dict((k, dict()) for k in names)
         for node in cls.decorated(graph):
-            props = cls.properties(context, node, names)
-            for name in props:
-                dicts[name][node] = props[name]
+            dicts['UDEV'][node] = cls.properties(context, node, names)
 
         return dicts
 
