@@ -52,7 +52,22 @@ class GraphMethods(object):
     """
 
     @staticmethod
-    def add_nodes(graph, nodes, node_type):
+    def get_node_args(nodes, node_type):
+        """
+        Get node arguments, along with keys.
+
+        :param nodes: source nodes
+        :type nodes: list of object
+        :param `NodeType` node_type: a node type
+        :returns: arguments suitable for passing to add_nodes_from()
+        """
+        return (
+           (n, {'node_type' : node_type, str(node_type) : n}) \
+           for n in nodes
+        )
+
+    @classmethod
+    def add_nodes(cls, graph, nodes, node_type):
         """
         Add nodes in ``nodes`` to graph.
 
@@ -64,11 +79,11 @@ class GraphMethods(object):
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        graph.add_nodes_from(nodes, node_type=node_type)
+        graph.add_nodes_from(cls.get_node_args(nodes, node_type))
 
-
-    @staticmethod
+    @classmethod
     def add_edges( # pylint: disable=too-many-arguments
+       cls,
        graph,
        sources,
        targets,
@@ -91,8 +106,9 @@ class GraphMethods(object):
         Nodes are device_paths of each device, as these uniquely identify
         the device.
         """
-        graph.add_nodes_from(sources, node_type=source_node_type)
-        graph.add_nodes_from(targets, node_type=target_node_type)
+        graph.add_nodes_from(cls.get_node_args(sources, source_node_type))
+        graph.add_nodes_from(cls.get_node_args(targets, target_node_type))
+
         edges = ((x, y) for x in sources for y in targets)
         graph.add_edges_from(edges, edge_type=edge_type)
 
