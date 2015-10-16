@@ -83,6 +83,14 @@ class NodeTypes(object):
         """
         return node.attr['node_type'] == str(node_type)
 
+    @staticmethod
+    def types(): # pylint: disable=invalid-name
+        """
+        :returns: a list of all ``NodeType`` objects.
+        :rtype: list of ``NodeType``
+        """
+        return [DevicePath, WWN]
+
 @six.add_metaclass(abc.ABCMeta)
 class EdgeType(object):
     """
