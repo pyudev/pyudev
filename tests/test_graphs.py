@@ -204,3 +204,23 @@ class TestGraphNodeDecorations(object):
         )
         devpaths = props['UDEV']
         assert all(devpaths[k]['DEVPATH'] == k for k in devpaths)
+
+
+class TestGraphComparison(object):
+    """
+    Compare storage graphs more or less stringently.
+    """
+
+    def test_equal(self, tmpdir):
+        """
+        Verify that two identical graphs are equivalent.
+        """
+        home_graph = graphs.GenerateGraph.get_graph(_CONTEXT, "home")
+        graphs.RewriteGraph.convert_graph(home_graph)
+        filepath = str(tmpdir.join('test.gml'))
+        nx.write_gml(home_graph, filepath)
+
+        graph1 = nx.read_gml(filepath)
+        graph2 = nx.read_gml(filepath)
+
+        assert(graphs.Compare.is_equivalent(graph1, graph2))

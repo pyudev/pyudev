@@ -28,6 +28,8 @@
 
 from ._decorations import UdevProperties
 
+from ._compare import Compare
+
 from ._structure import DMPartitionGraphs
 from ._structure import PartitionGraphs
 from ._structure import SpindleGraphs
