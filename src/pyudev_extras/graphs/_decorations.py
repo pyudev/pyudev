@@ -74,7 +74,7 @@ class UdevProperties(object):
         :returns: dict of property name, node, property value
         :rtype: dict
         """
-        dicts = dict((k, dict()) for k in names)
+        dicts = {'UDEV' : dict()}
         for node in cls.decorated(graph):
             dicts['UDEV'][node] = cls.properties(context, node, names)
 

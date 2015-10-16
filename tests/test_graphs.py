@@ -202,5 +202,5 @@ class TestGraphNodeDecorations(object):
            graph,
            ['DEVPATH']
         )
-        devpaths = props['DEVPATH']
-        assert all(devpaths[k] == k for k in devpaths)
+        devpaths = props['UDEV']
+        assert all(devpaths[k]['DEVPATH'] == k for k in devpaths)

@@ -88,6 +88,31 @@ class Utils(object):
         """
         return dict([(k, attr[k]) for k in attr])
 
+    @staticmethod
+    def get_attr(ele, keys):
+        """
+        Resolve the value of ``keys`` on ``ele``.
+
+        Since any nested values end up as simple strings, need to evaluate
+        the resulting string to get an actual dict.
+
+        :param ele: a graph element
+        :type ele: a `Node` or `Edge`
+        :param keys: a list of keys
+        :type keys: list of str
+        :returns: the result of reading from the nested dicts or None
+        :rtype: str or NoneType
+        """
+        res = ele.attr[keys[0]]
+        if len(keys) == 1:
+            return res
+
+        return reduce(
+           lambda x, y: x and x.get(y),
+           keys[1:],
+           eval(res) # pylint: disable=eval-used
+        )
+
 
 @six.add_metaclass(abc.ABCMeta)
 class GraphTransformer(object):
@@ -141,14 +166,16 @@ class PartitionTransformer(GraphTransformer):
 
     @staticmethod
     def xform_object(graph, obj):
-        obj.attr['label'] = os.path.basename(obj.attr['DEVPATH'])
+        obj.attr['label'] = os.path.basename(
+           Utils.get_attr(obj, ['UDEV', 'DEVPATH'])
+        )
         obj.attr['shape'] = "triangle"
 
     @classmethod
     def objects(cls, graph):
         return (n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
-           n.attr['DEVTYPE'] == 'partition')
+           Utils.get_attr(n, ['UDEV', 'DEVTYPE']) == 'partition')
 
 
 class PartitionedDiskTransformer(GraphTransformer):
@@ -183,10 +210,11 @@ class PartitionedDiskTransformer(GraphTransformer):
 
         # No edges besides partition edges, so build HTML label
         node_row = "<tr><td colspan=\"%s\">%s</td></tr>" % \
-           (len(partitions) + 1, obj.attr['DEVPATH'])
+           (len(partitions) + 1, Utils.get_attr(obj, ['UDEV', 'DEVPATH']))
 
         partition_names = sorted(
-           os.path.basename(p.attr['DEVPATH']) for p in partitions
+           os.path.basename(Utils.get_attr(p, ['UDEV', 'DEVPATH'])) for \
+              p in partitions
         )
         partition_data = reduce(
            lambda x, y: x + y,
@@ -204,7 +232,7 @@ class PartitionedDiskTransformer(GraphTransformer):
     def objects(cls, graph):
         return (n for n in graph.iternodes() if \
            NodeTypes.is_type(n, NodeTypes.DEVICE_PATH) and \
-           n.attr['DEVTYPE'] == 'disk')
+           Utils.get_attr(n, ['UDEV', 'DEVTYPE']) == 'disk')
 
 
 class SpindleTransformer(GraphTransformer):
