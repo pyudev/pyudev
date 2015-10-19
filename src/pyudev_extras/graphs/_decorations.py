@@ -49,7 +49,7 @@ class UdevProperties(object):
         """
         Returns elements that get decorated.
         """
-        node_types = nx.get_node_attributes(graph, 'node_type')
+        node_types = nx.get_node_attributes(graph, 'nodetype')
         return (k for k in node_types \
            if node_types[k] is NodeTypes.DEVICE_PATH)
 

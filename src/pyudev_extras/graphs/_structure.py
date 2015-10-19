@@ -62,7 +62,7 @@ class GraphMethods(object):
         :returns: arguments suitable for passing to add_nodes_from()
         """
         return (
-           (n, {'node_type' : node_type, str(node_type) : n}) \
+           (n, {'nodetype' : node_type, str(node_type) : n}) \
            for n in nodes
         )
 
@@ -110,7 +110,7 @@ class GraphMethods(object):
         graph.add_nodes_from(cls.get_node_args(targets, target_node_type))
 
         edges = ((x, y) for x in sources for y in targets)
-        graph.add_edges_from(edges, edge_type=edge_type)
+        graph.add_edges_from(edges, edgetype=edge_type)
 
 
 class SysfsTraversal(object):

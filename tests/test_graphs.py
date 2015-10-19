@@ -134,10 +134,10 @@ class TestSysfsGraphs(object):
         assert nx.number_of_nodes(graph) == len(set(devs))
         assert set(nx.nodes(graph)) == set(d.device_path for d in devs)
 
-        types = nx.get_node_attributes(graph, "node_type")
+        types = nx.get_node_attributes(graph, "nodetype")
         assert all(t is graphs.NodeTypes.DEVICE_PATH for t in types.values())
 
-        types = nx.get_edge_attributes(graph, "edge_type")
+        types = nx.get_edge_attributes(graph, "edgetype")
         assert all(t is graphs.EdgeTypes.SLAVE for t in types.values())
 
 

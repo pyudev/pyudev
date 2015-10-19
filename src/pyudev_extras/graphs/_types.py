@@ -81,7 +81,7 @@ class NodeTypes(object):
         :returns: True if ``node`` has type ``node_type``, otherwise False
         :rtype: bool
         """
-        return node.attr['node_type'] == str(node_type)
+        return node.attr['nodetype'] == str(node_type)
 
     @staticmethod
     def types(): # pylint: disable=invalid-name
@@ -158,4 +158,4 @@ class EdgeTypes(object):
         :returns: True if ``edge`` has type ``edge_type``, otherwise False
         :rtype: bool
         """
-        return edge.attr['edge_type'] == str(edge_type)
+        return edge.attr['edgetype'] == str(edge_type)
