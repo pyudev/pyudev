@@ -530,3 +530,44 @@ class TestDevice(object):
             with pytest.raises(TypeError) as exc_info:
                 comp_op(a_device, a_device)
             assert str(exc_info.value) == 'Device not orderable'
+
+    _devices = [d for d in _DEVICES \
+       if 'ID_WWN_WITH_EXTENSION' in d and d.device_type == 'disk']
+    if len(_devices) > 0:
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_devices),
+           settings=Settings(max_examples=5)
+        )
+        def test_id_wwn_with_extension(self, a_context, a_device):
+            """
+            Test that the ID_WWN_WITH_EXTENSION has a corresponding link.
+
+            Assert that the device is a block device if it has an
+            ID_WWN_WITH_EXTENSION property.
+
+            Skip any multipathed paths, see:
+            https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
+            """
+            assume(not 'DM_MULTIPATH_DEVICE_PATH' in a_device)
+            id_wwn = a_device['ID_WWN_WITH_EXTENSION']
+            assert(a_device.subsystem == u'block')
+
+            id_path = '/dev/disk/by-id'
+            link_name = "wwn-%s" % id_wwn
+            match = next(
+               (d for d in os.listdir(id_path) if d == link_name),
+               None
+            )
+            assert(match is not None)
+
+            link_path = os.path.join(id_path, match)
+            link_target = os.readlink(link_path)
+            target_path = os.path.normpath(os.path.join(id_path, link_target))
+            assert(target_path == a_device.device_node)
+    else:
+        def test_id_wwn_with_extension(self):
+            """
+            Skip this test if insufficient devices available.
+            """
+            pytest.skip("not enough devices with 'ID_WWN' in properties")
