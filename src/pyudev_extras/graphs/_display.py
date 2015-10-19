@@ -258,15 +258,14 @@ class GraphTransformers(object):
     """
     # pylint: disable=too-few-public-methods
 
-    @classmethod
-    def xform(cls, graph):
+    @staticmethod
+    def xform(graph, klasses):
         """
         Transform a graph for more helpful viewing.
 
         :param `A_Graph` graph: the networkx graph
+        :param klasses: a list of transformation classes
+        :type klasses: list of `GraphTransformer`
         """
-        PartitionedDiskTransformer.xform(graph)
-        SpindleTransformer.xform(graph)
-        PartitionTransformer.xform(graph)
-        PartitionEdgeTransformer.xform(graph)
-        CongruenceEdgeTransformer.xform(graph)
+        for klass in klasses:
+            klass.xform(graph)
