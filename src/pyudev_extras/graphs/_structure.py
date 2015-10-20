@@ -62,7 +62,7 @@ class GraphMethods(object):
         :returns: arguments suitable for passing to add_nodes_from()
         """
         return (
-           (n, {'nodetype' : node_type, str(node_type) : n}) \
+           (n, {'nodetype' : node_type, 'identifier' : n}) \
            for n in nodes
         )
 
