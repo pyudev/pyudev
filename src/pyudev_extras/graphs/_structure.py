@@ -31,7 +31,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from collections import namedtuple
-from functools import reduce # pylint: disable=redefined-builtin
+from itertools import chain
 
 import networkx as nx
 
@@ -249,7 +249,7 @@ class SysfsGraphs(object):
         # pylint: disable=star-args
         devices = (d for d in context.list_devices(**kwargs))
         graphs = (cls.parents_and_children(context, d) for d in devices)
-        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+        return nx.compose_all(chain([nx.MultiDiGraph()], graphs), name="sysfs")
 
 
 class SysfsBlockGraphs(object): # pragma: no cover
@@ -308,7 +308,10 @@ class PartitionGraphs(object):
         block_devices = context.list_devices(subsystem="block")
         partitions = block_devices.match_property('DEVTYPE', 'partition')
         graphs = (cls.partition_graph(d) for d in partitions)
-        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+        return nx.compose_all(
+           chain([nx.MultiDiGraph()], graphs),
+           name="partiton"
+        )
 
 
 class SpindleGraphs(object):
@@ -353,7 +356,10 @@ class SpindleGraphs(object):
         block_devices = context.list_devices(subsystem="block")
         disks = block_devices.match_property('DEVTYPE', 'disk')
         graphs = (cls.spindle_graph(d) for d in disks)
-        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+        return nx.compose_all(
+           chain([nx.MultiDiGraph()], graphs),
+           name='spindle'
+        )
 
 
 class DMPartitionGraphs(object):
@@ -412,4 +418,7 @@ class DMPartitionGraphs(object):
         block_devices = context.list_devices(subsystem="block")
         partitions = block_devices.match_property('DEVTYPE', 'partition')
         graphs = (cls.congruence_graph(context, d) for d in partitions)
-        return reduce(nx.compose, graphs, nx.MultiDiGraph())
+        return nx.compose_all(
+           chain([nx.MultiDiGraph()], graphs),
+           name='congruence'
+        )
