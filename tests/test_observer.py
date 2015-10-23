@@ -162,21 +162,18 @@ class TestPyQt4Observer(QtObserverTestBase):
     BINDING_NAME = 'PyQt4'
 
 
-class TestGlibObserver(ObserverTestBase):
+class GlibObserverTestBase(ObserverTestBase):
 
     def setup(self):
         self.event_sources = []
-        self.glib = pytest.importorskip('glib')
-        # make sure that we also have gobject
-        pytest.importorskip('gobject')
+        self.glib = None
 
     def teardown(self):
         for source in self.event_sources:
             self.glib.source_remove(source)
 
     def create_observer(self, monitor):
-        from pyudev.glib import MonitorObserver
-        self.observer = MonitorObserver(monitor)
+        self.observer = None
 
     def connect_signal(self, callback):
         # drop the sender argument from glib signal connections
@@ -200,6 +197,32 @@ class TestGlibObserver(ObserverTestBase):
     def stop_event_loop(self):
         self.mainloop.quit()
         return False
+
+
+class TestGlibObserver(GlibObserverTestBase):
+    
+    def setup(self):
+        GlibObserverTestBase.setup(self)
+        self.glib = pytest.importorskip('glib')
+        # make sure that we also have gobject
+        pytest.importorskip('gobject')
+    
+    def create_observer(self, monitor):
+        from pyudev.glib import MonitorObserver
+        self.observer = MonitorObserver(monitor)
+
+
+class TestGIObserver(GlibObserverTestBase):
+
+    def setup(self):
+        GlibObserverTestBase.setup(self)
+        self.glib = pytest.importorskip('gi.repository.GLib')
+        # make sure that we also have gobject
+        pytest.importorskip('gi.repository.GObject')
+    
+    def create_observer(self, monitor):
+        from pyudev.gi import MonitorObserver
+        self.observer = MonitorObserver(monitor)
 
 
 @pytest.mark.skipif(str('"DISPLAY" not in os.environ'),

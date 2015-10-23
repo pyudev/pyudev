@@ -52,7 +52,8 @@ echo "Installing supported GUI toolkits"
 apt python-qt4 python3-pyqt4 \
   python-pyside python3-pyside \
   python-wxgtk2.8 xvfb \
-  python-gobject
+  python-gobject \
+  python-gi python3-gi
 
 echo "Creating test virtualenvs"
 make_pyudev_venv python2 pyudev-py2

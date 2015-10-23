@@ -12,8 +12,8 @@ Almost the complete libudev_ functionality is exposed. You can:
 * Query device information, properties and attributes,
 * Monitor devices, both synchronously and asynchronously with background
   threads, or within the event loops of Qt (:mod:`pyudev.pyqt4`,
-  :mod:`pyudev.pyside`), glib (:mod:`pyudev.glib`) and wxPython
-  (:mod:`pyudev.wx`).
+  :mod:`pyudev.pyside`), glib (:mod:`pyudev.glib`, :mod:`pyudev.gi`) and 
+  wxPython (:mod:`pyudev.wx`).
 
 
 Documentation
