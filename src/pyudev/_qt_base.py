@@ -20,7 +20,7 @@
     pyudev._qt_base
     ===============
 
-    Base mixin class for Qt4 support.
+    Base mixin class for Qt4,Qt5 support.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
