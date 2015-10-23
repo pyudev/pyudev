@@ -68,8 +68,11 @@ class Mock(object):
 
 # mock out native modules used throughout pyudev to enable Sphinx autodoc even
 # if these modules are unavailable, as on readthedocs.org
-Mock.mock_modules('PyQt4', 'PyQt4.QtCore', 'PySide', 'PySide.QtCore',
-                  'glib', 'gobject', 'wx', 'wx.lib', 'wx.lib.newevent',
+Mock.mock_modules('PyQt5', 'PyQt5.QtCore',
+                  'PyQt4', 'PyQt4.QtCore',
+                  'PySide', 'PySide.QtCore',
+                  'glib', 'gobject',
+                  'wx', 'wx.lib', 'wx.lib.newevent',
                   'pyudev._libudev')
 
 
