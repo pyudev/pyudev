@@ -9,7 +9,6 @@
    :nosignatures:
 
    discover
-   traversal
 
 
 :mod:`pyudev_extras.discover`
@@ -21,14 +20,3 @@
         .. automethod:: get_devices
 
         .. automethod:: setup
-
-
-:mod:`pyudev_extras.traversal`
---------------------------------------
-.. automodule:: pyudev_extras.traversal
-
-    .. automethod:: pyudev_extras.traversal.holders
-
-    .. automethod:: pyudev_extras.traversal.slaves
-
-    .. automethod:: pyudev_extras.traversal.topology_walk
