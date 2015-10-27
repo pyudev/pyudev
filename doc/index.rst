@@ -75,6 +75,17 @@ contributions and the testsuite documentation.
    tests/index
 
 
+Endorsements
+------------
+If you're using pyudev and want to say something about it please add yourself
+to the endorsements page.
+
+.. toctree::
+   :maxdepth: 1
+
+   endorsements
+
+
 Other reading
 -------------
 
