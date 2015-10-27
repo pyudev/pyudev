@@ -27,7 +27,7 @@
 
     .. _gPyQt5: http://riverbankcomputing.co.uk/software/pyqt/intro
 
-    .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>, Sebastian Wiesner  <lunaryorn@gmail.com>
+    .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
 
@@ -36,45 +36,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import QObject
-from PyQt5.QtCore import QSocketNotifier
+from PyQt5 import QtCore
 
-from pyudev.core import Device
-from pyudev._qt_base import MonitorObserverMixin
+from ._qt_base import MonitorObserverGenerator
 
 
-class MonitorObserver(QObject, MonitorObserverMixin):
-    """An observer for device events integrating into the :mod:`PyQt5` mainloop.
-
-    This class inherits :class:`~PyQt5.QtCore.QObject` to turn device events
-    into Qt signals:
-
-    >>> from pyudev import Context, Monitor
-    >>> from pyudev.pyqt5 import MonitorObserver
-    >>> context = Context()
-    >>> monitor = Monitor.from_netlink(context)
-    >>> monitor.filter_by(subsystem='input')
-    >>> observer = MonitorObserver(monitor)
-    >>> def device_event(device):
-    ...     print('event {0} on device {1}'.format(device.action, device))
-    >>> observer.deviceEvent.connect(device_event)
-    >>> monitor.start()
-
-    This class is a child of :class:`~PyQt5.QtCore.QObject`.
-
-    """
-
-    #: emitted upon arbitrary device events
-    deviceEvent = pyqtSignal(Device)
-
-    def __init__(self, monitor, parent=None):
-        """
-        Observe the given ``monitor`` (a :class:`~pyudev.Monitor`):
-
-        ``parent`` is the parent :class:`~PyQt5.QtCore.QObject` of this
-        object.  It is passed unchanged to the inherited constructor of
-        :class:`~PyQt5.QtCore.QObject`.
-        """
-        QObject.__init__(self, parent)
-        self._setup_notifier(monitor, QSocketNotifier)
+MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
+   QtCore.QObject,
+   QtCore.pyqtSignal,
+   QtCore.QSocketNotifier
+)
