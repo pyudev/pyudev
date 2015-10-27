@@ -25,12 +25,20 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
-
+from pyudev.core import Device
+from pyudev._util import text_type
 
 class MonitorObserverMixin(object):
+    """
+    Base mixin for pyqt monitor observers.
+    """
+    # pylint: disable=too-few-public-methods
+
     def _setup_notifier(self, monitor, notifier_class):
         self.monitor = monitor
         self.notifier = notifier_class(
@@ -72,6 +80,10 @@ class MonitorObserverMixin(object):
 
 
 class QUDevMonitorObserverMixin(MonitorObserverMixin):
+    """
+    Obsolete monitor observer mixin.
+    """
+    # pylint: disable=too-few-public-methods
 
     def _setup_notifier(self, monitor, notifier_class):
         MonitorObserverMixin._setup_notifier(self, monitor, notifier_class)
@@ -89,3 +101,106 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
         signal = self._action_signal_map.get(device.action)
         if signal is not None:
             signal.emit(device)
+
+def make_init(qobject, socket_notifier):
+    """
+    Generates an initializer to observer the given ``monitor``
+    (a :class:`~pyudev.Monitor`):
+
+    ``parent`` is the parent :class:`~PyQt{4,5}.QtCore.QObject` of this
+    object.  It is passed unchanged to the inherited constructor of
+    :class:`~PyQt{4,5}.QtCore.QObject`.
+    """
+
+    def __init__(self, monitor, parent=None):
+        qobject.__init__(self, parent)
+        # pylint: disable=protected-access
+        self._setup_notifier(monitor, socket_notifier)
+
+    return __init__
+
+
+class MonitorObserverGenerator(object):
+    """
+    Class to generate a MonitorObserver class.
+    """
+    # pylint: disable=too-few-public-methods
+
+    @staticmethod
+    def make_monitor_observer(qobject, signal, socket_notifier):
+        """Generates an observer for device events integrating into the
+        PyQt{4,5} mainloop.
+
+        This class inherits :class:`~PyQt{4,5}.QtCore.QObject` to turn device
+        events into Qt signals:
+
+        >>> from pyudev import Context, Monitor
+        >>> from pyudev.pyqt4 import MonitorObserver
+        >>> context = Context()
+        >>> monitor = Monitor.from_netlink(context)
+        >>> monitor.filter_by(subsystem='input')
+        >>> observer = MonitorObserver(monitor)
+        >>> def device_event(device):
+        ...     print('event {0} on device {1}'.format(device.action, device))
+        >>> observer.deviceEvent.connect(device_event)
+        >>> monitor.start()
+
+        This class is a child of :class:`~{PySide, PyQt{4,5}}.QtCore.QObject`.
+
+        """
+        return type(
+           str("MonitorObserver"),
+           (qobject, MonitorObserverMixin),
+           {
+              str("__init__") : make_init(qobject, socket_notifier),
+              str("deviceEvent") : signal(Device)
+           }
+        )
+
+
+
+class QUDevMonitorObserverGenerator(object):
+    """
+    Class to generate a MonitorObserver class.
+    """
+    # pylint: disable=too-few-public-methods
+
+    @staticmethod
+    def make_monitor_observer(qobject, signal, socket_notifier):
+        """Generates an observer for device events integrating into the
+        PyQt{4,5} mainloop.
+
+        This class inherits :class:`~PyQt{4,5}.QtCore.QObject` to turn device
+        events into Qt signals:
+
+        >>> from pyudev import Context, Monitor
+        >>> from pyudev.pyqt4 import MonitorObserver
+        >>> context = Context()
+        >>> monitor = Monitor.from_netlink(context)
+        >>> monitor.filter_by(subsystem='input')
+        >>> observer = MonitorObserver(monitor)
+        >>> def device_event(device):
+        ...     print('event {0} on device {1}'.format(device.action, device))
+        >>> observer.deviceEvent.connect(device_event)
+        >>> monitor.start()
+
+        This class is a child of :class:`~{PyQt{4,5}, PySide}.QtCore.QObject`.
+
+        """
+        return type(
+           str("QUDevMonitorObserver"),
+           (qobject, QUDevMonitorObserverMixin),
+           {
+              str("__init__") : make_init(qobject, socket_notifier),
+              #: emitted upon arbitrary device events
+              str("deviceEvent") : signal(text_type, Device),
+              #: emitted if a device was added
+              str("deviceAdded") : signal(Device),
+              #: emitted if a device was removed
+              str("deviceRemoved") : signal(Device),
+              #: emitted if a device was changed
+              str("deviceChanged") : signal(Device),
+              #: emitted if a device was moved
+              str("deviceMoved") : signal(Device)
+           }
+        )

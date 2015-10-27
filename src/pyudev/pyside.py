@@ -35,80 +35,29 @@
     .. versionadded:: 0.6
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from PySide import QtCore
 
-from PySide.QtCore import QSocketNotifier, QObject, Signal
+from ._qt_base import MonitorObserverGenerator
+from ._qt_base import QUDevMonitorObserverGenerator
 
-from pyudev._util import text_type
-from pyudev.core import Device
-from pyudev._qt_base import QUDevMonitorObserverMixin, MonitorObserverMixin
+# pylint: disable=invalid-name
+MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
+   QtCore.QObject,
+   QtCore.Signal,
+   QtCore.QSocketNotifier
+)
 
-
-class MonitorObserver(QObject, MonitorObserverMixin):
-    """An observer for device events integrating into the :mod:`PySide` mainloop.
-
-    This class inherits :class:`~PySide.QtCore.QObject` to turn device events
-    into Qt signals:
-
-    >>> from pyudev import Context, Monitor
-    >>> from pyudev.pyqt4 import MonitorObserver
-    >>> context = Context()
-    >>> monitor = Monitor.from_netlink(context)
-    >>> monitor.filter_by(subsystem='input')
-    >>> observer = MonitorObserver(monitor)
-    >>> def device_event(device):
-    ...     print('event {0} on device {1}'.format(device.action, device))
-    >>> observer.deviceEvent.connect(device_event)
-    >>> monitor.start()
-
-    This class is a child of :class:`~PySide.QtCore.QObject`.
-
-    """
-
-    #: emitted upon arbitrary device events
-    deviceEvent = Signal(Device)
-
-    def __init__(self, monitor, parent=None):
-        """
-        Observe the given ``monitor`` (a :class:`~pyudev.Monitor`):
-
-        ``parent`` is the parent :class:`~PySide.QtCore.QObject` of this
-        object.  It is passed unchanged to the inherited constructor of
-        :class:`~PySide.QtCore.QObject`.
-        """
-        QObject.__init__(self, parent)
-        self._setup_notifier(monitor, QSocketNotifier)
-
-
-class QUDevMonitorObserver(QObject, QUDevMonitorObserverMixin):
-    """
-    An observer for device events integrating into the :mod:`PySide` mainloop.
-
-    .. deprecated:: 0.17
-       Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
-
-    """
-
-    #: emitted upon arbitrary device events
-    deviceEvent = Signal(text_type, Device)
-    #: emitted, if a device was added
-    deviceAdded = Signal(Device)
-    #: emitted, if a device was removed
-    deviceRemoved = Signal(Device)
-    #: emitted, if a device was changed
-    deviceChanged = Signal(Device)
-    #: emitted, if a device was moved
-    deviceMoved = Signal(Device)
-
-    def __init__(self, monitor, parent=None):
-        """
-        Observe the given ``monitor`` (a :class:`~pyudev.Monitor`):
-
-        ``parent`` is the parent :class:`~PySide.QtCore.QObject` of this
-        object.  It is passed unchanged to the inherited constructor of
-        :class:`~PySide.QtCore.QObject`.
-        """
-        QObject.__init__(self, parent)
-        self._setup_notifier(monitor, QSocketNotifier)
+"""
+.. deprecated:: 0.17
+   Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
+"""
+QUDevMonitorObserver = QUDevMonitorObserverGenerator.make_monitor_observer(
+   QtCore.QObject,
+   QtCore.Signal,
+   QtCore.QSocketNotifier
+)
