@@ -30,9 +30,8 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from ctypes import (CDLL, Structure, POINTER,
+from ctypes import (cdll, CDLL, Structure, POINTER,
                     c_char, c_char_p, c_int, c_uint, c_ulonglong)
-from ctypes.util import find_library
 
 from pyudev._errorcheckers import (check_negative_errorcode,
                                    check_errno_on_nonzero_return,
@@ -265,10 +264,10 @@ def load_udev_library():
 
     Raise :exc:`~exceptions.ImportError`, if the udev library was not found.
     """
-    udev_library_name = find_library('udev')
-    if not udev_library_name:
+    try:
+        libudev = cdll.LoadLibrary('libudev.so')
+    except OSError:
         raise ImportError('No library named udev')
-    libudev = CDLL(udev_library_name, use_errno=True)
     # context function signature
     for namespace, members in SIGNATURES.items():
         for funcname in members:
