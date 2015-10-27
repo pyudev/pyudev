@@ -49,7 +49,8 @@ echo "Installing headers for coverage tests"
 apt libudev-dev gccxml
 
 echo "Installing supported GUI toolkits"
-apt python-qt4 python3-pyqt4 \
+apt python-pyqt5 python3-pyqt5 \
+  python-qt4 python3-pyqt4 \
   python-pyside python3-pyside \
   python-wxgtk2.8 xvfb \
   python-gobject
