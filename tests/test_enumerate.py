@@ -91,7 +91,7 @@ class TestEnumerator(object):
         )
         for device in devices:
             attributes = device.attributes
-            assert not key in attributes or attributes[key] != value
+            assert attributes.lookup(key) != value
 
     def test_match_attribute_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
@@ -102,7 +102,7 @@ class TestEnumerator(object):
     def test_match_attribute_string(self, context):
         devices = list(context.list_devices().match_attribute('driver', 'usb'))
         for device in devices:
-            assert device.attributes['driver'] == b'usb'
+            assert device.attributes.lookup('driver') == b'usb'
 
     def test_match_attribute_int(self, context):
         # busnum gives us the number of a USB bus.  And any decent system
@@ -113,7 +113,7 @@ class TestEnumerator(object):
         # any device at all on the system running the test
         devices = list(context.list_devices().match_attribute('busnum', 2))
         for device in devices:
-            assert device.attributes['busnum'] == b'2'
+            assert device.attributes.lookup('busnum') == b'2'
             assert device.attributes.asint('busnum') == 2
 
     def test_match_attribute_bool(self, context):
@@ -122,7 +122,7 @@ class TestEnumerator(object):
         # test should work on all systems these tests are ever run on
         devices = list(context.list_devices().match_attribute('ro', False))
         for device in devices:
-            assert device.attributes['ro'] == b'0'
+            assert device.attributes.lookup('ro') == b'0'
             assert not device.attributes.asbool('ro')
 
     @_UDEV_TEST(154, "test_match_tag_mock")
