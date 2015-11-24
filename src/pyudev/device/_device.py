@@ -965,15 +965,9 @@ def _is_attribute_file(filepath): # pragma: no cover
                 filename in ('dev', 'uevent') or
                 os.path.islink(filepath))
 
-class Attributes(Container, Iterable, Sized):
+class Attributes(object):
     """
     udev attributes for :class:`Device` objects.
-
-    This class represents only a partial mapping between keys and values.
-
-    The underlying libudev methods return a set of keys which are a superset of
-    the set of keys which have values. Therefore, lookup with what libudev
-    documentation terms an 'available' key may still yield no value.
 
     .. versionadded:: 0.5
     """
@@ -982,63 +976,7 @@ class Attributes(Container, Iterable, Sized):
         self.device = device
         self._libudev = device._libudev
 
-    def _get_attributes_libudev(self):
-        """
-        Yields attribute keys of device using libudev.
-
-        Note that this method is correct wrt. libudev, but that libudev
-        methods return a superset of the attribute keys that can be looked up.
-        """
-        attrs = self._libudev.udev_device_get_sysattr_list_entry(self.device)
-        for attribute, _ in udev_list_iterate(self._libudev, attrs):
-            yield ensure_unicode_string(attribute)
-
-    def _get_attributes_sysfs(self): # pragma: no cover
-        """
-        Yields attribute keys of device by inspecting sysfs directories.
-
-        Should never end up being invoked where systemd version >= 167.
-
-        Its behavior barely resembles the behavior of _get_attributes_libudev()
-        which replaces it in all versions of systemd where
-        udev_device_get_sysattr_list_entry() is available.
-        """
-        sys_path = self.device.sys_path
-        for filename in os.listdir(sys_path):
-            filepath = os.path.join(sys_path, filename)
-            if _is_attribute_file(filepath):
-                yield filename
-
-    def _get_attributes(self):
-        """
-        Yields attribute keys of device.
-        """
-        if hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
-            return self._get_attributes_libudev()
-        else: # pragma: no cover
-            return self._get_attributes_sysfs()
-
-    def __len__(self):
-        """
-        Return the number of attribute keys defined.
-        """
-        return sum(1 for _ in self._get_attributes())
-
-    def __iter__(self):
-        """
-        Iterate over all attribute keys defined.
-
-        Yield each attribute key as unicode string.
-        """
-        return self._get_attributes()
-
-    def __contains__(self, attribute):
-        """
-        Whether the attribute key is considered available.
-        """
-        return attribute in self._get_attributes()
-
-    def __getitem__(self, attribute):
+    def lookup(self, attribute):
         """
         Get the given system ``attribute`` for the device.
 
@@ -1047,16 +985,13 @@ class Attributes(Container, Iterable, Sized):
 
         :returns: the attribute value or None if no value
         :rtype: byte string or NoneType
-        :raises `~exceptions.KeyError`: if there is no key for this device
 
-        Returns None if there is a key for the device but device lookup does
-        not yield a value.
+        Returns None if lookup does not yield a value.
         """
-        value = self._libudev.udev_device_get_sysattr_value(
-            self.device, ensure_byte_string(attribute))
-        if value is None and attribute not in self:
-            raise KeyError(attribute)
-        return value
+        return self._libudev.udev_device_get_sysattr_value(
+            self.device,
+            ensure_byte_string(attribute)
+        )
 
     def asstring(self, attribute):
         """
@@ -1073,7 +1008,7 @@ class Attributes(Container, Iterable, Sized):
         for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
-        value = self[attribute]
+        value = self.lookup(attribute)
         return ensure_unicode_string(value if value is not None else str(None))
 
     def asint(self, attribute):
