@@ -26,6 +26,7 @@ import pytest
 
 from pyudev import _libudev
 
+from .utils import libudev
 
 WRAPPER_BLACKLIST_PATTERNS = [
      # vararg functions not supported by ctypes
@@ -51,6 +52,12 @@ WRAPPER_BLACKLIST_PATTERNS = [
 
 
 def _is_blacklisted(function):
+    """
+    Determine if the function is to be ignored in testing.
+
+    :returns: True if the function should be ignored, otherwise False.
+    :rtype: bool
+    """
     for pattern in WRAPPER_BLACKLIST_PATTERNS:
         if pytest.is_unicode_string(pattern):
             if function.name == pattern:
@@ -116,45 +123,49 @@ class LibudevFunction(object):
         return _to_ctypes(self.declaration.return_type)
 
 
-def pytest_funcarg__libudev_function(request):
-    """
-    Override ``libudev_function`` to skip tests for blacklisted functions.
-    """
-    function = request.getfuncargvalue('libudev_function')
-    if _is_blacklisted(function):
-        pytest.skip('{0} is not wrapped'.format(function.name))
-    return LibudevFunction(function)
+_FUNCTIONS = [
+   f for f in libudev.Unit.parse(libudev.LIBUDEV_H).functions if f.name.startswith('udev_')
+]
+_LIBUDEV = _libudev.load_udev_library()
+
+_TEST_FUNCTIONS = [
+   LibudevFunction(f) for f in _FUNCTIONS if not _is_blacklisted(f)
+]
+
+def test_arguments():
+    failures = []
+    for libudev_function in _TEST_FUNCTIONS:
+        function = libudev_function.get_wrapper(_LIBUDEV)
+        if function.argtypes != libudev_function.argument_types:
+            failures.append(libudev_function.name)
+
+    assert failures == []
 
 
-def pytest_funcarg__libudev(request):
-    try:
-        return _libudev.load_udev_library()
-    except ImportError:
-        pytest.skip('udev not available')
-
-
-def pytest_funcarg__function(request):
-    libudev = request.getfuncargvalue('libudev')
-    libudev_function = request.getfuncargvalue('libudev_function')
-    return libudev_function.get_wrapper(libudev)
-
-
-def test_arguments(function, libudev_function):
-    assert function.argtypes == libudev_function.argument_types
-
-
-def test_return_type(function, libudev_function):
+def test_return_type():
     # Ignore the return type of *_unref() functions. The return value of these
     # functions is unused in pyudev, so it doesn't need to be wrapped.
-    restype = (libudev_function.return_type
+    failures = []
+    for libudev_function in _TEST_FUNCTIONS:
+        function = libudev_function.get_wrapper(_LIBUDEV)
+        restype = (libudev_function.return_type
                if not libudev_function.name.endswith('_unref')
                else None)
-    assert function.restype == restype
+        if function.restype != restype:
+            failures.append(libudev_function.name)
+
+    assert failures == []
 
 
-def test_error_checker(function, libudev_function):
-    name = libudev_function.name
-    if name in _libudev.ERROR_CHECKERS:
-        assert function.errcheck == _libudev.ERROR_CHECKERS[name]
-    else:
-        pytest.skip('{0} has no error checker'.format(name))
+def test_error_checker():
+    failures = []
+    for libudev_function in _TEST_FUNCTIONS:
+        function = libudev_function.get_wrapper(_LIBUDEV)
+        name = libudev_function.name
+        try:
+            if function.errcheck != _libudev.ERROR_CHECKERS[name]:
+                failures.append(name)
+        except KeyError:
+            failures.append(name)
+
+    assert failures == []

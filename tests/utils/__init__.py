@@ -16,30 +16,13 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.device
-    =============
+    pyudev.tests.utils
+    ==========================
 
-    Device class implementation of :mod:`pyudev`.
+    Utils to support pyudev testing.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+    .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-__all__ = [
-  'Attributes',
-  'Device',
-  'DeviceNotFoundAtPathError',
-  'DeviceNotFoundByNameError',
-  'DeviceNotFoundByNumberError',
-  'DeviceNotFoundError',
-  'DeviceNotFoundInEnvironmentError',
-  'Tags'
-]
-
-from ._device import Attributes
-from ._device import Device
-from ._device import Tags
-from ._errors import DeviceNotFoundAtPathError
-from ._errors import DeviceNotFoundByNameError
-from ._errors import DeviceNotFoundByNumberError
-from ._errors import DeviceNotFoundError
-from ._errors import DeviceNotFoundInEnvironmentError
+from . import libudev
+from . import udev

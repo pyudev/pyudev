@@ -16,12 +16,12 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    plugins.libudev
+    utils.libudev
     ===============
 
     Provide a list of all libudev functions as declared in ``libudev.h``.
 
-    This plugin parses ``libudev.h`` with :program:`gccxml` and extracts all
+    Parses ``libudev.h`` with :program:`gccxml` and extracts all
     libudev functions from this header.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
@@ -186,39 +186,3 @@ class Unit(object):
 
 
 LIBUDEV_H = '/usr/include/libudev.h'
-
-
-def pytest_configure(config):
-    try:
-        libudev_h = Unit.parse(LIBUDEV_H)
-        config.libudev_functions = [f for f in libudev_h.functions
-                                    if f.name.startswith('udev_')]
-        config.libudev_error = None
-    except (EnvironmentError, LookupError) as error:
-        config.libudev_functions = []
-        config.libudev_error = error
-
-
-def pytest_generate_tests(metafunc):
-    if 'libudev_function' in metafunc.funcargnames:
-        functions = sorted(metafunc.config.libudev_functions,
-                           key=attrgetter('name'))
-        if functions:
-            metafunc.parametrize('libudev_function', functions, indirect=True,
-                                 ids=[f.name for f in functions])
-        else:
-            metafunc.parametrize('libudev_function',
-                                 [metafunc.config.libudev_error],
-                                 indirect=True)
-
-
-def pytest_funcarg__libudev_function(request):
-    """
-    Return each :class:`Function` parsed from libudev.
-
-    If libudev could not be parsed, the invoking test is skipped.
-    """
-    if isinstance(request.param, Function):
-        return request.param
-    else:
-        pytest.skip(str(request.param))

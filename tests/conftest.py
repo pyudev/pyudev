@@ -27,25 +27,11 @@ import pyudev
 
 
 pytest_plugins = [
-    str('plugins.udev_database'),
-    str('plugins.fake_monitor'),
-    str('plugins.privileged'),
-    str('plugins.mock_libudev'),
-    str('plugins.libudev'),
-    str('plugins.travis'),
+    str('tests.plugins.fake_monitor'),
+    str('tests.plugins.privileged'),
+    str('tests.plugins.mock_libudev'),
+    str('tests.plugins.travis'),
 ]
-
-
-def assert_env_error(error, errno, filename=None):
-    __tracebackhide__ = True
-    # work around an apparent limitation in pytest.raises, which gives use
-    # tuple representations of exceptions instead of exception objects.  See
-    # pyudev issue #43
-    if isinstance(error, tuple):
-        error = OSError(*error)
-    assert error.errno == errno
-    assert error.strerror == os.strerror(errno)
-    assert error.filename == filename
 
 
 def is_unicode_string(value):
@@ -61,11 +47,10 @@ def is_unicode_string(value):
 
 
 def pytest_namespace():
-    return dict((func.__name__, func) for func in
-                (is_unicode_string, assert_env_error))
+    return dict((func.__name__, func) for func in (is_unicode_string,))
 
-
-def pytest_funcarg__context(request):
+@pytest.fixture
+def context(request):
     """
     Return a useable :class:`pyudev.Context` object.
     """

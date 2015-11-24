@@ -31,18 +31,33 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	pylint pyudev \
+	PYTHONPATH=src pylint src/pyudev src/pyudev_extras reproducers/*.py \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
 		--disable=duplicate-code \
 		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.*
+		--no-docstring-rgx=_.* \
+		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
+
+pylint-tests:
+	PYTHONPATH=src pylint tests \
+		--reports=no \
+		--disable=I \
+		--disable=bad-continuation \
+		--disable=duplicate-code \
+		--disable=no-self-use \
+		--exclude-protected=_libudev \
+		--no-docstring-rgx=_.* \
+		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
 PYREVERSE_OPTS = --output=pdf
 view:
 	-rm -Rf _pyreverse
 	mkdir _pyreverse
-	PYTHONPATH=. pyreverse ${PYREVERSE_OPTS} --project="pyudev" pyudev
+	PYTHONPATH=src pyreverse ${PYREVERSE_OPTS} --project="pyudev" src/pyudev src/pyudev_extras
 	mv classes_pyudev.pdf _pyreverse
 	mv packages_pyudev.pdf _pyreverse
+
+archive:
+	git archive --output=./archive.tar.gz HEAD

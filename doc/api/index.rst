@@ -9,6 +9,9 @@ This document provides API reference documentation for pyudev.  Refer to the
 
    pyudev
    pyudev.pyqt4
+   pyudev.pyqt5
    pyudev.pyside
    pyudev.glib
    pyudev.wx
+
+   pyudev_extras

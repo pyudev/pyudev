@@ -38,6 +38,7 @@ import sys
 import os
 from select import select
 
+import pytest
 
 class FakeMonitor(object):
     """
@@ -84,8 +85,8 @@ class FakeMonitor(object):
         finally:
             os.close(self._event_sink)
 
-
-def pytest_funcarg__fake_monitor(request):
+@pytest.fixture
+def fake_monitor(request):
     """
     Return a FakeMonitor, which emits the platform device as returned by
     the ``fake_monitor_device`` funcarg on all triggered actions.

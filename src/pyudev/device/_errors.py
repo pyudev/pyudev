@@ -29,7 +29,19 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-class DeviceNotFoundError(LookupError):
+import abc
+
+from six import add_metaclass
+
+@add_metaclass(abc.ABCMeta)
+class DeviceError(Exception):
+    """
+    Any error raised when messing around w/ or trying to discover devices.
+    """
+
+
+@add_metaclass(abc.ABCMeta)
+class DeviceNotFoundError(DeviceError):
     """
     An exception indicating that no :class:`Device` was found.
 
@@ -56,6 +68,28 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
 
     def __str__(self):
         return 'No device at {0!r}'.format(self.sys_path)
+
+
+class DeviceNotFoundByFileError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was
+    found from the given filename.
+    """
+
+class DeviceNotFoundByInterfaceIndexError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was found
+    from the given interface index.
+    """
+
+class DeviceNotFoundByKernelDeviceError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was found
+    from the given kernel device string.
+
+    The format of the kernel device string is defined in the
+    systemd.journal-fields man pagees.
+    """
 
 
 class DeviceNotFoundByNameError(DeviceNotFoundError):
@@ -122,3 +156,32 @@ class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
 
     def __str__(self):
         return 'No device found in environment'
+
+
+class DeviceValueError(DeviceError):
+    """
+    Raised when a parameter has an unacceptable value.
+
+    May also be raised when the parameter has an unacceptable type.
+    """
+
+    _FMT_STR = "value '%s' for parameter %s is unacceptable"
+
+    def __init__(self, value, param, msg=None):
+        """ Initializer.
+
+            :param object value: the value
+            :param str param: the parameter
+            :param str msg: an explanatory message
+        """
+        # pylint: disable=super-init-not-called
+        self._value = value
+        self._param = param
+        self._msg = msg
+
+    def __str__(self):
+        if self._msg:
+            fmt_str = self._FMT_STR + ": %s"
+            return fmt_str % (self._value, self._param, self._msg)
+        else:
+            return self._FMT_STR % (self._value, self._param)

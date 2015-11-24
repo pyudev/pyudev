@@ -27,10 +27,12 @@ from select import select
 import pytest
 import mock
 
-from pyudev import Device
-from pyudev import DeviceNotFoundAtPathError
-from pyudev import Monitor
-from pyudev import MonitorObserver
+from pyudev import Monitor, MonitorObserver, Device
+
+from tests.utils.udev import DeviceDatabase
+from tests.utils.udev import get_device_sample
+
+from tests._device_tests import _UDEV_TEST
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -39,16 +41,16 @@ from pyudev import MonitorObserver
 # necessary anyway, libudev can just assumed to be correct.
 
 
-def pytest_funcarg__monitor(request):
+@pytest.fixture
+def monitor(request):
     return Monitor.from_netlink(request.getfuncargvalue('context'))
 
 
-def pytest_funcarg__fake_monitor_device(request):
+@pytest.fixture
+def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    try:
-        return Device.from_path(context, '/devices/platform')
-    except DeviceNotFoundAtPathError:
-        pytest.skip('device not found')
+    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    return Device.from_path(context, device.device_path)
 
 
 @contextmanager
@@ -161,11 +163,11 @@ class TestMonitor(object):
                                               b'usb_interface')
                 update.assert_called_once_with(monitor)
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag(self, monitor):
         monitor.filter_by_tag('spam')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_filter_by_tag")
     def test_filter_by_tag_mock(self, monitor):
         funcname = 'udev_monitor_filter_add_match_tag'
         spec = lambda m, t: None
@@ -229,11 +231,6 @@ class TestMonitor(object):
                                autospec=spec) as func:
             monitor.set_receive_buffer_size(1000)
             func.assert_called_once_with(monitor, 1000)
-
-    def test_set_receive_buffer_size_privilege_error(self, monitor):
-        with pytest.raises(EnvironmentError) as exc_info:
-            monitor.set_receive_buffer_size(1000)
-        pytest.assert_env_error(exc_info.value, errno.EPERM)
 
     def test_poll_timeout(self, monitor):
         assert monitor.poll(timeout=0) is None

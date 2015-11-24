@@ -1,7 +1,8 @@
-recursive-include pyudev *.py
+recursive-include src/pyudev *.py
+recursive-include src/pyudev_extras *.py
 recursive-include doc *.rst *.py *.html
 recursive-include tests *.py
-recursive-include reproducers *.c
+recursive-include reproducers *.c *.py
 include tox.ini
 global-include requirements.txt
 include CHANGES.rst COPYING README.rst

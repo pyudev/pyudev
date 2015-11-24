@@ -31,12 +31,17 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
+import re
 from collections import Container
 from collections import Iterable
 from collections import Mapping
+from collections import Sized
 from datetime import timedelta
 
 from pyudev.device._errors import DeviceNotFoundAtPathError
+from pyudev.device._errors import DeviceNotFoundByFileError
+from pyudev.device._errors import DeviceNotFoundByInterfaceIndexError
+from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
@@ -48,37 +53,9 @@ from pyudev._util import udev_list_iterate
 
 # pylint: disable=too-many-lines
 
-class Device(Mapping):
-    # pylint: disable=too-many-public-methods
+class Devices(object):
     """
-    A single device with attached attributes and properties.
-
-    This class subclasses the ``Mapping`` ABC, providing a read-only
-    dictionary mapping property names to the corresponding values.
-    Therefore all well-known dicitionary methods and operators
-    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
-    properties.
-
-    Aside of the properties, a device also has a set of udev-specific
-    attributes like the path inside ``sysfs``.
-
-    :class:`Device` objects compare equal and unequal to other devices and
-    to strings (based on :attr:`device_path`).  However, there is no
-    ordering on :class:`Device` objects, and the corresponding operators
-    ``>``, ``<``, ``<=`` and ``>=`` raise :exc:`~exceptions.TypeError`.
-
-    .. warning::
-
-       Do **never** use object identity (``is`` operator) to compare
-       :class:`Device` objects.  :mod:`pyudev` may create multiple
-       :class:`Device` objects for the same device.  Instead simply compare
-       devices by value using ``==`` or ``!=``.
-
-    :class:`Device` objects are hashable and can therefore be used as keys
-    in dictionaries and sets.
-
-    They can also be given directly as ``udev_device *`` to functions wrapped
-    through :mod:`ctypes`.
+    Class for constructing :class:`Device` objects from various kinds of data.
     """
 
     @classmethod
@@ -89,9 +66,9 @@ class Device(Mapping):
 
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> Device.from_path(context, '/devices/platform')
+        >>> Devices.from_path(context, '/devices/platform')
         Device(u'/sys/devices/platform')
-        >>> Device.from_path(context, '/sys/devices/platform')
+        >>> Devices.from_path(context, '/sys/devices/platform')
         Device(u'/sys/devices/platform')
 
         ``context`` is the :class:`Context` in which to search the device.
@@ -100,7 +77,7 @@ class Device(Mapping):
         Return a :class:`Device` object for the device.  Raise
         :exc:`DeviceNotFoundAtPathError`, if no device was found for ``path``.
 
-        .. versionadded:: 0.4
+        .. versionadded:: 0.18
         """
         if not path.startswith(context.sys_path):
             path = os.path.join(context.sys_path, path.lstrip(os.sep))
@@ -113,7 +90,7 @@ class Device(Mapping):
 
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> Device.from_path(context, '/sys/devices/platform')
+        >>> Devices.from_sys_path(context, '/sys/devices/platform')
         Device(u'/sys/devices/platform')
 
         ``context`` is the :class:`Context` in which to search the device.
@@ -124,18 +101,13 @@ class Device(Mapping):
         :exc:`DeviceNotFoundAtPathError`, if no device was found for
         ``sys_path``.
 
-        .. versionchanged:: 0.4
-           Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
-           no device was found for ``sys_path``.
-        .. versionchanged:: 0.5
-           Raise :exc:`DeviceNotFoundAtPathError` instead of
-           :exc:`NoSuchDeviceError`.
+        .. versionadded:: 0.18
         """
         device = context._libudev.udev_device_new_from_syspath(
             context, ensure_byte_string(sys_path))
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
-        return cls(context, device)
+        return Device(context, device)
 
     @classmethod
     def from_name(cls, context, subsystem, sys_name):
@@ -145,10 +117,10 @@ class Device(Mapping):
 
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> sda = Device.from_name(context, 'block', 'sda')
+        >>> sda = Devices.from_name(context, 'block', 'sda')
         >>> sda
         Device(u'/sys/devices/pci0000:00/0000:00:1f.2/host0/target0:0:0/0:0:0:0/block/sda')
-        >>> sda == Device.from_path(context, '/block/sda')
+        >>> sda == Devices.from_path(context, '/block/sda')
 
         ``context`` is the :class:`Context` in which to search the device.
         ``subsystem`` and ``sys_name`` are byte or unicode strings, which
@@ -158,14 +130,14 @@ class Device(Mapping):
         :exc:`DeviceNotFoundByNameError`, if no device was found with the given
         name.
 
-        .. versionadded:: 0.5
+        .. versionadded:: 0.18
         """
         device = context._libudev.udev_device_new_from_subsystem_sysname(
             context, ensure_byte_string(subsystem),
             ensure_byte_string(sys_name))
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
-        return cls(context, device)
+        return Device(context, device)
 
     @classmethod
     def from_device_number(cls, context, typ, number):
@@ -177,7 +149,7 @@ class Device(Mapping):
         >>> from pyudev import Context, Device
         >>> ctx = Context()
         >>> major, minor = 8, 0
-        >>> device = Device.from_device_number(context, 'block',
+        >>> device = Devices.from_device_number(context, 'block',
         ...     os.makedev(major, minor))
         >>> device
         Device(u'/sys/devices/pci0000:00/0000:00:11.0/host0/target0:0:0/0:0:0:0/block/sda')
@@ -200,20 +172,15 @@ class Device(Mapping):
 
         Return a :class:`Device` object for the device with the given device
         ``number``.  Raise :exc:`DeviceNotFoundByNumberError`, if no device was
-        found with the given device type and number.  Raise
-        :exc:`~exceptions.ValueError`, if ``type`` is any other string than
-        ``'char'`` or ``'block'``.
+        found with the given device type and number.
 
-        .. versionadded:: 0.11
+        .. versionadded:: 0.18
         """
-        if typ not in ('char', 'block'):
-            raise ValueError('Invalid type: {0!r}. Must be one of "char" '
-                             'or "block".'.format(typ))
         device = context._libudev.udev_device_new_from_devnum(
             context, ensure_byte_string(typ[0]), number)
         if not device:
             raise DeviceNotFoundByNumberError(typ, number)
-        return cls(context, device)
+        return Device(context, device)
 
     @classmethod
     def from_device_file(cls, context, filename):
@@ -222,7 +189,7 @@ class Device(Mapping):
 
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> device = Device.from_device_file(context, '/dev/sda')
+        >>> device = Devices.from_device_file(context, '/dev/sda')
         >>> device
         Device(u'/sys/devices/pci0000:00/0000:00:0d.0/host2/target2:0:0/2:0:0:0/block/sda')
         >>> device.device_node
@@ -231,7 +198,7 @@ class Device(Mapping):
         .. warning::
 
            Though the example seems to suggest that ``device.device_node ==
-           filename`` holds with ``device = Device.from_device_file(context,
+           filename`` holds with ``device = Devices.from_device_file(context,
            filename)``, this is only true in a majority of cases.  There *can*
            be devices, for which this relation is actually false!  Thus, do
            *not* expect :attr:`~Device.device_node` to be equal to the given
@@ -243,15 +210,78 @@ class Device(Mapping):
         ``filename`` is a string containing the path of a device file.
 
         Return a :class:`Device` representing the given device file.  Raise
-        :exc:`~exceptions.ValueError` if ``filename`` is no device file at all.
-        Raise :exc:`~exceptions.EnvironmentError` if ``filename`` does not
-        exist or if its metadata was inaccessible.
+        :exc:`DeviceNotFoundByFileError` if ``filename`` is no device file
+        at all or if ``filename`` does not exist or if its metadata was
+        inaccessible.
 
-        .. versionadded:: 0.15
+        .. versionadded:: 0.18
         """
-        device_type = get_device_type(filename)
+        try:
+            device_type = get_device_type(filename)
+        except (EnvironmentError, ValueError) as err:
+            raise DeviceNotFoundByFileError(err)
+
         device_number = os.stat(filename).st_rdev
         return cls.from_device_number(context, device_type, device_number)
+
+
+    @classmethod
+    def from_interface_index(cls, context, ifindex):
+        """
+        Locate a device based on the interface index.
+
+        :param `Context` context: the libudev context
+        :param int ifindex: the interface index
+        :returns: the device corresponding to the interface index
+        :rtype: `Device`
+
+        This method is only appropriate for network devices.
+        """
+        network_devices = context.list_devices(subsystem='net')
+        dev = next(
+           (d for d in network_devices if d.attributes['ifindex'] == ifindex),
+           None
+        )
+        if dev:
+            return dev
+        else:
+            raise DeviceNotFoundByInterfaceIndexError(ifindex)
+
+
+    @classmethod
+    def from_kernel_device(cls, context, kernel_device):
+        """
+        Locate a device based on the kernel device.
+
+        :param `Context` context: the libudev context
+        :param str kernel_device: the kernel device
+        :returns: the device corresponding to ``kernel_device``
+        :rtype: `Device`
+        """
+        switch_char = kernel_device[0]
+        rest = kernel_device[1:]
+        if switch_char in ('b', 'c'):
+            number_re = re.compile(r'^(?P<major>\d+):(?P<minor>\d+)$')
+            match = number_re.match(rest)
+            if match:
+                number = os.makedev(
+                   int(match.group('major')),
+                   int(match.group('minor'))
+                )
+                return cls.from_device_number(context, switch_char, number)
+            else:
+                raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        elif switch_char == 'n':
+            return cls.from_interface_index(context, rest)
+        elif switch_char == '+':
+            (subsystem, _, kernel_device_name) = rest.partition(':')
+            if kernel_device_name and subsystem:
+                return cls.from_name(context, subsystem, kernel_device_name)
+            else:
+                raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        else:
+            raise DeviceNotFoundByKernelDeviceError(kernel_device)
+
 
     @classmethod
     def from_environment(cls, context):
@@ -272,12 +302,124 @@ class Device(Mapping):
 
         .. udevversion:: 152
 
-        .. versionadded:: 0.6
+        .. versionadded:: 0.18
         """
         device = context._libudev.udev_device_new_from_environment(context)
         if not device:
             raise DeviceNotFoundInEnvironmentError()
-        return cls(context, device)
+        return Device(context, device)
+
+    @classmethod
+    def METHODS(cls): # pylint: disable=invalid-name
+        """
+        Return methods that obtain a :class:`Device` from a variety of
+        different data.
+
+        :return: a list of from_* methods.
+        :rtype: list of class methods
+
+        .. versionadded:: 0.18
+        """
+        return [ #pragma: no cover
+           cls.from_device_file,
+           cls.from_device_number,
+           cls.from_name,
+           cls.from_path,
+           cls.from_sys_path
+        ]
+
+
+class Device(Mapping):
+    # pylint: disable=too-many-public-methods
+    """
+    A single device with attached attributes and properties.
+
+    This class subclasses the ``Mapping`` ABC, providing a read-only
+    dictionary mapping property names to the corresponding values.
+    Therefore all well-known dicitionary methods and operators
+    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
+    properties.
+
+    Aside of the properties, a device also has a set of udev-specific
+    attributes like the path inside ``sysfs``.
+
+    :class:`Device` objects compare equal and unequal to other devices and
+    to strings (based on :attr:`device_path`).  However, there is no
+    ordering on :class:`Device` objects, and the corresponding operators
+    ``>``, ``<``, ``<=`` and ``>=`` raise :exc:`~exceptions.TypeError`.
+
+    .. warning::
+
+       **Never** use object identity (``is`` operator) to compare
+       :class:`Device` objects.  :mod:`pyudev` may create multiple
+       :class:`Device` objects for the same device.  Instead compare
+       devices by value using ``==`` or ``!=``.
+
+    :class:`Device` objects are hashable and can therefore be used as keys
+    in dictionaries and sets.
+
+    They can also be given directly as ``udev_device *`` to functions wrapped
+    through :mod:`ctypes`.
+    """
+
+    @classmethod
+    def from_path(cls, context, path): #pragma: no cover
+        """
+        .. versionadded:: 0.4
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_path` instead.
+        """
+        return Devices.from_path(context, path)
+
+    @classmethod
+    def from_sys_path(cls, context, sys_path): #pragma: no cover
+        """
+        .. versionchanged:: 0.4
+           Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
+           no device was found for ``sys_path``.
+        .. versionchanged:: 0.5
+           Raise :exc:`DeviceNotFoundAtPathError` instead of
+           :exc:`NoSuchDeviceError`.
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_sys_path` instead.
+        """
+        return Devices.from_sys_path(context, sys_path)
+
+    @classmethod
+    def from_name(cls, context, subsystem, sys_name): #pragma: no cover
+        """
+        .. versionadded:: 0.5
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_name` instead.
+        """
+        return Devices.from_name(context, subsystem, sys_name)
+
+    @classmethod
+    def from_device_number(cls, context, typ, number): #pragma: no cover
+        """
+        .. versionadded:: 0.11
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_device_number` instead.
+        """
+        return Devices.from_device_number(context, typ, number)
+
+    @classmethod
+    def from_device_file(cls, context, filename): #pragma: no cover
+        """
+        .. versionadded:: 0.15
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_device_file` instead.
+        """
+        return Devices.from_device_file(context, filename)
+
+    @classmethod
+    def from_environment(cls, context): #pragma: no cover
+        """
+        .. versionadded:: 0.6
+        .. deprecated:: 0.18
+           Use :class:`Devices.from_environment` instead.
+        """
+        return Devices.from_environment(context)
 
     def __init__(self, context, _device):
         self.context = context
@@ -445,7 +587,7 @@ class Device(Mapping):
 
            >>> from pyudev import Context, Device
            >>> context = Context()
-           >>> device = Device.from_path(context, '/sys/devices/LNXSYSTM:00')
+           >>> device = Devices.from_path(context, '/sys/devices/LNXSYSTM:00')
            >>> device.sys_number
            u'00'
 
@@ -528,7 +670,7 @@ class Device(Mapping):
         >>> import os
         >>> from pyudev import Context, Device
         >>> context = Context()
-        >>> sda = Device.from_name(context, 'block', 'sda')
+        >>> sda = Devices.from_name(context, 'block', 'sda')
         >>> sda.device_number
         2048L
         >>> (os.major(sda.device_number), os.minor(sda.device_number))
@@ -605,8 +747,8 @@ class Device(Mapping):
         .. warning::
 
            Links are not necessarily resolved by
-           :meth:`Device.from_device_file()`. Hence do *not* rely on
-           ``Device.from_device_file(context, link).device_path ==
+           :meth:`Devices.from_device_file()`. Hence do *not* rely on
+           ``Devices.from_device_file(context, link).device_path ==
            device.device_path`` from any ``link`` in ``device.device_links``.
         """
         devlinks = self._libudev.udev_device_get_devlinks_list_entry(self)
@@ -803,31 +945,10 @@ class Device(Mapping):
     def __ge__(self, other):
         raise TypeError('Device not orderable')
 
-def _is_attribute_file(filepath):
+
+class Attributes(object):
     """
-    Check, if ``filepath`` points to a valid udev attribute filename.
-
-    Implementation is stolen from udev source code, ``print_all_attributes``
-    in ``udev/udevadm-info.c``.  It excludes hidden files (starting with a
-    dot), the special files ``dev`` and ``uevent`` and links.
-
-    Return ``True``, if ``filepath`` refers to an attribute, ``False``
-    otherwise.
-    """
-    filename = os.path.basename(filepath)
-    return not (filename.startswith('.') or
-                filename in ('dev', 'uevent') or
-                os.path.islink(filepath))
-
-class Attributes(Mapping):
-    """
-    A mapping which holds udev attributes for :class:`Device` objects.
-
-    This class subclasses the ``Mapping`` ABC, providing a read-only
-    dictionary mapping attribute names to the corresponding values.
-    Therefore all well-known dicitionary methods and operators
-    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
-    attributes.
+    udev attributes for :class:`Device` objects.
 
     .. versionadded:: 0.5
     """
@@ -836,57 +957,22 @@ class Attributes(Mapping):
         self.device = device
         self._libudev = device._libudev
 
-    def _get_attributes(self):
-        """
-        Yields attributes of device.
-        """
-        if hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
-            attrs = self._libudev.udev_device_get_sysattr_list_entry(
-                self.device)
-            for attribute, _ in udev_list_iterate(self._libudev, attrs):
-                yield ensure_unicode_string(attribute)
-        else:
-            sys_path = self.device.sys_path
-            for filename in os.listdir(sys_path):
-                filepath = os.path.join(sys_path, filename)
-                if _is_attribute_file(filepath):
-                    yield filename
-
-    def __len__(self):
-        """
-        Return the amount of attributes defined.
-        """
-        return sum(1 for _ in self._get_attributes())
-
-    def __iter__(self):
-        """
-        Iterate over all attributes defined.
-
-        Yield each attribute name as unicode string.
-        """
-        return self._get_attributes()
-
-    def __contains__(self, attribute):
-        value = self._libudev.udev_device_get_sysattr_value(
-            self.device, ensure_byte_string(attribute))
-        return value is not None
-
-    def __getitem__(self, attribute):
+    def lookup(self, attribute):
         """
         Get the given system ``attribute`` for the device.
 
         ``attribute`` is a unicode or byte string containing the name of the
         system attribute.
 
-        Return the attribute value as byte string, or raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device.
+        :returns: the attribute value or None if no value
+        :rtype: byte string or NoneType
+
+        Returns None if lookup does not yield a value.
         """
-        value = self._libudev.udev_device_get_sysattr_value(
-            self.device, ensure_byte_string(attribute))
-        if value is None:
-            raise KeyError(attribute)
-        return value
+        return self._libudev.udev_device_get_sysattr_value(
+            self.device,
+            ensure_byte_string(attribute)
+        )
 
     def asstring(self, attribute):
         """
@@ -903,7 +989,8 @@ class Attributes(Mapping):
         for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
-        return ensure_unicode_string(self[attribute])
+        value = self.lookup(attribute)
+        return ensure_unicode_string(value if value is not None else str(None))
 
     def asint(self, attribute):
         """
@@ -959,7 +1046,7 @@ class Tags(Iterable, Container):
         if hasattr(self._libudev, 'udev_device_has_tag'):
             return bool(self._libudev.udev_device_has_tag(
                 self.device, ensure_byte_string(tag)))
-        else:
+        else: # pragma: no cover
             return any(t == tag for t in self)
 
     @property
