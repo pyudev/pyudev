@@ -945,25 +945,6 @@ class Device(Mapping):
     def __ge__(self, other):
         raise TypeError('Device not orderable')
 
-def _is_attribute_file(filepath): # pragma: no cover
-    """
-    Check, if ``filepath`` points to a valid udev attribute filename.
-
-    Implementation is stolen from udev source code, ``print_all_attributes``
-    in ``udev/udevadm-info.c``.  It excludes hidden files (starting with a
-    dot), the special files ``dev`` and ``uevent`` and links.
-
-    Return ``True``, if ``filepath`` refers to an attribute, ``False``
-    otherwise.
-
-    Note that this method is a random ad-hoc mess, and the behavior is not
-    anything like the current behavior in ``print_all_attributes``. It is
-    retained only for backwards compatibility.
-    """
-    filename = os.path.basename(filepath)
-    return not (filename.startswith('.') or
-                filename in ('dev', 'uevent') or
-                os.path.islink(filepath))
 
 class Attributes(object):
     """
