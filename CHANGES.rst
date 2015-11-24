@@ -1,3 +1,21 @@
+0.18 (Dec 1, 2015)
+===================
+
+- DeviceNotFoundError is no longer a subtype of LookupError
+- Added support for pyqt5 monitor observer
+- Added discover module, which looks up a device on limited information
+- Attributes class no longer extends Mapping, extends object instead
+- Attributes class no longer inherits [] operator, Mapping methods
+- Attributes class objects are no longer iterable
+- Attributes.available_attributes property added
+- Attributes.get() method, with usual semantics, defined
+- Device.from_* methods are deprecated, uses Devices.from_* methods instead
+- Device.from_device_file() now raises DeviceNotFoundByFileError
+- Device.from_device_number() now raises DeviceNotFoundByNumberError
+- Devices.from_interface_index() method added
+- Devices.from_kernel_device() method added
+- Numerous testing infrastructure changes
+
 0.17 (Aug 26, 2015)
 =====================
 
