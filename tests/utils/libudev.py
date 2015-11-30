@@ -36,7 +36,7 @@ from tempfile import NamedTemporaryFile
 from subprocess import check_call
 from xml.etree import cElementTree as etree
 
-import py.path
+import py
 
 
 class GCCXMLParser(object):

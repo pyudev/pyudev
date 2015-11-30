@@ -173,6 +173,7 @@ class TestDevices(object):
             assert device.device_path == device_datum.device_path
     else:
         def test_from_device_number(self):
+            # pylint: disable=missing-docstring
             pytest.skip("not enough devices with device nodes in data")
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
@@ -206,6 +207,7 @@ class TestDevices(object):
                 assert error.device_number == device_datum.device_number
     else:
         def test_from_device_number_wrong_type(self):
+            # pylint: disable=missing-docstring
             pytest.skip("not enough devices with device nodes in data")
 
     @given(_CONTEXT_STRATEGY)
@@ -229,6 +231,7 @@ class TestDevices(object):
             assert device.device_path == device_datum.device_path
     else:
         def test_from_device_file(self):
+            # pylint: disable=missing-docstring
             pytest.skip("not enough devices with device nodes in data")
 
     _device_data = [d for d in _DEVICE_DATA if d.device_links]
@@ -260,6 +263,7 @@ class TestDevices(object):
                 assert link in device.device_links
     else:
         def test_from_device_file_links(self):
+            # pylint: disable=missing-docstring
             pytest.skip("not enough devices with links in data")
 
     @given(a_context=_CONTEXT_STRATEGY)
@@ -307,6 +311,7 @@ class TestDevices(object):
             assert device is not None
     else:
         def test_from_kernel_device(self):
+            # pylint: disable=missing-docstring
             pytest.skip("not enough journal entries with _KERNEL_DEVICE")
 
     _entries = [
@@ -330,6 +335,7 @@ class TestDevices(object):
             assert device is not None
     else:
         def test_from_journal_name(self):
+            # pylint: disable=missing-docstring
             pytest.skip(
                "not enough entries with _KERNEL_SUBSYSTEM and _UDEV_SYSNAME"
             )
