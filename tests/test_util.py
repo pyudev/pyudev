@@ -31,6 +31,8 @@ from hypothesis import Settings
 from pyudev import _util
 from pyudev import Context
 
+from .utils import is_unicode_string
+
 _CONTEXT = Context()
 
 
@@ -50,7 +52,7 @@ def test_ensure_byte_string_none():
 
 @pytest.mark.conversion
 def test_ensure_unicode_string():
-    assert pytest.is_unicode_string(
+    assert is_unicode_string(
         _util.ensure_unicode_string(b'hello world'))
     assert _util.ensure_unicode_string(b'hello world') == 'hello world'
     hello = 'hello world'

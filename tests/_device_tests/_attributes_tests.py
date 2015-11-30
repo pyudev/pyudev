@@ -38,6 +38,8 @@ import pytest
 
 from pyudev import Device
 
+from ..utils import is_unicode_string
+
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
@@ -87,7 +89,7 @@ class TestAttributes(object):
     def test_asstring(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in self.non_volatile_items(device_datum.attributes):
-            assert pytest.is_unicode_string(
+            assert is_unicode_string(
                 device.attributes.asstring(key))
             assert device.attributes.asstring(key) == value
 

@@ -26,6 +26,7 @@ import pytest
 
 from pyudev import _libudev
 
+from .utils import is_unicode_string
 from .utils import libudev
 
 WRAPPER_BLACKLIST_PATTERNS = [
@@ -59,7 +60,7 @@ def _is_blacklisted(function):
     :rtype: bool
     """
     for pattern in WRAPPER_BLACKLIST_PATTERNS:
-        if pytest.is_unicode_string(pattern):
+        if is_unicode_string(pattern):
             if function.name == pattern:
                 return True
         else:

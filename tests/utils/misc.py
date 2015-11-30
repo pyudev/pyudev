@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -15,29 +15,26 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+"""
+    utils.misc
+    =============
 
-import os
+    Miscellaneous useful methods.
 
-import pytest
+    .. moduleauthor::  mulhern <amulhern@redhat.com>
+"""
 
-import pyudev
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
+import six
 
 
-pytest_plugins = [
-    str('tests.plugins.fake_monitor'),
-    str('tests.plugins.privileged'),
-    str('tests.plugins.mock_libudev'),
-    str('tests.plugins.travis'),
-]
-
-@pytest.fixture
-def context(request):
+def is_unicode_string(value):
     """
-    Return a useable :class:`pyudev.Context` object.
+    Return ``True``, if ``value`` is of a real unicode string type
+    (``unicode`` in python 2, ``str`` in python 3), ``False`` otherwise.
     """
-    try:
-        return pyudev.Context()
-    except ImportError:
-        pytest.skip('udev not available')
+    return isinstance(value, unicode if six.PY2 else str)

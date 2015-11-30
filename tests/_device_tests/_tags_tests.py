@@ -35,6 +35,8 @@ import mock
 
 from pyudev import Device
 
+from ..utils import is_unicode_string
+
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
@@ -58,7 +60,7 @@ class TestTags(object):
             device = Device.from_path(a_context, device_datum.device_path)
             assert set(device.tags) == set(device_datum.tags)
             for tag in device.tags:
-                assert pytest.is_unicode_string(tag)
+                assert is_unicode_string(tag)
 
         @given(
            _CONTEXT_STRATEGY,

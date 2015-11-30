@@ -45,6 +45,8 @@ from pyudev import Devices
 
 from pyudev.device import Attributes, Tags
 
+from ..utils import is_unicode_string
+
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICE_DATA
 from ._constants import _DEVICES
@@ -192,7 +194,7 @@ class TestDevice(object):
     def test_sys_path(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.sys_path == device_datum.sys_path
-        assert pytest.is_unicode_string(device.sys_path)
+        assert is_unicode_string(device.sys_path)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -202,7 +204,7 @@ class TestDevice(object):
     def test_device_path(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_path == device_datum.device_path
-        assert pytest.is_unicode_string(device.device_path)
+        assert is_unicode_string(device.device_path)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -212,7 +214,7 @@ class TestDevice(object):
     def test_subsystem(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.subsystem == device_datum.properties['SUBSYSTEM']
-        assert pytest.is_unicode_string(device.subsystem)
+        assert is_unicode_string(device.subsystem)
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -221,7 +223,7 @@ class TestDevice(object):
     def test_device_sys_name(self, a_device):
         assert a_device.sys_name.replace('/', '!') == \
            os.path.basename(a_device.device_path)
-        assert pytest.is_unicode_string(a_device.sys_name)
+        assert is_unicode_string(a_device.sys_name)
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -233,7 +235,7 @@ class TestDevice(object):
         # doesn't count according to the implementation of libudev)
         if match and match.start() > 1:
             assert a_device.sys_number == match.group(0)
-            assert pytest.is_unicode_string(a_device.sys_name)
+            assert is_unicode_string(a_device.sys_name)
         else:
             assert a_device.sys_number is None
 
@@ -246,7 +248,7 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_type == device_datum.properties.get('DEVTYPE')
         if device.device_type:
-            assert pytest.is_unicode_string(device.device_type)
+            assert is_unicode_string(device.device_type)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -257,7 +259,7 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.driver == device_datum.properties.get('DRIVER')
         if device.driver:
-            assert pytest.is_unicode_string(device.driver)
+            assert is_unicode_string(device.driver)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -268,7 +270,7 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device.device_node == device_datum.device_node
         if device.device_node:
-            assert pytest.is_unicode_string(device.device_node)
+            assert is_unicode_string(device.device_node)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -332,7 +334,7 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert sorted(device.device_links) == sorted(device_datum.device_links)
         for link in device.device_links:
-            assert pytest.is_unicode_string(link)
+            assert is_unicode_string(link)
 
     @given(
        strategies.sampled_from(_DEVICES),
@@ -354,7 +356,7 @@ class TestDevice(object):
             assert a_device.action == 'spam'
             func.assert_called_once_with(a_device)
             func.reset_mock()
-            assert pytest.is_unicode_string(a_device.action)
+            assert is_unicode_string(a_device.action)
             func.assert_called_once_with(a_device)
 
     @given(
@@ -406,7 +408,7 @@ class TestDevice(object):
     def test_iteration(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         for property in device:
-            assert pytest.is_unicode_string(property)
+            assert is_unicode_string(property)
         # test that iteration really yields all properties
         device_properties = set(device)
         for property in device_datum.properties:
