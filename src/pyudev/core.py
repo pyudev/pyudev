@@ -156,6 +156,11 @@ class Context(object):
 
     @log_priority.setter
     def log_priority(self, value):
+        """
+        Set the log priority.
+
+        :param int value: the log priority.
+        """
         self._libudev.udev_set_log_priority(self, value)
 
     def list_devices(self, **kwargs):
@@ -261,8 +266,8 @@ class Enumerator(object):
         parent = kwargs.pop('parent', None)
         if parent is not None:
             self.match_parent(parent)
-        for property, value in kwargs.items():
-            self.match_property(property, value)
+        for prop, value in kwargs.items():
+            self.match_property(prop, value)
         return self
 
     def match_subsystem(self, subsystem, nomatch=False):
@@ -296,11 +301,11 @@ class Enumerator(object):
             self, ensure_byte_string(sys_name))
         return self
 
-    def match_property(self, property, value):
+    def match_property(self, prop, value):
         """
-        Include all devices, whose ``property`` has the given ``value``.
+        Include all devices, whose ``prop`` has the given ``value``.
 
-        ``property`` is either a unicode string or a byte string, containing
+        ``prop`` is either a unicode string or a byte string, containing
         the name of the property to match.  ``value`` is a property value,
         being one of the following types:
 
@@ -313,7 +318,7 @@ class Enumerator(object):
         Return the instance again.
         """
         self._libudev.udev_enumerate_add_match_property(
-            self, ensure_byte_string(property), property_value_to_bytes(value))
+            self, ensure_byte_string(prop), property_value_to_bytes(value))
         return self
 
     def match_attribute(self, attribute, value, nomatch=False):
