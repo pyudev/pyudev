@@ -51,6 +51,12 @@ pylint-tests:
 		--no-docstring-rgx=_.* \
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
+diff-quality:
+	- $(MAKE) pylint > pylint.log
+	- $(MAKE) pylint-tests >> pylint.log
+	diff-quality --violations=pylint pylint.log
+
+
 PYREVERSE_OPTS = --output=pdf
 view:
 	-rm -Rf _pyreverse
