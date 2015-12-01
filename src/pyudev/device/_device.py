@@ -1060,6 +1060,7 @@ class Tags(Iterable, Container):
 
     def __init__(self, device):
         self.device = device
+        self._libudev = device._libudev
 
     def _has_tag(self, tag):
         """
@@ -1073,10 +1074,6 @@ class Tags(Iterable, Container):
                 self.device, ensure_byte_string(tag)))
         else: # pragma: no cover
             return any(t == tag for t in self)
-
-    @property
-    def _libudev(self):
-        return self.device._libudev
 
     def __contains__(self, tag):
         """
