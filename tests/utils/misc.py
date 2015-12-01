@@ -16,30 +16,25 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.device
+    utils.misc
     =============
 
-    Device class implementation of :mod:`pyudev`.
+    Miscellaneous useful methods.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+    .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-__all__ = [
-  'Attributes',
-  'Device',
-  'DeviceNotFoundAtPathError',
-  'DeviceNotFoundByNameError',
-  'DeviceNotFoundByNumberError',
-  'DeviceNotFoundError',
-  'DeviceNotFoundInEnvironmentError',
-  'Tags'
-]
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-from ._device import Attributes
-from ._device import Device
-from ._device import Tags
-from ._errors import DeviceNotFoundAtPathError
-from ._errors import DeviceNotFoundByNameError
-from ._errors import DeviceNotFoundByNumberError
-from ._errors import DeviceNotFoundError
-from ._errors import DeviceNotFoundInEnvironmentError
+import six
+
+
+def is_unicode_string(value):
+    """
+    Return ``True``, if ``value`` is of a real unicode string type
+    (``unicode`` in python 2, ``str`` in python 3), ``False`` otherwise.
+    """
+    return isinstance(value, unicode if six.PY2 else str)

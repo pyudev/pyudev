@@ -25,3 +25,15 @@ htmlcov
 
 # pyreverse files
 _pyreverse
+
+# hypothesis files
+.hypothesis
+
+# vim
+*.swp
+
+# zip
+*.gz
+
+# pytest
+.cache

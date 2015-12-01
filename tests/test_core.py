@@ -27,6 +27,9 @@ import mock
 
 from pyudev import udev_version
 
+from tests._device_tests import _UDEV_TEST
+
+from tests.utils import is_unicode_string
 
 def test_udev_version():
     assert isinstance(udev_version(), int)
@@ -39,16 +42,16 @@ def test_udev_version():
 class TestContext(object):
 
     def test_sys_path(self, context):
-        assert pytest.is_unicode_string(context.sys_path)
+        assert is_unicode_string(context.sys_path)
         assert context.sys_path == '/sys'
 
     def test_device_path(self, context):
-        assert pytest.is_unicode_string(context.device_path)
+        assert is_unicode_string(context.device_path)
         assert context.device_path == '/dev'
 
-    @pytest.mark.udev_version('>= 167')
+    @_UDEV_TEST(167, "test_run_path")
     def test_run_path(self, context):
-        assert pytest.is_unicode_string(context.run_path)
+        assert is_unicode_string(context.run_path)
         assert context.run_path == '/run/udev'
 
     def test_log_priority_get(self, context):

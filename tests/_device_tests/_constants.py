@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -15,29 +15,38 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+"""
+    pyudev.tests._device_tests
+    ==========================
+
+    Tests for devices.
+
+    .. moduleauthor::  mulhern <amulhern@redhat.com>
+"""
+
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import os
+from hypothesis import strategies
 
 import pytest
 
-import pyudev
+from pyudev import Context
+from pyudev import Device
 
+from ..utils import udev
 
-pytest_plugins = [
-    str('tests.plugins.fake_monitor'),
-    str('tests.plugins.privileged'),
-    str('tests.plugins.mock_libudev'),
-    str('tests.plugins.travis'),
-]
+_CONTEXT = Context()
+_DEVICE_DATA = list(udev.get_device_sample(udev.DeviceDatabase.db()))
+_DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 
-@pytest.fixture
-def context(request):
-    """
-    Return a useable :class:`pyudev.Context` object.
-    """
-    try:
-        return pyudev.Context()
-    except ImportError:
-        pytest.skip('udev not available')
+_CONTEXT_STRATEGY = strategies.just(_CONTEXT)
+
+_UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
+
+def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
+    fmt_str = "%s: udev version must be at least %s, is %s"
+    return pytest.mark.skipif(
+       _UDEV_VERSION < version,
+       reason=fmt_str % (node, version, _UDEV_VERSION)
+    )

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
+# Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by the
@@ -15,29 +15,18 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+"""
+    pyudev.tests._device_tests
+    ==========================
 
-import os
+    Tests on devices.
 
-import pytest
+    .. moduleauthor::  mulhern  <amulhern@redhat.com>
+"""
 
-import pyudev
-
-
-pytest_plugins = [
-    str('tests.plugins.fake_monitor'),
-    str('tests.plugins.privileged'),
-    str('tests.plugins.mock_libudev'),
-    str('tests.plugins.travis'),
-]
-
-@pytest.fixture
-def context(request):
-    """
-    Return a useable :class:`pyudev.Context` object.
-    """
-    try:
-        return pyudev.Context()
-    except ImportError:
-        pytest.skip('udev not available')
+from ._constants import _CONTEXT
+from ._constants import _CONTEXT_STRATEGY
+from ._constants import _DEVICE_DATA
+from ._constants import _DEVICES
+from ._constants import _UDEV_VERSION
+from ._constants import _UDEV_TEST

@@ -22,10 +22,18 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from pyudev import Enumerator, Device
+from hypothesis import given
+from hypothesis import strategies
+from hypothesis import Settings
 
+from pyudev import Enumerator
 
-def pytest_funcarg__enumerator(request):
+from ._device_tests import _CONTEXT_STRATEGY
+from ._device_tests import _DEVICES
+from ._device_tests import _UDEV_TEST
+
+@pytest.fixture
+def enumerator(request):
     context = request.getfuncargvalue('context')
     return context.list_devices()
 
@@ -74,10 +82,16 @@ class TestEnumerator(object):
             assert device.asbool('ID_INPUT_KEY')
 
     def test_match_attribute_nomatch(self, context):
+        key = 'driver'
+        value = 'usb'
         devices = context.list_devices().match_attribute(
-            'driver', 'usb', nomatch=True)
+           key,
+           value,
+           nomatch=True
+        )
         for device in devices:
-            assert device.attributes.get('driver') != 'usb'
+            attributes = device.attributes
+            assert attributes.get(key) != value
 
     def test_match_attribute_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
@@ -88,7 +102,7 @@ class TestEnumerator(object):
     def test_match_attribute_string(self, context):
         devices = list(context.list_devices().match_attribute('driver', 'usb'))
         for device in devices:
-            assert device.attributes['driver'] == b'usb'
+            assert device.attributes.get('driver') == b'usb'
 
     def test_match_attribute_int(self, context):
         # busnum gives us the number of a USB bus.  And any decent system
@@ -99,7 +113,7 @@ class TestEnumerator(object):
         # any device at all on the system running the test
         devices = list(context.list_devices().match_attribute('busnum', 2))
         for device in devices:
-            assert device.attributes['busnum'] == b'2'
+            assert device.attributes.get('busnum') == b'2'
             assert device.attributes.asint('busnum') == 2
 
     def test_match_attribute_bool(self, context):
@@ -108,10 +122,10 @@ class TestEnumerator(object):
         # test should work on all systems these tests are ever run on
         devices = list(context.list_devices().match_attribute('ro', False))
         for device in devices:
-            assert device.attributes['ro'] == b'0'
+            assert device.attributes.get('ro') == b'0'
             assert not device.attributes.asbool('ro')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_match_tag_mock")
     def test_match_tag_mock(self, context):
         enumerator = context.list_devices()
         funcname = 'udev_enumerate_add_match_tag'
@@ -122,25 +136,32 @@ class TestEnumerator(object):
             assert retval is enumerator
             func.assert_called_with(enumerator, b'spam')
 
-    @pytest.mark.udev_version('>= 154')
+    @_UDEV_TEST(154, "test_match_tag")
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
         for device in devices:
             assert 'seat' in device.tags
 
-    @pytest.mark.parametrize('device_data', pytest.config.udev_device_sample)
-    @pytest.mark.udev_version('>= 217')
-    def test_match_parent(self, context, device_data):
-        device = Device.from_path(context, device_data.device_path)
-        parent = device.parent
-        if parent is None:
-            pytest.skip('Device {0!r} has no parent'.format(device))
-        else:
+    _devices = [d for d in _DEVICES if d.parent]
+    if len(_devices) > 0:
+        @given(
+           _CONTEXT_STRATEGY,
+           strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
+           settings=Settings(max_examples=5)
+        )
+        def test_match_parent(self, context, device):
+            parent = device.parent
             children = list(context.list_devices().match_parent(parent))
             assert device in children
-            assert parent in children
+            try:
+                assert parent in children
+            except AssertionError:
+                pytest.xfail("rhbz#1255191")
+    else:
+        def test_match_parent(self):
+            pytest.skip("not enough devices with parents")
 
-    @pytest.mark.udev_version('>= 165')
+    @_UDEV_TEST(165, "test_match_is_initialized_mock")
     def test_match_is_initialized_mock(self, context):
         enumerator = context.list_devices()
         funcname = 'udev_enumerate_add_match_is_initialized'
@@ -197,7 +218,7 @@ class TestEnumerator(object):
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
-    @pytest.mark.udev_version('>= 172')
+    @_UDEV_TEST(172, "test_match_passthrough_parent")
     def test_match_passthrough_parent(self, enumerator):
         with mock.patch.object(enumerator, 'match_parent',
                                autospec=True) as match_parent:
