@@ -93,7 +93,7 @@ Return a function implementing ``pipe2``."""
             return _pipe2_by_pipe
 
 
-_pipe2 = _get_pipe2_implementation()
+_PIPE2 = _get_pipe2_implementation()
 
 
 def set_fd_flag(fd, flag):
@@ -132,7 +132,7 @@ class Pipe(object):
         """Open and return a new :class:`Pipe`.
 
         The pipe uses non-blocking IO."""
-        source, sink = _pipe2(os.O_NONBLOCK | O_CLOEXEC)
+        source, sink = _PIPE2(os.O_NONBLOCK | O_CLOEXEC)
         return cls(source, sink)
 
     def __init__(self, source_fd, sink_fd):
