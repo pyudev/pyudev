@@ -96,6 +96,15 @@ class TestAttributes(object):
     @given(
        _CONTEXT_STRATEGY,
        strategies.sampled_from(_DEVICE_DATA),
+       settings=Settings(max_examples=2)
+    )
+    def test_asstring_bogus_value(self, a_context, device_datum):
+        device = Device.from_path(a_context, device_datum.device_path)
+        assert device.attributes.asstring("totally bogus") == u''
+
+    @given(
+       _CONTEXT_STRATEGY,
+       strategies.sampled_from(_DEVICE_DATA),
        settings=Settings(max_examples=5)
     )
     def test_asint(self, a_context, device_datum):
