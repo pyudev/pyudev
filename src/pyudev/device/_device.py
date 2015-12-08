@@ -986,7 +986,8 @@ class Attributes(object):
         ``attribute`` is a unicode or byte string containing the name of the
         system attribute.
 
-        :param str attribute: the attribute to lookup
+        :param attribute: the attribute to lookup
+        :type attribute: unicode or byte string
         :param object default: the default value to return
         :returns: the attribute value or None if no value
         :rtype: byte string or NoneType
@@ -999,9 +1000,9 @@ class Attributes(object):
         )
         return value if value is not None else default
 
-    def asstring(self, attribute):
+    def asstring(self, attribute, default=u''):
         """
-        Get the given ``atribute`` for the device as unicode string.
+        Get the given ``attribute`` for the device as unicode string.
 
         Depending on the content of the attribute, this may or may not work.
         Be prepared to catch :exc:`~exceptions.UnicodeDecodeError`.
@@ -1010,14 +1011,20 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as byte string.  Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
+        :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
-        """
-        value = self.get(attribute)
-        return ensure_unicode_string(value if value is not None else str(None))
 
-    def asint(self, attribute):
+        :param attribute: the lookup key
+        :type attribute: unicode or byte string
+        :param default: the default value to return if unavailable
+        :type default: unicode or byte string, default is u''
+        :raises UnicodeDecodeError: if result can not be converted
+        :returns: the contents of the attribute or the default
+        :rtype: unicode string
+        """
+        return ensure_unicode_string(self.get(attribute, default))
+
+    def asint(self, attribute, default=u''):
         """
         Get the given ``attribute`` as integer.
 
@@ -1025,13 +1032,21 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as integer. Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or a :exc:`~exceptions.ValueError`, if the
+        :exc:`~exceptions.ValueError`, if the
         attribute value cannot be converted to an integer.
-        """
-        return int(self.asstring(attribute))
 
-    def asbool(self, attribute):
+        :param attribute: the lookup key
+        :type attribute: unicode or byte string
+        :param default: the default value to return if unavailable
+        :type default: unicode or byte string, default is u''
+        :raises ValueError: if conversion fails
+        :raises UnicodeDecodeError: if value can not be converted to unicode
+        :returns: the contents of the attribute as an int
+        :rtype: int
+        """
+        return int(self.asstring(attribute, default))
+
+    def asbool(self, attribute, default=u''):
         """
         Get the given ``attribute`` from this device as boolean.
 
@@ -1044,10 +1059,19 @@ class Attributes(object):
 
         Return ``True``, if the attribute value is ``'1'`` and ``False``, if
         the attribute value is ``'0'``.  Any other value raises a
-        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
-        if the given attribute is not defined for this device.
+        :exc:`~exceptions.ValueError`.
+
+        :param attribute: the lookup key
+        :type attribute: unicode or byte string
+        :param default: the default value to return if unavailable
+        :type default: unicode or byte string, default is u''
+        :raises ValueError: if string is not '1' or '0'
+        :raises UnicodeDecodeError: if value can not be converted to unicode
+        :returns: the contents of the attribute
+        :rtype: bool
         """
-        return string_to_bool(self.asstring(attribute))
+        return string_to_bool(self.asstring(attribute, default))
+
 
 class Tags(Iterable, Container):
     """
