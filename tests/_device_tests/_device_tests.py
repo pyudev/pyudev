@@ -492,8 +492,6 @@ class TestDevice(object):
             else:
                 with pytest.raises(ValueError) as exc_info:
                     device.asbool(prop)
-                message = 'Not a boolean value: {0!r}'
-                assert str(exc_info.value) == message.format(value)
 
     @given(
        strategies.sampled_from(_DEVICES),

@@ -44,10 +44,16 @@ from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+
+from pyudev._conversions import ConversionError
+from pyudev._conversions import SysfsConversion
+from pyudev._conversions import SysfsConversions
+from pyudev._conversions import UdevConversion
+from pyudev._conversions import UdevConversions
+
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
-from pyudev._util import string_to_bool
 from pyudev._util import udev_list_iterate
 from pyudev._util import udev_version
 
@@ -952,7 +958,10 @@ class Device(Mapping):
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
         """
-        return int(self[prop])
+        try:
+            return UdevConversion.convert(self[prop], UdevConversions.to_int)
+        except ConversionError:
+            raise ValueError(self[prop])
 
     def asbool(self, prop):
         """
@@ -970,7 +979,11 @@ class Device(Mapping):
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
         """
-        return string_to_bool(self[prop])
+        res = self[prop]
+        try:
+            return UdevConversion.convert(res, UdevConversions.to_bool)
+        except ConversionError:
+            raise ValueError(res)
 
     def __hash__(self):
         return hash(self.device_path)
@@ -1064,12 +1077,15 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as byte string.  Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
+        :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
         """
         value = self.get(attribute)
-        return ensure_unicode_string(value if value is not None else str(None))
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_unicode)
+        except ConversionError:
+            raise UnicodeDecodeError(value)
 
     def asint(self, attribute):
         """
@@ -1079,11 +1095,15 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as integer. Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or a :exc:`~exceptions.ValueError`, if the
+        :exc:`~exceptions.ValueError`, if the
         attribute value cannot be converted to an integer.
         """
-        return int(self.asstring(attribute))
+        value = self.get(attribute)
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_int)
+        except ConversionError:
+            raise ValueError(value)
 
     def asbool(self, attribute):
         """
@@ -1098,10 +1118,15 @@ class Attributes(object):
 
         Return ``True``, if the attribute value is ``'1'`` and ``False``, if
         the attribute value is ``'0'``.  Any other value raises a
-        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
-        if the given attribute is not defined for this device.
+        :exc:`~exceptions.ValueError`.
         """
-        return string_to_bool(self.asstring(attribute))
+        value = self.get(attribute)
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_bool)
+        except ConversionError:
+            raise ValueError(value)
+
 
 class Tags(Iterable, Container):
     """
