@@ -49,8 +49,28 @@ from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
 from pyudev._util import string_to_bool
 from pyudev._util import udev_list_iterate
+from pyudev._util import udev_version
 
 # pylint: disable=too-many-lines
+
+try:
+    _UDEV_VERSION = udev_version()
+except: # pylint: disable=bare-except
+    _UDEV_VERSION = None
+
+def _from_name_post_228(cls, context, subsystem, sys_name):
+    # pylint: disable=unused-argument
+    device = context._libudev.udev_device_new_from_subsystem_sysname(
+        context, ensure_byte_string(subsystem),
+        ensure_byte_string(sys_name))
+    if not device:
+        raise DeviceNotFoundByNameError(subsystem, sys_name)
+    return Device(context, device)
+
+def _from_name_pre_228(cls, context, subsystem, sys_name):
+    # pylint: disable=unused-argument
+    sys_name = sys_name.replace("/", "!")
+    return _from_name_post_228(cls, context, subsystem, sys_name)
 
 class Devices(object):
     """
@@ -108,8 +128,11 @@ class Devices(object):
             raise DeviceNotFoundAtPathError(sys_path)
         return Device(context, device)
 
-    @classmethod
-    def from_name(cls, context, subsystem, sys_name):
+    if _UDEV_VERSION is None or _UDEV_VERSION < 228:
+        from_name = classmethod(_from_name_pre_228)
+    else:
+        from_name = classmethod(_from_name_post_228)
+    from_name.__func__.__doc__ = \
         """
         Create a new device from a given ``subsystem`` and a given
         ``sys_name``:
@@ -131,12 +154,6 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_subsystem_sysname(
-            context, ensure_byte_string(subsystem),
-            ensure_byte_string(sys_name))
-        if not device:
-            raise DeviceNotFoundByNameError(subsystem, sys_name)
-        return Device(context, device)
 
     @classmethod
     def from_device_number(cls, context, typ, number):
