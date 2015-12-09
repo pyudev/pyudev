@@ -89,9 +89,9 @@ class TestAttributes(object):
     def test_asstring(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in self.non_volatile_items(device_datum.attributes):
-            assert is_unicode_string(
-                device.attributes.asstring(key))
-            assert device.attributes.asstring(key) == value
+            res = pytest.deprecated_call(device.attributes.asstring, key)
+            assert is_unicode_string(res)
+            assert res == value
 
     @given(
        _CONTEXT_STRATEGY,
@@ -105,9 +105,10 @@ class TestAttributes(object):
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.attributes.asint(key)
+                    pytest.deprecated_call(device.attributes.asint, key)
             else:
-                assert device.attributes.asint(key) == value
+                res = pytest.deprecated_call(device.attributes.asint, key)
+                assert res == value
 
     @given(
        _CONTEXT_STRATEGY,
@@ -118,12 +119,12 @@ class TestAttributes(object):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in self.non_volatile_items(device_datum.attributes):
             if value == '1':
-                assert device.attributes.asbool(key)
+                assert pytest.deprecated_call(device.attributes.asbool, key)
             elif value == '0':
-                assert not device.attributes.asbool(key)
+                assert not pytest.deprecated_call(device.attributes.asbool, key)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.attributes.asbool(key)
+                    pytest.deprecated_call(device.attributes.asbool, key)
 
     @_UDEV_TEST(167, "test_available_attributes")
     @given(

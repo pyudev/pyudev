@@ -957,7 +957,17 @@ class Device(Mapping):
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         try:
             return UdevConversion.convert(self[prop], UdevConversions.to_int)
         except ConversionError:
@@ -978,7 +988,17 @@ class Device(Mapping):
         the property value is ``'0'``.  Any other value raises a
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         res = self[prop]
         try:
             return UdevConversion.convert(res, UdevConversions.to_bool)
@@ -1079,7 +1099,17 @@ class Attributes(object):
         Return the attribute value as byte string.  Raise a
         :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         value = self.get(attribute)
         value = value if value is not None else str(None)
         try:
@@ -1097,7 +1127,17 @@ class Attributes(object):
         Return the attribute value as integer. Raise a
         :exc:`~exceptions.ValueError`, if the
         attribute value cannot be converted to an integer.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         value = self.get(attribute)
         value = value if value is not None else str(None)
         try:
@@ -1119,7 +1159,17 @@ class Attributes(object):
         Return ``True``, if the attribute value is ``'1'`` and ``False``, if
         the attribute value is ``'0'``.  Any other value raises a
         :exc:`~exceptions.ValueError`.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         value = self.get(attribute)
         value = value if value is not None else str(None)
         try:

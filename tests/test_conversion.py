@@ -32,8 +32,6 @@ from __future__ import unicode_literals
 
 import pytest
 
-import pyudev
-
 from pyudev import ConversionError
 from pyudev import SysfsConversion
 from pyudev import SysfsConversions
@@ -45,6 +43,7 @@ class TestUdevConversion(object):
     """
     Test simple udev conversions.
     """
+    # pylint: disable=too-few-public-methods
 
     def test_bad_conversions(self):
         """
@@ -62,6 +61,7 @@ class TestSysfsConversion(object):
     """
     Test simple sysfs attribute conversions.
     """
+    # pylint: disable=too-few-public-methods
 
     def test_bad_conversions(self):
         """
