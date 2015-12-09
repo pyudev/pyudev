@@ -599,8 +599,7 @@ class Device(Mapping):
         .. versionadded:: 0.11
         """
         number = self._libudev.udev_device_get_sysnum(self)
-        if number is not None:
-            return ensure_unicode_string(number)
+        return ensure_unicode_string(number) if number is not None else None
 
     @property
     def device_type(self):
@@ -623,6 +622,8 @@ class Device(Mapping):
         device_type = self._libudev.udev_device_get_devtype(self)
         if device_type is not None:
             return ensure_unicode_string(device_type)
+        else:
+            return device_type
 
     @property
     def driver(self):
@@ -633,8 +634,7 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         driver = self._libudev.udev_device_get_driver(self)
-        if driver:
-            return ensure_unicode_string(driver)
+        return ensure_unicode_string(driver) if driver else None
 
     @property
     def device_node(self):
@@ -655,8 +655,7 @@ class Device(Mapping):
            :meth:`from_device_file()`.
         """
         node = self._libudev.udev_device_get_devnode(self)
-        if node:
-            return ensure_unicode_string(node)
+        return ensure_unicode_string(node) if node else None
 
     @property
     def device_number(self):
@@ -783,8 +782,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         action = self._libudev.udev_device_get_action(self)
-        if action:
-            return ensure_unicode_string(action)
+        return ensure_unicode_string(action) if action else None
 
     @property
     def sequence_number(self):
