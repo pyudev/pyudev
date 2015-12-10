@@ -468,14 +468,20 @@ class TestDevice(object):
     )
     def test_asint(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for property, value in device_datum.properties.items():
+        for prop, value in device_datum.properties.items():
             try:
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.asint(property)
+                    if pytest.__version__ == '2.8.4':
+                        device.asint(prop)
+                    else:
+                        pytest.deprecated_call(device.asint, prop)
             else:
-                assert device.asint(property) == value
+                if pytest.__version__ == '2.8.4':
+                    assert device.asint(prop) == value
+                else:
+                    assert pytest.deprecated_call(device.asint, prop) == value
 
     @given(
        _CONTEXT_STRATEGY,
@@ -486,14 +492,21 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop, value in device_datum.properties.items():
             if value == '1':
-                assert device.asbool(prop)
+                if pytest.__version__ == '2.8.4':
+                    assert device.asbool(prop)
+                else:
+                    assert pytest.deprecated_call(device.asbool, prop)
             elif value == '0':
-                assert not device.asbool(prop)
+                if pytest.__version__ == '2.8.4':
+                    assert not device.asbool(prop)
+                else:
+                    assert not pytest.deprecated_call(device.asbool, prop)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.asbool(prop)
-                message = 'Not a boolean value: {0!r}'
-                assert str(exc_info.value) == message.format(value)
+                    if pytest.__version__ == '2.8.4':
+                        device.asbool(prop)
+                    else:
+                        pytest.deprecated_call(device.asbool, prop)
 
     @given(
        strategies.sampled_from(_DEVICES),

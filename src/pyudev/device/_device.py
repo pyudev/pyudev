@@ -44,13 +44,39 @@ from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+
+from pyudev._conversions import ConversionError
+from pyudev._conversions import SysfsConversion
+from pyudev._conversions import SysfsConversions
+from pyudev._conversions import UdevConversion
+from pyudev._conversions import UdevConversions
+
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
-from pyudev._util import string_to_bool
 from pyudev._util import udev_list_iterate
+from pyudev._util import udev_version
 
 # pylint: disable=too-many-lines
+
+try:
+    _UDEV_VERSION = udev_version()
+except: # pylint: disable=bare-except
+    _UDEV_VERSION = None
+
+def _from_name_post_228(cls, context, subsystem, sys_name):
+    # pylint: disable=unused-argument
+    device = context._libudev.udev_device_new_from_subsystem_sysname(
+        context, ensure_byte_string(subsystem),
+        ensure_byte_string(sys_name))
+    if not device:
+        raise DeviceNotFoundByNameError(subsystem, sys_name)
+    return Device(context, device)
+
+def _from_name_pre_228(cls, context, subsystem, sys_name):
+    # pylint: disable=unused-argument
+    sys_name = sys_name.replace("/", "!")
+    return _from_name_post_228(cls, context, subsystem, sys_name)
 
 class Devices(object):
     """
@@ -108,8 +134,11 @@ class Devices(object):
             raise DeviceNotFoundAtPathError(sys_path)
         return Device(context, device)
 
-    @classmethod
-    def from_name(cls, context, subsystem, sys_name):
+    if _UDEV_VERSION is None or _UDEV_VERSION < 228:
+        from_name = classmethod(_from_name_pre_228)
+    else:
+        from_name = classmethod(_from_name_post_228)
+    from_name.__func__.__doc__ = \
         """
         Create a new device from a given ``subsystem`` and a given
         ``sys_name``:
@@ -131,12 +160,6 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_subsystem_sysname(
-            context, ensure_byte_string(subsystem),
-            ensure_byte_string(sys_name))
-        if not device:
-            raise DeviceNotFoundByNameError(subsystem, sys_name)
-        return Device(context, device)
 
     @classmethod
     def from_device_number(cls, context, typ, number):
@@ -369,6 +392,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_path` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_path(context, path)
 
     @classmethod
@@ -383,6 +412,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_sys_path` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_sys_path(context, sys_path)
 
     @classmethod
@@ -392,6 +427,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_name` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_name(context, subsystem, sys_name)
 
     @classmethod
@@ -401,6 +442,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_number` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_device_number(context, typ, number)
 
     @classmethod
@@ -410,6 +457,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_file` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_device_file(context, filename)
 
     @classmethod
@@ -419,6 +472,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_environment` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
@@ -532,8 +591,11 @@ class Device(Mapping):
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use Device.ancestors instead.',
-                      DeprecationWarning)
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.ancestors instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return self.ancestors
 
     @property
@@ -599,8 +661,7 @@ class Device(Mapping):
         .. versionadded:: 0.11
         """
         number = self._libudev.udev_device_get_sysnum(self)
-        if number is not None:
-            return ensure_unicode_string(number)
+        return ensure_unicode_string(number) if number is not None else None
 
     @property
     def device_type(self):
@@ -623,6 +684,8 @@ class Device(Mapping):
         device_type = self._libudev.udev_device_get_devtype(self)
         if device_type is not None:
             return ensure_unicode_string(device_type)
+        else:
+            return device_type
 
     @property
     def driver(self):
@@ -633,8 +696,7 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         driver = self._libudev.udev_device_get_driver(self)
-        if driver:
-            return ensure_unicode_string(driver)
+        return ensure_unicode_string(driver) if driver else None
 
     @property
     def device_node(self):
@@ -655,8 +717,7 @@ class Device(Mapping):
            :meth:`from_device_file()`.
         """
         node = self._libudev.udev_device_get_devnode(self)
-        if node:
-            return ensure_unicode_string(node)
+        return ensure_unicode_string(node) if node else None
 
     @property
     def device_number(self):
@@ -783,8 +844,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         action = self._libudev.udev_device_get_action(self)
-        if action:
-            return ensure_unicode_string(action)
+        return ensure_unicode_string(action) if action else None
 
     @property
     def sequence_number(self):
@@ -897,8 +957,21 @@ class Device(Mapping):
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
-        return int(self[prop])
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
+        try:
+            return UdevConversion.convert(self[prop], UdevConversions.to_int)
+        except ConversionError:
+            raise ValueError(self[prop])
 
     def asbool(self, prop):
         """
@@ -915,8 +988,22 @@ class Device(Mapping):
         the property value is ``'0'``.  Any other value raises a
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
-        return string_to_bool(self[prop])
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
+        res = self[prop]
+        try:
+            return UdevConversion.convert(res, UdevConversions.to_bool)
+        except ConversionError:
+            raise ValueError(res)
 
     def __hash__(self):
         return hash(self.device_path)
@@ -1010,12 +1097,25 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as byte string.  Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
+        :exc:`~exceptions.UnicodeDecodeError`, if the
         content of the attribute cannot be decoded into a unicode string.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         value = self.get(attribute)
-        return ensure_unicode_string(value if value is not None else str(None))
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_unicode)
+        except ConversionError:
+            raise UnicodeDecodeError(value)
 
     def asint(self, attribute):
         """
@@ -1025,11 +1125,25 @@ class Attributes(object):
         attribute.
 
         Return the attribute value as integer. Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or a :exc:`~exceptions.ValueError`, if the
+        :exc:`~exceptions.ValueError`, if the
         attribute value cannot be converted to an integer.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
-        return int(self.asstring(attribute))
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
+        value = self.get(attribute)
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_int)
+        except ConversionError:
+            raise ValueError(value)
 
     def asbool(self, attribute):
         """
@@ -1044,10 +1158,25 @@ class Attributes(object):
 
         Return ``True``, if the attribute value is ``'1'`` and ``False``, if
         the attribute value is ``'0'``.  Any other value raises a
-        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
-        if the given attribute is not defined for this device.
+        :exc:`~exceptions.ValueError`.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
-        return string_to_bool(self.asstring(attribute))
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
+        value = self.get(attribute)
+        value = value if value is not None else str(None)
+        try:
+            return SysfsConversion.convert(value, SysfsConversions.to_bool)
+        except ConversionError:
+            raise ValueError(value)
+
 
 class Tags(Iterable, Container):
     """
@@ -1060,6 +1189,7 @@ class Tags(Iterable, Container):
 
     def __init__(self, device):
         self.device = device
+        self._libudev = device._libudev
 
     def _has_tag(self, tag):
         """
@@ -1073,10 +1203,6 @@ class Tags(Iterable, Container):
                 self.device, ensure_byte_string(tag)))
         else: # pragma: no cover
             return any(t == tag for t in self)
-
-    @property
-    def _libudev(self):
-        return self.device._libudev
 
     def __contains__(self, tag):
         """
