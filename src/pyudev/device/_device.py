@@ -979,75 +979,85 @@ class Attributes(object):
         for attribute, _ in udev_list_iterate(self._libudev, attrs):
             yield ensure_unicode_string(attribute)
 
+    def _get(self, attribute):
+        """
+        Get the given system ``attribute`` for the device.
+
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        :returns: the value corresponding to ``attribute``
+        :rtype: an arbitrary sequence of bytes
+        :raises KeyError: if no value found
+        """
+        value = self._libudev.udev_device_get_sysattr_value(
+           self.device,
+           ensure_byte_string(attribute)
+        )
+        if value is None:
+            raise KeyError(attribute)
+        return value
+
     def get(self, attribute, default=None):
         """
         Get the given system ``attribute`` for the device.
 
-        ``attribute`` is a unicode or byte string containing the name of the
-        system attribute.
-
-        :param str attribute: the attribute to lookup
-        :param object default: the default value to return
-        :returns: the attribute value or None if no value
-        :rtype: byte string or NoneType
-
-        Returns ``default`` if lookup gets None.
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        :param default: a default if no corresponding value found
+        :type default: a sequence of bytes
+        :returns: the value corresponding to ``attribute`` or ``default``
+        :rtype: object
         """
-        value = self._libudev.udev_device_get_sysattr_value(
-            self.device,
-            ensure_byte_string(attribute)
-        )
-        return value if value is not None else default
+        try:
+            return self._get(attribute)
+        except KeyError:
+            return default
 
     def asstring(self, attribute):
         """
-        Get the given ``atribute`` for the device as unicode string.
+        Get the given ``attribute`` for the device as unicode string.
 
-        Depending on the content of the attribute, this may or may not work.
-        Be prepared to catch :exc:`~exceptions.UnicodeDecodeError`.
-
-        ``attribute`` is a unicode or byte string containing the name of the
-        attribute.
-
-        Return the attribute value as byte string.  Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or :exc:`~exceptions.UnicodeDecodeError`, if the
-        content of the attribute cannot be decoded into a unicode string.
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        :returns: the value corresponding to ``attribute``, as unicode
+        :rtype: unicode
+        :raises KeyError: if no value found for ``attribute``
+        :raises UnicodeDecodeError: if value is not convertible
         """
-        value = self.get(attribute)
-        return ensure_unicode_string(value if value is not None else str(None))
+        return ensure_unicode_string(self._get(attribute))
 
     def asint(self, attribute):
         """
-        Get the given ``attribute`` as integer.
+        Get the given ``attribute`` as an int.
 
-        ``attribute`` is a unicode or byte string containing the name of the
-        attribute.
-
-        Return the attribute value as integer. Raise a
-        :exc:`~exceptions.KeyError`, if the given attribute is not defined
-        for this device, or a :exc:`~exceptions.ValueError`, if the
-        attribute value cannot be converted to an integer.
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        :returns: the value corresponding to ``attribute``, as an int
+        :rtype: int
+        :raises KeyError: if no value found for ``attribute``
+        :raises UnicodeDecodeError: if value is not convertible to unicode
+        :raises ValueError: if unicode value can not be converted to an int
         """
         return int(self.asstring(attribute))
 
     def asbool(self, attribute):
         """
-        Get the given ``attribute`` from this device as boolean.
+        Get the given ``attribute`` from this device as a bool.
+
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        :returns: the value corresponding to ``attribute``, as bool
+        :rtype: bool
+        :raises KeyError: if no value found for ``attribute``
+        :raises UnicodeDecodeError: if value is not convertible to unicode
+        :raises ValueError: if unicode value can not be converted to a bool
 
         A boolean attribute has either a value of ``'1'`` or of ``'0'``,
         where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
         other value causes a :exc:`~exceptions.ValueError` to be raised.
-
-        ``attribute`` is a unicode or byte string containing the name of the
-        attribute.
-
-        Return ``True``, if the attribute value is ``'1'`` and ``False``, if
-        the attribute value is ``'0'``.  Any other value raises a
-        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
-        if the given attribute is not defined for this device.
         """
         return string_to_bool(self.asstring(attribute))
+
 
 class Tags(Iterable, Container):
     """
