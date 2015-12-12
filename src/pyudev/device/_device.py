@@ -131,6 +131,7 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
+        sys_name = sys_name.replace("/", "!")
         device = context._libudev.udev_device_new_from_subsystem_sysname(
             context, ensure_byte_string(subsystem),
             ensure_byte_string(sys_name))
