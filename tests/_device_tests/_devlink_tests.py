@@ -36,7 +36,7 @@ import pytest
 
 from pyudev import Devlink
 
-from ._constants import _DEVICES
+from .._constants import _DEVICES
 
 
 class TestDevlinks(object):
