@@ -39,28 +39,18 @@ import pytest
 from pyudev import Device
 
 from ..utils import is_unicode_string
+from .._constants import non_volatile_attributes
 
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
 from ._device_tests import _UDEV_TEST
 
+
 class TestAttributes(object):
     """
     Test ``Attributes`` class methods.
     """
-
-    _VOLATILE_ATTRIBUTES = ['energy_uj', 'power_on_acct']
-
-    @classmethod
-    def non_volatile_items(cls, attributes):
-        """
-        Yields keys for non-volatile attributes only.
-
-        :param dict attributes: attributes dict obtained from udev
-        """
-        return ((k, v) for (k, v) in attributes.items() \
-           if k not in cls._VOLATILE_ATTRIBUTES)
 
     @given(
        _CONTEXT_STRATEGY,
@@ -69,7 +59,7 @@ class TestAttributes(object):
     )
     def test_getitem(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             raw_value = value.encode(sys.getfilesystemencoding())
             assert isinstance(device.attributes.get(key), bytes)
             assert device.attributes.get(key) == raw_value
@@ -111,8 +101,11 @@ class TestAttributes(object):
        settings=Settings(max_examples=5)
     )
     def test_asstring(self, a_context, device_datum):
+        """
+        Test that string value agrees with cli value and is unicode.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             assert is_unicode_string(device.attributes.asstring(key))
             assert device.attributes.asstring(key) == value
 
@@ -122,8 +115,11 @@ class TestAttributes(object):
        settings=Settings(max_examples=5)
     )
     def test_asint(self, a_context, device_datum):
+        """
+        Test that integer result is an int or ValueError raised.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             try:
                 value = int(value)
             except ValueError:
@@ -138,8 +134,11 @@ class TestAttributes(object):
        settings=Settings(max_examples=5)
     )
     def test_asbool(self, a_context, device_datum):
+        """
+        Test that bool result is a bool or ValueError raised.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             if value == '1':
                 assert device.attributes.asbool(key)
             elif value == '0':
