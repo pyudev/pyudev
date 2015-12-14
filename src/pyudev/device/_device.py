@@ -44,6 +44,7 @@ from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
 from pyudev.device._errors import DeviceNotFoundByNumberError
 from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
@@ -938,7 +939,17 @@ class Device(Mapping):
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         return int(self[prop])
 
     def asbool(self, prop):
@@ -956,7 +967,17 @@ class Device(Mapping):
         the property value is ``'0'``.  Any other value raises a
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
+
+        .. deprecated:: 0.19
+           Use UdevConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use UdevConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         return string_to_bool(self[prop])
 
     def __hash__(self):
@@ -1064,7 +1085,17 @@ class Attributes(object):
         :rtype: unicode
         :raises KeyError: if no value found for ``attribute``
         :raises UnicodeDecodeError: if value is not convertible
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         return ensure_unicode_string(self._get(attribute))
 
     def asint(self, attribute):
@@ -1078,7 +1109,17 @@ class Attributes(object):
         :raises KeyError: if no value found for ``attribute``
         :raises UnicodeDecodeError: if value is not convertible to unicode
         :raises ValueError: if unicode value can not be converted to an int
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         return int(self.asstring(attribute))
 
     def asbool(self, attribute):
@@ -1096,7 +1137,17 @@ class Attributes(object):
         A boolean attribute has either a value of ``'1'`` or of ``'0'``,
         where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
         other value causes a :exc:`~exceptions.ValueError` to be raised.
+
+        .. deprecated:: 0.19
+           Use SysfsConversions.convert instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use SysfsConversions.convert instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+
         return string_to_bool(self.asstring(attribute))
 
 
