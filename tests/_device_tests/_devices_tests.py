@@ -43,10 +43,10 @@ from pyudev import DeviceNotFoundByNameError
 from pyudev import DeviceNotFoundByNumberError
 from pyudev import DeviceNotFoundInEnvironmentError
 
-from ._constants import _CONTEXT_STRATEGY
-from ._constants import _DEVICE_DATA
-from ._constants import _DEVICES
-from ._constants import _UDEV_TEST
+from .._constants import _CONTEXT_STRATEGY
+from .._constants import _DEVICE_DATA
+from .._constants import _DEVICES
+from .._constants import _UDEV_TEST
 
 from ..utils import journal
 

@@ -28,10 +28,10 @@ from hypothesis import Settings
 
 from pyudev import Enumerator
 
-from ._device_tests import _CONTEXT_STRATEGY
-from ._device_tests import _DEVICES
-from ._device_tests import _UDEV_TEST
-from ._device_tests import _UDEV_VERSION
+from ._constants import _CONTEXT_STRATEGY
+from ._constants import _DEVICES
+from ._constants import _UDEV_TEST
+from ._constants import _UDEV_VERSION
 
 
 @pytest.fixture

@@ -24,8 +24,10 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from hypothesis import strategies
 
@@ -34,7 +36,7 @@ import pytest
 from pyudev import Context
 from pyudev import Device
 
-from ..utils import udev
+from .utils import udev
 
 _CONTEXT = Context()
 _DEVICE_DATA = list(udev.get_device_sample(udev.DeviceDatabase.db()))

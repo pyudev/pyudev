@@ -47,10 +47,10 @@ from pyudev.device import Attributes, Tags
 
 from ..utils import is_unicode_string
 
-from ._constants import _CONTEXT_STRATEGY
-from ._constants import _DEVICE_DATA
-from ._constants import _DEVICES
-from ._constants import _UDEV_TEST
+from .._constants import _CONTEXT_STRATEGY
+from .._constants import _DEVICE_DATA
+from .._constants import _DEVICES
+from .._constants import _UDEV_TEST
 
 
 class TestDevice(object):

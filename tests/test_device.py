@@ -32,7 +32,7 @@ import gc
 
 import pytest
 
-from ._device_tests import _DEVICE_DATA
+from ._constants import _DEVICE_DATA
 
 # pylint: disable=too-few-public-methods
 

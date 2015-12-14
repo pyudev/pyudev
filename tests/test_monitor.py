@@ -32,7 +32,7 @@ from pyudev import Monitor, MonitorObserver, Device
 from tests.utils.udev import DeviceDatabase
 from tests.utils.udev import get_device_sample
 
-from tests._device_tests import _UDEV_TEST
+from tests._constants import _UDEV_TEST
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
