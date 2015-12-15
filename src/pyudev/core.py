@@ -31,7 +31,7 @@ from __future__ import (print_function, division, unicode_literals,
 
 from pyudev.device import Device
 from pyudev.device._errors import DeviceNotFoundAtPathError
-from pyudev._libudev import load_udev_library
+from pyudev._ctypeslib.libudev import load_udev_library
 
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string

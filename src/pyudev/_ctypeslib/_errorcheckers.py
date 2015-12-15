@@ -15,17 +15,17 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
-
-
 """
-    pyudev._errorcheckers
-    =====================
+    pyudev._ctypeslib._errorcheckers
+    ================================
 
     Error checkers for ctypes wrappers.
 """
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 
 import os

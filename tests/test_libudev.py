@@ -24,7 +24,7 @@ import ctypes
 
 import pytest
 
-from pyudev import _libudev
+from pyudev import _ctypeslib
 
 from .utils import is_unicode_string
 from .utils import libudev
@@ -90,7 +90,7 @@ def _pointer_to_ctypes(pointer):
 
 TYPE_CONVERTER = {
     'FundamentalType': lambda t: FUNDAMENTAL_TYPES[t.name],
-    'Struct': lambda s: getattr(_libudev, s.name),
+    'Struct': lambda s: getattr(_ctypeslib.libudev, s.name),
     'PointerType': _pointer_to_ctypes,
     # const qualifiers are ignored in ctypes
     'CvQualifiedType': lambda t: _to_ctypes(t.type),
@@ -127,7 +127,7 @@ class LibudevFunction(object):
 _FUNCTIONS = [
    f for f in libudev.Unit.parse(libudev.LIBUDEV_H).functions if f.name.startswith('udev_')
 ]
-_LIBUDEV = _libudev.load_udev_library()
+_LIBUDEV = _ctypeslib.libudev.load_udev_library()
 
 _TEST_FUNCTIONS = [
    LibudevFunction(f) for f in _FUNCTIONS if not _is_blacklisted(f)
@@ -164,7 +164,7 @@ def test_error_checker():
         function = libudev_function.get_wrapper(_LIBUDEV)
         name = libudev_function.name
         try:
-            if function.errcheck != _libudev.ERROR_CHECKERS[name]:
+            if function.errcheck != _ctypeslib.libudev.ERROR_CHECKERS[name]:
                 failures.append(name)
         except KeyError:
             failures.append(name)
