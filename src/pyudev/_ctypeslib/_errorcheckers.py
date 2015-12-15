@@ -40,19 +40,19 @@ ERRNO_EXCEPTIONS = {
 }
 
 
-def exception_from_errno(errno):
-    """Create an exception from ``errno``.
+def exception_from_errno(errnum):
+    """Create an exception from ``errnum``.
 
-    ``errno`` is an integral error number.
+    ``errnum`` is an integral error number.
 
-    Return an exception object appropriate to ``errno``.
+    Return an exception object appropriate to ``errnum``.
 
     """
-    exception = ERRNO_EXCEPTIONS.get(errno)
+    exception = ERRNO_EXCEPTIONS.get(errnum)
     if exception is not None:
         return exception()
     else:
-        return EnvironmentError(errno, os.strerror(errno))
+        return EnvironmentError(errnum, os.strerror(errnum))
 
 
 def check_negative_errorcode(result, func, *args):
@@ -70,8 +70,8 @@ def check_negative_errorcode(result, func, *args):
     """
     if result < 0:
         # udev returns the *negative* errno code at this point
-        errno = -result
-        raise exception_from_errno(errno)
+        errnum = -result
+        raise exception_from_errno(errnum)
     else:
         return result
 
@@ -85,9 +85,9 @@ def check_errno_on_nonzero_return(result, func, *args):
 
     """
     if result != 0:
-        errno = get_errno()
-        if errno != 0:
-            raise exception_from_errno(errno)
+        errnum = get_errno()
+        if errnum != 0:
+            raise exception_from_errno(errnum)
     return result
 
 
@@ -100,7 +100,7 @@ def check_errno_on_null_pointer_return(result, func, *args):
 
     """
     if not result:
-        errno = get_errno()
-        if errno != 0:
-            raise exception_from_errno(errno)
+        errnum = get_errno()
+        if errnum != 0:
+            raise exception_from_errno(errnum)
     return result
