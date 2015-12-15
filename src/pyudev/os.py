@@ -33,7 +33,9 @@ import fcntl
 import select
 from functools import partial
 
-from pyudev._libc import load_c_library, fd_pair
+from pyudev._ctypeslib.libc import fd_pair
+from pyudev._ctypeslib.libc import load_c_library
+
 from pyudev._util import eintr_retry_call
 
 

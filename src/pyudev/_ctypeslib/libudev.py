@@ -17,8 +17,8 @@
 
 
 """
-    _libudev
-    ========
+    pyudev._ctypeslib.libudev
+    =========================
 
     Wrapper types for libudev.  Use ``libudev`` attribute to access libudev
     functions.
@@ -26,17 +26,25 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from ctypes import c_char
+from ctypes import c_char_p
+from ctypes import c_int
+from ctypes import c_uint
+from ctypes import c_ulonglong
+from ctypes import CDLL
+from ctypes import Structure
+from ctypes import POINTER
 
-from ctypes import (CDLL, Structure, POINTER,
-                    c_char, c_char_p, c_int, c_uint, c_ulonglong)
 from ctypes.util import find_library
 
-from pyudev._errorcheckers import (check_negative_errorcode,
-                                   check_errno_on_nonzero_return,
-                                   check_errno_on_null_pointer_return)
+from ._errorcheckers import check_errno_on_nonzero_return
+from ._errorcheckers import check_errno_on_null_pointer_return
+from ._errorcheckers import check_negative_errorcode
 
 
 class udev(Structure):
