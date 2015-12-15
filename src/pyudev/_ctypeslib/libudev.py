@@ -51,6 +51,7 @@ class udev(Structure):
     """
     Dummy for ``udev`` structure.
     """
+    # pylint: disable=too-few-public-methods
     pass
 
 udev_p = POINTER(udev)
@@ -60,6 +61,7 @@ class udev_enumerate(Structure):
     """
     Dummy for ``udev_enumerate`` structure.
     """
+    # pylint: disable=too-few-public-methods
 
 udev_enumerate_p = POINTER(udev_enumerate)
 
@@ -68,6 +70,7 @@ class udev_list_entry(Structure):
     """
     Dummy for ``udev_list_entry`` structure.
     """
+    # pylint: disable=too-few-public-methods
 
 udev_list_entry_p = POINTER(udev_list_entry)
 
@@ -76,6 +79,7 @@ class udev_device(Structure):
     """
     Dummy for ``udev_device`` structure.
     """
+    # pylint: disable=too-few-public-methods
 
 udev_device_p = POINTER(udev_device)
 
@@ -84,6 +88,7 @@ class udev_monitor(Structure):
     """
     Dummy for ``udev_device`` structure.
     """
+    # pylint: disable=too-few-public-methods
 
 udev_monitor_p = POINTER(udev_monitor)
 
@@ -91,6 +96,7 @@ class udev_hwdb(Structure):
     """
     Dummy for ``udev_hwdb`` structure.
     """
+    # pylint: disable=too-few-public-methods
 
 udev_hwdb_p = POINTER(udev_hwdb)
 
