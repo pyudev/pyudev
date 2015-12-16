@@ -1,3 +1,9 @@
+0.18.1 (Dec 18, 2015)
+=====================
+
+- Restore raising KeyError by Attributes.as* methods when attribute not found.
+- Explicitly require six module.
+
 0.18 (Dec 1, 2015)
 ===================
 
