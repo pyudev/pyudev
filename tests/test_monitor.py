@@ -313,8 +313,17 @@ class TestMonitorObserver(object):
 
     def make_observer(self, monitor, use_deprecated=False):
         if use_deprecated:
-            self.observer = pytest.deprecated_call(
-                MonitorObserver, monitor, event_handler=self.event_handler)
+            if pytest.__version__ == '2.8.4':
+                self.observer = MonitorObserver(
+                   monitor,
+                   event_handler=self.event_handler
+                )
+            else:
+                self.observer = pytest.deprecated_call(
+                   MonitorObserver,
+                   monitor,
+                   event_handler=self.event_handler
+                )
         else:
             self.observer = MonitorObserver(monitor, callback=self.callback)
         return self.observer

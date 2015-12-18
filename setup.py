@@ -54,7 +54,10 @@ setuptools.setup(
         'Topic :: Software Development :: Libraries',
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
-        ],
+    ],
+    install_requires = [
+        'six'
+    ],
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
     )
