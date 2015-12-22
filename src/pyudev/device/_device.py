@@ -39,6 +39,7 @@ from datetime import timedelta
 
 from pyudev.device._errors import DeviceNotFoundAtPathError
 from pyudev.device._errors import DeviceNotFoundByFileError
+from pyudev.device._errors import DeviceNotFoundByFileDescriptorError
 from pyudev.device._errors import DeviceNotFoundByInterfaceIndexError
 from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
 from pyudev.device._errors import DeviceNotFoundByNameError
@@ -283,6 +284,24 @@ class Devices(object):
                 raise DeviceNotFoundByKernelDeviceError(kernel_device)
         else:
             raise DeviceNotFoundByKernelDeviceError(kernel_device)
+
+
+    @classmethod
+    def from_file_descriptor(cls, context, fd):
+        """
+        Create a new device object from a file descriptor.
+
+        :param `Context` context: the libudev context
+        :param file fd: a file descriptor
+        :raises DeviceNotFoundError: on failure
+        """
+        try:
+            device_type = get_device_type(fd)
+            device_number = os.fstat(fd).st_rdev
+        except (EnvironmentError, ValueError) as err:
+            raise DeviceNotFoundByFileDescriptorError(err)
+
+        return cls.from_device_number(context, device_type, device_number)
 
 
     @classmethod
