@@ -562,9 +562,12 @@ class Device(Mapping):
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
+
+        :returns: name of subsystem if found, else None
+        :rtype: unicode string or NoneType
         """
-        return ensure_unicode_string(
-            self._libudev.udev_device_get_subsystem(self))
+        subsys = self._libudev.udev_device_get_subsystem(self)
+        return None if subsys is None else ensure_unicode_string(subsys)
 
     @property
     def sys_name(self):
