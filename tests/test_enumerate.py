@@ -48,6 +48,7 @@ class TestEnumerator(object):
     def test_match_subsystem_nomatch(self, context):
         devices = context.list_devices().match_subsystem('input', nomatch=True)
         for device in devices:
+            assert device.subsystem is not None
             assert device.subsystem != 'input'
 
     def test_match_subsystem_nomatch_unfulfillable(self, context):
@@ -55,6 +56,44 @@ class TestEnumerator(object):
         devices.match_subsystem('input')
         devices.match_subsystem('input', nomatch=True)
         assert not list(devices)
+
+    def test_match_subsystem_nomatch_complete(self, context):
+        """
+        Test that w/ respect to the universe of devices returned by
+        list_devices() a match and its inverse are complements of each other.
+
+        Note that list_devices() omits devices that have no subsystem,
+        so with respect to the whole universe of devices, the two are
+        not complements of each other.
+        """
+        m_devices = set(context.list_devices().match_subsystem('j'))
+        nm_devices = set(
+           context.list_devices().match_subsystem('j', nomatch=True)
+        )
+
+        assert not m_devices.intersection(nm_devices)
+
+        devices = set(context.list_devices())
+        assert devices == m_devices.union(nm_devices)
+
+    def test_match_scsi_devices_children(self, context):
+        """
+        Test that every device with type scsi_device has only one disk
+        descendant.
+        """
+        scsi_devices = context.list_devices().match_property(
+           'DEVTYPE',
+           'scsi_device'
+        )
+
+        def func(dev):
+            return context.list_devices(
+               subsystem='block',
+               DEVTYPE='disk',
+               parent=dev
+            )
+
+        assert all(len(list(func(d))) in (0, 1) for d in scsi_devices)
 
     def test_match_sys_name(self, context):
         devices = context.list_devices().match_sys_name('sda')
