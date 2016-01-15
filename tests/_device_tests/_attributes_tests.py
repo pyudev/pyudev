@@ -79,7 +79,31 @@ class TestAttributes(object):
        settings=Settings(max_examples=5)
     )
     def test_getitem_nonexisting(self, a_device):
-        assert a_device.attributes.get('a non-existing attribute') is None
+        """
+        Test behavior when corresponding value is non-existant.
+        """
+        not_key = "a non-existing attribute"
+        assert a_device.attributes.get(not_key) is None
+        with pytest.raises(KeyError):
+            a_device.attributes.asstring(not_key)
+        with pytest.raises(KeyError):
+            a_device.attributes.asint(not_key)
+        with pytest.raises(KeyError):
+            a_device.attributes.asbool(not_key)
+
+    @given(
+       strategies.sampled_from(_DEVICES),
+       settings=Settings(max_examples=5)
+    )
+    def test_non_iterable(self, a_device):
+        """
+        Test that the attributes object can not be iterated over.
+        """
+        # pylint: disable=pointless-statement
+        with pytest.raises(TypeError):
+            'key' in a_device.attributes
+        with pytest.raises(TypeError):
+            a_device.attributes['key']
 
     @given(
        _CONTEXT_STRATEGY,
@@ -89,8 +113,7 @@ class TestAttributes(object):
     def test_asstring(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in self.non_volatile_items(device_datum.attributes):
-            assert is_unicode_string(
-                device.attributes.asstring(key))
+            assert is_unicode_string(device.attributes.asstring(key))
             assert device.attributes.asstring(key) == value
 
     @given(
