@@ -53,6 +53,18 @@ from .._constants import _DEVICES
 from .._constants import _UDEV_TEST
 
 
+def _namespaced_directories(device):
+    """
+    Returns a list of possibly namespaced directories for ``device``.
+
+    :param Device device: the device
+    """
+    sys_path = device.sys_path
+    return (
+       name for name in os.listdir(sys_path) if \
+       (name.find(':') > 0 and os.path.isdir(os.path.join(sys_path, name)))
+    )
+
 class TestDevice(object):
     """
     Test ``Device`` methods.
@@ -492,3 +504,26 @@ class TestDevice(object):
         link_target = os.readlink(link_path)
         target_path = os.path.normpath(os.path.join(id_path, link_target))
         assert target_path == a_device.device_node
+
+    _devices = [d for d in _DEVICES if any(_namespaced_directories(d))]
+    @pytest.mark.skipif(
+        len(_devices) == 0,
+        reason='no namespaced directories to test'
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_namespace_ids(self, a_device):
+        """
+        Exercise namespace ids.
+
+        Find candidates that will work, even though some maybe shouldn't.
+        It's possible that they shouldn't because they might match the
+        expected format of a namespace prefixed value without matching any
+        actual namespace.
+        """
+        for name in _namespaced_directories(a_device):
+            (first, _, _) = name.partition(':')
+            names = a_device.namespace_ids(first)
+            assert names != []
+
+        assert not any(a_device.namespace_ids('really unlikely namespace'))

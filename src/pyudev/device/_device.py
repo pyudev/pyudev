@@ -880,6 +880,36 @@ class Device(Mapping):
         # Attributes.device.
         return Attributes(self)
 
+    def namespace_ids(self, namespace):
+        """
+        Returns generator of subdirectory identifiers for ``namespace``.
+
+        :param str namespace: a namespace prefix
+
+        A namespace is just a string intended to help in disambiguating
+        directory names.
+
+        For example, 'enclosure_device:0' is a directory name in the
+        namespace 'enclosure_device'.
+
+        Intended to be used like:
+
+        >>> namespace = 'enclosure_device'
+        >>> attrs = device.attributes
+        >>> dir_ids = list(device.namespace_ids(namespace))
+        >>> dir_ids
+        ['0']
+        >>> enclosure_id = dir_ids[0]
+        >>> status = attrs.get("%s:%s/status" % (namespace, enclosure_id))
+
+        """
+        prefix = '%s:' % namespace
+        len_prefix = len(prefix)
+        sys_path = self.sys_path
+        return (
+           d[len_prefix:] for d in os.listdir(sys_path) if d.startswith(prefix)
+        )
+
     @property
     def tags(self):
         """
