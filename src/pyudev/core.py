@@ -35,6 +35,7 @@ except ImportError:
     from pyudev._compat import check_output
 
 from pyudev.device import Device
+from pyudev.device._errors import DeviceNotFoundAtPathError
 from pyudev._libudev import load_udev_library
 from pyudev._util import (ensure_unicode_string, ensure_byte_string,
                           udev_list_iterate, property_value_to_bytes)
@@ -417,4 +418,7 @@ class Enumerator(object):
         self._libudev.udev_enumerate_scan_devices(self)
         entry = self._libudev.udev_enumerate_get_list_entry(self)
         for name, _ in udev_list_iterate(self._libudev, entry):
-            yield Device.from_sys_path(self.context, name)
+            try:
+                yield Device.from_sys_path(self.context, name)
+            except DeviceNotFoundAtPathError:
+                continue
