@@ -31,6 +31,8 @@ from pyudev import Enumerator
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICES
 from ._device_tests import _UDEV_TEST
+from ._device_tests import _UDEV_VERSION
+
 
 @pytest.fixture
 def enumerator(request):
@@ -189,13 +191,24 @@ class TestEnumerator(object):
            settings=Settings(max_examples=5)
         )
         def test_match_parent(self, context, device):
+            """
+            For a given device, verify that it is in its parent's children.
+
+            Verify that the parent is also among the device's children,
+            unless the parent lacks a subsystem
+
+            See: rhbz#1255191
+            """
             parent = device.parent
             children = list(context.list_devices().match_parent(parent))
             assert device in children
-            try:
+            if _UDEV_VERSION <= 175:
                 assert parent in children
-            except AssertionError:
-                pytest.xfail("rhbz#1255191")
+            else:
+                if parent.subsystem is not None:
+                    assert parent in children
+                else:
+                    assert parent not in children
     else:
         def test_match_parent(self):
             pytest.skip("not enough devices with parents")

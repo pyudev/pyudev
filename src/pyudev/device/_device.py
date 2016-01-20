@@ -131,6 +131,7 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
+        sys_name = sys_name.replace("/", "!")
         device = context._libudev.udev_device_new_from_subsystem_sysname(
             context, ensure_byte_string(subsystem),
             ensure_byte_string(sys_name))
@@ -369,6 +370,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_path` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_path(context, path)
 
     @classmethod
@@ -383,6 +390,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_sys_path` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_sys_path(context, sys_path)
 
     @classmethod
@@ -392,6 +405,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_name` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_name(context, subsystem, sys_name)
 
     @classmethod
@@ -401,6 +420,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_number` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_device_number(context, typ, number)
 
     @classmethod
@@ -410,6 +435,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_file` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_device_file(context, filename)
 
     @classmethod
@@ -419,6 +450,12 @@ class Device(Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_environment` instead.
         """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use equivalent Devices method instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
@@ -532,8 +569,11 @@ class Device(Mapping):
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use Device.ancestors instead.',
-                      DeprecationWarning)
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.ancestors instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
         return self.ancestors
 
     @property
