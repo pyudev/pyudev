@@ -34,11 +34,7 @@ import sys
 import stat
 import errno
 
-
-if sys.version_info[0] == 2:
-    text_type = unicode
-else:
-    text_type = str
+import six
 
 
 def ensure_byte_string(value):
@@ -62,7 +58,7 @@ def ensure_unicode_string(value):
     decoded with the filesystem encoding (as in
     :func:`sys.getfilesystemencoding()`).
     """
-    if not isinstance(value, text_type):
+    if not isinstance(value, six.text_type):
         value = value.decode(sys.getfilesystemencoding())
     return value
 
@@ -85,7 +81,7 @@ def property_value_to_bytes(value):
     if isinstance(value, bytes):
         return value
     else:
-        return ensure_byte_string(text_type(value))
+        return ensure_byte_string(six.text_type(value))
 
 
 def string_to_bool(value):

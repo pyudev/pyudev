@@ -217,10 +217,10 @@ class Devices(object):
         """
         try:
             device_type = get_device_type(filename)
+            device_number = os.stat(filename).st_rdev
         except (EnvironmentError, ValueError) as err:
             raise DeviceNotFoundByFileError(err)
 
-        device_number = os.stat(filename).st_rdev
         return cls.from_device_number(context, device_type, device_number)
 
 
@@ -503,8 +503,8 @@ class Device(Mapping):
         It can be ``None`` (the default), which means, that no specific device
         type is expected.
 
-        Return a parent :class:`Device` within the given ``subsystem`` and – if
-        ``device_type`` is not ``None`` – with the given ``device_type``, or
+        Return a parent :class:`Device` within the given ``subsystem`` and, if
+        ``device_type`` is not ``None``, with the given ``device_type``, or
         ``None``, if this device has no parent device matching these
         constraints.
 
@@ -562,9 +562,12 @@ class Device(Mapping):
     def subsystem(self):
         """
         Name of the subsystem this device is part of as unicode string.
+
+        :returns: name of subsystem if found, else None
+        :rtype: unicode string or NoneType
         """
-        return ensure_unicode_string(
-            self._libudev.udev_device_get_subsystem(self))
+        subsys = self._libudev.udev_device_get_subsystem(self)
+        return None if subsys is None else ensure_unicode_string(subsys)
 
     @property
     def sys_name(self):
