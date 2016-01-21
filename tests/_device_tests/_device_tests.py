@@ -537,8 +537,11 @@ class TestDevice(object):
                 comp_op(a_device, a_device)
             assert str(exc_info.value) == 'Device not orderable'
 
-    _devices = [d for d in _DEVICES \
-       if 'ID_WWN_WITH_EXTENSION' in d and d.device_type == 'disk']
+    _devices = [
+       d for d in _DEVICES if \
+          d.device_type == 'disk' and \
+          'ID_WWN_WITH_EXTENSION' in d and 'DM_MULTIPATH_TIMESTAMP' not in d
+    ]
     if len(_devices) > 0:
         @given(
            strategies.sampled_from(_devices),
@@ -554,7 +557,6 @@ class TestDevice(object):
             Skip any multipathed paths, see:
             https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
             """
-            assume(not 'DM_MULTIPATH_DEVICE_PATH' in a_device)
             id_wwn = a_device['ID_WWN_WITH_EXTENSION']
             assert a_device.subsystem == u'block'
 
