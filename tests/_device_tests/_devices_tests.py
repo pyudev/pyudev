@@ -231,7 +231,7 @@ class TestDevices(object):
             See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
             """
             device = Devices.from_path(a_context, device_datum.device_path)
-            assume(not 'DM_MULTIPATH_DEVICE_PATH' in device)
+            assume(not 'DM_MULTIPATH_TIMESTAMP' in device)
 
             for link in device_datum.device_links:
                 link = os.path.join(a_context.device_path, link)
