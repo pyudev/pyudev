@@ -48,3 +48,4 @@ from pyudev.monitor import *
 from pyudev.version import __version__
 from pyudev.version import __version_info__
 from pyudev._parsing import *
+from pyudev._conversions import *

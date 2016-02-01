@@ -158,6 +158,13 @@ class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
         return 'No device found in environment'
 
 
+class DeviceNotFoundByFileDescriptorError(DeviceNotFoundError):
+    """
+    Raised if device is not found by a file descriptor.
+    """
+    pass
+
+
 class DeviceValueError(DeviceError):
     """
     Raised when a parameter has an unacceptable value.
