@@ -32,7 +32,7 @@ import gc
 
 import pytest
 
-from ._device_tests import _DEVICE_DATA
+from ._constants import _DEVICE_DATA
 
 # pylint: disable=too-few-public-methods
 
@@ -75,6 +75,17 @@ if len(_DEVICE_DATA) > 0:
     from ._device_tests._tags_tests import TestTags
 else:
     class TestTags(object):
+        """ Not enough devices available. """
+
+        def test_all(self):
+            """ Always skipped test. """
+            pytest.skip("skipping all tags tests, not enough devices")
+
+if len(_DEVICE_DATA) > 0:
+    # pylint: disable=unused-import
+    from ._device_tests._devlink_tests import TestDevlinks
+else:
+    class TestDevlinks(object):
         """ Not enough devices available. """
 
         def test_all(self):

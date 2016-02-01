@@ -6,9 +6,6 @@ Report to generate examples for bz#1265315.
 
 from __future__ import print_function
 
-import os
-import stat
-
 import pyudev
 
 def main():

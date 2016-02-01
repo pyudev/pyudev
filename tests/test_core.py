@@ -27,7 +27,7 @@ import mock
 
 from pyudev import udev_version
 
-from tests._device_tests import _UDEV_TEST
+from tests._constants import _UDEV_TEST
 
 from tests.utils import is_unicode_string
 

@@ -37,7 +37,9 @@ from functools import partial
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
 from pyudev.core import Device
-from pyudev.os import Pipe, Poll, set_fd_status_flag
+
+from pyudev._os import pipe
+from pyudev._os import poll
 
 
 __all__ = ['Monitor', 'MonitorObserver']
@@ -255,7 +257,7 @@ class Monitor(object):
         if not self._started:
             self._libudev.udev_monitor_enable_receiving(self)
             # Force monitor FD into non-blocking mode
-            set_fd_status_flag(self, os.O_NONBLOCK)
+            pipe.set_fd_status_flag(self, os.O_NONBLOCK)
             self._started = True
 
     def set_receive_buffer_size(self, size):
@@ -354,7 +356,7 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        if eintr_retry_call(Poll.for_events((self, 'r')).poll, timeout):
+        if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
         else:
             return None
@@ -511,12 +513,12 @@ class MonitorObserver(Thread):
     def start(self):
         """Start the observer thread."""
         if not self.is_alive():
-            self._stop_event = Pipe.open()
+            self._stop_event = pipe.Pipe.open()
         Thread.start(self)
 
     def run(self):
         self.monitor.start()
-        notifier = Poll.for_events(
+        notifier = poll.Poll.for_events(
             (self.monitor, 'r'), (self._stop_event.source, 'r'))
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):

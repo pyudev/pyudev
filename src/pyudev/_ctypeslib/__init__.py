@@ -16,10 +16,13 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.tests._device_tests
-    ==========================
+    pyudev._ctypeslib
+    =================
 
-    Tests on devices.
+    Wrappers for libraries.
 
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
+
+from . import libc
+from . import libudev

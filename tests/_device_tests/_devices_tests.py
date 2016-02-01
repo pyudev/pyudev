@@ -43,12 +43,11 @@ from pyudev import DeviceNotFoundByNameError
 from pyudev import DeviceNotFoundByNumberError
 from pyudev import DeviceNotFoundInEnvironmentError
 
-from ._constants import _CONTEXT_STRATEGY
-from ._constants import _DEVICE_DATA
-from ._constants import _DEVICES
-from ._constants import _UDEV_TEST
+from .._constants import _CONTEXT_STRATEGY
+from .._constants import _DEVICE_DATA
+from .._constants import _DEVICES
+from .._constants import _UDEV_TEST
 
-from ..utils import journal
 
 class TestDevices(object):
     """
@@ -231,7 +230,7 @@ class TestDevices(object):
             See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
             """
             device = Devices.from_path(a_context, device_datum.device_path)
-            assume(not 'DM_MULTIPATH_DEVICE_PATH' in device)
+            assume(not 'DM_MULTIPATH_TIMESTAMP' in device)
 
             for link in device_datum.device_links:
                 link = os.path.join(a_context.device_path, link)
@@ -270,50 +269,3 @@ class TestDevices(object):
         # there is no device in a standard environment
         with pytest.raises(DeviceNotFoundInEnvironmentError):
             Devices.from_environment(a_context)
-
-    _entries = [
-       e for e in journal.journal_entries() if e.get('_KERNEL_DEVICE')
-    ]
-    if len(_entries) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_entries),
-           settings=Settings(max_examples=5)
-        )
-        def test_from_kernel_device(self, a_context, entry):
-            """
-            Test that kernel devices can be obtained.
-            """
-            kernel_device = entry['_KERNEL_DEVICE']
-            device = Devices.from_kernel_device(a_context, kernel_device)
-            assert device is not None
-    else:
-        def test_from_kernel_device(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough journal entries with _KERNEL_DEVICE")
-
-    _entries = [
-       e for e in journal.journal_entries() if \
-          e.get('_KERNEL_DEVICE') and e.get('_UDEV_SYSNAME')
-    ]
-    if len(_entries) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_entries),
-           settings=Settings(max_examples=5)
-        )
-        def test_from_journal_name(self, a_context, entry):
-            """
-            Test that kernel subsystem combined with udev sysname yields
-            a device.
-            """
-            udev_sysname = entry['_UDEV_SYSNAME']
-            subsystem = entry['_KERNEL_SUBSYSTEM']
-            device = Devices.from_name(a_context, subsystem, udev_sysname)
-            assert device is not None
-    else:
-        def test_from_journal_name(self):
-            # pylint: disable=missing-docstring
-            pytest.skip(
-               "not enough entries with _KERNEL_SUBSYSTEM and _UDEV_SYSNAME"
-            )
