@@ -37,6 +37,7 @@ import pytest
 
 from hypothesis import given
 from hypothesis import strategies
+from hypothesis import Settings
 
 _CONTEXT = pyudev.Context()
 _DEVICES = _CONTEXT.list_devices()
@@ -76,3 +77,24 @@ class TestIDPATH(object):
         def test_parsing_sas_path(self):
             # pylint: disable=missing-docstring
             pytest.skip("not enough devices w/ ID_SAS_PATH property")
+
+
+class TestPCIAddress(object):
+    """
+    Test parsing a PCI address object.
+    """
+
+    _devices = [d for d in _DEVICES if d.subsystem == 'pci']
+    @pytest.mark.skipif(
+       len(_devices) == 0,
+       reason="no devices with subsystem pci"
+    )
+    @given(
+       strategies.sampled_from(_devices),
+       settings=Settings(min_satisfying_examples=1)
+    )
+    def test_parsing_pci(self, a_device):
+        """
+        Test correct parsing of pci-addresses.
+        """
+        assert pyudev.PCIAddressParse().parse(a_device.sys_name) is not None

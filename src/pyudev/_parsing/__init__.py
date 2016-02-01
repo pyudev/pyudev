@@ -27,10 +27,13 @@
 __all__ = [
    'Devlink',
    'IdPathParse',
-   'IdPathParsers'
+   'IdPathParsers',
+   'PCIAddressParse'
 ]
 
 from ._devlink import Devlink
 
 from ._id_path import IdPathParse
 from ._id_path import IdPathParsers
+
+from ._pci_address import PCIAddressParse
