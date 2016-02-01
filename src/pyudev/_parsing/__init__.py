@@ -25,9 +25,12 @@
 """
 
 __all__ = [
+   'Devlink',
    'IdPathParse',
    'IdPathParsers'
 ]
+
+from ._devlink import Devlink
 
 from ._id_path import IdPathParse
 from ._id_path import IdPathParsers

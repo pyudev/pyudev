@@ -34,7 +34,6 @@ __all__ = [
   'DeviceNotFoundByNumberError',
   'DeviceNotFoundError',
   'DeviceNotFoundInEnvironmentError',
-  'Devlink',
   'Tags'
 ]
 
@@ -42,7 +41,6 @@ from ._device import Attributes
 from ._device import Device
 from ._device import Devices
 from ._device import Tags
-from ._devlink import Devlink
 from ._errors import DeviceNotFoundAtPathError
 from ._errors import DeviceNotFoundByFileError
 from ._errors import DeviceNotFoundByNameError
