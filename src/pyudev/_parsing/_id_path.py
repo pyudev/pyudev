@@ -29,95 +29,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import re
-
 from collections import defaultdict
 
-
-class _Parser(object):
-    """
-    A parser for udev ID_PATH values.
-    """
-
-    def __init__(self, format_string, fields):
-        """
-        Initializer.
-
-        :param str format_string: string used to format this id by udev
-        :param fields: list of fields that fill the string
-
-        ``format_string`` must content itself with basic C-style format
-        codes, beginning with '%' as '%s', '%d'.
-        """
-        self.format_string = '%s' % format_string
-        self.fields = fields
-        self._prefix = self.format_string.split('%', 1)[0]
-
-        substitution_list = [
-           ('(?P<%s>%s)' % (f.name, f.regexp)) for f in self.fields
-        ]
-        regexp = self.format_string % tuple(substitution_list)
-        self._regexp = re.compile('(?P<total>%s)' % regexp)
-
-    @property
-    def regexp(self):
-        """
-        The regular expression that should match this value.
-
-        :returns: the regular expression that should match this value
-        :rtype: compiled regular expression
-
-        The regular expression uses ?P<name> syntax.
-
-        If there is a match, match.groups('total') matches the entire matched
-        string.
-        """
-        return self._regexp
-
-    @property
-    def prefix(self):
-        """
-        A partially distinguishing prefix.
-
-        Some parsers may use the same prefix.
-
-        :returns: a prefix that distinguishes the parser from other parsers
-        """
-        return self._prefix
-
-    @property
-    def keys(self):
-        """
-        Keys within the regular expression.
-
-        :returns: a list of the keys useful for finding portions of a match
-        :rtype: list of str
-        """
-        return [f.name for f in self.fields]
-
-
-class _Field(object):
-    """
-    A field in an id_path.
-    """
-    # pylint: disable=too-few-public-methods
-
-    def __init__(self, name, regexp, description=None):
-        """
-        Initializer.
-
-        :param str name: the name of the field
-        :param str regexp: regular expression to match the field
-
-        The best choice of regular expression may generally define a language
-        that is a superset of the actual language of the field.
-        Since the containing regular expression will constrain matches, the
-        regular expression does not need to be the most precise.
-        In general, '.*' may be good enough.
-        """
-        self.name = name
-        self.regexp = regexp
-        self.description = description
+from ._shared import Field
+from ._shared import Parser
 
 
 class IdPathParsers(object):
@@ -127,70 +42,70 @@ class IdPathParsers(object):
     # pylint: disable=too-few-public-methods
 
     PARSERS = [
-       _Parser('acpi-%s', [_Field('sys_name', '.*')]),
-       _Parser('ap-%s', [_Field('sys_name', '.*')]),
-       _Parser('ata-%s', [_Field('port_no', '.*')]),
-       _Parser('bcma-%s', [_Field('core', '.*')]),
-       _Parser('cciss-disk%s', [_Field('disk', '.*')]),
-       _Parser('ccw-%s', [_Field('sys_name', '.*')]),
-       _Parser('ccwgroup-%s', [_Field('sys_name', '.*')]),
-       _Parser('fc-%s-%s', [_Field('port_name', '.*'), _Field('lun', '.*')]),
-       _Parser(
-          'ip-%s:%s-iscsi-%s-%s',
+       Parser(r'acpi-%s', [Field('sys_name')]),
+       Parser(r'ap-%s', [Field('sys_name')]),
+       Parser(r'ata-%s', [Field('port_no')]),
+       Parser(r'bcma-%s', [Field('core')]),
+       Parser(r'cciss-disk%s', [Field('disk')]),
+       Parser(r'ccw-%s', [Field('sys_name')]),
+       Parser(r'ccwgroup-%s', [Field('sys_name')]),
+       Parser(r'fc-%s-%s', [Field('port_name'), Field('lun')]),
+       Parser(
+          r'ip-%s:%s-iscsi-%s-%s',
           [
-             _Field('persistent_address', '.*'),
-             _Field('persistent_port', '.*'),
-             _Field('target_name', '.*'),
-             _Field('lun', '.*')
+             Field('persistent_address'),
+             Field('persistent_port'),
+             Field('target_name'),
+             Field('lun')
           ]
        ),
-       _Parser('iucv-%s', [_Field('sys_name', '.*')]),
-       _Parser('nst%s', [_Field('name', '.*')]),
-       _Parser('pci-%s', [_Field('sys_name', '.*')]),
-       _Parser('platform-%s', [_Field('sys_name', '.*')]),
-       _Parser('sas-%s-%s', [_Field('sas_address', '.*'), _Field('lun', '.*')]),
-       _Parser(
-          'sas-exp%s-phy%s-%s',
+       Parser(r'iucv-%s', [Field('sys_name')]),
+       Parser(r'nst%s', [Field('name')]),
+       Parser(r'pci-%s', [Field('sys_name')]),
+       Parser(r'platform-%s', [Field('sys_name')]),
+       Parser(r'sas-%s-%s', [Field('sas_address'), Field('lun')]),
+       Parser(
+          r'sas-exp%s-phy%s-%s',
           [
-             _Field(
+             Field(
                 'sas_address',
-                '.*',
+                r'.*',
                 'sysfs sas_address attribute of expander'
              ),
-             _Field(
+             Field(
                 'phy_identifier',
-                '.*',
+                r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             _Field('lun', '.*', 'sysnum of device (0 if none)')
+             Field('lun', description='sysnum of device (0 if none)')
           ]
        ),
-       _Parser(
-          'sas-phy%s-%s',
+       Parser(
+          r'sas-phy%s-%s',
           [
-             _Field(
+             Field(
                 'phy_identifier',
-                '.*',
+                r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             _Field('lun', '.*', 'sysnum of device (0 if none)')
+             Field('lun', description='sysnum of device (0 if none)')
           ]
        ),
-       _Parser('scm-%s', [_Field('sys_name', '.*')]),
-       _Parser(
-          'scsi-%s:%s:%s:%s',
+       Parser(r'scm-%s', [Field('sys_name')]),
+       Parser(
+          r'scsi-%s:%s:%s:%s',
           [
-             _Field('host', '.*'),
-             _Field('bus', '.*'),
-             _Field('target', '.*'),
-             _Field('lun', '.*')
+             Field('host'),
+             Field('bus'),
+             Field('target'),
+             Field('lun')
           ]
        ),
-       _Parser('serio-%s', [_Field('sysnum', '.*')]),
-       _Parser('st%s', [_Field('name', '.*')]),
-       _Parser('usb-0:%s', [_Field('port', '.*')]),
-       _Parser('vmbus-%s-%s', [_Field('guid', '.*'), _Field('lun', '.*')]),
-       _Parser('xen-%s', [_Field('sys_name', '.*')])
+       Parser('serio-%s', [Field('sysnum')]),
+       Parser('st%s', [Field('name')]),
+       Parser('usb-0:%s', [Field('port')]),
+       Parser('vmbus-%s-%s', [Field('guid'), Field('lun')]),
+       Parser('xen-%s', [Field('sys_name')])
     ]
 
 
@@ -205,7 +120,7 @@ class IdPathParse(object):
         Initializer.
 
         :param parsers: parser objects to parse with
-        :type parsers: list of _Parser
+        :type parsers: list of Parser
         """
         self.parsers = parsers
 
