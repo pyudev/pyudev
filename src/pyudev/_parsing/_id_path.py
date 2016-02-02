@@ -42,70 +42,70 @@ class IdPathParsers(object):
     # pylint: disable=too-few-public-methods
 
     PARSERS = [
-       Parser('acpi-%s', [Field('sys_name', '.*')]),
-       Parser('ap-%s', [Field('sys_name', '.*')]),
-       Parser('ata-%s', [Field('port_no', '.*')]),
-       Parser('bcma-%s', [Field('core', '.*')]),
-       Parser('cciss-disk%s', [Field('disk', '.*')]),
-       Parser('ccw-%s', [Field('sys_name', '.*')]),
-       Parser('ccwgroup-%s', [Field('sys_name', '.*')]),
-       Parser('fc-%s-%s', [Field('port_name', '.*'), Field('lun', '.*')]),
+       Parser(r'acpi-%s', [Field('sys_name')]),
+       Parser(r'ap-%s', [Field('sys_name')]),
+       Parser(r'ata-%s', [Field('port_no')]),
+       Parser(r'bcma-%s', [Field('core')]),
+       Parser(r'cciss-disk%s', [Field('disk')]),
+       Parser(r'ccw-%s', [Field('sys_name')]),
+       Parser(r'ccwgroup-%s', [Field('sys_name')]),
+       Parser(r'fc-%s-%s', [Field('port_name'), Field('lun')]),
        Parser(
-          'ip-%s:%s-iscsi-%s-%s',
+          r'ip-%s:%s-iscsi-%s-%s',
           [
-             Field('persistent_address', '.*'),
-             Field('persistent_port', '.*'),
-             Field('target_name', '.*'),
-             Field('lun', '.*')
+             Field('persistent_address'),
+             Field('persistent_port'),
+             Field('target_name'),
+             Field('lun')
           ]
        ),
-       Parser('iucv-%s', [Field('sys_name', '.*')]),
-       Parser('nst%s', [Field('name', '.*')]),
-       Parser('pci-%s', [Field('sys_name', '.*')]),
-       Parser('platform-%s', [Field('sys_name', '.*')]),
-       Parser('sas-%s-%s', [Field('sas_address', '.*'), Field('lun', '.*')]),
+       Parser(r'iucv-%s', [Field('sys_name')]),
+       Parser(r'nst%s', [Field('name')]),
+       Parser(r'pci-%s', [Field('sys_name')]),
+       Parser(r'platform-%s', [Field('sys_name')]),
+       Parser(r'sas-%s-%s', [Field('sas_address'), Field('lun')]),
        Parser(
-          'sas-exp%s-phy%s-%s',
+          r'sas-exp%s-phy%s-%s',
           [
              Field(
                 'sas_address',
-                '.*',
+                r'.*',
                 'sysfs sas_address attribute of expander'
              ),
              Field(
                 'phy_identifier',
-                '.*',
+                r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             Field('lun', '.*', 'sysnum of device (0 if none)')
+             Field('lun', description='sysnum of device (0 if none)')
           ]
        ),
        Parser(
-          'sas-phy%s-%s',
+          r'sas-phy%s-%s',
           [
              Field(
                 'phy_identifier',
-                '.*',
+                r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             Field('lun', '.*', 'sysnum of device (0 if none)')
+             Field('lun', description='sysnum of device (0 if none)')
           ]
        ),
-       Parser('scm-%s', [Field('sys_name', '.*')]),
+       Parser(r'scm-%s', [Field('sys_name')]),
        Parser(
-          'scsi-%s:%s:%s:%s',
+          r'scsi-%s:%s:%s:%s',
           [
-             Field('host', '.*'),
-             Field('bus', '.*'),
-             Field('target', '.*'),
-             Field('lun', '.*')
+             Field('host'),
+             Field('bus'),
+             Field('target'),
+             Field('lun')
           ]
        ),
-       Parser('serio-%s', [Field('sysnum', '.*')]),
-       Parser('st%s', [Field('name', '.*')]),
-       Parser('usb-0:%s', [Field('port', '.*')]),
-       Parser('vmbus-%s-%s', [Field('guid', '.*'), Field('lun', '.*')]),
-       Parser('xen-%s', [Field('sys_name', '.*')])
+       Parser('serio-%s', [Field('sysnum')]),
+       Parser('st%s', [Field('name')]),
+       Parser('usb-0:%s', [Field('port')]),
+       Parser('vmbus-%s-%s', [Field('guid'), Field('lun')]),
+       Parser('xen-%s', [Field('sys_name')])
     ]
 
 
