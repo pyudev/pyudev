@@ -33,6 +33,8 @@ from __future__ import unicode_literals
 
 import pyudev
 
+from pyudev import _parsing
+
 import pytest
 
 from hypothesis import given
@@ -58,7 +60,7 @@ class TestIDPATH(object):
         Test that parsing is satisfactory on all examples.
         """
         id_path = a_device.get('ID_PATH')
-        parser = pyudev.IdPathParse(pyudev.IdPathParsers.PARSERS)
+        parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
         result = parser.parse(id_path)
         assert isinstance(result, list) and result != []
 
@@ -70,7 +72,7 @@ class TestIDPATH(object):
             Test that parsing is satisfactory on all examples.
             """
             id_path = a_device.get('ID_SAS_PATH')
-            parser = pyudev.IdPathParse(pyudev.IdPathParsers.PARSERS)
+            parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
             result = parser.parse(id_path)
             assert isinstance(result, list) and result != []
     else:
@@ -97,4 +99,4 @@ class TestPCIAddress(object):
         """
         Test correct parsing of pci-addresses.
         """
-        assert pyudev.PCIAddressParse().parse(a_device.sys_name) is not None
+        assert _parsing.PCIAddressParse().parse(a_device.sys_name) is not None
