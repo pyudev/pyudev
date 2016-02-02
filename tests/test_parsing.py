@@ -31,6 +31,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from itertools import groupby
+
 import pyudev
 
 from pyudev import _parsing
@@ -79,6 +81,48 @@ class TestIDPATH(object):
         def test_parsing_sas_path(self):
             # pylint: disable=missing-docstring
             pytest.skip("not enough devices w/ ID_SAS_PATH property")
+
+
+class TestDevlinks(object):
+    """
+    Test ``Devlinks`` methods.
+    """
+    # pylint: disable=too-few-public-methods
+
+    _devices = [d for d in _DEVICES if list(d.device_links)]
+    if len(_devices) > 0:
+        @given(
+           strategies.sampled_from(_devices),
+           settings=Settings(max_examples=5)
+        )
+        def test_devlinks(self, a_device):
+            """
+            Verify that device links are in "by-.*" categories or no category.
+            """
+            device_links = (_parsing.Devlink(d) for d in a_device.device_links)
+
+            def sort_func(dl):
+                """
+                :returns: category of device link
+                :rtype: str
+                """
+                key = dl.category
+                return key if key is not None else ""
+
+            devlinks = sorted(device_links, key=sort_func)
+
+            categories = list(k for k, g in groupby(devlinks, sort_func))
+            assert all(c == "" or c.startswith("by-") for c in categories)
+
+            assert all((d.category is None and d.value is None) or \
+               (d.category is not None and d.value is not None) \
+               for d in devlinks)
+
+            assert all(d.path == str(d) for d in devlinks)
+    else:
+        def test_devlinks(self):
+            # pylint: disable=missing-docstring
+            pytest.skip("not enough devices with devlinks")
 
 
 class TestPCIAddress(object):
