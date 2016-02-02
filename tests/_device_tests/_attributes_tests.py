@@ -31,8 +31,8 @@ import stat
 import sys
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 import pytest
 
@@ -52,11 +52,8 @@ class TestAttributes(object):
     Test ``Attributes`` class methods.
     """
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_getitem(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in non_volatile_attributes(device_datum.attributes):
@@ -64,10 +61,8 @@ class TestAttributes(object):
             assert isinstance(device.attributes.get(key), bytes)
             assert device.attributes.get(key) == raw_value
 
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_getitem_nonexisting(self, a_device):
         """
         Test behavior when corresponding value is non-existant.
@@ -81,10 +76,8 @@ class TestAttributes(object):
         with pytest.raises(KeyError):
             a_device.attributes.asbool(not_key)
 
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_non_iterable(self, a_device):
         """
         Test that the attributes object can not be iterated over.
@@ -95,11 +88,8 @@ class TestAttributes(object):
         with pytest.raises(TypeError):
             a_device.attributes['key']
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asstring(self, a_context, device_datum):
         """
         Test that string value agrees with cli value and is unicode.
@@ -109,11 +99,8 @@ class TestAttributes(object):
             assert is_unicode_string(device.attributes.asstring(key))
             assert device.attributes.asstring(key) == value
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asint(self, a_context, device_datum):
         """
         Test that integer result is an int or ValueError raised.
@@ -128,11 +115,8 @@ class TestAttributes(object):
             else:
                 assert device.attributes.asint(key) == value
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asbool(self, a_context, device_datum):
         """
         Test that bool result is a bool or ValueError raised.
@@ -150,10 +134,8 @@ class TestAttributes(object):
                 assert str(exc_info.value).startswith(message)
 
     @_UDEV_TEST(167, "test_available_attributes")
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_available_attributes(self, a_device):
         """
         Test that the available attributes are exactly the names of files

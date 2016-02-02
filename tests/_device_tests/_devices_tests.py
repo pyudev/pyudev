@@ -31,8 +31,8 @@ import stat
 
 from hypothesis import assume
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 import pytest
 
@@ -55,11 +55,8 @@ class TestDevices(object):
     """
     # pylint: disable=invalid-name
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_from_path(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert device is not None
@@ -67,21 +64,15 @@ class TestDevices(object):
            Devices.from_sys_path(a_context, device_datum.sys_path)
         assert device == Devices.from_path(a_context, device_datum.sys_path)
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_from_path_strips_leading_slash(self, a_context, device_datum):
         path = device_datum.device_path
         assert Devices.from_path(a_context, path[1:]) == \
                Devices.from_path(a_context, path)
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_from_sys_path(self, a_context, device_datum):
         device = Devices.from_sys_path(a_context, device_datum.sys_path)
         assert device is not None
@@ -96,11 +87,8 @@ class TestDevices(object):
         assert error.sys_path == sys_path
         assert str(error) == 'No device at {0!r}'.format(sys_path)
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=20)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_from_name(self, a_context, a_device):
         """
         Test that getting a new device based on the name and subsystem
@@ -134,58 +122,50 @@ class TestDevices(object):
             error.sys_name, error.subsystem)
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
-        )
-        def test_from_device_number(self, a_context, device_datum):
-            mode = os.stat(device_datum.device_node).st_mode
-            typ = 'block' if stat.S_ISBLK(mode) else 'char'
-            device = Devices.from_device_number(
-                a_context, typ, device_datum.device_number)
-            assert device.device_number == device_datum.device_number
-            # make sure, we are really referring to the same device
-            assert device.device_path == device_datum.device_path
-    else:
-        def test_from_device_number(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices with device nodes in data")
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason='no device with a device node'
+    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_from_device_number(self, a_context, device_datum):
+        mode = os.stat(device_datum.device_node).st_mode
+        typ = 'block' if stat.S_ISBLK(mode) else 'char'
+        device = Devices.from_device_number(
+            a_context, typ, device_datum.device_number)
+        assert device.device_number == device_datum.device_number
+        # make sure, we are really referring to the same device
+        assert device.device_path == device_datum.device_path
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
-        )
-        def test_from_device_number_wrong_type(
-            self,
-            a_context,
-            device_datum
-        ):
-            mode = os.stat(device_datum.device_node).st_mode
-            # deliberately use the wrong type here to cause either failure
-            # or at least device mismatch
-            typ = 'char' if stat.S_ISBLK(mode) else 'block'
-            try:
-                # this either fails, in which case the caught exception is
-                # raised, or succeeds, but returns a wrong device
-                # (device numbers are not unique across device types)
-                device = Devices.from_device_number(
-                    a_context, typ, device_datum.device_number)
-                # if it succeeds, the resulting device must not match the
-                # one, we are actually looking for!
-                assert device.device_path != device_datum.device_path
-            except DeviceNotFoundByNumberError as error:
-                # check the correctness of the exception attributes
-                assert error.device_type == typ
-                assert error.device_number == device_datum.device_number
-    else:
-        def test_from_device_number_wrong_type(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices with device nodes in data")
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason='no device with a device node'
+    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_from_device_number_wrong_type(
+        self,
+        a_context,
+        device_datum
+    ):
+        mode = os.stat(device_datum.device_node).st_mode
+        # deliberately use the wrong type here to cause either failure
+        # or at least device mismatch
+        typ = 'char' if stat.S_ISBLK(mode) else 'block'
+        try:
+            # this either fails, in which case the caught exception is
+            # raised, or succeeds, but returns a wrong device
+            # (device numbers are not unique across device types)
+            device = Devices.from_device_number(
+                a_context, typ, device_datum.device_number)
+            # if it succeeds, the resulting device must not match the
+            # one, we are actually looking for!
+            assert device.device_path != device_datum.device_path
+        except DeviceNotFoundByNumberError as error:
+            # check the correctness of the exception attributes
+            assert error.device_type == typ
+            assert error.device_number == device_datum.device_number
 
     @given(_CONTEXT_STRATEGY)
     def test_from_device_number_invalid_type(self, a_context):
@@ -193,55 +173,47 @@ class TestDevices(object):
             Devices.from_device_number(a_context, 'foobar', 100)
 
     _device_data = [d for d in _DEVICE_DATA if d.device_node]
-    if len(_device_data) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason='no device with a device node'
+    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_from_device_file(self, a_context, device_datum):
+        device = Devices.from_device_file(
+           a_context,
+           device_datum.device_node
         )
-        def test_from_device_file(self, a_context, device_datum):
-            device = Devices.from_device_file(
-               a_context,
-               device_datum.device_node
-            )
-            assert device.device_node == device_datum.device_node
+        assert device.device_node == device_datum.device_node
+        assert device.device_path == device_datum.device_path
+
+    _device_data = [d for d in _DEVICE_DATA if list(d.device_links)]
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason='no device with a device node'
+    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_from_device_file_links(self, a_context, device_datum):
+        """
+        For each link in DEVLINKS, test that the constructed device's
+        path matches the orginal devices path.
+
+        This does not hold true in the case of multipath. In this case
+        udevadm's DEVLINKS fields holds some links that do not actually
+        point to the originating device.
+
+        See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
+        """
+        device = Devices.from_path(a_context, device_datum.device_path)
+        assume(not 'DM_MULTIPATH_TIMESTAMP' in device)
+
+        for link in device_datum.device_links:
+            link = os.path.join(a_context.device_path, link)
+
+            device = Devices.from_device_file(a_context, link)
             assert device.device_path == device_datum.device_path
-    else:
-        def test_from_device_file(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices with device nodes in data")
-
-    _device_data = [d for d in _DEVICE_DATA if d.device_links]
-    if len(_device_data) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
-        )
-        def test_from_device_file_links(self, a_context, device_datum):
-            """
-            For each link in DEVLINKS, test that the constructed device's
-            path matches the orginal devices path.
-
-            This does not hold true in the case of multipath. In this case
-            udevadm's DEVLINKS fields holds some links that do not actually
-            point to the originating device.
-
-            See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
-            """
-            device = Devices.from_path(a_context, device_datum.device_path)
-            assume(not 'DM_MULTIPATH_TIMESTAMP' in device)
-
-            for link in device_datum.device_links:
-                link = os.path.join(a_context.device_path, link)
-
-                device = Devices.from_device_file(a_context, link)
-                assert device.device_path == device_datum.device_path
-                assert link in device.device_links
-    else:
-        def test_from_device_file_links(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices with links in data")
+            assert link in device.device_links
 
     @given(a_context=_CONTEXT_STRATEGY)
     def test_from_device_file_no_device_file(self, tmpdir, a_context):
