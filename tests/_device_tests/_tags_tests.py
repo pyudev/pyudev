@@ -27,8 +27,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 import pytest
 import mock
@@ -50,38 +50,31 @@ class TestTags(object):
     pytestmark = _UDEV_TEST(154, "TestTags")
 
     _device_data = [d for d in _DEVICE_DATA if d.tags]
-    if len(_device_data) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
-        )
-        def test_iteration(self, a_context, device_datum):
-            device = Device.from_path(a_context, device_datum.device_path)
-            assert set(device.tags) == set(device_datum.tags)
-            for tag in device.tags:
-                assert is_unicode_string(tag)
-
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_device_data),
-           settings=Settings(max_examples=5)
-        )
-        def test_contains(self, a_context, device_datum):
-            device = Device.from_path(a_context, device_datum.device_path)
-            for tag in device_datum.tags:
-                assert tag in device.tags
-    else:
-        def test_iteration(self):
-            pytest.skip("not enough devices with tags")
-
-        def test_contains(self):
-            pytest.skip("not enough devices with tags")
-
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason="no device with tags"
     )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_iteration(self, a_context, device_datum):
+        device = Device.from_path(a_context, device_datum.device_path)
+        assert set(device.tags) == set(device_datum.tags)
+        for tag in device.tags:
+            assert is_unicode_string(tag)
+
+    @pytest.mark.skipif(
+       len(_device_data) == 0,
+       reason="no device with tags"
+    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_contains(self, a_context, device_datum):
+        device = Device.from_path(a_context, device_datum.device_path)
+        for tag in device_datum.tags:
+            assert tag in device.tags
+
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_iteration_mock(self, a_device):
         funcname = 'udev_device_get_tags_list_entry'
         with pytest.libudev_list(a_device._libudev, funcname,
@@ -93,10 +86,8 @@ class TestTags(object):
 
 
     @_UDEV_TEST(172, "test_contans_mock")
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_contains_mock(self, a_device):
         """
         Test that ``udev_device_has_tag`` is called if available.

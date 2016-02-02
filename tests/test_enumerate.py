@@ -23,8 +23,8 @@ import pytest
 import mock
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 from pyudev import Enumerator
 
@@ -184,34 +184,28 @@ class TestEnumerator(object):
             assert 'seat' in device.tags
 
     _devices = [d for d in _DEVICES if d.parent]
-    if len(_devices) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
-           settings=Settings(max_examples=5)
-        )
-        def test_match_parent(self, context, device):
-            """
-            For a given device, verify that it is in its parent's children.
+    @pytest.mark.skipif(len(_devices) == 0, reason="no device with parent")
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_devices))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_match_parent(self, context, device):
+        """
+        For a given device, verify that it is in its parent's children.
 
-            Verify that the parent is also among the device's children,
-            unless the parent lacks a subsystem
+        Verify that the parent is also among the device's children,
+        unless the parent lacks a subsystem
 
-            See: rhbz#1255191
-            """
-            parent = device.parent
-            children = list(context.list_devices().match_parent(parent))
-            assert device in children
-            if _UDEV_VERSION <= 175:
+        See: rhbz#1255191
+        """
+        parent = device.parent
+        children = list(context.list_devices().match_parent(parent))
+        assert device in children
+        if _UDEV_VERSION <= 175:
+            assert parent in children
+        else:
+            if parent.subsystem is not None:
                 assert parent in children
             else:
-                if parent.subsystem is not None:
-                    assert parent in children
-                else:
-                    assert parent not in children
-    else:
-        def test_match_parent(self):
-            pytest.skip("not enough devices with parents")
+                assert parent not in children
 
     @_UDEV_TEST(165, "test_match_is_initialized_mock")
     def test_match_is_initialized_mock(self, context):

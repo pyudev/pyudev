@@ -40,8 +40,8 @@ from pyudev import _parsing
 import pytest
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 _CONTEXT = pyudev.Context()
 _DEVICES = _CONTEXT.list_devices()
@@ -68,20 +68,20 @@ class TestIDPATH(object):
         assert isinstance(result, list) and result != []
 
     _devices = [d for d in _DEVICES if d.get('ID_SAS_PATH') is not None]
-    if len(_devices) > 0:
-        @given(strategies.sampled_from(_devices))
-        def test_parsing_sas_path(self, a_device):
-            """
-            Test that parsing is satisfactory on all examples.
-            """
-            id_path = a_device.get('ID_SAS_PATH')
-            parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
-            result = parser.parse(id_path)
-            assert isinstance(result, list) and result != []
-    else:
-        def test_parsing_sas_path(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices w/ ID_SAS_PATH property")
+    @pytest.mark.skipif(
+       len(_devices) == 0,
+       reason="no devices with ID_SAS_PATH property"
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(min_satisfying_examples=1)
+    def test_parsing_sas_path(self, a_device):
+        """
+        Test that parsing is satisfactory on all examples.
+        """
+        id_path = a_device.get('ID_SAS_PATH')
+        parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
+        result = parser.parse(id_path)
+        assert isinstance(result, list) and result != []
 
 
 class TestDevlinks(object):
@@ -91,39 +91,36 @@ class TestDevlinks(object):
     # pylint: disable=too-few-public-methods
 
     _devices = [d for d in _DEVICES if list(d.device_links)]
-    if len(_devices) > 0:
-        @given(
-           strategies.sampled_from(_devices),
-           settings=Settings(max_examples=5)
-        )
-        def test_devlinks(self, a_device):
+    @pytest.mark.skipif(
+       len(_devices) == 0,
+       reason="no devices with device links"
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_devlinks(self, a_device):
+        """
+        Verify that device links are in "by-.*" categories or no category.
+        """
+        device_links = (_parsing.Devlink(d) for d in a_device.device_links)
+
+        def sort_func(dl):
             """
-            Verify that device links are in "by-.*" categories or no category.
+            :returns: category of device link
+            :rtype: str
             """
-            device_links = (_parsing.Devlink(d) for d in a_device.device_links)
+            key = dl.category
+            return key if key is not None else ""
 
-            def sort_func(dl):
-                """
-                :returns: category of device link
-                :rtype: str
-                """
-                key = dl.category
-                return key if key is not None else ""
+        devlinks = sorted(device_links, key=sort_func)
 
-            devlinks = sorted(device_links, key=sort_func)
+        categories = list(k for k, g in groupby(devlinks, sort_func))
+        assert all(c == "" or c.startswith("by-") for c in categories)
 
-            categories = list(k for k, g in groupby(devlinks, sort_func))
-            assert all(c == "" or c.startswith("by-") for c in categories)
+        assert all((d.category is None and d.value is None) or \
+           (d.category is not None and d.value is not None) \
+           for d in devlinks)
 
-            assert all((d.category is None and d.value is None) or \
-               (d.category is not None and d.value is not None) \
-               for d in devlinks)
-
-            assert all(d.path == str(d) for d in devlinks)
-    else:
-        def test_devlinks(self):
-            # pylint: disable=missing-docstring
-            pytest.skip("not enough devices with devlinks")
+        assert all(d.path == str(d) for d in devlinks)
 
 
 class TestPCIAddress(object):
@@ -137,10 +134,8 @@ class TestPCIAddress(object):
        len(_devices) == 0,
        reason="no devices with subsystem pci"
     )
-    @given(
-       strategies.sampled_from(_devices),
-       settings=Settings(min_satisfying_examples=1)
-    )
+    @given(strategies.sampled_from(_devices))
+    @settings(min_satisfying_examples=1)
     def test_parsing_pci(self, a_device):
         """
         Test correct parsing of pci-addresses.

@@ -44,8 +44,8 @@ import pytest
 
 from hypothesis import assume
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 
 _CONTEXT = pyudev.Context()
@@ -116,9 +116,9 @@ class TestDiscovery(object):
 
     @given(
        strategies.sampled_from(_DEVICES).filter(lambda x: x.device_number),
-       strategies.text(":, -/+=").filter(lambda x: x),
-       settings=Settings(max_examples=NUM_TESTS)
+       strategies.text(":, -/+=").filter(lambda x: x)
     )
+    @settings(max_examples=NUM_TESTS)
     def test_device_number(self, a_device, a_string):
         """
         Test lookup by a device number.
@@ -130,10 +130,8 @@ class TestDiscovery(object):
             res = DeviceNumberHypothesis.get_devices(self._CONTEXT, number)
             assert a_device in res
 
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=NUM_TESTS)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=NUM_TESTS)
     def test_path(self, a_device):
         """
         Test lookup by path.
@@ -142,10 +140,8 @@ class TestDiscovery(object):
             res = DevicePathHypothesis.get_devices(self._CONTEXT, path)
             assert res == set((a_device,))
 
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=NUM_TESTS)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=NUM_TESTS)
     def test_name(self, a_device):
         """
         Test lookup by device name.
@@ -158,39 +154,34 @@ class TestDiscovery(object):
         assert a_device in res
 
     _devices = [d for d in _DEVICES if list(d.device_links)]
-    if len(_devices) != 0:
-        @given(
-           strategies.sampled_from(_devices),
-           settings=Settings(max_examples=NUM_TESTS)
-        )
-        def test_device_file(self, a_device):
-            """
-            Test lookup by device file.
+    @pytest.mark.skipif(
+        len(_devices) == 0,
+        reason="no device with device links"
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(max_examples=NUM_TESTS, min_satisfying_examples=1)
+    def test_device_file(self, a_device):
+        """
+        Test lookup by device file.
 
-            Skip any devices that are multipath device paths because links
-            may point to other paths in multipath group (rhbz#1263441).
-            """
-            assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device)
-            links = TestUtilities.get_files(a_device)
-            devs = frozenset(
-               d for l in links for d in DeviceFileHypothesis.get_devices(
-                  self._CONTEXT,
-                  l
-               )
-            )
-            assert devs == set((a_device,))
-    else:
-        def test_device_file(self):
-            """
-            Skip the test.
-            """
-            pytest.skip("No devices with device links.")
+        Skip any devices that are multipath device paths because links
+        may point to other paths in multipath group (rhbz#1263441).
+        """
+        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device)
+        links = TestUtilities.get_files(a_device)
+        devs = frozenset(
+           d for l in links for d in DeviceFileHypothesis.get_devices(
+              self._CONTEXT,
+              l
+           )
+        )
+        assert devs == set((a_device,))
 
     @given(
        strategies.sampled_from(_DEVICES),
-       strategies.text(":, -/+=").filter(lambda x: x),
-       settings=Settings(max_examples=NUM_TESTS)
+       strategies.text(":, -/+=").filter(lambda x: x)
     )
+    @settings(max_examples=NUM_TESTS)
     def test_anything(self, a_device, a_string):
         """
         Grab any of the likely candidates for looking up a device.
