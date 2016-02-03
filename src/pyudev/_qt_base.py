@@ -30,8 +30,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import six
+
 from pyudev.core import Device
-from pyudev._util import text_type
 
 class MonitorObserverMixin(object):
     """
@@ -193,7 +194,7 @@ class QUDevMonitorObserverGenerator(object):
            {
               str("__init__") : make_init(qobject, socket_notifier),
               #: emitted upon arbitrary device events
-              str("deviceEvent") : signal(text_type, Device),
+              str("deviceEvent") : signal(six.text_type, Device),
               #: emitted if a device was added
               str("deviceAdded") : signal(Device),
               #: emitted if a device was removed

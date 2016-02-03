@@ -31,76 +31,82 @@ import stat
 import sys
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 import pytest
 
 from pyudev import Device
 
 from ..utils import is_unicode_string
+from .._constants import non_volatile_attributes
 
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
 from ._device_tests import _UDEV_TEST
 
+
 class TestAttributes(object):
     """
     Test ``Attributes`` class methods.
     """
 
-    _VOLATILE_ATTRIBUTES = ['energy_uj', 'power_on_acct']
-
-    @classmethod
-    def non_volatile_items(cls, attributes):
-        """
-        Yields keys for non-volatile attributes only.
-
-        :param dict attributes: attributes dict obtained from udev
-        """
-        return ((k, v) for (k, v) in attributes.items() \
-           if k not in cls._VOLATILE_ATTRIBUTES)
-
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_getitem(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             raw_value = value.encode(sys.getfilesystemencoding())
             assert isinstance(device.attributes.get(key), bytes)
             assert device.attributes.get(key) == raw_value
 
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_getitem_nonexisting(self, a_device):
-        assert a_device.attributes.get('a non-existing attribute') is None
+        """
+        Test behavior when corresponding value is non-existant.
+        """
+        not_key = "a non-existing attribute"
+        assert a_device.attributes.get(not_key) is None
+        with pytest.raises(KeyError):
+            a_device.attributes.asstring(not_key)
+        with pytest.raises(KeyError):
+            a_device.attributes.asint(not_key)
+        with pytest.raises(KeyError):
+            a_device.attributes.asbool(not_key)
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
+    def test_non_iterable(self, a_device):
+        """
+        Test that the attributes object can not be iterated over.
+        """
+        # pylint: disable=pointless-statement
+        with pytest.raises(TypeError):
+            'key' in a_device.attributes
+        with pytest.raises(TypeError):
+            a_device.attributes['key']
+
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asstring(self, a_context, device_datum):
+        """
+        Test that string value agrees with cli value and is unicode.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
-            assert is_unicode_string(
-                device.attributes.asstring(key))
+        for key, value in non_volatile_attributes(device_datum.attributes):
+            assert is_unicode_string(device.attributes.asstring(key))
             assert device.attributes.asstring(key) == value
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asint(self, a_context, device_datum):
+        """
+        Test that integer result is an int or ValueError raised.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             try:
                 value = int(value)
             except ValueError:
@@ -109,14 +115,14 @@ class TestAttributes(object):
             else:
                 assert device.attributes.asint(key) == value
 
-    @given(
-       _CONTEXT_STRATEGY,
-       strategies.sampled_from(_DEVICE_DATA),
-       settings=Settings(max_examples=5)
-    )
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
     def test_asbool(self, a_context, device_datum):
+        """
+        Test that bool result is a bool or ValueError raised.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in self.non_volatile_items(device_datum.attributes):
+        for key, value in non_volatile_attributes(device_datum.attributes):
             if value == '1':
                 assert device.attributes.asbool(key)
             elif value == '0':
@@ -128,10 +134,8 @@ class TestAttributes(object):
                 assert str(exc_info.value).startswith(message)
 
     @_UDEV_TEST(167, "test_available_attributes")
-    @given(
-       strategies.sampled_from(_DEVICES),
-       settings=Settings(max_examples=5)
-    )
+    @given(strategies.sampled_from(_DEVICES))
+    @settings(max_examples=5)
     def test_available_attributes(self, a_device):
         """
         Test that the available attributes are exactly the names of files

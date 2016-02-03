@@ -1,3 +1,17 @@
+0.19.0 (Feb 3, 2015)
+==================
+
+- Restore raising KeyError by Attributes.as* methods when attribute not found.
+- Explicitly require six module.
+- Never raise a DeviceNotFoundError when iterating over a device enumeration.
+- Device.subsystem() now returns None if device has no subsystem.
+- Add DeprecationWarnings to deprecated Device methods.
+- Replace "/" with "!" in Device.from_name() sys_name parameter.
+- Add some unstable classes for parsing some kinds of values.
+- Make version info more like Python's including micro numbers and levels.
+- Refactor some internal modules into subdirectories.
+- Work on tests and reproducers.
+
 0.18 (Dec 1, 2015)
 ===================
 

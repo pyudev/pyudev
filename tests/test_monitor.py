@@ -32,7 +32,7 @@ from pyudev import Monitor, MonitorObserver, Device
 from tests.utils.udev import DeviceDatabase
 from tests.utils.udev import get_device_sample
 
-from tests._device_tests import _UDEV_TEST
+from tests._constants import _UDEV_TEST
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling
@@ -313,8 +313,17 @@ class TestMonitorObserver(object):
 
     def make_observer(self, monitor, use_deprecated=False):
         if use_deprecated:
-            self.observer = pytest.deprecated_call(
-                MonitorObserver, monitor, event_handler=self.event_handler)
+            if pytest.__version__ == '2.8.4':
+                self.observer = MonitorObserver(
+                   monitor,
+                   event_handler=self.event_handler
+                )
+            else:
+                self.observer = pytest.deprecated_call(
+                   MonitorObserver,
+                   monitor,
+                   event_handler=self.event_handler
+                )
         else:
             self.observer = MonitorObserver(monitor, callback=self.callback)
         return self.observer

@@ -23,14 +23,16 @@ import pytest
 import mock
 
 from hypothesis import given
+from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import Settings
 
 from pyudev import Enumerator
 
-from ._device_tests import _CONTEXT_STRATEGY
-from ._device_tests import _DEVICES
-from ._device_tests import _UDEV_TEST
+from ._constants import _CONTEXT_STRATEGY
+from ._constants import _DEVICES
+from ._constants import _UDEV_TEST
+from ._constants import _UDEV_VERSION
+
 
 @pytest.fixture
 def enumerator(request):
@@ -48,6 +50,7 @@ class TestEnumerator(object):
     def test_match_subsystem_nomatch(self, context):
         devices = context.list_devices().match_subsystem('input', nomatch=True)
         for device in devices:
+            assert device.subsystem is not None
             assert device.subsystem != 'input'
 
     def test_match_subsystem_nomatch_unfulfillable(self, context):
@@ -55,6 +58,44 @@ class TestEnumerator(object):
         devices.match_subsystem('input')
         devices.match_subsystem('input', nomatch=True)
         assert not list(devices)
+
+    def test_match_subsystem_nomatch_complete(self, context):
+        """
+        Test that w/ respect to the universe of devices returned by
+        list_devices() a match and its inverse are complements of each other.
+
+        Note that list_devices() omits devices that have no subsystem,
+        so with respect to the whole universe of devices, the two are
+        not complements of each other.
+        """
+        m_devices = set(context.list_devices().match_subsystem('j'))
+        nm_devices = set(
+           context.list_devices().match_subsystem('j', nomatch=True)
+        )
+
+        assert not m_devices.intersection(nm_devices)
+
+        devices = set(context.list_devices())
+        assert devices == m_devices.union(nm_devices)
+
+    def test_match_scsi_devices_children(self, context):
+        """
+        Test that every device with type scsi_device has only one disk
+        descendant.
+        """
+        scsi_devices = context.list_devices().match_property(
+           'DEVTYPE',
+           'scsi_device'
+        )
+
+        def func(dev):
+            return context.list_devices(
+               subsystem='block',
+               DEVTYPE='disk',
+               parent=dev
+            )
+
+        assert all(len(list(func(d))) in (0, 1) for d in scsi_devices)
 
     def test_match_sys_name(self, context):
         devices = context.list_devices().match_sys_name('sda')
@@ -143,23 +184,28 @@ class TestEnumerator(object):
             assert 'seat' in device.tags
 
     _devices = [d for d in _DEVICES if d.parent]
-    if len(_devices) > 0:
-        @given(
-           _CONTEXT_STRATEGY,
-           strategies.sampled_from(_DEVICES).filter(lambda x: x.parent),
-           settings=Settings(max_examples=5)
-        )
-        def test_match_parent(self, context, device):
-            parent = device.parent
-            children = list(context.list_devices().match_parent(parent))
-            assert device in children
-            try:
+    @pytest.mark.skipif(len(_devices) == 0, reason="no device with parent")
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_devices))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_match_parent(self, context, device):
+        """
+        For a given device, verify that it is in its parent's children.
+
+        Verify that the parent is also among the device's children,
+        unless the parent lacks a subsystem
+
+        See: rhbz#1255191
+        """
+        parent = device.parent
+        children = list(context.list_devices().match_parent(parent))
+        assert device in children
+        if _UDEV_VERSION <= 175:
+            assert parent in children
+        else:
+            if parent.subsystem is not None:
                 assert parent in children
-            except AssertionError:
-                pytest.xfail("rhbz#1255191")
-    else:
-        def test_match_parent(self):
-            pytest.skip("not enough devices with parents")
+            else:
+                assert parent not in children
 
     @_UDEV_TEST(165, "test_match_is_initialized_mock")
     def test_match_is_initialized_mock(self, context):

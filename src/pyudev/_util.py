@@ -29,16 +29,17 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+try:
+    from subprocess import check_output
+except ImportError:
+    from pyudev._compat import check_output
+
 import os
 import sys
 import stat
 import errno
 
-
-if sys.version_info[0] == 2:
-    text_type = unicode
-else:
-    text_type = str
+import six
 
 
 def ensure_byte_string(value):
@@ -62,7 +63,7 @@ def ensure_unicode_string(value):
     decoded with the filesystem encoding (as in
     :func:`sys.getfilesystemencoding()`).
     """
-    if not isinstance(value, text_type):
+    if not isinstance(value, six.text_type):
         value = value.decode(sys.getfilesystemencoding())
     return value
 
@@ -85,7 +86,7 @@ def property_value_to_bytes(value):
     if isinstance(value, bytes):
         return value
     else:
-        return ensure_byte_string(text_type(value))
+        return ensure_byte_string(six.text_type(value))
 
 
 def string_to_bool(value):
@@ -176,3 +177,31 @@ def eintr_retry_call(func, *args, **kwargs):
             if error_code == errno.EINTR:
                 continue
             raise
+
+def udev_version():
+    """
+    Get the version of the underlying udev library.
+
+    udev doesn't use a standard major-minor versioning scheme, but instead
+    labels releases with a single consecutive number.  Consequently, the
+    version number returned by this function is a single integer, and not a
+    tuple (like for instance the interpreter version in
+    :data:`sys.version_info`).
+
+    As libudev itself does not provide a function to query the version number,
+    this function calls the ``udevadm`` utility, so be prepared to catch
+    :exc:`~exceptions.EnvironmentError` and
+    :exc:`~subprocess.CalledProcessError` if you call this function.
+
+    Return the version number as single integer.  Raise
+    :exc:`~exceptions.ValueError`, if the version number retrieved from udev
+    could not be converted to an integer.  Raise
+    :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
+    not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
+    ``udevadm`` returned a non-zero exit code.  On Python 2.7 or newer, the
+    ``output`` attribute of this exception is correctly set.
+
+    .. versionadded:: 0.8
+    """
+    output = ensure_unicode_string(check_output(['udevadm', '--version']))
+    return int(output.strip())

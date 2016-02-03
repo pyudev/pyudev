@@ -15,25 +15,24 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-
 """
-    pyudev._libc
-    ============
+    pyudev._ctypeslib.libc
+    ======================
 
-    Wrapper types for libudev.  Use ``libudev`` attribute to access libudev
-    functions.
+    Wrappers for libc.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from ctypes import CDLL, c_int
 from ctypes.util import find_library
 
-from pyudev._errorcheckers import check_errno_on_nonzero_return
+from ._errorcheckers import check_errno_on_nonzero_return
 
 
 fd_pair = c_int * 2

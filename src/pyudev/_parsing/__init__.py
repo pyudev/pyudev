@@ -16,10 +16,24 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.tests._device_tests
-    ==========================
+    pyudev._parsing
+    ===============
 
-    Tests on devices.
+    Parsing various fields extracted by pyudev.
 
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
+
+__all__ = [
+   'Devlink',
+   'IdPathParse',
+   'IdPathParsers',
+   'PCIAddressParse'
+]
+
+from ._devlink import Devlink
+
+from ._id_path import IdPathParse
+from ._id_path import IdPathParsers
+
+from ._pci_address import PCIAddressParse

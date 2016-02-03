@@ -25,5 +25,9 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-__version__ = '0.18'
-__version_info__ = tuple(int(x) for x in __version__.split('.'))
+__version_info__ = (0, 19, 0, '')
+__version__ = "%s%s" % \
+   (
+      ".".join(str(x) for x in __version_info__[:3]),
+      "".join(str(x) for x in __version_info__[3:])
+   )
