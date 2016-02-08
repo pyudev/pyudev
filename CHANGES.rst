@@ -1,4 +1,4 @@
-0.19.0 (Feb 3, 2015)
+0.19.0 (Feb 3, 2016)
 ==================
 
 - Restore raising KeyError by Attributes.as* methods when attribute not found.
