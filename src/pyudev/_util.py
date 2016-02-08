@@ -122,27 +122,29 @@ _is_char_device = stat.S_ISCHR
 _is_block_device = stat.S_ISBLK
 
 
-def get_device_type(filename):
+def get_device_type(file_id):
     """
     Get the device type of a device file.
 
-    ``filename`` is a string containing the path of a device file.
-
-    Return ``'char'`` if ``filename`` is a character device, or ``'block'`` if
-    ``filename`` is a block device.  Raise :exc:`~exceptions.ValueError` if
-    ``filename`` is no device file at all.  Raise
-    :exc:`~exceptions.EnvironmentError` if ``filename`` does not exist or if
-    its metadata was inaccessible.
+    :param file_id: an identifier for the file
+    :type file_id: str or int
+    :rtype: str
+    :raises EnvironmentError: on failure to access ``file_id``
+    :raises ValueError: if device is not block or char
 
     .. versionadded:: 0.15
     """
-    mode = os.stat(filename).st_mode
+    if isinstance(file_id, int):
+        mode = os.fstat(file_id).st_mode
+    else:
+        mode = os.stat(file_id).st_mode
+
     if _is_char_device(mode):
         return 'char'
     elif _is_block_device(mode):
         return 'block'
     else:
-        raise ValueError('not a device file: {0!r}'.format(filename))
+        raise ValueError('not a device file: {0!r}'.format(file_id))
 
 
 def eintr_retry_call(func, *args, **kwargs):

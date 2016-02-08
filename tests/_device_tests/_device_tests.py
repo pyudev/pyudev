@@ -53,6 +53,18 @@ from .._constants import _DEVICES
 from .._constants import _UDEV_TEST
 
 
+def _namespaced_directories(device):
+    """
+    Returns a list of possibly namespaced directories for ``device``.
+
+    :param Device device: the device
+    """
+    sys_path = device.sys_path
+    return (
+       name for name in os.listdir(sys_path) if \
+       (name.find(':') > 0 and os.path.isdir(os.path.join(sys_path, name)))
+    )
+
 class TestDevice(object):
     """
     Test ``Device`` methods.
@@ -382,14 +394,20 @@ class TestDevice(object):
     @settings(max_examples=5)
     def test_asint(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for property, value in device_datum.properties.items():
+        for prop, value in device_datum.properties.items():
             try:
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.asint(property)
+                    if pytest.__version__ == '2.8.4':
+                        device.asint(prop)
+                    else:
+                        pytest.deprecated_call(device.asint, prop)
             else:
-                assert device.asint(property) == value
+                if pytest.__version__ == '2.8.4':
+                    assert device.asint(prop) == value
+                else:
+                    assert pytest.deprecated_call(device.asint, prop) == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -397,14 +415,21 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop, value in device_datum.properties.items():
             if value == '1':
-                assert device.asbool(prop)
+                if pytest.__version__ == '2.8.4':
+                    assert device.asbool(prop)
+                else:
+                    assert pytest.deprecated_call(device.asbool, prop)
             elif value == '0':
-                assert not device.asbool(prop)
+                if pytest.__version__ == '2.8.4':
+                    assert not device.asbool(prop)
+                else:
+                    assert not pytest.deprecated_call(device.asbool, prop)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.asbool(prop)
-                message = 'Not a boolean value: {0!r}'
-                assert str(exc_info.value) == message.format(value)
+                    if pytest.__version__ == '2.8.4':
+                        device.asbool(prop)
+                    else:
+                        pytest.deprecated_call(device.asbool, prop)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -479,3 +504,26 @@ class TestDevice(object):
         link_target = os.readlink(link_path)
         target_path = os.path.normpath(os.path.join(id_path, link_target))
         assert target_path == a_device.device_node
+
+    _devices = [d for d in _DEVICES if any(_namespaced_directories(d))]
+    @pytest.mark.skipif(
+        len(_devices) == 0,
+        reason='no namespaced directories to test'
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(max_examples=5, min_satisfying_examples=1)
+    def test_namespace_ids(self, a_device):
+        """
+        Exercise namespace ids.
+
+        Find candidates that will work, even though some maybe shouldn't.
+        It's possible that they shouldn't because they might match the
+        expected format of a namespace prefixed value without matching any
+        actual namespace.
+        """
+        for name in _namespaced_directories(a_device):
+            (first, _, _) = name.partition(':')
+            names = a_device.namespace_ids(first)
+            assert names != []
+
+        assert not any(a_device.namespace_ids('really unlikely namespace'))

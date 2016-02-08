@@ -96,8 +96,12 @@ class TestAttributes(object):
         """
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in non_volatile_attributes(device_datum.attributes):
-            assert is_unicode_string(device.attributes.asstring(key))
-            assert device.attributes.asstring(key) == value
+            if pytest.__version__ == '2.8.4':
+                res = device.attributes.asstring(key)
+            else:
+                res = pytest.deprecated_call(device.attributes.asstring, key)
+            assert is_unicode_string(res)
+            assert res == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -111,9 +115,16 @@ class TestAttributes(object):
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.attributes.asint(key)
+                    if pytest.__version__ == '2.8.4':
+                        device.attributes.asint(key)
+                    else:
+                        pytest.deprecated_call(device.attributes.asint, key)
             else:
-                assert device.attributes.asint(key) == value
+                if pytest.__version__ == '2.8.4':
+                    res = device.attributes.asint(key)
+                else:
+                    res = pytest.deprecated_call(device.attributes.asint, key)
+                assert res == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -124,14 +135,22 @@ class TestAttributes(object):
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in non_volatile_attributes(device_datum.attributes):
             if value == '1':
-                assert device.attributes.asbool(key)
+                if pytest.__version__ == '2.8.4':
+                    assert device.attributes.asbool(key)
+                else:
+                    assert pytest.deprecated_call(device.attributes.asbool, key)
             elif value == '0':
-                assert not device.attributes.asbool(key)
+                if pytest.__version__ == '2.8.4':
+                    res = device.attributes.asbool(key)
+                else:
+                    res = pytest.deprecated_call(device.attributes.asbool, key)
+                assert not res
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.attributes.asbool(key)
-                message = 'Not a boolean value:'
-                assert str(exc_info.value).startswith(message)
+                    if pytest.__version__ == '2.8.4':
+                        device.attributes.asbool(key)
+                    else:
+                        pytest.deprecated_call(device.attributes.asbool, key)
 
     @_UDEV_TEST(167, "test_available_attributes")
     @given(strategies.sampled_from(_DEVICES))
