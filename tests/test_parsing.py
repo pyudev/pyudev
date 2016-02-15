@@ -164,3 +164,23 @@ class TestPCIAddress(object):
         """
         (parser, result) = _parsing.PCIAddressParse().parse(a_device.sys_name)
         assert all(result.group(k) != "" for k in parser.keys)
+
+
+class TestDMUUID(object):
+    """
+    Test parsing a DM_UUID str.
+    """
+    # pylint: disable=too-few-public-methods
+    _devices = [d for d in _DEVICES if d.get('DM_UUID') is not None]
+    @pytest.mark.skipif(
+       len(_devices) == 0,
+       reason="no devices with DM_UUID property"
+    )
+    @given(strategies.sampled_from(_devices))
+    @settings(min_satisfying_examples=1)
+    def test_parsing_dmuuid(self, a_device):
+        """
+        Test parsing of DM_UUIDs.
+        """
+        (parser, result) = _parsing.DMUUIDParse().parse(a_device['DM_UUID'])
+        assert all(result.group(k) != "" for k in parser.keys)
