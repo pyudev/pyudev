@@ -100,7 +100,7 @@ class Field(object):
     """
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, name, regexp=r'.*', description=None):
+    def __init__(self, name, regexp=r'.+', description=None):
         """
         Initializer.
 
