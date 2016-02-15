@@ -52,20 +52,27 @@ class TestIDPATH(object):
     Test parsing ID_PATH values.
     """
     # pylint: disable=too-few-public-methods
-
-    @given(
-       strategies.sampled_from(_DEVICES).filter(
-          lambda x: x.get('ID_PATH') is not None
-       )
+    _devices = [d for d in _DEVICES if d.get('ID_PATH') is not None]
+    @pytest.mark.skipif(
+       len(_devices) == 0,
+       reason="no devices with ID_PATH property"
     )
+    @given(strategies.sampled_from(_devices))
+    @settings(min_satisfying_examples=1)
     def test_parsing(self, a_device):
         """
         Test that parsing is satisfactory on all examples.
         """
+        parsers = _parsing.IdPathParsers.PARSERS
         id_path = a_device.get('ID_PATH')
-        parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
+        parser = _parsing.IdPathParse(parsers)
         result = parser.parse(id_path)
         assert isinstance(result, list) and result != []
+        assert all(
+           any(r[1].group('total').startswith(p.prefix) for p in parsers) \
+                   for r in result
+        )
+        assert not any(r[1].group('total').startswith('-') for r in result)
 
     _devices = [d for d in _DEVICES if d.get('ID_SAS_PATH') is not None]
     @pytest.mark.skipif(
@@ -78,10 +85,25 @@ class TestIDPATH(object):
         """
         Test that parsing is satisfactory on all examples.
         """
+        parsers = _parsing.IdPathParsers.PARSERS
         id_path = a_device.get('ID_SAS_PATH')
-        parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
+        parser = _parsing.IdPathParse(parsers)
         result = parser.parse(id_path)
         assert isinstance(result, list) and result != []
+        assert all(
+           any(r[1].group('total').startswith(p.prefix) for p in parsers) \
+                   for r in result
+        )
+        assert not any(r[1].group('total').startswith('-') for r in result)
+
+    def test_failure(self):
+        """
+        Test at least one failure.
+        """
+        id_path = 'pci-0000_09_00_0-sas0x5000155359566200-lun-0'
+        parser = _parsing.IdPathParse(_parsing.IdPathParsers.PARSERS)
+        result = parser.parse(id_path)
+        assert result == []
 
 
 class TestDevlinks(object):

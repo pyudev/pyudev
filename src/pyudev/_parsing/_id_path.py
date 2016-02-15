@@ -35,6 +35,16 @@ from ._shared import Field
 from ._shared import Parser
 
 
+class IdPathField(Field):
+    """
+    Overrides default regular expression.
+    """
+    # pylint: disable=too-few-public-methods
+
+    def __init__(self, name, regexp=r'[^-]+', description=None):
+        super(IdPathField, self).__init__(name, regexp, description)
+
+
 class IdPathParsers(object):
     """
     Aggregate parsers.
@@ -42,70 +52,73 @@ class IdPathParsers(object):
     # pylint: disable=too-few-public-methods
 
     PARSERS = [
-       Parser(r'acpi-%s', [Field('sys_name')]),
-       Parser(r'ap-%s', [Field('sys_name')]),
-       Parser(r'ata-%s', [Field('port_no')]),
-       Parser(r'bcma-%s', [Field('core')]),
-       Parser(r'cciss-disk%s', [Field('disk')]),
-       Parser(r'ccw-%s', [Field('sys_name')]),
-       Parser(r'ccwgroup-%s', [Field('sys_name')]),
-       Parser(r'fc-%s-%s', [Field('port_name'), Field('lun')]),
+       Parser(r'acpi-%s', [IdPathField('sys_name')]),
+       Parser(r'ap-%s', [IdPathField('sys_name')]),
+       Parser(r'ata-%s', [IdPathField('port_no')]),
+       Parser(r'bcma-%s', [IdPathField('core')]),
+       Parser(r'cciss-disk%s', [IdPathField('disk')]),
+       Parser(r'ccw-%s', [IdPathField('sys_name')]),
+       Parser(r'ccwgroup-%s', [IdPathField('sys_name')]),
+       Parser(r'fc-%s-%s', [IdPathField('port_name'), IdPathField('lun')]),
        Parser(
           r'ip-%s:%s-iscsi-%s-%s',
           [
-             Field('persistent_address'),
-             Field('persistent_port'),
-             Field('target_name'),
-             Field('lun')
+             IdPathField('persistent_address'),
+             IdPathField('persistent_port'),
+             IdPathField('target_name'),
+             IdPathField('lun')
           ]
        ),
-       Parser(r'iucv-%s', [Field('sys_name')]),
-       Parser(r'nst%s', [Field('name')]),
-       Parser(r'pci-%s', [Field('sys_name')]),
-       Parser(r'platform-%s', [Field('sys_name')]),
-       Parser(r'sas-%s-%s', [Field('sas_address'), Field('lun')]),
+       Parser(r'iucv-%s', [IdPathField('sys_name')]),
+       Parser(r'nst%s', [IdPathField('name')]),
+       Parser(r'pci-%s', [IdPathField('sys_name')]),
+       Parser(r'platform-%s', [IdPathField('sys_name')]),
+       Parser(r'sas-%s-lun-%s',
+          [IdPathField('sas_address'), IdPathField('lun')]
+       ),
        Parser(
           r'sas-exp%s-phy%s-%s',
           [
-             Field(
+             IdPathField(
                 'sas_address',
                 r'.*',
                 'sysfs sas_address attribute of expander'
              ),
-             Field(
+             IdPathField(
                 'phy_identifier',
                 r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             Field('lun', description='sysnum of device (0 if none)')
+             IdPathField('lun', description='sysnum of device (0 if none)')
           ]
        ),
        Parser(
           r'sas-phy%s-%s',
           [
-             Field(
+             IdPathField(
                 'phy_identifier',
                 r'.*',
                 'sysfs phy_identifier attribute of target sas device'
              ),
-             Field('lun', description='sysnum of device (0 if none)')
+             IdPathField('lun', description='sysnum of device (0 if none)')
           ]
        ),
-       Parser(r'scm-%s', [Field('sys_name')]),
+       Parser(r'scm-%s', [IdPathField('sys_name')]),
        Parser(
           r'scsi-%s:%s:%s:%s',
           [
-             Field('host'),
-             Field('bus'),
-             Field('target'),
-             Field('lun')
+             IdPathField('host'),
+             IdPathField('bus'),
+             IdPathField('target'),
+             IdPathField('lun')
           ]
        ),
-       Parser('serio-%s', [Field('sysnum')]),
-       Parser('st%s', [Field('name')]),
-       Parser('usb-0:%s', [Field('port')]),
-       Parser('vmbus-%s-%s', [Field('guid'), Field('lun')]),
-       Parser('xen-%s', [Field('sys_name')])
+       Parser('serio-%s', [IdPathField('sysnum')]),
+       Parser('st%s', [IdPathField('name')]),
+       Parser('usb-0:%s', [IdPathField('port')]),
+       Parser('virtio-pci-%s', [IdPathField('sys_name')]),
+       Parser('vmbus-%s-%s', [IdPathField('guid'), IdPathField('lun')]),
+       Parser('xen-%s', [IdPathField('sys_name')])
     ]
 
 
@@ -166,6 +179,6 @@ class IdPathParse(object):
 
             (parser, best_match) = max(matches, key=lambda x: len(x[0].prefix))
             match_list.append((parser, best_match))
-            value = value[len(best_match.group('total')):]
+            value = value[len(best_match.group('total')) + 1:]
 
         return match_list
