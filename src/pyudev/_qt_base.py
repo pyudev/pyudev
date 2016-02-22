@@ -32,7 +32,7 @@ from __future__ import unicode_literals
 
 import six
 
-from pyudev.core import Device
+from pyudev.device import Device
 
 class MonitorObserverMixin(object):
     """

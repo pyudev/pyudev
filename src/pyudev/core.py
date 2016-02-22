@@ -29,7 +29,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from pyudev.device import Device
+from pyudev.device import Devices
 from pyudev.device._errors import DeviceNotFoundAtPathError
 from pyudev._ctypeslib.libudev import load_udev_library
 
@@ -391,6 +391,6 @@ class Enumerator(object):
         entry = self._libudev.udev_enumerate_get_list_entry(self)
         for name, _ in udev_list_iterate(self._libudev, entry):
             try:
-                yield Device.from_sys_path(self.context, name)
+                yield Devices.from_sys_path(self.context, name)
             except DeviceNotFoundAtPathError:
                 continue
