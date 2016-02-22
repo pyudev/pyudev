@@ -34,9 +34,10 @@ import errno
 from threading import Thread
 from functools import partial
 
+from pyudev.device import Device
+
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
-from pyudev.core import Device
 
 from pyudev._os import pipe
 from pyudev._os import poll
