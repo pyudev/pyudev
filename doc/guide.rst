@@ -245,7 +245,7 @@ filesystems:
 >>> monitor.filter_by('block')
 >>> for device in iter(monitor.poll, None):
 ...     if 'ID_FS_TYPE' in device:
-...         print('{0} partition {1}'.format(action, device.get('ID_FS_LABEL')))
+...         print('{0} partition {1}'.format(device.action, device.get('ID_FS_LABEL')))
 ...
 add partition MULTIBOOT
 remove partition MULTIBOOT
