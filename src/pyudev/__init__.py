@@ -57,7 +57,6 @@ from pyudev.discover import DeviceNumberHypothesis
 from pyudev.discover import DevicePathHypothesis
 from pyudev.discover import Discovery
 
-from pyudev.core import udev_version
 from pyudev.core import Context
 from pyudev.core import Enumerator
 
@@ -66,3 +65,5 @@ from pyudev.monitor import MonitorObserver
 
 from pyudev.version import __version__
 from pyudev.version import __version_info__
+
+from pyudev._util import udev_version

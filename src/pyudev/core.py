@@ -37,7 +37,6 @@ from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import property_value_to_bytes
 from pyudev._util import udev_list_iterate
-from pyudev._util import udev_version
 
 
 class Context(object):
