@@ -45,8 +45,10 @@ import gobject
 
 class _ObserverMixin(object):
     """Mixin to provide observer behavior to the old and the new API."""
+    # pylint: disable=too-few-public-methods
 
     def _setup_observer(self, monitor):
+        # pylint: disable=attribute-defined-outside-init
         self.monitor = monitor
         self.event_source = None
         self.enabled = True
@@ -66,12 +68,14 @@ class _ObserverMixin(object):
     @enabled.setter
     def enabled(self, value):
         if value and self.event_source is None:
+            # pylint: disable=attribute-defined-outside-init
             self.event_source = glib.io_add_watch(
                 self.monitor, glib.IO_IN, self._process_udev_event)
         elif not value and self.event_source is not None:
             glib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
+        # pylint: disable=unused-argument
         if condition == glib.IO_IN:
             device = self.monitor.poll(timeout=0)
             if device:

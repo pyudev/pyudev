@@ -39,13 +39,6 @@ import six
 from pyudev.device import Devices
 from pyudev.device import DeviceNotFoundError
 
-__all__ = [
-   "DeviceFileHypothesis",
-   "DeviceNameHypothesis",
-   "DeviceNumberHypothesis",
-   "DevicePathHypothesis",
-   "Discovery"
-]
 
 def wrap_exception(func):
     """

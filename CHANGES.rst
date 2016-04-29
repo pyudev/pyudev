@@ -1,4 +1,14 @@
-0.19.0 (Feb 3, 2015)
+0.20.0 (April 29, 2016)
+=======================
+
+- Remove parsing code added in previous release.
+- No longer do CI for Python 2.6.
+- Eliminate all wildcard imports and __all__ statements.
+- No longer use deprecated Device.from_sys_path() method.
+- Minor pylint induced changes.
+- Documentation fixes.
+
+0.19.0 (Feb 3, 2016)
 ==================
 
 - Restore raising KeyError by Attributes.as* methods when attribute not found.

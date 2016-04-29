@@ -123,25 +123,25 @@ class Unit(object):
         for symbol in self.tree.getroot():
             self._symbol_table[symbol.get('id')] = symbol
 
-    def _resolve_Function(self, symbol):
+    def _resolve_Function(self, symbol): # pylint: disable=invalid-name
         return_type = self._resolve_symbol(symbol.get('returns'))
         arguments = tuple(self._resolve_symbol(a.get('type'))
                           for a in symbol.findall('./Argument'))
         return Function(symbol.get('name'), arguments, return_type)
 
-    def _resolve_Struct(self, symbol):
+    def _resolve_Struct(self, symbol): # pylint: disable=invalid-name
         return Struct(symbol.get('name'))
 
-    def _resolve_FundamentalType(self, symbol):
+    def _resolve_FundamentalType(self, symbol): # pylint: disable=invalid-name
         return FundamentalType(symbol.get('name'))
 
-    def _resolve_CvQualifiedType(self, symbol):
+    def _resolve_CvQualifiedType(self, symbol): # pylint: disable=invalid-name
         return CvQualifiedType(self._resolve_symbol(symbol.get('type')))
 
-    def _resolve_PointerType(self, symbol):
+    def _resolve_PointerType(self, symbol): # pylint: disable=invalid-name
         return PointerType(self._resolve_symbol(symbol.get('type')))
 
-    def _resolve_Typedef(self, symbol):
+    def _resolve_Typedef(self, symbol): # pylint: disable=invalid-name
         return Typedef(self._resolve_symbol(symbol.get('type')))
 
     def _resolve_symbol(self, symbol):

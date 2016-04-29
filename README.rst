@@ -55,7 +55,7 @@ Development
 
 The source code is hosted on GitHub_::
 
-   git clone git://github.com/lunaryorn/pyudev.git
+   git clone git://github.com/pyudev/pyudev.git
 
 Please fork the repository and send pull requests with your fixes or new
 features, but respect the following guidelines:
