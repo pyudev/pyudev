@@ -43,9 +43,6 @@ from pyudev._os import pipe
 from pyudev._os import poll
 
 
-__all__ = ['Monitor', 'MonitorObserver']
-
-
 class Monitor(object):
     """
     A synchronous device event monitor.
