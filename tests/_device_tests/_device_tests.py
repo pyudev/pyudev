@@ -32,7 +32,6 @@ import operator
 import gc
 from datetime import timedelta
 
-from hypothesis import assume
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies
@@ -382,14 +381,14 @@ class TestDevice(object):
     @settings(max_examples=5)
     def test_asint(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for property, value in device_datum.properties.items():
+        for prop, value in device_datum.properties.items():
             try:
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.asint(property)
+                    device.asint(prop)
             else:
-                assert device.asint(property) == value
+                assert device.asint(prop) == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)

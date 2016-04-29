@@ -55,6 +55,10 @@ class TestAttributes(object):
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
     def test_getitem(self, a_context, device_datum):
+        """
+        Test that attribute value is the same as datum attribute value and
+        is instance of bytes.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
         for key, value in non_volatile_attributes(device_datum.attributes):
             raw_value = value.encode(sys.getfilesystemencoding())
