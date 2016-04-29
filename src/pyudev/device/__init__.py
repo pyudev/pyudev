@@ -24,18 +24,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-__all__ = [
-  'Attributes',
-  'Device',
-  'Devices',
-  'DeviceNotFoundAtPathError',
-  'DeviceNotFoundByFileError',
-  'DeviceNotFoundByNameError',
-  'DeviceNotFoundByNumberError',
-  'DeviceNotFoundError',
-  'DeviceNotFoundInEnvironmentError',
-  'Tags'
-]
 
 from ._device import Attributes
 from ._device import Device

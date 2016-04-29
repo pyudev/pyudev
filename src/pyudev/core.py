@@ -39,8 +39,6 @@ from pyudev._util import property_value_to_bytes
 from pyudev._util import udev_list_iterate
 from pyudev._util import udev_version
 
-__all__ = ['udev_version', 'Context', 'Enumerator']
-
 
 class Context(object):
     """
