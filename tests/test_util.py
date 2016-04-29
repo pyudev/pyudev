@@ -19,7 +19,6 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 import sys
-import errno
 
 import pytest
 from mock import Mock
@@ -123,9 +122,9 @@ def raise_valueerror():
     raise ValueError('from function')
 
 
-_char_devices = list(_CONTEXT.list_devices(subsystem="tty"))
-@pytest.mark.skipif(len(_char_devices) == 0, reason='no tty devices')
-@given(strategies.sampled_from(_char_devices))
+_CHAR_DEVICES = list(_CONTEXT.list_devices(subsystem="tty"))
+@pytest.mark.skipif(len(_CHAR_DEVICES) == 0, reason='no tty devices')
+@given(strategies.sampled_from(_CHAR_DEVICES))
 @settings(min_satisfying_examples=1, max_examples=5)
 def test_get_device_type_character_device(a_device):
     """
@@ -133,9 +132,9 @@ def test_get_device_type_character_device(a_device):
     """
     assert _util.get_device_type(a_device.device_node) == 'char'
 
-_block_devices = list(_CONTEXT.list_devices(subsystem="block"))
-@pytest.mark.skipif(len(_block_devices) == 0, reason='no block devices')
-@given(strategies.sampled_from(_block_devices))
+_BLOCK_DEVICES = list(_CONTEXT.list_devices(subsystem="block"))
+@pytest.mark.skipif(len(_BLOCK_DEVICES) == 0, reason='no block devices')
+@given(strategies.sampled_from(_BLOCK_DEVICES))
 @settings(min_satisfying_examples=1, max_examples=5)
 def test_get_device_type_block_device(a_device):
     """
@@ -167,6 +166,7 @@ def test_eintr_retry_call(tmpdir):
     import os, signal, select
 
     def handle_alarm(signum, frame):
+        # pylint: disable=unused-argument
         pass
     orig_alarm = signal.getsignal(signal.SIGALRM)
 
@@ -181,7 +181,7 @@ def test_eintr_retry_call(tmpdir):
 
         # Ensure that a signal raises EINTR on Python < 3.5
         if sys.version_info < (3, 5):
-            with pytest.raises(select.error) as e:
+            with pytest.raises(select.error):
                 signal.alarm(1)
                 select.select([], [], [fd], 2)
 

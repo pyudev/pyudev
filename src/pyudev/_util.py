@@ -117,11 +117,6 @@ def udev_list_iterate(libudev, entry):
         entry = libudev.udev_list_entry_get_next(entry)
 
 
-# for the sake of readability
-_is_char_device = stat.S_ISCHR
-_is_block_device = stat.S_ISBLK
-
-
 def get_device_type(filename):
     """
     Get the device type of a device file.
@@ -137,9 +132,9 @@ def get_device_type(filename):
     .. versionadded:: 0.15
     """
     mode = os.stat(filename).st_mode
-    if _is_char_device(mode):
+    if stat.S_ISCHR(mode):
         return 'char'
-    elif _is_block_device(mode):
+    elif stat.S_ISBLK(mode):
         return 'block'
     else:
         raise ValueError('not a device file: {0!r}'.format(filename))
@@ -166,13 +161,13 @@ def eintr_retry_call(func, *args, **kwargs):
     while True:
         try:
             return func(*args, **kwargs)
-        except (OSError, IOError, select.error) as e:
+        except (OSError, IOError, select.error) as err:
             # If this is not an IOError or OSError, it's the old select.error
             # type, which means that the errno is only accessible via subscript
-            if isinstance(e, (OSError, IOError)):
-                error_code = e.errno
+            if isinstance(err, (OSError, IOError)):
+                error_code = err.errno
             else:
-                error_code = e.args[0]
+                error_code = err.args[0]
 
             if error_code == errno.EINTR:
                 continue

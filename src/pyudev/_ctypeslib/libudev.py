@@ -47,61 +47,64 @@ from ._errorcheckers import check_errno_on_null_pointer_return
 from ._errorcheckers import check_negative_errorcode
 
 
-class udev(Structure):
+class udev(Structure): # pylint: disable=invalid-name
     """
     Dummy for ``udev`` structure.
     """
     # pylint: disable=too-few-public-methods
     pass
 
-udev_p = POINTER(udev)
+udev_p = POINTER(udev) # pylint: disable=invalid-name
 
 
-class udev_enumerate(Structure):
+class udev_enumerate(Structure): # pylint: disable=invalid-name
     """
     Dummy for ``udev_enumerate`` structure.
     """
     # pylint: disable=too-few-public-methods
+    pass
 
-udev_enumerate_p = POINTER(udev_enumerate)
+udev_enumerate_p = POINTER(udev_enumerate) # pylint: disable=invalid-name
 
 
-class udev_list_entry(Structure):
+class udev_list_entry(Structure): # pylint: disable=invalid-name
     """
     Dummy for ``udev_list_entry`` structure.
     """
     # pylint: disable=too-few-public-methods
+    pass
 
-udev_list_entry_p = POINTER(udev_list_entry)
+udev_list_entry_p = POINTER(udev_list_entry) # pylint: disable=invalid-name
 
 
-class udev_device(Structure):
+class udev_device(Structure): # pylint: disable=invalid-name
+    """
+    Dummy for ``udev_device`` structure.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+
+udev_device_p = POINTER(udev_device) # pylint: disable=invalid-name
+
+
+class udev_monitor(Structure): # pylint: disable=invalid-name
     """
     Dummy for ``udev_device`` structure.
     """
     # pylint: disable=too-few-public-methods
 
-udev_device_p = POINTER(udev_device)
+udev_monitor_p = POINTER(udev_monitor) # pylint: disable=invalid-name
 
-
-class udev_monitor(Structure):
-    """
-    Dummy for ``udev_device`` structure.
-    """
-    # pylint: disable=too-few-public-methods
-
-udev_monitor_p = POINTER(udev_monitor)
-
-class udev_hwdb(Structure):
+class udev_hwdb(Structure): # pylint: disable=invalid-name
     """
     Dummy for ``udev_hwdb`` structure.
     """
     # pylint: disable=too-few-public-methods
 
-udev_hwdb_p = POINTER(udev_hwdb)
+udev_hwdb_p = POINTER(udev_hwdb) # pylint: disable=invalid-name
 
 
-dev_t = c_ulonglong
+dev_t = c_ulonglong # pylint: disable=invalid-name
 
 
 SIGNATURES = {

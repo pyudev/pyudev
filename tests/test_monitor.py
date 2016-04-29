@@ -19,7 +19,6 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import errno
 from datetime import datetime, timedelta
 from contextlib import contextmanager
 from select import select

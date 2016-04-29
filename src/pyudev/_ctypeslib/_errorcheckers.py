@@ -99,6 +99,7 @@ def check_errno_on_null_pointer_return(result, func, *args):
     raised.  Otherwise nothing happens.
 
     """
+    # pylint: disable=invalid-name
     if not result:
         errnum = get_errno()
         if errnum != 0:
