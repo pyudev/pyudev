@@ -22,8 +22,6 @@ from __future__ import (print_function, division, unicode_literals,
 import re
 import ctypes
 
-import pytest
-
 from pyudev import _ctypeslib
 
 from .utils import is_unicode_string
@@ -66,7 +64,7 @@ def _is_blacklisted(function):
         else:
             if pattern.match(function.name):
                 return True
-    else:
+    else: # pylint: disable=useless-else-on-loop
         return False
 
 

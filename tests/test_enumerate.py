@@ -224,8 +224,8 @@ class TestEnumerator(object):
         """
         properties = ('DEVTYPE', 'ID_TYPE')
         devices = context.list_devices()
-        for property in properties:
-            devices.match_property(property, 'disk')
+        for prop in properties:
+            devices.match_property(prop, 'disk')
         for device in devices:
             assert (device.get('DEVTYPE') == 'disk' or
                     device.get('ID_TYPE') == 'disk')
@@ -233,8 +233,8 @@ class TestEnumerator(object):
     def test_combined_matches_of_different_types(self, context):
         properties = ('DEVTYPE', 'ID_TYPE')
         devices = context.list_devices().match_subsystem('input')
-        for property in properties:
-            devices.match_property(property, 'disk')
+        for prop in properties:
+            devices.match_property(prop, 'disk')
         devices = list(devices)
         assert not devices
 
