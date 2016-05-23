@@ -114,15 +114,15 @@ class UDevAdm(object):
         return output.decode(sys.getfilesystemencoding())
 
     def query_devices(self):
+        """
+        Generate devices from udevadm database.
+
+        Yields sys paths, minus the initial '/sys'.
+        """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
-        for line in database:
-            line = line.strip()
-            if not line:
-                continue
-            typ, value = line.split(': ', 1)
-            if typ == 'P':
-                yield value
+
+        return (l[3:] for l in (l.strip() for l in database) if l[:3] == "P: ")
 
     def query_device_properties(self, device_path):
         """
