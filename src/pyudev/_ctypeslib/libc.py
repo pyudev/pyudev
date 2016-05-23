@@ -38,9 +38,9 @@ fd_pair = c_int * 2
 
 
 SIGNATURES = dict(
-    pipe2=([fd_pair, c_int], c_int),
+   pipe2=([fd_pair, c_int], c_int),
 )
 
 ERROR_CHECKERS = dict(
-    pipe2=check_errno_on_nonzero_return,
+   pipe2=check_errno_on_nonzero_return,
 )
