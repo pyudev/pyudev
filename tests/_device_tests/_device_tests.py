@@ -393,6 +393,13 @@ class TestDevice(object):
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
     def test_asbool(self, a_context, device_datum):
+        """
+        Test that values of 1 and 0 get properly interpreted as bool
+        and that all other values raise a ValueError.
+
+        :param Context a_context: libudev context
+        :param device_datum: a device datum
+        """
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop, value in device_datum.properties.items():
             if value == '1':
