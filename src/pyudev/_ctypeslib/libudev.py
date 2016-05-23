@@ -92,6 +92,7 @@ class udev_monitor(Structure): # pylint: disable=invalid-name
     Dummy for ``udev_device`` structure.
     """
     # pylint: disable=too-few-public-methods
+    pass
 
 udev_monitor_p = POINTER(udev_monitor) # pylint: disable=invalid-name
 
@@ -100,6 +101,7 @@ class udev_hwdb(Structure): # pylint: disable=invalid-name
     Dummy for ``udev_hwdb`` structure.
     """
     # pylint: disable=too-few-public-methods
+    pass
 
 udev_hwdb_p = POINTER(udev_hwdb) # pylint: disable=invalid-name
 
