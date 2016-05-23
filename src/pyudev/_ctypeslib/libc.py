@@ -29,8 +29,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from ctypes import CDLL, c_int
-from ctypes.util import find_library
+from ctypes import c_int
 
 from ._errorcheckers import check_errno_on_nonzero_return
 
@@ -45,29 +44,3 @@ SIGNATURES = dict(
 ERROR_CHECKERS = dict(
     pipe2=check_errno_on_nonzero_return,
 )
-
-def load_c_library():
-    """Load the ``libc`` library and return a :class:`ctypes.CDLL` object for it.
- The library has errno handling enabled.
-
-    Important functions are given proper signatures and return types to support
-    type checking and argument conversion.
-
-    Raise :exc:`~exceptions.ImportError`, if the library was not found.
-
-    """
-    library_name = find_library('c')
-    if not library_name:
-        raise ImportError('No library named c')
-    libc = CDLL(library_name, use_errno=True)
-    # Add function signatures
-    for name, signature in SIGNATURES.items():
-        function = getattr(libc, name, None)
-        if function:
-            argtypes, restype = signature
-            function.argtypes = argtypes
-            function.restype = restype
-            errorchecker = ERROR_CHECKERS.get(name)
-            if errorchecker:
-                function.errcheck = errorchecker
-    return libc

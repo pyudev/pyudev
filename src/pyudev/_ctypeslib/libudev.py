@@ -109,93 +109,86 @@ udev_hwdb_p = POINTER(udev_hwdb) # pylint: disable=invalid-name
 dev_t = c_ulonglong # pylint: disable=invalid-name
 
 
-SIGNATURES = {
+SIGNATURES = dict(
     # context
-    'udev': dict(
-        new=([], udev_p),
-        unref=([udev_p], None),
-        ref=([udev_p], udev_p),
-        get_sys_path=([udev_p], c_char_p),
-        get_dev_path=([udev_p], c_char_p),
-        get_run_path=([udev_p], c_char_p),
-        get_log_priority=([udev_p], c_int),
-        set_log_priority=([udev_p, c_int], None)),
-    # enumeration
-    'udev_enumerate': dict(
-        new=([udev_p], udev_enumerate_p),
-        ref=([udev_enumerate_p], udev_enumerate_p),
-        unref=([udev_enumerate_p], None),
-        add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
-        add_nomatch_subsystem=([udev_enumerate_p, c_char_p], c_int),
-        add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
-        add_match_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
-        add_nomatch_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
-        add_match_tag=([udev_enumerate_p, c_char_p], c_int),
-        add_match_sysname=([udev_enumerate_p, c_char_p], c_int),
-        add_match_parent=([udev_enumerate_p, udev_device_p], c_int),
-        add_match_is_initialized=([udev_enumerate_p], c_int),
-        scan_devices=([udev_enumerate_p], c_int),
-        get_list_entry=([udev_enumerate_p], udev_list_entry_p)),
+    udev_new=([], udev_p),
+    udev_unref=([udev_p], None),
+    udev_ref=([udev_p], udev_p),
+    udev_get_sys_path=([udev_p], c_char_p),
+    udev_get_dev_path=([udev_p], c_char_p),
+    udev_get_run_path=([udev_p], c_char_p),
+    udev_get_log_priority=([udev_p], c_int),
+    udev_set_log_priority=([udev_p, c_int], None),
+    udev_enumerate_new=([udev_p], udev_enumerate_p),
+    udev_enumerate_ref=([udev_enumerate_p], udev_enumerate_p),
+    udev_enumerate_unref=([udev_enumerate_p], None),
+    udev_enumerate_add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
+    udev_enumerate_add_nomatch_subsystem=([udev_enumerate_p, c_char_p], c_int),
+    udev_enumerate_add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+    udev_enumerate_add_match_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+    udev_enumerate_add_nomatch_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+    udev_enumerate_add_match_tag=([udev_enumerate_p, c_char_p], c_int),
+    udev_enumerate_add_match_sysname=([udev_enumerate_p, c_char_p], c_int),
+    udev_enumerate_add_match_parent=([udev_enumerate_p, udev_device_p], c_int),
+    udev_enumerate_add_match_is_initialized=([udev_enumerate_p], c_int),
+    udev_enumerate_scan_devices=([udev_enumerate_p], c_int),
+    udev_enumerate_get_list_entry=([udev_enumerate_p], udev_list_entry_p),
     # list entries
-    'udev_list_entry': dict(
-        get_next=([udev_list_entry_p], udev_list_entry_p),
-        get_name=([udev_list_entry_p], c_char_p),
-        get_value=([udev_list_entry_p], c_char_p)),
+    udev_list_entry_get_next=([udev_list_entry_p], udev_list_entry_p),
+    udev_list_entry_get_name=([udev_list_entry_p], c_char_p),
+    udev_list_entry_get_value=([udev_list_entry_p], c_char_p),
     # devices
-    'udev_device': dict(
-        ref=([udev_device_p], udev_device_p),
-        unref=([udev_device_p], None),
-        new_from_syspath=([udev_p, c_char_p], udev_device_p),
-        new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
+    udev_device_ref=([udev_device_p], udev_device_p),
+    udev_device_unref=([udev_device_p], None),
+    udev_device_new_from_syspath=([udev_p, c_char_p], udev_device_p),
+    udev_device_new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
                                     udev_device_p),
-        new_from_devnum=([udev_p, c_char, dev_t], udev_device_p),
-        new_from_device_id=([udev_p, c_char_p], udev_device_p),
-        new_from_environment=([udev_p], udev_device_p),
-        get_parent=([udev_device_p], udev_device_p),
-        get_parent_with_subsystem_devtype=([udev_device_p, c_char_p, c_char_p],
+    udev_device_new_from_devnum=([udev_p, c_char, dev_t], udev_device_p),
+    udev_device_new_from_device_id=([udev_p, c_char_p], udev_device_p),
+    udev_device_new_from_environment=([udev_p], udev_device_p),
+    udev_device_get_parent=([udev_device_p], udev_device_p),
+    udev_device_get_parent_with_subsystem_devtype=([udev_device_p, c_char_p, c_char_p],
                                            udev_device_p),
-        get_devpath=([udev_device_p], c_char_p),
-        get_subsystem=([udev_device_p], c_char_p),
-        get_syspath=([udev_device_p], c_char_p),
-        get_sysnum=([udev_device_p], c_char_p),
-        get_sysname=([udev_device_p], c_char_p),
-        get_driver=([udev_device_p], c_char_p),
-        get_devtype=([udev_device_p], c_char_p),
-        get_devnode=([udev_device_p], c_char_p),
-        get_property_value=([udev_device_p, c_char_p], c_char_p),
-        get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
-        get_devnum=([udev_device_p], dev_t),
-        get_action=([udev_device_p], c_char_p),
-        get_seqnum=([udev_device_p], c_ulonglong),
-        get_is_initialized=([udev_device_p], c_int),
-        get_usec_since_initialized=([udev_device_p], c_ulonglong),
-        get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
-        get_tags_list_entry=([udev_device_p], udev_list_entry_p),
-        get_properties_list_entry=([udev_device_p], udev_list_entry_p),
-        get_sysattr_list_entry=([udev_device_p], udev_list_entry_p),
-        set_sysattr_value=([udev_device_p, c_char_p, c_char_p], c_int),
-        has_tag=([udev_device_p, c_char_p], c_int)),
+    udev_device_get_devpath=([udev_device_p], c_char_p),
+    udev_device_get_subsystem=([udev_device_p], c_char_p),
+    udev_device_get_syspath=([udev_device_p], c_char_p),
+    udev_device_get_sysnum=([udev_device_p], c_char_p),
+    udev_device_get_sysname=([udev_device_p], c_char_p),
+    udev_device_get_driver=([udev_device_p], c_char_p),
+    udev_device_get_devtype=([udev_device_p], c_char_p),
+    udev_device_get_devnode=([udev_device_p], c_char_p),
+    udev_device_get_property_value=([udev_device_p, c_char_p], c_char_p),
+    udev_device_get_sysattr_value=([udev_device_p, c_char_p], c_char_p),
+    udev_device_get_devnum=([udev_device_p], dev_t),
+    udev_device_get_action=([udev_device_p], c_char_p),
+    udev_device_get_seqnum=([udev_device_p], c_ulonglong),
+    udev_device_get_is_initialized=([udev_device_p], c_int),
+    udev_device_get_usec_since_initialized=([udev_device_p], c_ulonglong),
+    udev_device_get_devlinks_list_entry=([udev_device_p], udev_list_entry_p),
+    udev_device_get_tags_list_entry=([udev_device_p], udev_list_entry_p),
+    udev_device_get_properties_list_entry=([udev_device_p], udev_list_entry_p),
+    udev_device_get_sysattr_list_entry=([udev_device_p], udev_list_entry_p),
+    udev_device_set_sysattr_value=([udev_device_p, c_char_p, c_char_p], c_int),
+    udev_device_has_tag=([udev_device_p, c_char_p], c_int),
     # monitoring
-    'udev_monitor': dict(
-        ref=([udev_monitor_p], udev_monitor_p),
-        unref=([udev_monitor_p], None),
-        new_from_netlink=([udev_p, c_char_p], udev_monitor_p),
-        enable_receiving=([udev_monitor_p], c_int),
-        set_receive_buffer_size=([udev_monitor_p, c_int], c_int),
-        get_fd=([udev_monitor_p], c_int),
-        receive_device=([udev_monitor_p], udev_device_p),
-        filter_add_match_subsystem_devtype=(
+    udev_monitor_ref=([udev_monitor_p], udev_monitor_p),
+    udev_monitor_unref=([udev_monitor_p], None),
+    udev_monitor_new_from_netlink=([udev_p, c_char_p], udev_monitor_p),
+    udev_monitor_enable_receiving=([udev_monitor_p], c_int),
+    udev_monitor_set_receive_buffer_size=([udev_monitor_p, c_int], c_int),
+    udev_monitor_get_fd=([udev_monitor_p], c_int),
+    udev_monitor_receive_device=([udev_monitor_p], udev_device_p),
+    udev_monitor_filter_add_match_subsystem_devtype=(
             [udev_monitor_p, c_char_p, c_char_p], c_int),
-        filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
-        filter_update=([udev_monitor_p], c_int),
-        filter_remove=([udev_monitor_p], c_int)),
+    udev_monitor_filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
+    udev_monitor_filter_update=([udev_monitor_p], c_int),
+    udev_monitor_filter_remove=([udev_monitor_p], c_int),
     # hwdb
-    'udev_hwdb': dict(
-        ref=([udev_hwdb_p], udev_hwdb_p),
-        unref=([udev_hwdb_p], None),
-        new=([udev_p], udev_hwdb_p),
-        get_properties_list_entry=([udev_hwdb_p, c_char_p, c_uint], udev_list_entry_p))
-}
+    udev_hwdb_ref=([udev_hwdb_p], udev_hwdb_p),
+    udev_hwdb_unref=([udev_hwdb_p], None),
+    udev_hwdb_new=([udev_p], udev_hwdb_p),
+    udev_hwdb_get_properties_list_entry=([udev_hwdb_p, c_char_p, c_uint], udev_list_entry_p)
+)
 
 
 ERROR_CHECKERS = dict(
@@ -272,32 +265,3 @@ ERROR_CHECKERS = dict(
     udev_set_log_priority=None,
     udev_unref=None
 )
-
-
-def load_udev_library():
-    """
-    Load the ``udev`` library and return a :class:`ctypes.CDLL` object for
-    it.  The library has errno handling enabled.
-
-    Important functions are given proper signatures and return types to
-    support type checking and argument conversion.
-
-    Raise :exc:`~exceptions.ImportError`, if the udev library was not found.
-    """
-    udev_library_name = find_library('udev')
-    if not udev_library_name:
-        raise ImportError('No library named udev')
-    libudev = CDLL(udev_library_name, use_errno=True)
-    # context function signature
-    for namespace, members in SIGNATURES.items():
-        for funcname in members:
-            fullname = '{0}_{1}'.format(namespace, funcname)
-            func = getattr(libudev, fullname, None)
-            if func:
-                argtypes, restype = members[funcname]
-                func.argtypes = argtypes
-                func.restype = restype
-                errorchecker = ERROR_CHECKERS.get(fullname)
-                if errorchecker:
-                    func.errcheck = errorchecker
-    return libudev

@@ -41,7 +41,9 @@ import fcntl
 from functools import partial
 
 from pyudev._ctypeslib.libc import fd_pair
-from pyudev._ctypeslib.libc import load_c_library
+from pyudev._ctypeslib.libc import ERROR_CHECKERS
+from pyudev._ctypeslib.libc import SIGNATURES
+from pyudev._ctypeslib.utils import load_ctypes_library
 
 # Define O_CLOEXEC, if not present in os already
 O_CLOEXEC = getattr(os, 'O_CLOEXEC', 0o2000000)
@@ -91,7 +93,7 @@ Return a function implementing ``pipe2``."""
         return os.pipe2 # pylint: disable=no-member
     else:
         try:
-            libc = load_c_library()
+            libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
             return (partial(_pipe2_ctypes, libc)
                     if hasattr(libc, 'pipe2') else
                     _pipe2_by_pipe)
