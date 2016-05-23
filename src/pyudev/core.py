@@ -31,7 +31,9 @@ from __future__ import (print_function, division, unicode_literals,
 
 from pyudev.device import Devices
 from pyudev.device._errors import DeviceNotFoundAtPathError
-from pyudev._ctypeslib.libudev import load_udev_library
+from pyudev._ctypeslib.libudev import ERROR_CHECKERS
+from pyudev._ctypeslib.libudev import SIGNATURES
+from pyudev._ctypeslib.utils import load_ctypes_library
 
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
@@ -59,7 +61,7 @@ class Context(object):
         """
         Create a new context.
         """
-        self._libudev = load_udev_library()
+        self._libudev = load_ctypes_library('udev', SIGNATURES, ERROR_CHECKERS)
         self._as_parameter_ = self._libudev.udev_new()
 
     def __del__(self):
