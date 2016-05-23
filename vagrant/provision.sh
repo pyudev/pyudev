@@ -46,7 +46,7 @@ echo "Installing Tox for Venv management"
 sudo pip install -q -i https://restricted.crate.io/ -U tox
 
 echo "Installing headers for coverage tests"
-apt libudev-dev gccxml
+apt libudev-dev
 
 echo "Installing supported GUI toolkits"
 apt python-pyqt5 python3-pyqt5 \
