@@ -120,7 +120,14 @@ class UDevAdm(object):
             line = line.strip()
             if not line:
                 continue
-            typ, value = line.split(': ', 1)
+
+            # Some udevadm database entries have an unexpected format due to
+            # rhbz#1338823.
+            try:
+                typ, value = line.split(': ', 1)
+            except ValueError:
+                continue
+
             if typ == 'P':
                 yield value
 
