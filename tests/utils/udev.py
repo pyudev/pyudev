@@ -123,7 +123,7 @@ class UDevAdm(object):
             sys.getfilesystemencoding()).splitlines()
         for line in database:
             line = line.strip()
-            if not line:
+            if line == "":
                 continue
 
             # Some udevadm database entries have an unexpected format due to
