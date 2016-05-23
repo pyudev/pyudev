@@ -114,6 +114,11 @@ class UDevAdm(object):
         return output.decode(sys.getfilesystemencoding())
 
     def query_devices(self):
+        """
+        Generate devices from udevadm database.
+
+        Yields sys paths, minus the initial '/sys'.
+        """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
         for line in database:
