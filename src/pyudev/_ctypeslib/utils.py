@@ -33,13 +33,15 @@ from ctypes import CDLL
 from ctypes.util import find_library
 
 
-def load_ctypes_library(libname, signatures, error_checkers):
+def load_ctypes_library(name, signatures, error_checkers):
     """
     Load library ``name`` and return a :class:`ctypes.CDLL` object for it.
 
     :param str name: the library name
-    :param infos: additional decorations for each method
-    :type infos: dict of ?
+    :param signatures: signatures of methods
+    :type signatures: dict of str * (tuple of (list of type) * type)
+    :param error_checkers: error checkers for methods
+    :type error_checkers: dict of str * ((int * ptr * arglist) -> int)
 
     The library has errno handling enabled.
     Important functions are given proper signatures and return types to support
@@ -49,9 +51,9 @@ def load_ctypes_library(libname, signatures, error_checkers):
     :rtype: ctypes.CDLL
     :raises ImportError: if the library is not found
     """
-    library_name = find_library(libname)
+    library_name = find_library(name)
     if not library_name:
-        raise ImportError('No library named %s' % libname)
+        raise ImportError('No library named %s' % name)
     lib = CDLL(library_name, use_errno=True)
     # Add function signatures
     for funcname, signature in signatures.items():
