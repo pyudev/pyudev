@@ -33,7 +33,7 @@ from ctypes import CDLL
 from ctypes.util import find_library
 
 
-def load_ctypes_library(name, signatures, error_checkers):
+def load_ctypes_library(name, signatures, error_checkers, autofind=True):
     """
     Load library ``name`` and return a :class:`ctypes.CDLL` object for it.
 
@@ -42,18 +42,27 @@ def load_ctypes_library(name, signatures, error_checkers):
     :type signatures: dict of str * (tuple of (list of type) * type)
     :param error_checkers: error checkers for methods
     :type error_checkers: dict of str * ((int * ptr * arglist) -> int)
+    :param bool autofind: if True, treat name as prefix, else treat name as lib
 
     The library has errno handling enabled.
     Important functions are given proper signatures and return types to support
     type checking and argument conversion.
 
+    If autofind is True, use Python mechanisms to infer the platform specific
+    name of the library from ``name``. If autofind is False, treat ``name``
+    as the complete platform specific name of the library.
+
     :returns: a loaded library
     :rtype: ctypes.CDLL
     :raises ImportError: if the library is not found
     """
-    library_name = find_library(name)
-    if not library_name:
-        raise ImportError('No library named %s' % name)
+    if autofind:
+        library_name = find_library(name)
+        if not library_name:
+            raise ImportError('No library named %s' % name)
+    else:
+        library_name = name
+
     lib = CDLL(library_name, use_errno=True)
     # Add function signatures
     for funcname, signature in signatures.items():

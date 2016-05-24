@@ -57,11 +57,24 @@ class Context(object):
     wrapped through :mod:`ctypes`.
     """
 
-    def __init__(self):
+    def __init__(self, libudev=None):
         """
         Create a new context.
+
+        :param str libudev: the full name of the libudev library
+
+        If ``libudev`` is unset, the name of the library is automatically
+        inferred.
         """
-        self._libudev = load_ctypes_library('udev', SIGNATURES, ERROR_CHECKERS)
+        if libudev is not None:
+            name = libudev
+            autofind=False
+        else:
+            name = 'udev'
+            autofind = True
+
+        self._libudev = \
+           load_ctypes_library(name, SIGNATURES, ERROR_CHECKERS, autofind)
         self._as_parameter_ = self._libudev.udev_new()
 
     def __del__(self):
