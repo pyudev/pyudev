@@ -114,13 +114,25 @@ class UDevAdm(object):
         return output.decode(sys.getfilesystemencoding())
 
     def query_devices(self):
+        """
+        Generate devices from udevadm database.
+
+        Yields sys paths, minus the initial '/sys'.
+        """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
         for line in database:
             line = line.strip()
-            if not line:
+            if line == "":
                 continue
-            typ, value = line.split(': ', 1)
+
+            # Some udevadm database entries have an unexpected format due to
+            # rhbz#1338823.
+            try:
+                typ, value = line.split(': ', 1)
+            except ValueError:
+                continue
+
             if typ == 'P':
                 yield value
 
