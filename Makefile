@@ -14,18 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-VAGRANT = vagrant
-TESTARGS = --enable-privileged -rfEsxX
-
-.PHONY: vagrant-up
-vagrant-up:
-	$(VAGRANT) up
-
-.PHONY: vagrant-test
-vagrant-test: vagrant-up
-	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-py2/bin/py.test $(TESTARGS)"
-	$(VAGRANT) ssh -c "cd /vagrant && xvfb-run /home/vagrant/pyudev-py3/bin/py.test $(TESTARGS)"
-
 .PHONY: upload-release
 upload-release:
 	python setup.py release register sdist upload
