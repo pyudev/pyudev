@@ -31,6 +31,8 @@ from __future__ import unicode_literals
 
 from hypothesis import strategies
 
+import pyprocdev
+
 import pytest
 
 from pyudev import Context
@@ -62,3 +64,5 @@ def non_volatile_attributes(attributes):
     """
     return ((k, v) for (k, v) in attributes.items() \
        if k not in _VOLATILE_ATTRIBUTES)
+
+_PROCDEV = pyprocdev.ProcDev()

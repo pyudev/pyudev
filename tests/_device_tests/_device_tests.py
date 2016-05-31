@@ -39,6 +39,8 @@ from hypothesis import strategies
 import pytest
 import mock
 
+import pyprocdev
+
 from pyudev import Device
 from pyudev import Devices
 
@@ -49,6 +51,7 @@ from ..utils import is_unicode_string
 from .._constants import _CONTEXT_STRATEGY
 from .._constants import _DEVICE_DATA
 from .._constants import _DEVICES
+from .._constants import _PROCDEV
 from .._constants import _UDEV_TEST
 
 
@@ -218,6 +221,31 @@ class TestDevice(object):
         assert device.driver == device_datum.properties.get('DRIVER')
         if device.driver:
             assert is_unicode_string(device.driver)
+
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=50)
+    def test_driver_char_block(self, a_context, device_datum):
+        """
+        If a device is character or block then libudev supplies no driver.
+
+        If the device has a parent, then the parent's driver is the same
+        as is obtained from the device's major number and /proc/devices.
+        If the device has no parent, then the device may still have a driver
+        in /proc/devices.
+        """
+        device = Devices.from_path(a_context, device_datum.device_path)
+        if device.subsystem in ('block', 'char'):
+            assert device.driver is None
+
+            subsystem = pyprocdev.DeviceTypes.BLOCK if \
+               device.subsystem == 'block' else pyprocdev.DeviceTypes.CHARACTER
+            major = os.major(device.device_number)
+
+            assert major in _PROCDEV.majors(subsystem)
+
+            parent = device.parent
+            if parent is not None:
+                assert parent.driver == _PROCDEV.get_driver(subsystem, major)
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
