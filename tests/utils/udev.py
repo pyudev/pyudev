@@ -39,6 +39,7 @@ import random
 import subprocess
 from collections import Iterable, Sized
 
+
 class UDevAdm(object):
     """
     Wrap ``udevadm`` utility.
@@ -143,12 +144,18 @@ class UDevAdm(object):
             :returns: a map of properties on the device
             :rtype: dict of str * str
         """
-        properties = {}
-        for line in self._execute_query(device_path, 'property').splitlines():
-            line = line.strip()
-            prop, value = line.split('=', 1)
-            properties[prop] = value
-        return properties
+        pairs = [
+           l.strip().split('=', 1) for l in \
+              self._execute_query(device_path, 'property').splitlines()
+        ]
+
+        if self.adm().query_udev_version() < 230:
+            num_pairs = len(pairs)
+            indices = \
+               [i + 1 for i in range(num_pairs - 1) if pairs[i][1] == ""]
+            pairs = [pairs[i] for i in range(num_pairs) if i not in indices]
+
+        return dict(pairs)
 
     def query_device_attributes(self, device_path):
         output = self._execute(
