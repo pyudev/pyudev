@@ -122,20 +122,8 @@ class UDevAdm(object):
         """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
-        for line in database:
-            line = line.strip()
-            if line == "":
-                continue
 
-            # Some udevadm database entries have an unexpected format due to
-            # rhbz#1338823.
-            try:
-                typ, value = line.split(': ', 1)
-            except ValueError:
-                continue
-
-            if typ == 'P':
-                yield value
+        return (l[3:] for l in (l.strip() for l in database) if l[:3] == "P: ")
 
     def query_device_properties(self, device_path):
         """
