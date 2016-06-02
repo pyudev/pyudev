@@ -102,6 +102,11 @@ class UDevAdm(object):
         return int(self._execute('--version'))
 
     def _execute(self, *args):
+        """
+        Execute a udevadm command.
+
+        :raises CalledProcessError:
+        """
         command = [self.udevadm] + list(args)
         proc = subprocess.Popen(command, stdout=subprocess.PIPE)
         output = proc.communicate()[0].strip()
@@ -110,6 +115,11 @@ class UDevAdm(object):
         return output
 
     def _execute_query(self, device_path, query_type='all'):
+        """
+        Execute a "udevadm info" query.
+
+        :raises CalledProcessError:
+        """
         output = self._execute('info', '--root', '--path', device_path,
                                '--query', query_type)
         return output.decode(sys.getfilesystemencoding())
@@ -119,6 +129,8 @@ class UDevAdm(object):
         Generate devices from udevadm database.
 
         Yields sys paths, minus the initial '/sys'.
+
+        :raises CalledProcessError:
         """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
@@ -127,10 +139,12 @@ class UDevAdm(object):
 
     def query_device_properties(self, device_path):
         """
-            Return map of properties.
+        Return map of properties.
 
-            :returns: a map of properties on the device
-            :rtype: dict of str * str
+        :returns: a map of properties on the device
+        :rtype: dict of str * str
+
+        :raises CalledProcessError:
         """
         pairs = [
            l.strip().split('=', 1) for l in \
