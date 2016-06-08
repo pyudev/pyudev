@@ -18,13 +18,14 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
+import random
+
 import pytest
 import mock
 
 from pyudev import Monitor, Device
 
 from tests.utils.udev import DeviceDatabase
-from tests.utils.udev import get_device_sample
 
 @pytest.fixture
 def monitor(request):
@@ -34,7 +35,7 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
+    device = random.choice(list(DeviceDatabase.db()))
     return Device.from_path(context, device.device_path)
 
 

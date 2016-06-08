@@ -330,28 +330,3 @@ class DeviceDatabase(Iterable, Sized):
         """
         data = DeviceData(device_path, self._udevadm)
         return data if data.exists and data in self else None
-
-def get_device_sample(udev_database, device=None, sample_size=None):
-    """
-    Compute a sample of the udev device database.
-
-    :param udev_database: the udev database
-    :param device: the unique device to compute the data for
-    :param sample_size: the size of the sample to compute
-    :type sample_size: int or NoneType
-    :returns: a sample of udev devices
-    :rtype: list of :class:`DeviceData`
-    :raises ValueError: if the specified device does not exist
-
-    If no sample size and no device specified, returns all devices.
-    """
-    if device is not None:
-        device_data = udev_database.find_device_data(device)
-        if not device_data:
-            raise ValueError('{0} does not exist'.format(device))
-        return [device_data]
-    elif sample_size is not None:
-        actual_size = min(sample_size, len(udev_database))
-        return random.sample(list(udev_database), actual_size)
-    else:
-        return list(udev_database)
