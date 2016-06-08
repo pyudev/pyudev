@@ -64,10 +64,7 @@ class TestDevice(object):
            isinstance(a_device.parent, Device)
 
     _devices = [d for d in _DEVICES if d.parent]
-    @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason='no device with a parent'
-    )
+    @pytest.mark.skipif(len(_devices) == 0, reason='no device with a parent')
     @_UDEV_TEST(172, "test_child_of_parents")
     @given(strategies.sampled_from(_devices))
     @settings(max_examples=5, min_satisfying_examples=1)
@@ -75,10 +72,7 @@ class TestDevice(object):
         assert a_device in a_device.parent.children
 
     _devices = [d for d in _DEVICES if list(d.children)]
-    @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason='no device with a child'
-    )
+    @pytest.mark.skipif(len(_devices) == 0, reason='no device with a child')
     @_UDEV_TEST(172, "test_children")
     @given(strategies.sampled_from(_devices))
     @settings(max_examples=5, min_satisfying_examples=1)
