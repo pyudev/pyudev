@@ -209,6 +209,16 @@ class DeviceData(object):
         return '/sys' + self.device_path
 
     @property
+    def exists(self):
+        """
+        Whether this device has some real existance on machine.
+
+        :returns: True if the device does exist, otherwise False.
+        :rtype: bool
+        """
+        return os.path.exists(self.sys_path)
+
+    @property
     def properties(self):
         """
         Get the device properties as mapping of property names as strings to
