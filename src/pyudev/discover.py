@@ -118,7 +118,7 @@ class Hypothesis(object):
         :rtype: set of :class:`Device`
         """
         key = cls.match(value)
-        return cls.lookup(context, key) if key else frozenset()
+        return cls.lookup(context, key) if key is not None else frozenset()
 
 
 class DeviceNumberHypothesis(Hypothesis):
@@ -193,7 +193,7 @@ class DeviceNumberHypothesis(Hypothesis):
         """
         func = wrap_exception(Devices.from_device_number)
         res = (func(context, s, key) for s in cls.find_subsystems(context))
-        return frozenset(r for r in res if r)
+        return frozenset(r for r in res if r is not None)
 
 
 class DevicePathHypothesis(Hypothesis):
@@ -222,7 +222,7 @@ class DevicePathHypothesis(Hypothesis):
         :rtype: frozenset of :class:`Device`
         """
         res = wrap_exception(Devices.from_path)(context, key)
-        return frozenset((res,)) if res else frozenset()
+        return frozenset((res,)) if res is not None else frozenset()
 
 
 class DeviceNameHypothesis(Hypothesis):
@@ -269,7 +269,7 @@ class DeviceNameHypothesis(Hypothesis):
         """
         func = wrap_exception(Devices.from_name)
         res = (func(context, s, key) for s in cls.find_subsystems(context))
-        return frozenset(r for r in res if r)
+        return frozenset(r for r in res if r is not None)
 
 
 class DeviceFileHypothesis(Hypothesis):
@@ -342,11 +342,11 @@ class DeviceFileHypothesis(Hypothesis):
         func = wrap_exception(Devices.from_device_file)
         if '/' in key:
             device = func(context, key)
-            return frozenset((device,)) if device else frozenset()
+            return frozenset((device,)) if device is not None else frozenset()
         else:
             files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
             devices = (func(context, f) for f in files)
-            return frozenset(d for d in devices if d)
+            return frozenset(d for d in devices if d is not None)
 
 
 class Discovery(object):

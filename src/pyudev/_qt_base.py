@@ -73,7 +73,7 @@ class MonitorObserverMixin(object):
         monitoring socket.
         """
         device = self.monitor.poll(timeout=0)
-        if device:
+        if device is not None:
             self._emit_event(device)
 
     def _emit_event(self, device):

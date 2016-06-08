@@ -165,7 +165,7 @@ class Monitor(object):
            This method can also be after :meth:`start()` now.
         """
         subsystem = ensure_byte_string(subsystem)
-        if device_type:
+        if device_type is not None:
             device_type = ensure_byte_string(device_type)
         self._libudev.udev_monitor_filter_add_match_subsystem_devtype(
             self, subsystem, device_type)
@@ -422,7 +422,7 @@ class Monitor(object):
         self.start()
         while True:
             device = self.poll()
-            if device:
+            if device is not None:
                 yield device.action, device
 
 
