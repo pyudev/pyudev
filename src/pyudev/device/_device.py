@@ -525,7 +525,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         parent = self.parent
-        while parent:
+        while parent is not None:
             yield parent
             parent = parent.parent
 
