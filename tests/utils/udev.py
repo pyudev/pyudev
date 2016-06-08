@@ -311,10 +311,13 @@ class DeviceDatabase(Iterable, Sized):
         self._devices = set(self._udevadm.query_devices())
 
     def __iter__(self):
-        return (DeviceData(d, self._udevadm) for d in self._devices)
+        return (
+           d for d in (DeviceData(d, self._udevadm) for d in self._devices) \
+              if d.exists
+        )
 
     def __len__(self):
-        return len(self._devices)
+        return sum(1 for _ in self)
 
     def find_device_data(self, device_path):
         """
@@ -325,10 +328,8 @@ class DeviceDatabase(Iterable, Sized):
         Return a :class:`DeviceData` object containing the data for the given
         device, or ``None`` if the device was not found.
         """
-        if device_path in self._devices:
-            return DeviceData(device_path, self._udevadm)
-        else:
-            return None
+        data = DeviceData(device_path, self._udevadm)
+        return data if data.exists and data in self else None
 
 def get_device_sample(udev_database, device=None, sample_size=None):
     """
