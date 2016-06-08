@@ -153,9 +153,9 @@ class UDevAdm(object):
 
         if self.adm().query_udev_version() < 230:
             num_pairs = len(pairs)
-            indices = \
-               [i + 1 for i in range(num_pairs - 1) if pairs[i][1] == ""]
-            pairs = [pairs[i] for i in range(num_pairs) if i not in indices]
+            indices = [i for i in range(num_pairs) if pairs[i][1] == ""]
+            pairs = [pairs[i] for i in range(num_pairs) if \
+               i not in indices and i - 1 not in indices]
 
         return dict(pairs)
 
