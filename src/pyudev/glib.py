@@ -78,7 +78,7 @@ class _ObserverMixin(object):
         # pylint: disable=unused-argument
         if condition == glib.IO_IN:
             device = self.monitor.poll(timeout=0)
-            if device:
+            if device is not None:
                 self._emit_event(device)
         return True
 

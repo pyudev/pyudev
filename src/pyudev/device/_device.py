@@ -243,7 +243,7 @@ class Devices(object):
               d.attributes.get('ifindex') == ifindex),
            None
         )
-        if dev:
+        if dev is not None:
             return dev
         else:
             raise DeviceNotFoundByInterfaceIndexError(ifindex)
