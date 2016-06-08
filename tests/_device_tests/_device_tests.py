@@ -349,11 +349,18 @@ class TestDevice(object):
         assert len(device) == len(device_datum.properties)
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=5)
+    @settings(max_examples=100)
     def test_getitem(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
-            assert device[prop] == device_datum.properties[prop]
+            if prop == 'DEVLINKS':
+                assert sorted(device[prop].split(),) == \
+                   sorted(device_datum.properties[prop].split(),)
+            elif prop == 'TAGS':
+                assert sorted(device[prop].split(':'),) == \
+                   sorted(device_datum.properties[prop].split(':'),)
+            else:
+                assert device[prop] == device_datum.properties[prop]
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
     @pytest.mark.skipif(
