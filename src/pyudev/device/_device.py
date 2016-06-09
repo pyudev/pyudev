@@ -677,7 +677,7 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         driver = self._libudev.udev_device_get_driver(self)
-        return ensure_unicode_string(driver) if driver else None
+        return ensure_unicode_string(driver) if driver is not None else None
 
     @property
     def device_node(self):
@@ -698,7 +698,7 @@ class Device(Mapping):
            :meth:`from_device_file()`.
         """
         node = self._libudev.udev_device_get_devnode(self)
-        return ensure_unicode_string(node) if node else None
+        return ensure_unicode_string(node) if node is not None else None
 
     @property
     def device_number(self):
@@ -825,7 +825,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         action = self._libudev.udev_device_get_action(self)
-        return ensure_unicode_string(action) if action else None
+        return ensure_unicode_string(action) if action is not None else None
 
     @property
     def sequence_number(self):
