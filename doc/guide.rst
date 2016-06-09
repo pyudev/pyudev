@@ -8,7 +8,7 @@ like device enumeration or monitoring:
 
 .. contents::
 
-A detailled reference is provided in the :doc:`API documentation <api/index>`.
+A detailed reference is provided in the :doc:`API documentation <api/index>`.
 
 
 Getting started
