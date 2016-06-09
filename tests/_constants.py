@@ -39,7 +39,7 @@ from pyudev import Device
 from .utils import udev
 
 _CONTEXT = Context()
-_DEVICE_DATA = list(udev.get_device_sample(udev.DeviceDatabase.db()))
+_DEVICE_DATA = udev.DeviceDatabase.db()
 _DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 
 _CONTEXT_STRATEGY = strategies.just(_CONTEXT)

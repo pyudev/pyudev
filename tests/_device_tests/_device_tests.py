@@ -64,10 +64,7 @@ class TestDevice(object):
            isinstance(a_device.parent, Device)
 
     _devices = [d for d in _DEVICES if d.parent]
-    @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason='no device with a parent'
-    )
+    @pytest.mark.skipif(len(_devices) == 0, reason='no device with a parent')
     @_UDEV_TEST(172, "test_child_of_parents")
     @given(strategies.sampled_from(_devices))
     @settings(max_examples=5, min_satisfying_examples=1)
@@ -75,10 +72,7 @@ class TestDevice(object):
         assert a_device in a_device.parent.children
 
     _devices = [d for d in _DEVICES if list(d.children)]
-    @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason='no device with a child'
-    )
+    @pytest.mark.skipif(len(_devices) == 0, reason='no device with a child')
     @_UDEV_TEST(172, "test_children")
     @given(strategies.sampled_from(_devices))
     @settings(max_examples=5, min_satisfying_examples=1)
@@ -343,17 +337,32 @@ class TestDevice(object):
             assert property in device_properties
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=5)
+    @settings(max_examples=100)
+    @_UDEV_TEST(230, "check exact equivalence of device_datum and device")
     def test_length(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         assert len(device) == len(device_datum.properties)
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=5)
+    @settings(max_examples=100)
+    def test_key_subset(self, a_context, device_datum):
+        device = Devices.from_path(a_context, device_datum.device_path)
+        assert frozenset(device_datum.properties.keys()) <= \
+           frozenset(device.keys())
+
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=100)
     def test_getitem(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
-            assert device[prop] == device_datum.properties[prop]
+            if prop == 'DEVLINKS':
+                assert sorted(device[prop].split(),) == \
+                   sorted(device_datum.properties[prop].split(),)
+            elif prop == 'TAGS':
+                assert sorted(device[prop].split(':'),) == \
+                   sorted(device_datum.properties[prop].split(':'),)
+            else:
+                assert device[prop] == device_datum.properties[prop]
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
     @pytest.mark.skipif(

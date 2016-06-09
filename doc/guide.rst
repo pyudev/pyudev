@@ -8,7 +8,7 @@ like device enumeration or monitoring:
 
 .. contents::
 
-A detailled reference is provided in the :doc:`API documentation <api/index>`.
+A detailed reference is provided in the :doc:`API documentation <api/index>`.
 
 
 Getting started
@@ -342,6 +342,15 @@ For instance, the above example would look like this in a PySide_ application:
 >>> observer.deviceEvent.connect(log_event)
 >>> monitor.start()
 
+Device objects as booleans
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The use of a Device object in a boolean context as a shorthand for a comparison
+with None is an error.
+
+The Device class inherits from the abstract Mapping class, as it maps udev
+property names to their values. Consequently, if a Device object has no udev
+properties, an unusual but not impossible occurance, the object is
+interpreted as False in a boolean context.
 
 .. _pypi: https://pypi.python.org/pypi/pyudev
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
