@@ -861,6 +861,15 @@ class Device(Mapping):
         return Attributes(self)
 
     @property
+    def properties(self):
+        """
+        The udev properties of this object as read-only Properties mapping.
+
+        .. versionadded:: 0.21
+        """
+        return Properties(self)
+
+    @property
     def tags(self):
         """
         A :class:`Tags` object representing the tags attached to this device.
@@ -985,6 +994,89 @@ class Device(Mapping):
 
     def __ge__(self, other):
         raise TypeError('Device not orderable')
+
+
+class Properties(Mapping):
+    """
+    udev properties :class:`Device` objects.
+
+    .. versionadded:: 0.21
+    """
+
+    def __init__(self, device):
+        self.device = device
+        self._libudev = device._libudev
+
+    def __iter__(self):
+        """
+        Iterate over the names of all properties defined for the device.
+
+        Return a generator yielding the names of all properties of this
+        device as unicode strings.
+        """
+        properties = \
+           self._libudev.udev_device_get_properties_list_entry(self.device)
+        for name, _ in udev_list_iterate(self._libudev, properties):
+            yield ensure_unicode_string(name)
+
+    def __len__(self):
+        """
+        Return the amount of properties defined for this device as integer.
+        """
+        properties = \
+           self._libudev.udev_device_get_properties_list_entry(self.device)
+        return sum(1 for _ in udev_list_iterate(self._libudev, properties))
+
+    def __getitem__(self, prop):
+        """
+        Get the given property from this device.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as unicode string, or raise a
+        :exc:`~exceptions.KeyError`, if the given property is not defined
+        for this device.
+        """
+        value = self._libudev.udev_device_get_property_value(
+           self.device,
+           ensure_byte_string(prop)
+        )
+        if value is None:
+            raise KeyError(prop)
+        return ensure_unicode_string(value)
+
+    def asint(self, prop):
+        """
+        Get the given property from this device as integer.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as integer. Raise a
+        :exc:`~exceptions.KeyError`, if the given property is not defined
+        for this device, or a :exc:`~exceptions.ValueError`, if the property
+        value cannot be converted to an integer.
+        """
+        return int(self[prop])
+
+    def asbool(self, prop):
+        """
+        Get the given property from this device as boolean.
+
+        A boolean property has either a value of ``'1'`` or of ``'0'``,
+        where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
+        other value causes a :exc:`~exceptions.ValueError` to be raised.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return ``True``, if the property value is ``'1'`` and ``False``, if
+        the property value is ``'0'``.  Any other value raises a
+        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
+        if the given property is not defined for this device.
+        """
+        return string_to_bool(self[prop])
 
 
 class Attributes(object):
