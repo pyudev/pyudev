@@ -907,17 +907,32 @@ class Device(Mapping):
 
         Return a generator yielding the names of all properties of this
         device as unicode strings.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
         """
-        properties = self._libudev.udev_device_get_properties_list_entry(self)
-        for name, _ in udev_list_iterate(self._libudev, properties):
-            yield ensure_unicode_string(name)
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__iter__()
 
     def __len__(self):
         """
         Return the amount of properties defined for this device as integer.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
         """
-        properties = self._libudev.udev_device_get_properties_list_entry(self)
-        return sum(1 for _ in udev_list_iterate(self._libudev, properties))
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__len__()
 
     def __getitem__(self, prop):
         """
@@ -929,12 +944,17 @@ class Device(Mapping):
         Return the property value as unicode string, or raise a
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
         """
-        value = self._libudev.udev_device_get_property_value(
-            self, ensure_byte_string(prop))
-        if value is None:
-            raise KeyError(prop)
-        return ensure_unicode_string(value)
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__getitem__(prop)
 
     def asint(self, prop):
         """
@@ -947,8 +967,17 @@ class Device(Mapping):
         :exc:`~exceptions.KeyError`, if the given property is not defined
         for this device, or a :exc:`~exceptions.ValueError`, if the property
         value cannot be converted to an integer.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Use Device.properties.asint() instead.
         """
-        return int(self[prop])
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.properties.asint instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.asint(prop)
 
     def asbool(self, prop):
         """
@@ -965,8 +994,17 @@ class Device(Mapping):
         the property value is ``'0'``.  Any other value raises a
         :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
         if the given property is not defined for this device.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Use Device.properties.asbool() instead.
         """
-        return string_to_bool(self[prop])
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.properties.asbool instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.asbool(prop)
 
     def __hash__(self):
         return hash(self.device_path)
