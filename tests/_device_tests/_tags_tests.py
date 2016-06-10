@@ -56,22 +56,13 @@ class TestTags(object):
     )
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
     @settings(max_examples=5, min_satisfying_examples=1)
-    def test_iteration(self, a_context, device_datum):
+    def test_iteration_and_contains(self, a_context, device_datum):
+        """
+        Test that iteration yields all tags and contains checks them.
+        """
         device = Device.from_path(a_context, device_datum.device_path)
-        assert set(device.tags) == set(device_datum.tags)
-        for tag in device.tags:
-            assert is_unicode_string(tag)
-
-    @pytest.mark.skipif(
-       len(_device_data) == 0,
-       reason="no device with tags"
-    )
-    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
-    @settings(max_examples=5, min_satisfying_examples=1)
-    def test_contains(self, a_context, device_datum):
-        device = Device.from_path(a_context, device_datum.device_path)
-        for tag in device_datum.tags:
-            assert tag in device.tags
+        assert frozenset(device.tags) == frozenset(device_datum.tags)
+        assert all(is_unicode_string(tag) for tag in device.tags)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
