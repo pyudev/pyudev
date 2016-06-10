@@ -70,8 +70,7 @@ class TestTags(object):
     @settings(max_examples=5, min_satisfying_examples=1)
     def test_contains(self, a_context, device_datum):
         device = Device.from_path(a_context, device_datum.device_path)
-        for tag in device_datum.tags:
-            assert tag in device.tags
+        assert frozenset(device_datum.tags) == frozenset(device.tags)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
