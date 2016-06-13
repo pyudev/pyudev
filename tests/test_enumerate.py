@@ -30,6 +30,7 @@ from pyudev import Enumerator
 
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICES
+from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _UDEV_TEST
 from ._constants import _UDEV_VERSION
 
@@ -41,25 +42,44 @@ def enumerator(request):
 
 
 class TestEnumerator(object):
+    """
+    Test the Enumerator class.
+    """
 
-    def test_match_subsystem(self, context):
-        devices = context.list_devices().match_subsystem('input')
-        for device in devices:
-            assert device.subsystem == 'input'
+    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
+    @settings(max_examples=5)
+    def test_match_subsystem(self, context, subsystem):
+        """
+        Subsystem match matches devices w/ correct subsystem.
+        """
+        devices = context.list_devices().match_subsystem(subsystem)
+        assert all(device.subsystem == subsystem for device in devices)
 
-    def test_match_subsystem_nomatch(self, context):
-        devices = context.list_devices().match_subsystem('input', nomatch=True)
-        for device in devices:
-            assert device.subsystem is not None
-            assert device.subsystem != 'input'
+    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
+    @settings(max_examples=5)
+    def test_match_subsystem_nomatch(self, context, subsystem):
+        """
+        Subsystem no match gets no subsystem with subsystem.
+        """
+        devices = \
+           context.list_devices().match_subsystem(subsystem, nomatch=True)
+        assert all(d.subsystem is not None and d.subsystem != subsystem \
+           for d in devices)
 
-    def test_match_subsystem_nomatch_unfulfillable(self, context):
+    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
+    @settings(max_examples=5)
+    def test_match_subsystem_nomatch_unfulfillable(self, context, subsystem):
+        """
+        Combining match and no match should give an empty result.
+        """
         devices = context.list_devices()
-        devices.match_subsystem('input')
-        devices.match_subsystem('input', nomatch=True)
+        devices.match_subsystem(subsystem)
+        devices.match_subsystem(subsystem, nomatch=True)
         assert not list(devices)
 
-    def test_match_subsystem_nomatch_complete(self, context):
+    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
+    @settings(max_examples=5)
+    def test_match_subsystem_nomatch_complete(self, context, subsystem):
         """
         Test that w/ respect to the universe of devices returned by
         list_devices() a match and its inverse are complements of each other.
@@ -68,10 +88,9 @@ class TestEnumerator(object):
         so with respect to the whole universe of devices, the two are
         not complements of each other.
         """
-        m_devices = set(context.list_devices().match_subsystem('j'))
-        nm_devices = set(
-           context.list_devices().match_subsystem('j', nomatch=True)
-        )
+        m_devices = set(context.list_devices().match_subsystem(subsystem))
+        nm_devices = \
+           set(context.list_devices().match_subsystem(subsystem, nomatch=True))
 
         assert not m_devices.intersection(nm_devices)
 
