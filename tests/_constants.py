@@ -52,13 +52,3 @@ def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
        _UDEV_VERSION < version,
        reason=fmt_str % (node, version, _UDEV_VERSION)
     )
-
-_VOLATILE_ATTRIBUTES = ('energy_uj', 'power_on_acct')
-def non_volatile_attributes(attributes):
-    """
-    Yields keys for non-volatile attributes only.
-
-    :param dict attributes: attributes dict obtained from udev
-    """
-    return ((k, v) for (k, v) in attributes.items() \
-       if k not in _VOLATILE_ATTRIBUTES)
