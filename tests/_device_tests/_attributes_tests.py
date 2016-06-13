@@ -39,7 +39,6 @@ import pytest
 from pyudev import Device
 
 from ..utils import is_unicode_string
-from .._constants import non_volatile_attributes
 
 from ._device_tests import _CONTEXT_STRATEGY
 from ._device_tests import _DEVICE_DATA
@@ -56,14 +55,11 @@ class TestAttributes(object):
     @settings(max_examples=5)
     def test_getitem(self, a_context, device_datum):
         """
-        Test that attribute value is the same as datum attribute value and
-        is instance of bytes.
+        Test that attribute value exists and is instance of bytes.
         """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in non_volatile_attributes(device_datum.attributes):
-            raw_value = value.encode(sys.getfilesystemencoding())
-            assert isinstance(device.attributes.get(key), bytes)
-            assert device.attributes.get(key) == raw_value
+        assert all(isinstance(device.attributes.get(key), bytes) \
+           for key in device_datum.attributes.keys())
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -96,28 +92,25 @@ class TestAttributes(object):
     @settings(max_examples=5)
     def test_asstring(self, a_context, device_datum):
         """
-        Test that string value agrees with cli value and is unicode.
+        Test that attribute exists for actual device and is unicode.
         """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in non_volatile_attributes(device_datum.attributes):
-            assert is_unicode_string(device.attributes.asstring(key))
-            assert device.attributes.asstring(key) == value
+        assert all(is_unicode_string(device.attributes.asstring(key)) \
+           for key in device_datum.attributes.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=5)
+    @settings(max_examples=10)
     def test_asint(self, a_context, device_datum):
         """
         Test that integer result is an int or ValueError raised.
         """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in non_volatile_attributes(device_datum.attributes):
+        for key, value in device_datum.attributes.items():
             try:
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
                     device.attributes.asint(key)
-            else:
-                assert device.attributes.asint(key) == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -126,16 +119,12 @@ class TestAttributes(object):
         Test that bool result is a bool or ValueError raised.
         """
         device = Device.from_path(a_context, device_datum.device_path)
-        for key, value in non_volatile_attributes(device_datum.attributes):
-            if value == '1':
-                assert device.attributes.asbool(key)
-            elif value == '0':
-                assert not device.attributes.asbool(key)
+        for key, value in device_datum.attributes.items():
+            if value in ('0', '1'):
+                assert device.attributes.asbool(key) in (False, True)
             else:
-                with pytest.raises(ValueError) as exc_info:
+                with pytest.raises(ValueError):
                     device.attributes.asbool(key)
-                message = 'Not a boolean value:'
-                assert str(exc_info.value).startswith(message)
 
     @_UDEV_TEST(167, "test_available_attributes")
     @given(strategies.sampled_from(_DEVICES))
