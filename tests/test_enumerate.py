@@ -30,6 +30,7 @@ from pyudev import Enumerator
 
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICES
+from ._constants import _PROPERTY_STRATEGY
 from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
 from ._constants import _UDEV_TEST
@@ -107,11 +108,15 @@ class TestEnumerator(object):
         devices = context.list_devices().match_sys_name(sysname)
         assert all(device.sys_name == sysname for device in devices)
 
-    def test_match_property_string(self, context):
-        devices = list(context.list_devices().match_property('DRIVER', 'usb'))
-        for device in devices:
-            assert device['DRIVER'] == 'usb'
-            assert device.driver == 'usb'
+    @given(_CONTEXT_STRATEGY, _PROPERTY_STRATEGY)
+    @settings(max_examples=50)
+    def test_match_property_string(self, context, pair):
+        """
+        Match property only gets devices with that property.
+        """
+        key, value = pair
+        devices = context.list_devices().match_property(key, value)
+        assert all(device.properties[key] == value for device in devices)
 
     def test_match_property_int(self, context):
         devices = list(context.list_devices().match_property(
