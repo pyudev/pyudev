@@ -42,6 +42,12 @@ def enumerator(request):
     context = request.getfuncargvalue('context')
     return context.list_devices()
 
+def _is_int(value):
+    try:
+        int(value)
+        return True
+    except (TypeError, ValueError):
+        return False
 
 class TestEnumerator(object):
     """
@@ -119,12 +125,20 @@ class TestEnumerator(object):
         devices = context.list_devices().match_property(key, value)
         assert all(device.properties[key] == value for device in devices)
 
-    def test_match_property_int(self, context):
-        devices = list(context.list_devices().match_property(
-            'ID_INPUT_KEY', 1))
-        for device in devices:
-            assert device['ID_INPUT_KEY'] == '1'
-            assert device.asint('ID_INPUT_KEY') == 1
+    @given(
+       _CONTEXT_STRATEGY,
+       _PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1]))
+    )
+    @settings(max_examples=50)
+    def test_match_property_int(self, context, pair):
+        """
+        For a property that might plausibly have an integer value, search
+        using the integer value and verify that the result all match.
+        """
+        key, value = pair
+        devices = context.list_devices().match_property(key, int(value))
+        assert all(device[key] == value and device.asint(key) == int(value) \
+           for device in devices)
 
     def test_match_property_bool(self, context):
         devices = list(context.list_devices().match_property(
