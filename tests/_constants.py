@@ -52,6 +52,11 @@ _SUBSYSTEM_STRATEGY = \
 _SYSNAME_STRATEGY = \
    strategies.sampled_from(_CONTEXT.list_devices()).map(lambda x: x.sys_name)
 
+_PROPERTY_STRATEGY = \
+   strategies.sampled_from(_CONTEXT.list_devices()).flatmap(
+      lambda d: strategies.sampled_from(d.properties.items())
+   )
+
 def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
     fmt_str = "%s: udev version must be at least %s, is %s"
     return pytest.mark.skipif(
