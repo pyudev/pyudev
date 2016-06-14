@@ -98,9 +98,8 @@ class TestEnumerator(object):
         not complements of each other.
         """
         m_devices = set(context.list_devices().match_subsystem(subsystem))
-        nm_devices = set(
-           context.list_devices().match_subsystem(subsystem, nomatch=True)
-        )
+        nm_devices = \
+           set(context.list_devices().match_subsystem(subsystem, nomatch=True))
 
         assert not m_devices.intersection(nm_devices)
 
