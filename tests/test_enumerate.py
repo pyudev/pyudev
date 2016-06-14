@@ -31,6 +31,7 @@ from pyudev import Enumerator
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICES
 from ._constants import _SUBSYSTEM_STRATEGY
+from ._constants import _SYSNAME_STRATEGY
 from ._constants import _UDEV_TEST
 from ._constants import _UDEV_VERSION
 
@@ -98,10 +99,14 @@ class TestEnumerator(object):
         devices = set(context.list_devices())
         assert devices == m_devices.union(nm_devices)
 
-    def test_match_sys_name(self, context):
-        devices = context.list_devices().match_sys_name('sda')
-        for device in devices:
-            assert device.sys_name == 'sda'
+    @given(_CONTEXT_STRATEGY, _SYSNAME_STRATEGY)
+    @settings(max_examples=5)
+    def test_match_sys_name(self, context, sysname):
+        """
+        A sysname lookup only gives devices with that sysname.
+        """
+        devices = context.list_devices().match_sys_name(sysname)
+        assert all(device.sys_name == sysname for device in devices)
 
     def test_match_property_string(self, context):
         devices = list(context.list_devices().match_property('DRIVER', 'usb'))
