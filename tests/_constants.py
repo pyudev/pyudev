@@ -49,6 +49,9 @@ _UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
 _SUBSYSTEM_STRATEGY = \
    strategies.sampled_from(_CONTEXT.list_devices()).map(lambda x: x.subsystem)
 
+# Workaround for issue #181
+_SUBSYSTEM_STRATEGY = _SUBSYSTEM_STRATEGY.filter(lambda s: s != 'i2c')
+
 _SYSNAME_STRATEGY = \
    strategies.sampled_from(_CONTEXT.list_devices()).map(lambda x: x.sys_name)
 

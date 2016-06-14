@@ -22,6 +22,7 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
+from hypothesis import assume
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies
