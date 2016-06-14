@@ -253,9 +253,8 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (self._libudev.udev_enumerate_add_match_subsystem
-                 if not nomatch else
-                 self._libudev.udev_enumerate_add_nomatch_subsystem)
+        match = self._libudev.udev_enumerate_add_nomatch_subsystem \
+           if nomatch else self._libudev.udev_enumerate_add_match_subsystem
         match(self, ensure_byte_string(subsystem))
         return self
 
