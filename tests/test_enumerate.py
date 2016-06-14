@@ -26,6 +26,7 @@ from hypothesis import assume
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies
+from hypothesis import HealthCheck
 
 from pyudev import Enumerator
 
@@ -49,6 +50,13 @@ def _is_int(value):
         return True
     except (TypeError, ValueError):
         return False
+
+def _is_bool(value):
+    try:
+        return int(value) in (0, 1)
+    except (TypeError, ValueError):
+        return False
+
 
 class TestEnumerator(object):
     """
@@ -140,12 +148,26 @@ class TestEnumerator(object):
         assert all(device[key] == value and device.asint(key) == int(value) \
            for device in devices)
 
-    def test_match_property_bool(self, context):
-        devices = list(context.list_devices().match_property(
-            'ID_INPUT_KEY', True))
-        for device in devices:
-            assert device['ID_INPUT_KEY'] == '1'
-            assert device.asbool('ID_INPUT_KEY')
+    @given(
+       _CONTEXT_STRATEGY,
+       _PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1]))
+    )
+    @settings(
+       max_examples=10,
+       suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow]
+    )
+    def test_match_property_bool(self, context, pair):
+        """
+        Verify that a probably boolean property lookup works.
+        """
+        key, value = pair
+        bool_value = True if int(value) == 1 else False
+        devices = context.list_devices().match_property(key, bool_value)
+        assert all(
+           device.properties[key] == value and \
+           device.asbool(key) == bool_value \
+           for device in devices
+        )
 
     def test_match_attribute_nomatch(self, context):
         key = 'driver'
