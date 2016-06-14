@@ -97,25 +97,6 @@ class TestEnumerator(object):
         devices = set(context.list_devices())
         assert devices == m_devices.union(nm_devices)
 
-    def test_match_scsi_devices_children(self, context):
-        """
-        Test that every device with type scsi_device has only one disk
-        descendant.
-        """
-        scsi_devices = context.list_devices().match_property(
-           'DEVTYPE',
-           'scsi_device'
-        )
-
-        def func(dev):
-            return context.list_devices(
-               subsystem='block',
-               DEVTYPE='disk',
-               parent=dev
-            )
-
-        assert all(len(list(func(d))) in (0, 1) for d in scsi_devices)
-
     def test_match_sys_name(self, context):
         devices = context.list_devices().match_sys_name('sda')
         for device in devices:
