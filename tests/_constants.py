@@ -60,6 +60,18 @@ _PROPERTY_STRATEGY = \
       lambda d: strategies.sampled_from(d.properties.items())
    )
 
+# the attributes object for a given device
+_ATTRIBUTES_STRATEGY = \
+   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda d: d.attributes)
+
+# an attribute key and value pair
+_ATTRIBUTE_STRATEGY = \
+   _ATTRIBUTES_STRATEGY.flatmap(
+      lambda attrs: strategies.sampled_from(attrs.available_attributes).map(
+         lambda key: (key, attrs.get(key))
+      )
+   )
+
 def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
     fmt_str = "%s: udev version must be at least %s, is %s"
     return pytest.mark.skipif(
