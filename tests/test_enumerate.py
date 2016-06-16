@@ -223,10 +223,19 @@ class TestEnumerator(object):
         )
         assert any(device.attributes.get(key) == value for device in devices)
 
-    def test_match_attribute_nomatch_unfulfillable(self, context):
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+    )
+    @settings(max_examples=50)
+    def test_match_attribute_nomatch_unfulfillable(self, context, pair):
+        """
+        Match and no match for a key/value gives empty set.
+        """
+        key, value = pair
         devices = context.list_devices()
-        devices.match_attribute('driver', 'usb')
-        devices.match_attribute('driver', 'usb', nomatch=True)
+        devices.match_attribute(key, value)
+        devices.match_attribute(key, value, nomatch=True)
         assert not list(devices)
 
     def test_match_attribute_string(self, context):
