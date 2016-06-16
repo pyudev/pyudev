@@ -196,6 +196,33 @@ class TestEnumerator(object):
            )
         )
 
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+    )
+    @settings(
+       max_examples=10,
+       suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow]
+    )
+    def test_match_attribute_backslash(self, context, pair):
+        """
+        Test that no matches with value starting with a backslash work.
+        """
+        key, value = pair
+        assume(value.startswith(b"\\"))
+        devices = context.list_devices().match_attribute(
+           key,
+           value
+        )
+        assert list(devices) == []
+
+        devices = context.list_devices().match_attribute(
+           key,
+           value,
+           nomatch=True
+        )
+        assert any(device.attributes.get(key) == value for device in devices)
+
     def test_match_attribute_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
         devices.match_attribute('driver', 'usb')
