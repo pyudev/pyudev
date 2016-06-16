@@ -238,6 +238,29 @@ class TestEnumerator(object):
         devices.match_attribute(key, value, nomatch=True)
         assert not list(devices)
 
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+    )
+    @settings(max_examples=50)
+    def test_match_attribute_nomatch_complete(self, context, pair):
+        """
+        Test that w/ respect to the universe of devices returned by
+        list_devices() a match and its inverse are complements of each other.
+        """
+        key, value = pair
+        m_devices = frozenset(
+           context.list_devices().match_attribute(key, value)
+        )
+        nm_devices = frozenset(
+           context.list_devices().match_attribute(key, value, nomatch=True)
+        )
+
+        assert not m_devices.intersection(nm_devices)
+
+        devices = frozenset(context.list_devices())
+        assert devices == m_devices.union(nm_devices)
+
     def test_match_attribute_string(self, context):
         devices = list(context.list_devices().match_attribute('driver', 'usb'))
         for device in devices:
