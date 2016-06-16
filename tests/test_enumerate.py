@@ -24,12 +24,14 @@ import mock
 
 from hypothesis import assume
 from hypothesis import given
+from hypothesis import note
 from hypothesis import settings
 from hypothesis import strategies
 from hypothesis import HealthCheck
 
 from pyudev import Enumerator
 
+from ._constants import _ATTRIBUTE_STRATEGY
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICES
 from ._constants import _PROPERTY_STRATEGY
@@ -169,17 +171,27 @@ class TestEnumerator(object):
            for device in devices
         )
 
-    def test_match_attribute_nomatch(self, context):
-        key = 'driver'
-        value = 'usb'
-        devices = context.list_devices().match_attribute(
-           key,
-           value,
-           nomatch=True
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+    )
+    def test_match_attribute_nomatch(self, context, pair):
+        """
+        Test that nomatch returns no devices with attribute value match.
+        """
+        key, value = pair
+        devices = list(
+           context.list_devices().match_attribute(key, value, nomatch=True)
         )
-        for device in devices:
-            attributes = device.attributes
-            assert attributes.get(key) != value
+
+        all(device.attributes.get(key) != value for device in devices)
+
+        note(
+           " ".join(
+              ("Device: %s, actual: %s" % (d, d.attributes.get(key))) \
+                 for d in devices if d.attributes.get(key) == value
+           )
+        )
 
     def test_match_attribute_nomatch_unfulfillable(self, context):
         devices = context.list_devices()
