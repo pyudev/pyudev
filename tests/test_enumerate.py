@@ -274,17 +274,22 @@ class TestEnumerator(object):
         devices = context.list_devices().match_attribute(key, value)
         assert all(device.attributes.get(key) == value for device in devices)
 
-    def test_match_attribute_int(self, context):
-        # busnum gives us the number of a USB bus.  And any decent system
-        # likely has two or more usb buses, so this should work on more or less
-        # any system.  I didn't find any other attribute that is likely to be
-        # present on a wide range of system, so this is probably as general as
-        # possible.  Still it may fail because the attribute isn't present on
-        # any device at all on the system running the test
-        devices = list(context.list_devices().match_attribute('busnum', 2))
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda x: _is_int(x[1]))
+    )
+    @settings(max_examples=50)
+    def test_match_attribute_int(self, context, pair):
+        """
+        Test matching integer attribute.
+        """
+        key, value = pair
+        int_value = int(value)
+        devices = context.list_devices().match_attribute(key, int_value)
         for device in devices:
-            assert device.attributes.get('busnum') == b'2'
-            assert device.attributes.asint('busnum') == 2
+            attributes = device.attributes
+            assert attributes.get(key) == value
+            assert device.attributes.asint(key) == int_value
 
     def test_match_attribute_bool(self, context):
         # ro tells us whether a volumne is mounted read-only or not.  And any
