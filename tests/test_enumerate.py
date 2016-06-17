@@ -261,10 +261,18 @@ class TestEnumerator(object):
         devices = frozenset(context.list_devices())
         assert devices == m_devices.union(nm_devices)
 
-    def test_match_attribute_string(self, context):
-        devices = list(context.list_devices().match_attribute('driver', 'usb'))
-        for device in devices:
-            assert device.attributes.get('driver') == b'usb'
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+    )
+    @settings(max_examples=50)
+    def test_match_attribute_string(self, context, pair):
+        """
+        Test that matching attribute as string works.
+        """
+        key, value = pair
+        devices = context.list_devices().match_attribute(key, value)
+        assert all(device.attributes.get(key) == value for device in devices)
 
     def test_match_attribute_int(self, context):
         # busnum gives us the number of a USB bus.  And any decent system
