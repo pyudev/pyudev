@@ -291,14 +291,22 @@ class TestEnumerator(object):
             assert attributes.get(key) == value
             assert device.attributes.asint(key) == int_value
 
-    def test_match_attribute_bool(self, context):
-        # ro tells us whether a volumne is mounted read-only or not.  And any
-        # developers system should have at least one readable volume, thus this
-        # test should work on all systems these tests are ever run on
-        devices = list(context.list_devices().match_attribute('ro', False))
+    @given(
+       _CONTEXT_STRATEGY,
+       _ATTRIBUTE_STRATEGY.filter(lambda x: _is_bool(x[1]))
+    )
+    @settings(max_examples=50)
+    def test_match_attribute_bool(self, context, pair):
+        """
+        Test matching boolean attribute.
+        """
+        key, value = pair
+        bool_value = True if int(value) == 1 else False
+        devices = context.list_devices().match_attribute(key, bool_value)
         for device in devices:
-            assert device.attributes.get('ro') == b'0'
-            assert not device.attributes.asbool('ro')
+            attributes = device.attributes
+            assert attributes.get(key) == value
+            assert attributes.asbool(key) == bool_value
 
     @_UDEV_TEST(154, "test_match_tag_mock")
     def test_match_tag_mock(self, context):
