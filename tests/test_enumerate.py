@@ -308,17 +308,6 @@ class TestEnumerator(object):
             assert attributes.get(key) == value
             assert attributes.asbool(key) == bool_value
 
-    @_UDEV_TEST(154, "test_match_tag_mock")
-    def test_match_tag_mock(self, context):
-        enumerator = context.list_devices()
-        funcname = 'udev_enumerate_add_match_tag'
-        spec = lambda e, t: None
-        with mock.patch.object(enumerator._libudev, funcname,
-                               autospec=spec) as func:
-            retval = enumerator.match_tag('spam')
-            assert retval is enumerator
-            func.assert_called_with(enumerator, b'spam')
-
     @_UDEV_TEST(154, "test_match_tag")
     def test_match_tag(self, context):
         devices = list(context.list_devices().match_tag('seat'))
@@ -348,17 +337,6 @@ class TestEnumerator(object):
                 assert parent in children
             else:
                 assert parent not in children
-
-    @_UDEV_TEST(165, "test_match_is_initialized_mock")
-    def test_match_is_initialized_mock(self, context):
-        enumerator = context.list_devices()
-        funcname = 'udev_enumerate_add_match_is_initialized'
-        spec = lambda e: None
-        with mock.patch.object(enumerator._libudev, funcname,
-                               autospec=spec) as func:
-            retval = enumerator.match_is_initialized()
-            assert retval is enumerator
-            func.assert_called_with(enumerator)
 
     def test_combined_matches_of_same_type(self, context):
         """
