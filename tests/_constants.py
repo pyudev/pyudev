@@ -72,6 +72,16 @@ _ATTRIBUTE_STRATEGY = \
       )
    )
 
+# the tags object for a given device
+_TAGS_STRATEGY = \
+   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda d: d.tags)
+
+# an arbitrary tag belonging to a given device
+_TAG_STRATEGY = \
+        _TAGS_STRATEGY.filter(lambda t: sum(1 for _ in t) != 0).flatmap(
+           strategies.sampled_from
+        )
+
 def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
     fmt_str = "%s: udev version must be at least %s, is %s"
     return pytest.mark.skipif(
