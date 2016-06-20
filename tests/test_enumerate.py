@@ -27,7 +27,6 @@ from hypothesis import given
 from hypothesis import note
 from hypothesis import settings
 from hypothesis import strategies
-from hypothesis import HealthCheck
 
 from pyudev import Enumerator
 
@@ -40,6 +39,8 @@ from ._constants import _SYSNAME_STRATEGY
 from ._constants import _TAG_STRATEGY
 from ._constants import _UDEV_TEST
 from ._constants import _UDEV_VERSION
+
+from .utils import failed_health_check_wrapper
 
 
 @pytest.fixture
@@ -66,6 +67,7 @@ class TestEnumerator(object):
     Test the Enumerator class.
     """
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
     def test_match_subsystem(self, context, subsystem):
@@ -75,6 +77,7 @@ class TestEnumerator(object):
         devices = context.list_devices().match_subsystem(subsystem)
         assert all(device.subsystem == subsystem for device in devices)
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
     def test_match_subsystem_nomatch(self, context, subsystem):
@@ -86,6 +89,7 @@ class TestEnumerator(object):
         assert all(d.subsystem is not None and d.subsystem != subsystem \
            for d in devices)
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
     def test_match_subsystem_nomatch_unfulfillable(self, context, subsystem):
@@ -97,6 +101,7 @@ class TestEnumerator(object):
         devices.match_subsystem(subsystem, nomatch=True)
         assert not list(devices)
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
     def test_match_subsystem_nomatch_complete(self, context, subsystem):
@@ -117,6 +122,7 @@ class TestEnumerator(object):
         devices = set(context.list_devices())
         assert devices == m_devices.union(nm_devices)
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SYSNAME_STRATEGY)
     @settings(max_examples=5)
     def test_match_sys_name(self, context, sysname):
@@ -126,6 +132,7 @@ class TestEnumerator(object):
         devices = context.list_devices().match_sys_name(sysname)
         assert all(device.sys_name == sysname for device in devices)
 
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _PROPERTY_STRATEGY)
     @settings(max_examples=50)
     def test_match_property_string(self, context, pair):
@@ -136,6 +143,7 @@ class TestEnumerator(object):
         devices = context.list_devices().match_property(key, value)
         assert all(device.properties[key] == value for device in devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1]))
@@ -151,14 +159,12 @@ class TestEnumerator(object):
         assert all(device[key] == value and device.asint(key) == int(value) \
            for device in devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1]))
     )
-    @settings(
-       max_examples=10,
-       suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow]
-    )
+    @settings(max_examples=10)
     def test_match_property_bool(self, context, pair):
         """
         Verify that a probably boolean property lookup works.
@@ -172,6 +178,7 @@ class TestEnumerator(object):
            for device in devices
         )
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
@@ -197,14 +204,12 @@ class TestEnumerator(object):
            )
         )
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
     )
-    @settings(
-       max_examples=10,
-       suppress_health_check=[HealthCheck.filter_too_much, HealthCheck.too_slow]
-    )
+    @settings(max_examples=10)
     def test_match_attribute_backslash(self, context, pair):
         """
         Test that no matches with value starting with a backslash work.
@@ -224,6 +229,7 @@ class TestEnumerator(object):
         )
         assert any(device.attributes.get(key) == value for device in devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
@@ -239,6 +245,7 @@ class TestEnumerator(object):
         devices.match_attribute(key, value, nomatch=True)
         assert not list(devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
@@ -262,6 +269,7 @@ class TestEnumerator(object):
         devices = frozenset(context.list_devices())
         assert devices == m_devices.union(nm_devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
@@ -275,6 +283,7 @@ class TestEnumerator(object):
         devices = context.list_devices().match_attribute(key, value)
         assert all(device.attributes.get(key) == value for device in devices)
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda x: _is_int(x[1]))
@@ -292,6 +301,7 @@ class TestEnumerator(object):
             assert attributes.get(key) == value
             assert device.attributes.asint(key) == int_value
 
+    @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
        _ATTRIBUTE_STRATEGY.filter(lambda x: _is_bool(x[1]))
@@ -310,6 +320,7 @@ class TestEnumerator(object):
             assert attributes.asbool(key) == bool_value
 
     @_UDEV_TEST(154, "test_match_tag")
+    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _TAG_STRATEGY)
     @settings(max_examples=50)
     def test_match_tag(self, context, tag):
