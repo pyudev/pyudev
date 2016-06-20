@@ -42,12 +42,6 @@ from ._constants import _UDEV_VERSION
 
 from .utils import failed_health_check_wrapper
 
-
-@pytest.fixture
-def enumerator(request):
-    context = request.getfuncargvalue('context')
-    return context.list_devices()
-
 def _is_int(value):
     try:
         int(value)
@@ -382,32 +376,68 @@ class TestEnumerator(object):
             assert device.asbool('ID_INPUT_MOUSE')
             assert device.sys_name == 'mouse0'
 
+
+class TestEnumeratorMatchMethod(object):
+    """
+    Test the behavior of Enumerator.match.
+
+    Only methods that test behavior of this method by patching the Enumerator
+    object with the methods that match() should invoke belong here.
+    """
+
+    _ENUMERATOR_STRATEGY = _CONTEXT_STRATEGY.map(lambda x: x.list_devices())
+
+    @given(_ENUMERATOR_STRATEGY)
+    @settings(max_examples=1)
     def test_match_passthrough_subsystem(self, enumerator):
+        """
+        Test that special keyword subsystem results in a match_subsystem call.
+        """
         with mock.patch.object(enumerator, 'match_subsystem',
                                autospec=True) as match_subsystem:
             enumerator.match(subsystem=mock.sentinel.subsystem)
             match_subsystem.assert_called_with(mock.sentinel.subsystem)
 
+    @given(_ENUMERATOR_STRATEGY)
+    @settings(max_examples=1)
     def test_match_passthrough_sys_name(self, enumerator):
+        """
+        Test that special keyword sys_name results in a match_sys_name call.
+        """
         with mock.patch.object(enumerator, 'match_sys_name',
                                autospec=True) as match_sys_name:
             enumerator.match(sys_name=mock.sentinel.sys_name)
             match_sys_name.assert_called_with(mock.sentinel.sys_name)
 
+    @given(_ENUMERATOR_STRATEGY)
+    @settings(max_examples=1)
     def test_match_passthrough_tag(self, enumerator):
+        """
+        Test that special keyword tag results in a match_tag call.
+        """
         with mock.patch.object(enumerator, 'match_tag',
                                autospec=True) as match_tag:
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
     @_UDEV_TEST(172, "test_match_passthrough_parent")
+    @given(_ENUMERATOR_STRATEGY)
+    @settings(max_examples=1)
     def test_match_passthrough_parent(self, enumerator):
+        """
+        Test that special keyword 'parent' results in a match parent call.
+        """
         with mock.patch.object(enumerator, 'match_parent',
                                autospec=True) as match_parent:
             enumerator.match(parent=mock.sentinel.parent)
             match_parent.assert_called_with(mock.sentinel.parent)
 
+    @given(_ENUMERATOR_STRATEGY)
+    @settings(max_examples=1)
     def test_match_passthrough_property(self, enumerator):
+        """
+        Test that non-special keyword args are treated as properties.
+        """
         with mock.patch.object(enumerator, 'match_property',
                                autospec=True) as match_property:
             enumerator.match(eggs=mock.sentinel.eggs, spam=mock.sentinel.spam)
