@@ -180,6 +180,9 @@ class TestEnumerator(object):
         Test that nomatch returns no devices with attribute value match.
         """
         key, value = pair
+        if _UDEV_VERSION <= 222:
+            assume(not value.startswith(b"\\"))
+
         devices = list(
            context.list_devices().match_attribute(key, value, nomatch=True)
         )
