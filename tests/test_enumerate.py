@@ -37,6 +37,7 @@ from ._constants import _DEVICES
 from ._constants import _PROPERTY_STRATEGY
 from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
+from ._constants import _TAG_STRATEGY
 from ._constants import _UDEV_TEST
 from ._constants import _UDEV_VERSION
 
@@ -309,10 +310,14 @@ class TestEnumerator(object):
             assert attributes.asbool(key) == bool_value
 
     @_UDEV_TEST(154, "test_match_tag")
-    def test_match_tag(self, context):
-        devices = list(context.list_devices().match_tag('seat'))
-        for device in devices:
-            assert 'seat' in device.tags
+    @given(_CONTEXT_STRATEGY, _TAG_STRATEGY)
+    @settings(max_examples=50)
+    def test_match_tag(self, context, tag):
+        """
+        Test that matches returned for tag actually have tag.
+        """
+        devices = context.list_devices().match_tag(tag)
+        assert all(tag in device.tags for device in devices)
 
     _devices = [d for d in _DEVICES if d.parent]
     @pytest.mark.skipif(len(_devices) == 0, reason="no device with parent")
