@@ -348,6 +348,12 @@ class TestEnumerator(object):
             else:
                 assert parent not in children
 
+
+class TestEnumeratorMatchCombinations(object):
+    """
+    Test combinations of matches.
+    """
+
     def test_combined_matches_of_same_type(self, context):
         """
         Test for behaviour as observed in #1
