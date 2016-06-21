@@ -394,13 +394,54 @@ class TestEnumeratorMatchCombinations(object):
               for d in complement
         )
 
-    def test_combined_matches_of_different_types(self, context):
-        properties = ('DEVTYPE', 'ID_TYPE')
-        devices = context.list_devices().match_subsystem('input')
-        for prop in properties:
-            devices.match_property(prop, 'disk')
-        devices = list(devices)
-        assert not devices
+    @given(
+       _CONTEXT_STRATEGY,
+       strategies.lists(
+          elements=_PROPERTY_STRATEGY,
+          min_size=1,
+          max_size=2,
+          unique_by=lambda p: p[0]
+       ),
+       strategies.lists(
+          elements=_ATTRIBUTE_STRATEGY,
+          min_size=1,
+          max_size=2,
+          unique_by=lambda p: p[0]
+       )
+    )
+    @settings(max_examples=20)
+    def test_combined_matches_of_different_types(self, context, ppairs, apairs):
+        """
+        Require that properties and attributes have a conjunction.
+        """
+        enumeration = context.list_devices()
+        all_devices = frozenset(enumeration)
+
+        enumeration = context.list_devices()
+        for key, value in ppairs:
+            enumeration.match_property(key, value)
+        for key, value in apairs:
+            enumeration.match_attribute(key, value)
+
+        devices = list(frozenset(enumeration))
+
+        counter_examples = [
+           d for d in devices if \
+           all(d.properties.get(key) != value for key, value in ppairs) or \
+           any(d.attributes.get(key) != value for key, value in apairs)
+        ]
+
+        assert counter_examples == []
+
+        complement = list(all_devices - frozenset(devices))
+
+        counter_examples = [
+           d for d in complement if \
+           any(d.properties.get(key) == value for key, value in ppairs) and \
+           all(d.attributes.get(key) == value for key, value in apairs)
+        ]
+
+        assert counter_examples == []
 
     def test_match(self, context):
         devices = list(context.list_devices().match(
