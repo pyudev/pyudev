@@ -354,17 +354,45 @@ class TestEnumeratorMatchCombinations(object):
     Test combinations of matches.
     """
 
-    def test_combined_matches_of_same_type(self, context):
+    @given(
+       _CONTEXT_STRATEGY,
+       strategies.lists(
+          elements=_PROPERTY_STRATEGY,
+          min_size=2,
+          max_size=3,
+          unique_by=lambda p: p[0]
+       )
+    )
+    @settings(max_examples=20)
+    def test_combined_property_matches(self, context, ppairs):
         """
         Test for behaviour as observed in #1
+
+        If matching multiple properties, then the result is the union of
+        the matching sets, i.e., the resulting filter is a disjunction.
         """
-        properties = ('DEVTYPE', 'ID_TYPE')
-        devices = context.list_devices()
-        for prop in properties:
-            devices.match_property(prop, 'disk')
-        for device in devices:
-            assert (device.get('DEVTYPE') == 'disk' or
-                    device.get('ID_TYPE') == 'disk')
+        enumeration = context.list_devices()
+
+        all_devices = frozenset(enumeration)
+
+        enumeration = context.list_devices()
+
+        for key, value in ppairs:
+            enumeration.match_property(key, value)
+
+        devices = list(frozenset(enumeration))
+
+        assert all(
+           any(d.properties.get(key) == value for key, value in ppairs) \
+              for d in devices
+        )
+
+        complement = list(all_devices - frozenset(devices))
+
+        assert all(
+           all(d.properties.get(key) != value for key, value in ppairs) \
+              for d in complement
+        )
 
     def test_combined_matches_of_different_types(self, context):
         properties = ('DEVTYPE', 'ID_TYPE')
