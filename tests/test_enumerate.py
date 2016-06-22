@@ -196,11 +196,12 @@ class TestEnumerator(object):
         """
         key, value = pair
 
+        all_devices = frozenset(context.list_devices())
         devices = frozenset(context.list_devices().match_attribute(key, value))
         assert all(d.attributes.get(key) == value for d in devices)
-        all_devices = frozenset(context.list_devices())
         complement = all_devices - devices
-        assert all(device.attributes.get(key) != value for device in complement)
+        examples = [d for d in complement if d.attributes.get(key) == value]
+        assert examples == []
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
