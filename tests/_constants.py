@@ -35,16 +35,75 @@ import pytest
 
 from pyudev import Context
 from pyudev import Device
+from pyudev import Devices
+from pyudev import DeviceNotFoundError
 
 from .utils import udev
 
 _CONTEXT = Context()
+
+def _check_device(device):
+    """
+    Check that device exists by getting it.
+    """
+    try:
+        Devices.from_path(_CONTEXT, device.sys_path)
+        return True
+    except DeviceNotFoundError:
+        return False
+
 _DEVICE_DATA = udev.DeviceDatabase.db()
 _DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
+
+_DEVICE_STRATEGY = strategies.sampled_from(_CONTEXT.list_devices())
+_DEVICE_STRATEGY = _DEVICE_STRATEGY.filter(_check_device)
 
 _CONTEXT_STRATEGY = strategies.just(_CONTEXT)
 
 _UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
+
+_SUBSYSTEM_STRATEGY = _DEVICE_STRATEGY.map(lambda x: x.subsystem)
+
+# Workaround for issue #181
+_SUBSYSTEM_STRATEGY = _SUBSYSTEM_STRATEGY.filter(lambda s: s != 'i2c')
+
+_SYSNAME_STRATEGY = _DEVICE_STRATEGY.map(lambda x: x.sys_name)
+
+_PROPERTY_STRATEGY = _DEVICE_STRATEGY.flatmap(
+   lambda d: strategies.sampled_from(d.properties.items())
+)
+
+_MATCH_PROPERTY_STRATEGY = \
+   _PROPERTY_STRATEGY.filter(lambda p: p[0][-4:] != "_ENC")
+
+# the attributes object for a given device
+_ATTRIBUTES_STRATEGY = _DEVICE_STRATEGY.map(lambda d: d.attributes)
+
+# an attribute key and value pair
+_ATTRIBUTE_STRATEGY = \
+   _ATTRIBUTES_STRATEGY.flatmap(
+      lambda attrs: strategies.sampled_from(attrs.available_attributes).map(
+         lambda key: (key, attrs.get(key))
+      )
+   )
+
+_ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
+
+if _UDEV_VERSION <= 222:
+    _ATTRIBUTE_STRATEGY = \
+       _ATTRIBUTE_STRATEGY.filter(
+          lambda p: not p[1].startswith(b"\\") and not p[1][-1:] == b" " and \
+          not p[1].startswith(b'[')
+       )
+
+# the tags object for a given device
+_TAGS_STRATEGY = _DEVICE_STRATEGY.map(lambda d: d.tags)
+
+# an arbitrary tag belonging to a given device
+_TAG_STRATEGY = \
+        _TAGS_STRATEGY.filter(lambda t: sum(1 for _ in t) != 0).flatmap(
+           strategies.sampled_from
+        )
 
 def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
     fmt_str = "%s: udev version must be at least %s, is %s"
@@ -52,13 +111,3 @@ def _UDEV_TEST(version, node=None): # pylint: disable=invalid-name
        _UDEV_VERSION < version,
        reason=fmt_str % (node, version, _UDEV_VERSION)
     )
-
-_VOLATILE_ATTRIBUTES = ('energy_uj', 'power_on_acct')
-def non_volatile_attributes(attributes):
-    """
-    Yields keys for non-volatile attributes only.
-
-    :param dict attributes: attributes dict obtained from udev
-    """
-    return ((k, v) for (k, v) in attributes.items() \
-       if k not in _VOLATILE_ATTRIBUTES)

@@ -340,12 +340,19 @@ class TestDevice(object):
     @settings(max_examples=100)
     @_UDEV_TEST(230, "check exact equivalence of device_datum and device")
     def test_length(self, a_context, device_datum):
+        """
+        Verify that the keys in the device and in the datum are equal.
+        """
         device = Devices.from_path(a_context, device_datum.device_path)
-        assert len(device) == len(device_datum.properties)
+        assert frozenset(device_datum.properties.keys()) == \
+           frozenset(device.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=100)
     def test_key_subset(self, a_context, device_datum):
+        """
+        Verify that the device contains all the keys in the device datum.
+        """
         device = Devices.from_path(a_context, device_datum.device_path)
         assert frozenset(device_datum.properties.keys()) <= \
            frozenset(device.keys())
