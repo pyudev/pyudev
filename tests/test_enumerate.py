@@ -151,7 +151,7 @@ class TestEnumerator(object):
         assert all(device.properties[key] == value for device in devices)
         all_devices = frozenset(context.list_devices())
         complement = all_devices - devices
-        assert all(device.properties[key] != value for device in complement)
+        assert all(device.properties.get(key) != value for device in complement)
 
     @failed_health_check_wrapper
     @given(
@@ -187,6 +187,20 @@ class TestEnumerator(object):
            device.asbool(key) == bool_value \
            for device in devices
         )
+
+    @failed_health_check_wrapper
+    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
+    def test_match_attribute_match(self, context, pair):
+        """
+        Test match returns matching devices.
+        """
+        key, value = pair
+
+        devices = frozenset(context.list_devices().match_attribute(key, value))
+        assert all(d.attributes.get(key) == value for d in devices)
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+        assert all(device.attributes.get(key) != value for device in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
