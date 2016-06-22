@@ -441,13 +441,40 @@ class TestEnumeratorMatchCombinations(object):
 
         assert counter_examples == []
 
-    def test_match(self, context):
-        devices = list(context.list_devices().match(
-            subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0'))
-        for device in devices:
-            assert device.subsystem == 'input'
-            assert device.asbool('ID_INPUT_MOUSE')
-            assert device.sys_name == 'mouse0'
+    @given(
+       _CONTEXT_STRATEGY,
+       _SUBSYSTEM_STRATEGY,
+       _SYSNAME_STRATEGY,
+       _MATCH_PROPERTY_STRATEGY
+    )
+    @settings(max_examples=10)
+    def test_match(self, context, subsystem, sysname, ppair):
+        """
+        Test that matches from different categories are a conjunction.
+        """
+        prop_name, prop_value = ppair
+        kwargs = {prop_name: prop_value}
+        devices = frozenset(
+           context.list_devices().match(
+              subsystem=subsystem,
+              sys_name=sysname,
+              **kwargs
+           )
+        )
+        assert all(
+           device.subsystem == subsystem and device.sys_name == sysname and \
+           device.properties.get(prop_name) == prop_value \
+           for device in devices
+        )
+
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+
+        assert all(
+           device.subsystem != subsystem or device.sys_name != sysname or \
+           device.properties.get(prop_name) != prop_value \
+           for device in complement
+        )
 
 
 class TestEnumeratorMatchMethod(object):
