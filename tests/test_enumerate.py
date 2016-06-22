@@ -587,32 +587,3 @@ class TestEnumeratorMatchMethod(object):
             posargs = [args for args, _ in match_property.call_args_list]
             assert ('spam', mock.sentinel.spam) in posargs
             assert ('eggs', mock.sentinel.eggs) in posargs
-
-
-class TestContext(object):
-
-    @pytest.mark.match
-    def test_list_devices(self, context):
-        devices = list(context.list_devices(
-            subsystem='input', ID_INPUT_MOUSE=True, sys_name='mouse0'))
-        for device in devices:
-            assert device.subsystem == 'input'
-            assert device.asbool('ID_INPUT_MOUSE')
-            assert device.sys_name == 'mouse0'
-
-    @pytest.mark.match
-    def test_list_devices_passthrough(self, context):
-        with mock.patch.object(Enumerator, 'match') as match:
-            context.list_devices(subsystem=mock.sentinel.subsystem,
-                                 sys_name=mock.sentinel.sys_name,
-                                 tag=mock.sentinel.tag,
-                                 parent=mock.sentinel.parent,
-                                 prop1=mock.sentinel.prop1,
-                                 prop2=mock.sentinel.prop2)
-            match.assert_called_with(
-                subsystem=mock.sentinel.subsystem,
-                sys_name=mock.sentinel.sys_name,
-                tag=mock.sentinel.tag,
-                parent=mock.sentinel.parent,
-                prop1=mock.sentinel.prop1,
-                prop2=mock.sentinel.prop2)
