@@ -61,13 +61,19 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
-    @settings(max_examples=5)
+    @settings(max_examples=50)
     def test_match_subsystem(self, context, subsystem):
         """
         Subsystem match matches devices w/ correct subsystem.
         """
-        devices = context.list_devices().match_subsystem(subsystem)
+        devices = frozenset(context.list_devices().match_subsystem(subsystem))
         assert all(device.subsystem == subsystem for device in devices)
+
+        all_devices = frozenset(context.list_devices())
+
+        complement = all_devices - devices
+
+        assert all(device.subsystem != subsystem for device in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -76,10 +82,16 @@ class TestEnumerator(object):
         """
         Subsystem no match gets no subsystem with subsystem.
         """
-        devices = \
+        devices = frozenset(
            context.list_devices().match_subsystem(subsystem, nomatch=True)
-        assert all(d.subsystem is not None and d.subsystem != subsystem \
-           for d in devices)
+        )
+        assert all(d.subsystem != subsystem for d in devices)
+
+        all_devices = frozenset(context.list_devices())
+
+        complement = all_devices - devices
+
+        assert all(d.subsystem == subsystem for d in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -121,8 +133,11 @@ class TestEnumerator(object):
         """
         A sysname lookup only gives devices with that sysname.
         """
-        devices = context.list_devices().match_sys_name(sysname)
+        devices = frozenset(context.list_devices().match_sys_name(sysname))
         assert all(device.sys_name == sysname for device in devices)
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+        assert all(device.sys_name != sysname for device in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _PROPERTY_STRATEGY)
@@ -132,8 +147,11 @@ class TestEnumerator(object):
         Match property only gets devices with that property.
         """
         key, value = pair
-        devices = context.list_devices().match_property(key, value)
+        devices = frozenset(context.list_devices().match_property(key, value))
         assert all(device.properties[key] == value for device in devices)
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+        assert all(device.properties[key] != value for device in complement)
 
     @failed_health_check_wrapper
     @given(
@@ -178,13 +196,18 @@ class TestEnumerator(object):
         """
         key, value = pair
 
-        devices = \
+        devices = frozenset(
            context.list_devices().match_attribute(key, value, nomatch=True)
+        )
 
         counter_examples = \
            [device for device in devices if device.attributes.get(key) == value]
 
         assert counter_examples == []
+
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+        assert all(device.attributes.get(key) == value for device in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
@@ -275,8 +298,13 @@ class TestEnumerator(object):
         """
         Test that matches returned for tag actually have tag.
         """
-        devices = context.list_devices().match_tag(tag)
+        devices = frozenset(context.list_devices().match_tag(tag))
         assert all(tag in device.tags for device in devices)
+
+        all_devices = frozenset(context.list_devices())
+        complement = all_devices - devices
+
+        assert all(tag not in device.tags for device in complement)
 
     @failed_health_check_wrapper
     @given(
