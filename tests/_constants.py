@@ -73,6 +73,9 @@ _PROPERTY_STRATEGY = _DEVICE_STRATEGY.flatmap(
    lambda d: strategies.sampled_from(d.properties.items())
 )
 
+_MATCH_PROPERTY_STRATEGY = \
+   _PROPERTY_STRATEGY.filter(lambda p: p[0][-4:] != "_ENC")
+
 # the attributes object for a given device
 _ATTRIBUTES_STRATEGY = _DEVICE_STRATEGY.map(lambda d: d.attributes)
 
