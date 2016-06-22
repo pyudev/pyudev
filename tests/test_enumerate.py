@@ -512,11 +512,13 @@ class TestEnumeratorMatchCombinations(object):
         all_devices = frozenset(context.list_devices())
         complement = all_devices - devices
 
-        assert all(
-           device.subsystem != subsystem or device.sys_name != sysname or \
-           device.properties.get(prop_name) != prop_value \
-           for device in complement
-        )
+        counter_examples = [
+           device for device in complement if \
+           device.subsystem == subsystem and device.sys_name == sysname and \
+           device.properties.get(prop_name) == prop_value
+        ]
+
+        assert counter_examples == []
 
 
 class TestEnumeratorMatchMethod(object):
