@@ -35,34 +35,46 @@ import pytest
 
 from pyudev import Context
 from pyudev import Device
+from pyudev import Devices
+from pyudev import DeviceNotFoundError
 
 from .utils import udev
 
 _CONTEXT = Context()
+
+def _check_device(device):
+    """
+    Check that device exists by getting it.
+    """
+    try:
+        Devices.from_path(_CONTEXT, device.sys_path)
+        return True
+    except DeviceNotFoundError:
+        return False
+
 _DEVICE_DATA = udev.DeviceDatabase.db()
 _DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
+
+_DEVICE_STRATEGY = strategies.sampled_from(_CONTEXT.list_devices())
+_DEVICE_STRATEGY = _DEVICE_STRATEGY.filter(_check_device)
 
 _CONTEXT_STRATEGY = strategies.just(_CONTEXT)
 
 _UDEV_VERSION = int(udev.UDevAdm.adm().query_udev_version())
 
-_SUBSYSTEM_STRATEGY = \
-   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda x: x.subsystem)
+_SUBSYSTEM_STRATEGY = _DEVICE_STRATEGY.map(lambda x: x.subsystem)
 
 # Workaround for issue #181
 _SUBSYSTEM_STRATEGY = _SUBSYSTEM_STRATEGY.filter(lambda s: s != 'i2c')
 
-_SYSNAME_STRATEGY = \
-   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda x: x.sys_name)
+_SYSNAME_STRATEGY = _DEVICE_STRATEGY.map(lambda x: x.sys_name)
 
-_PROPERTY_STRATEGY = \
-   strategies.sampled_from(_CONTEXT.list_devices()).flatmap(
-      lambda d: strategies.sampled_from(d.properties.items())
-   )
+_PROPERTY_STRATEGY = _DEVICE_STRATEGY.flatmap(
+   lambda d: strategies.sampled_from(d.properties.items())
+)
 
 # the attributes object for a given device
-_ATTRIBUTES_STRATEGY = \
-   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda d: d.attributes)
+_ATTRIBUTES_STRATEGY = _DEVICE_STRATEGY.map(lambda d: d.attributes)
 
 # an attribute key and value pair
 _ATTRIBUTE_STRATEGY = \
@@ -83,8 +95,7 @@ if _UDEV_VERSION <= 222:
        _ATTRIBUTE_STRATEGY.filter(lambda p: not p[1][-1:] == b" ")
 
 # the tags object for a given device
-_TAGS_STRATEGY = \
-   strategies.sampled_from(_CONTEXT.list_devices()).map(lambda d: d.tags)
+_TAGS_STRATEGY = _DEVICE_STRATEGY.map(lambda d: d.tags)
 
 # an arbitrary tag belonging to a given device
 _TAG_STRATEGY = \
