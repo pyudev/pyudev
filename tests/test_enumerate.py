@@ -353,6 +353,48 @@ class TestEnumeratorMatchCombinations(object):
     @given(
        _CONTEXT_STRATEGY,
        strategies.lists(
+          elements=_ATTRIBUTE_STRATEGY,
+          min_size=2,
+          max_size=3,
+          unique_by=lambda p: p[0]
+       )
+    )
+    @settings(max_examples=20)
+    def test_combined_attribute_matches(self, context, apairs):
+        """
+        Test for conjunction of attributes.
+
+        If matching multiple attributes, then the result is the intersection of
+        the matching sets, i.e., the resulting filter is a conjunction.
+        """
+        enumeration = context.list_devices()
+
+        all_devices = frozenset(enumeration)
+
+        enumeration = context.list_devices()
+
+        for key, value in apairs:
+            enumeration.match_attribute(key, value)
+
+        devices = list(frozenset(enumeration))
+
+        assert all(
+           all(d.attributes.get(key) == value for key, value in apairs) \
+              for d in devices
+        )
+
+        complement = list(all_devices - frozenset(devices))
+
+        counter_examples = [
+           d for d in complement if \
+           all(d.attributes.get(key) == value for key, value in apairs)
+        ]
+
+        assert counter_examples == []
+
+    @given(
+       _CONTEXT_STRATEGY,
+       strategies.lists(
           elements=_PROPERTY_STRATEGY,
           min_size=1,
           max_size=2,
