@@ -31,7 +31,7 @@ from pyudev import Enumerator
 from ._constants import _ATTRIBUTE_STRATEGY
 from ._constants import _CONTEXT_STRATEGY
 from ._constants import _DEVICE_STRATEGY
-from ._constants import _PROPERTY_STRATEGY
+from ._constants import _MATCH_PROPERTY_STRATEGY
 from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
 from ._constants import _TAG_STRATEGY
@@ -140,7 +140,7 @@ class TestEnumerator(object):
         assert all(device.sys_name != sysname for device in complement)
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _PROPERTY_STRATEGY)
+    @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY)
     @settings(max_examples=50)
     def test_match_property_string(self, context, pair):
         """
@@ -156,7 +156,7 @@ class TestEnumerator(object):
     @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
-       _PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1]))
+       _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1]))
     )
     @settings(max_examples=50)
     def test_match_property_int(self, context, pair):
@@ -172,7 +172,7 @@ class TestEnumerator(object):
     @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
-       _PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1]))
+       _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1]))
     )
     @settings(max_examples=10)
     def test_match_property_bool(self, context, pair):
@@ -355,7 +355,7 @@ class TestEnumeratorMatchCombinations(object):
     @given(
        _CONTEXT_STRATEGY,
        strategies.lists(
-          elements=_PROPERTY_STRATEGY,
+          elements=_MATCH_PROPERTY_STRATEGY,
           min_size=2,
           max_size=3,
           unique_by=lambda p: p[0]
@@ -437,7 +437,7 @@ class TestEnumeratorMatchCombinations(object):
     @given(
        _CONTEXT_STRATEGY,
        strategies.lists(
-          elements=_PROPERTY_STRATEGY,
+          elements=_MATCH_PROPERTY_STRATEGY,
           min_size=1,
           max_size=2,
           unique_by=lambda p: p[0]
