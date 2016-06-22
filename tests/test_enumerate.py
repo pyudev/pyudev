@@ -22,9 +22,7 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from hypothesis import assume
 from hypothesis import given
-from hypothesis import note
 from hypothesis import settings
 from hypothesis import strategies
 
@@ -32,7 +30,7 @@ from pyudev import Enumerator
 
 from ._constants import _ATTRIBUTE_STRATEGY
 from ._constants import _CONTEXT_STRATEGY
-from ._constants import _DEVICES
+from ._constants import _DEVICE_STRATEGY
 from ._constants import _PROPERTY_STRATEGY
 from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
@@ -173,61 +171,23 @@ class TestEnumerator(object):
         )
 
     @failed_health_check_wrapper
-    @given(
-       _CONTEXT_STRATEGY,
-       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
-    )
+    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
     def test_match_attribute_nomatch(self, context, pair):
         """
         Test that nomatch returns no devices with attribute value match.
         """
         key, value = pair
-        if _UDEV_VERSION <= 222:
-            assume(not value.startswith(b"\\"))
 
-        devices = list(
+        devices = \
            context.list_devices().match_attribute(key, value, nomatch=True)
-        )
 
-        all(device.attributes.get(key) != value for device in devices)
+        counter_examples = \
+           [device for device in devices if device.attributes.get(key) == value]
 
-        note(
-           " ".join(
-              ("Device: %s, actual: %s" % (d, d.attributes.get(key))) \
-                 for d in devices if d.attributes.get(key) == value
-           )
-        )
+        assert counter_examples == []
 
     @failed_health_check_wrapper
-    @given(
-       _CONTEXT_STRATEGY,
-       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
-    )
-    @settings(max_examples=10)
-    def test_match_attribute_backslash(self, context, pair):
-        """
-        Test that no matches with value starting with a backslash work.
-        """
-        key, value = pair
-        assume(value.startswith(b"\\"))
-        devices = context.list_devices().match_attribute(
-           key,
-           value
-        )
-        assert list(devices) == []
-
-        devices = context.list_devices().match_attribute(
-           key,
-           value,
-           nomatch=True
-        )
-        assert any(device.attributes.get(key) == value for device in devices)
-
-    @failed_health_check_wrapper
-    @given(
-       _CONTEXT_STRATEGY,
-       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
-    )
+    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
     @settings(max_examples=50)
     def test_match_attribute_nomatch_unfulfillable(self, context, pair):
         """
@@ -240,10 +200,7 @@ class TestEnumerator(object):
         assert not list(devices)
 
     @failed_health_check_wrapper
-    @given(
-       _CONTEXT_STRATEGY,
-       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
-    )
+    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
     @settings(max_examples=50)
     def test_match_attribute_nomatch_complete(self, context, pair):
         """
@@ -264,10 +221,7 @@ class TestEnumerator(object):
         assert devices == m_devices.union(nm_devices)
 
     @failed_health_check_wrapper
-    @given(
-       _CONTEXT_STRATEGY,
-       _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
-    )
+    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
     @settings(max_examples=50)
     def test_match_attribute_string(self, context, pair):
         """
@@ -324,10 +278,12 @@ class TestEnumerator(object):
         devices = context.list_devices().match_tag(tag)
         assert all(tag in device.tags for device in devices)
 
-    _devices = [d for d in _DEVICES if d.parent]
-    @pytest.mark.skipif(len(_devices) == 0, reason="no device with parent")
-    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @failed_health_check_wrapper
+    @given(
+       _CONTEXT_STRATEGY,
+       _DEVICE_STRATEGY.filter(lambda d: d.parent is not None)
+    )
+    @settings(max_examples=5)
     def test_match_parent(self, context, device):
         """
         For a given device, verify that it is in its parent's children.
