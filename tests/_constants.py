@@ -89,7 +89,7 @@ _ATTRIBUTE_STRATEGY = \
 
 _ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
 
-if _UDEV_VERSION <= 222:
+if _UDEV_VERSION <= 229:
     _ATTRIBUTE_STRATEGY = \
        _ATTRIBUTE_STRATEGY.filter(
           lambda p: not p[1].startswith(b"\\") and not p[1][-1:] == b" " and \
