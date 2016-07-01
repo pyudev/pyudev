@@ -67,6 +67,18 @@ def _test_direct_and_complement(context, devices, func):
     complement = frozenset(context.list_devices()) - devices
     assert [device for device in complement if func(device)] == []
 
+def _test_intersection_and_union(context, matches, nomatches):
+    """
+    Test that intersection is empty and union is all of devices.
+
+    :param matches: the matching devices
+    :type matches: frozenset of Device
+    :param nomatches: the non-matching devices
+    :type nomatches: frozenset of Device
+    """
+    assert matches & nomatches == frozenset()
+    assert matches | nomatches == frozenset(context.list_devices())
+
 class TestEnumerator(object):
     """
     Test the Enumerator class.
@@ -124,14 +136,11 @@ class TestEnumerator(object):
         so with respect to the whole universe of devices, the two are
         not complements of each other.
         """
-        m_devices = set(context.list_devices().match_subsystem(subsystem))
-        nm_devices = \
-           set(context.list_devices().match_subsystem(subsystem, nomatch=True))
-
-        assert not m_devices.intersection(nm_devices)
-
-        devices = set(context.list_devices())
-        assert devices == m_devices.union(nm_devices)
+        m_devices = frozenset(context.list_devices().match_subsystem(subsystem))
+        nm_devices = frozenset(
+           context.list_devices().match_subsystem(subsystem, nomatch=True)
+        )
+        _test_intersection_and_union(context, m_devices, nm_devices)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SYSNAME_STRATEGY)
@@ -252,11 +261,7 @@ class TestEnumerator(object):
         nm_devices = frozenset(
            context.list_devices().match_attribute(key, value, nomatch=True)
         )
-
-        assert not m_devices.intersection(nm_devices)
-
-        devices = frozenset(context.list_devices())
-        assert devices == m_devices.union(nm_devices)
+        _test_intersection_and_union(context, m_devices, nm_devices)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
