@@ -53,6 +53,19 @@ def _is_bool(value):
     except (TypeError, ValueError):
         return False
 
+def _test_direct_and_complement(context, devices, func):
+    """
+    Test that results are correct and that complement holds.
+
+    :param Context context: the libudev context
+    :param devices: the devices that match
+    :type devices: frozenset of Device
+    :param func: the property to test
+    :type func: device -> bool
+    """
+    assert [device for device in devices if not func(device)] == []
+    complement = frozenset(context.list_devices()) - devices
+    assert [device for device in complement if func(device)] == []
 
 class TestEnumerator(object):
     """
@@ -66,14 +79,11 @@ class TestEnumerator(object):
         """
         Subsystem match matches devices w/ correct subsystem.
         """
-        devices = frozenset(context.list_devices().match_subsystem(subsystem))
-        assert all(device.subsystem == subsystem for device in devices)
-
-        all_devices = frozenset(context.list_devices())
-
-        complement = all_devices - devices
-
-        assert all(device.subsystem != subsystem for device in complement)
+        _test_direct_and_complement(
+           context,
+           frozenset(context.list_devices().match_subsystem(subsystem)),
+           lambda d: d.subsystem == subsystem
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -82,16 +92,13 @@ class TestEnumerator(object):
         """
         Subsystem no match gets no subsystem with subsystem.
         """
-        devices = frozenset(
-           context.list_devices().match_subsystem(subsystem, nomatch=True)
+        _test_direct_and_complement(
+           context,
+           frozenset(
+              context.list_devices().match_subsystem(subsystem, nomatch=True)
+           ),
+           lambda d: d.subsystem != subsystem
         )
-        assert all(d.subsystem != subsystem for d in devices)
-
-        all_devices = frozenset(context.list_devices())
-
-        complement = all_devices - devices
-
-        assert all(d.subsystem == subsystem for d in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -133,11 +140,11 @@ class TestEnumerator(object):
         """
         A sysname lookup only gives devices with that sysname.
         """
-        devices = frozenset(context.list_devices().match_sys_name(sysname))
-        assert all(device.sys_name == sysname for device in devices)
-        all_devices = frozenset(context.list_devices())
-        complement = all_devices - devices
-        assert all(device.sys_name != sysname for device in complement)
+        _test_direct_and_complement(
+           context,
+           frozenset(context.list_devices().match_sys_name(sysname)),
+           lambda d: d.sys_name == sysname
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY)
@@ -147,11 +154,11 @@ class TestEnumerator(object):
         Match property only gets devices with that property.
         """
         key, value = pair
-        devices = frozenset(context.list_devices().match_property(key, value))
-        assert all(device.properties[key] == value for device in devices)
-        all_devices = frozenset(context.list_devices())
-        complement = all_devices - devices
-        assert all(device.properties.get(key) != value for device in complement)
+        _test_direct_and_complement(
+           context,
+           frozenset(context.list_devices().match_property(key, value)),
+           lambda d: d.properties.get(key) == value
+        )
 
     @failed_health_check_wrapper
     @given(
@@ -195,13 +202,11 @@ class TestEnumerator(object):
         Test match returns matching devices.
         """
         key, value = pair
-
-        all_devices = frozenset(context.list_devices())
-        devices = frozenset(context.list_devices().match_attribute(key, value))
-        assert all(d.attributes.get(key) == value for d in devices)
-        complement = all_devices - devices
-        examples = [d for d in complement if d.attributes.get(key) == value]
-        assert examples == []
+        _test_direct_and_complement(
+           context,
+           frozenset(context.list_devices().match_attribute(key, value)),
+           lambda d: d.attributes.get(key) == value
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
@@ -211,18 +216,13 @@ class TestEnumerator(object):
         """
         key, value = pair
 
-        devices = frozenset(
-           context.list_devices().match_attribute(key, value, nomatch=True)
+        _test_direct_and_complement(
+           context,
+           frozenset(
+              context.list_devices().match_attribute(key, value, nomatch=True)
+           ),
+           lambda d: d.attributes.get(key) != value
         )
-
-        counter_examples = \
-           [device for device in devices if device.attributes.get(key) == value]
-
-        assert counter_examples == []
-
-        all_devices = frozenset(context.list_devices())
-        complement = all_devices - devices
-        assert all(device.attributes.get(key) == value for device in complement)
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
@@ -313,13 +313,11 @@ class TestEnumerator(object):
         """
         Test that matches returned for tag actually have tag.
         """
-        devices = frozenset(context.list_devices().match_tag(tag))
-        assert all(tag in device.tags for device in devices)
-
-        all_devices = frozenset(context.list_devices())
-        complement = all_devices - devices
-
-        assert all(tag not in device.tags for device in complement)
+        _test_direct_and_complement(
+           context,
+           frozenset(context.list_devices().match_tag(tag)),
+           lambda d: tag in d.tags
+        )
 
     @failed_health_check_wrapper
     @given(
@@ -372,25 +370,15 @@ class TestEnumeratorMatchCombinations(object):
         """
         enumeration = context.list_devices()
 
-        all_devices = frozenset(enumeration)
-
-        enumeration = context.list_devices()
-
         for key, value in ppairs:
             enumeration.match_property(key, value)
 
-        devices = list(frozenset(enumeration))
-
-        assert all(
-           any(d.properties.get(key) == value for key, value in ppairs) \
-              for d in devices
-        )
-
-        complement = list(all_devices - frozenset(devices))
-
-        assert all(
-           all(d.properties.get(key) != value for key, value in ppairs) \
-              for d in complement
+        _test_direct_and_complement(
+           context,
+           frozenset(enumeration),
+           lambda d: any(
+              d.properties.get(key) == value for key, value in ppairs
+           )
         )
 
     @given(
@@ -412,28 +400,16 @@ class TestEnumeratorMatchCombinations(object):
         """
         enumeration = context.list_devices()
 
-        all_devices = frozenset(enumeration)
-
-        enumeration = context.list_devices()
-
         for key, value in apairs:
             enumeration.match_attribute(key, value)
 
-        devices = list(frozenset(enumeration))
-
-        assert all(
-           all(d.attributes.get(key) == value for key, value in apairs) \
-              for d in devices
+        _test_direct_and_complement(
+           context,
+           frozenset(enumeration),
+           lambda d: all(
+              d.attributes.get(key) == value for key, value in apairs
+           )
         )
-
-        complement = list(all_devices - frozenset(devices))
-
-        counter_examples = [
-           d for d in complement if \
-           all(d.attributes.get(key) == value for key, value in apairs)
-        ]
-
-        assert counter_examples == []
 
     @given(
        _CONTEXT_STRATEGY,
@@ -456,33 +432,20 @@ class TestEnumeratorMatchCombinations(object):
         Require that properties and attributes have a conjunction.
         """
         enumeration = context.list_devices()
-        all_devices = frozenset(enumeration)
-
-        enumeration = context.list_devices()
         for key, value in ppairs:
             enumeration.match_property(key, value)
         for key, value in apairs:
             enumeration.match_attribute(key, value)
 
-        devices = list(frozenset(enumeration))
-
-        counter_examples = [
-           d for d in devices if \
-           all(d.properties.get(key) != value for key, value in ppairs) or \
-           any(d.attributes.get(key) != value for key, value in apairs)
-        ]
-
-        assert counter_examples == []
-
-        complement = list(all_devices - frozenset(devices))
-
-        counter_examples = [
-           d for d in complement if \
-           any(d.properties.get(key) == value for key, value in ppairs) and \
-           all(d.attributes.get(key) == value for key, value in apairs)
-        ]
-
-        assert counter_examples == []
+        _test_direct_and_complement(
+           context,
+           frozenset(enumeration),
+           lambda d: all(
+              d.attributes.get(key) == value for key, value in apairs
+           ) and any(
+              d.properties.get(key) == value for key, value in ppairs
+           )
+        )
 
     @given(
        _CONTEXT_STRATEGY,
@@ -504,22 +467,12 @@ class TestEnumeratorMatchCombinations(object):
               **kwargs
            )
         )
-        assert all(
-           device.subsystem == subsystem and device.sys_name == sysname and \
-           device.properties.get(prop_name) == prop_value \
-           for device in devices
+        _test_direct_and_complement(
+           context,
+           devices,
+           lambda d: d.subsystem == subsystem and d.sys_name == sysname and \
+              d.properties.get(prop_name) == prop_value
         )
-
-        all_devices = frozenset(context.list_devices())
-        complement = all_devices - devices
-
-        counter_examples = [
-           device for device in complement if \
-           device.subsystem == subsystem and device.sys_name == sysname and \
-           device.properties.get(prop_name) == prop_value
-        ]
-
-        assert counter_examples == []
 
 
 class TestEnumeratorMatchMethod(object):
