@@ -48,6 +48,14 @@ class Poll(object):
 
     @staticmethod
     def _has_event(events, event):
+        """
+        Whether events has event.
+
+        :param int events: a bit vector of events
+        :param int event: a single event
+        :returns: True if event is among events, otherwise False
+        :rtype: bool
+        """
         return events & event != 0
 
     @classmethod
@@ -59,11 +67,13 @@ class Poll(object):
         ``r``, listen for whether that is ready to be read.  If ``w``, listen
         for whether the channel is ready to be written to.
 
+        :returns: a Poll object set up to recognize the specified events
+        :rtype: Poll
         """
         notifier = eintr_retry_call(select.poll)
         for fd, event in events:
             mask = cls._EVENT_TO_MASK.get(event)
-            if not mask:
+            if mask is None:
                 raise ValueError('Unknown event type: {0!r}'.format(event))
             notifier.register(fd, mask)
         return cls(notifier)
@@ -94,7 +104,8 @@ class Poll(object):
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
-        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
+        events = eintr_retry_call(self._notifier.poll, timeout)
+        return list(self._parse_events(events))
 
     def _parse_events(self, events):
         """Parse ``events``.
@@ -102,7 +113,9 @@ class Poll(object):
         ``events`` is a list of events as returned by
         :meth:`select.poll.poll()`.
 
-        Yield all parsed events.
+        Yield all parsed events as tuple of file descriptor and char
+
+        :raises IOError: on select.POLLNVAL and select.POLLERR
 
         """
         for fd, event_mask in events:
