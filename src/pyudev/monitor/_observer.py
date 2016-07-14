@@ -129,8 +129,7 @@ class MonitorObserver(Thread):
 
     def run(self):
         self.monitor.start()
-        notifier = poll.Poll.for_events(
-            (self.monitor, 'r'), (self._stop_event.source, 'r'))
+        notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):
                 if file_descriptor == self._stop_event.source.fileno():
