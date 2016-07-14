@@ -107,9 +107,15 @@ class Poll(object):
         """
         for fd, event_mask in events:
             if self._has_event(event_mask, select.POLLNVAL):
-                raise IOError('File descriptor not open: {0!r}'.format(fd))
+                print("penguinland says the POLLNVAL fd was {} and the event_mask was {}"
+                      .format(fd, event_mask))
+                continue
+                #raise IOError('File descriptor not open: {0!r}'.format(fd))
             elif self._has_event(event_mask, select.POLLERR):
-                raise IOError('Error while polling fd: {0!r}'.format(fd))
+                print("penguinland says the POLLERR fd was {} and the event_mask was {}"
+                      .format(fd, event_mask))
+                continue
+                #raise IOError('Error while polling fd: {0!r}'.format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
                 yield fd, 'r'
