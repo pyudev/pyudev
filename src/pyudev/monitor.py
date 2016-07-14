@@ -354,7 +354,9 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
+        events = \
+           eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout)
+        if events:
             return self._receive_device()
         else:
             return None
@@ -515,6 +517,22 @@ class MonitorObserver(Thread):
         Thread.start(self)
 
     def run(self):
+        """
+        Observe the monitor.
+
+        Algorithm:
+        1. Start the monitor.
+        2. Set up an object to poll the monitor and for the stop event.
+        3. Do forever:
+           For each event in the Poll result:
+              If it's the stop signal stop.
+              If it's an event on the monitor, read devices from the monitor.
+                 Use a timeout of 0, because there is an event on the monitor
+                 or this code point would not have been reached.
+              If it is any other event, raise an EnvironmentError.
+
+        :raises EnvironmentError: if an unexpected event found
+        """
         self.monitor.start()
         notifier = poll.Poll.for_events(
             (self.monitor, 'r'), (self._stop_event.source, 'r'))
@@ -526,7 +544,11 @@ class MonitorObserver(Thread):
                     self._stop_event.source.close()
                     return
                 elif file_descriptor == self.monitor.fileno() and event == 'r':
-                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
+                    read_device = partial(
+                       eintr_retry_call,
+                       self.monitor.poll,
+                       timeout=0
+                    )
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
