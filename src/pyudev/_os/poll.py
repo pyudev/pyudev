@@ -35,6 +35,34 @@ import select
 from pyudev._util import eintr_retry_call
 
 
+class Status(object):
+    """
+    Status of polled fd.
+    """
+    pass
+
+
+class Ready(Status):
+    """
+    Fd is ready to be read.
+    """
+    pass
+Ready = Ready()
+
+
+class HungUp(Status):
+    """
+    Fd has hung up.
+    """
+    pass
+HungUp = HungUp()
+
+
+class Statuses(object):
+    READY = Ready
+    HUNGUP = HungUp
+
+
 class Poll(object):
     """A poll object.
 
@@ -87,9 +115,9 @@ class Poll(object):
 
         Return a list of all events that occurred before ``timeout``, where
         each event is a pair ``(fd, event)``. ``fd`` is the integral file
-        descriptor, and ``event`` a string indicating the event type.  If
-        ``'r'``, there is data to read from ``fd``.  If ``'h'``, the file
-        descriptor was hung up (i.e. the remote side of a pipe was closed).
+        descriptor, and ``event`` a Status object indicating the event type.
+
+        :rtype: list of tuple of file descriptor * Status
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
@@ -102,7 +130,7 @@ class Poll(object):
         ``events`` is a list of events as returned by
         :meth:`select.poll.poll()`.
 
-        Yield all parsed events as tuple of file descriptor and char
+        Yield all parsed events as tuple of file descriptor and Status
 
         :raises IOError: on select.POLLNVAL and select.POLLERR
 
@@ -114,6 +142,6 @@ class Poll(object):
                 raise IOError('Error while polling fd: {0!r}'.format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
-                yield fd, 'r'
+                yield fd, Statuses.READY
             if self._has_event(event_mask, select.POLLHUP):
-                yield fd, 'h'
+                yield fd, Statuses.HUNGUP
