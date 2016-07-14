@@ -131,18 +131,23 @@ class MonitorObserver(Thread):
         self.monitor.start()
         notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
         while True:
-            for file_descriptor, event in eintr_retry_call(notifier.poll):
+            for file_descriptor, status in eintr_retry_call(notifier.poll):
                 if file_descriptor == self._stop_event.source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno() and event == 'r':
-                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
-                    for device in iter(read_device, None):
-                        self._callback(device)
-                else:
-                    raise EnvironmentError('Observed monitor hung up')
+                elif file_descriptor == self.monitor.fileno():
+                    if status is poll.Statuses.READY:
+                        read_device = partial(
+                           eintr_retry_call,
+                           self.monitor.poll,
+                           timeout=0
+                        )
+                        for device in iter(read_device, None):
+                            self._callback(device)
+                    else:
+                        raise EnvironmentError('Observed monitor hung up')
 
     def send_stop(self):
         """
