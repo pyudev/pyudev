@@ -354,8 +354,7 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        events = \
-           eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout)
+        events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
         if events:
             return self._receive_device()
         else:
@@ -534,8 +533,7 @@ class MonitorObserver(Thread):
         :raises EnvironmentError: if an unexpected event found
         """
         self.monitor.start()
-        notifier = poll.Poll.for_events(
-            (self.monitor, 'r'), (self._stop_event.source, 'r'))
+        notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):
                 if file_descriptor == self._stop_event.source.fileno():
