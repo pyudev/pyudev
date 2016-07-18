@@ -843,7 +843,7 @@ class Device(Mapping):
         The system attributes of this device as read-only
         :class:`Attributes` mapping.
 
-        System attributes are basically normal files inside the the device
+        System attributes are basically normal files inside the device
         directory.  These files contain all sorts of information about the
         device, which may not be reflected by properties.  These attributes
         are commonly used for matching in udev rules, and can be printed
@@ -851,6 +851,9 @@ class Device(Mapping):
 
         The values of these attributes are not always proper strings, and
         can contain arbitrary bytes.
+
+        :returns: an Attributes object, useful for reading attributes
+        :rtype: Attributes
 
         .. versionadded:: 0.5
         """
