@@ -88,6 +88,7 @@ class Monitor(object):
         self._as_parameter_ = monitor_p
         self._libudev = context._libudev
         self._started = False
+        print("penguinland says this monitor's fd is {}".format(self.fileno()))
 
     def __del__(self):
         self._libudev.udev_monitor_unref(self)
