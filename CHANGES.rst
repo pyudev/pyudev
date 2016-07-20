@@ -1,3 +1,17 @@
+0.21.0 (July 20, 2016)
+======================
+
+- Deprecate use of Device object as mapping from udev property names to values.
+- Add a Properties class and a Device.properties() method for udev properties.
+- Fix places where Device object was incorrectly used in a boolean context.
+- Return an empty string, not None, if the property value is an empty string.
+- Exceptions re-raised from libudev calls now have a message string.
+- Insert a warning about using a Device in a boolean context in docs.
+- Infrastructure for vagrant tests is removed.
+- Various internal refactorings.
+- Extensive test improvements.
+- Numerous documentation fixes.
+
 0.20.0 (April 29, 2016)
 =======================
 
