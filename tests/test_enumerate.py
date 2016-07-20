@@ -182,8 +182,11 @@ class TestEnumerator(object):
         """
         key, value = pair
         devices = context.list_devices().match_property(key, int(value))
-        assert all(device[key] == value and device.asint(key) == int(value) \
-           for device in devices)
+        assert all(
+           device.properties[key] == value and \
+           device.properties.asint(key) == int(value) \
+           for device in devices
+        )
 
     @failed_health_check_wrapper
     @given(
@@ -200,7 +203,7 @@ class TestEnumerator(object):
         devices = context.list_devices().match_property(key, bool_value)
         assert all(
            device.properties[key] == value and \
-           device.asbool(key) == bool_value \
+           device.properties.asbool(key) == bool_value \
            for device in devices
         )
 

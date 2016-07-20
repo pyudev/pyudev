@@ -167,7 +167,7 @@ class TestDiscovery(object):
         Skip any devices that are multipath device paths because links
         may point to other paths in multipath group (rhbz#1263441).
         """
-        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device)
+        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
         links = TestUtilities.get_files(a_device)
         devs = frozenset(
            d for l in links for d in DeviceFileHypothesis.get_devices(
@@ -186,7 +186,7 @@ class TestDiscovery(object):
         """
         Grab any of the likely candidates for looking up a device.
         """
-        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device)
+        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
 
         values = list(TestUtilities.get_device_numbers(a_device, a_string))
         values.extend(TestUtilities.get_paths(a_device))

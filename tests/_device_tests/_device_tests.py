@@ -63,7 +63,7 @@ class TestDevice(object):
         assert a_device.parent is None or \
            isinstance(a_device.parent, Device)
 
-    _devices = [d for d in _DEVICES if d.parent]
+    _devices = [d for d in _DEVICES if d.parent is not None]
     @pytest.mark.skipif(len(_devices) == 0, reason='no device with a parent')
     @_UDEV_TEST(172, "test_child_of_parents")
     @given(strategies.sampled_from(_devices))
@@ -90,7 +90,7 @@ class TestDevice(object):
             assert ancestor == child.parent
             child = ancestor
 
-    _devices = [d for d in _DEVICES if d.find_parent(d.subsystem)]
+    _devices = [d for d in _DEVICES if d.find_parent(d.subsystem) is not None]
     @pytest.mark.skipif(
         len(_devices) == 0,
         reason='no device with a parent in the same subsystem'
@@ -329,10 +329,10 @@ class TestDevice(object):
     @settings(max_examples=5)
     def test_iteration(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for property in device:
+        for property in device.properties:
             assert is_unicode_string(property)
         # test that iteration really yields all properties
-        device_properties = set(device)
+        device_properties = set(device.properties)
         for property in device_datum.properties:
             assert property in device_properties
 
@@ -345,7 +345,7 @@ class TestDevice(object):
         """
         device = Devices.from_path(a_context, device_datum.device_path)
         assert frozenset(device_datum.properties.keys()) == \
-           frozenset(device.keys())
+           frozenset(device.properties.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=100)
@@ -355,7 +355,7 @@ class TestDevice(object):
         """
         device = Devices.from_path(a_context, device_datum.device_path)
         assert frozenset(device_datum.properties.keys()) <= \
-           frozenset(device.keys())
+           frozenset(device.properties.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=100)
@@ -363,13 +363,13 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
             if prop == 'DEVLINKS':
-                assert sorted(device[prop].split(),) == \
+                assert sorted(device.properties[prop].split(),) == \
                    sorted(device_datum.properties[prop].split(),)
             elif prop == 'TAGS':
-                assert sorted(device[prop].split(':'),) == \
+                assert sorted(device.properties[prop].split(':'),) == \
                    sorted(device_datum.properties[prop].split(':'),)
             else:
-                assert device[prop] == device_datum.properties[prop]
+                assert device.properties[prop] == device_datum.properties[prop]
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
     @pytest.mark.skipif(
@@ -382,7 +382,8 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         data_devname = os.path.join(
             a_context.device_path, device_datum.properties['DEVNAME'])
-        device_devname = os.path.join(a_context.device_path, device['DEVNAME'])
+        device_devname = \
+           os.path.join(a_context.device_path, device.properties['DEVNAME'])
         assert device_devname == data_devname
 
     @given(strategies.sampled_from(_DEVICES))
@@ -390,7 +391,7 @@ class TestDevice(object):
     def test_getitem_nonexisting(self, a_device):
         with pytest.raises(KeyError) as excinfo:
             # pylint: disable=pointless-statement
-            a_device['a non-existing property']
+            a_device.properties['a non-existing property']
         assert str(excinfo.value) == repr('a non-existing property')
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
@@ -402,9 +403,9 @@ class TestDevice(object):
                 value = int(value)
             except ValueError:
                 with pytest.raises(ValueError):
-                    device.asint(prop)
+                    device.properties.asint(prop)
             else:
-                assert device.asint(prop) == value
+                assert device.properties.asint(prop) == value
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -419,12 +420,12 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop, value in device_datum.properties.items():
             if value == '1':
-                assert device.asbool(prop)
+                assert device.properties.asbool(prop)
             elif value == '0':
-                assert not device.asbool(prop)
+                assert not device.properties.asbool(prop)
             else:
                 with pytest.raises(ValueError) as exc_info:
-                    device.asbool(prop)
+                    device.properties.asbool(prop)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -466,7 +467,8 @@ class TestDevice(object):
     _devices = [
        d for d in _DEVICES if \
           d.device_type == 'disk' and \
-          'ID_WWN_WITH_EXTENSION' in d and 'DM_MULTIPATH_TIMESTAMP' not in d
+          'ID_WWN_WITH_EXTENSION' in d.properties and \
+          'DM_MULTIPATH_TIMESTAMP' not in d.properties
     ]
     @pytest.mark.skipif(
         len(_devices) == 0,
@@ -484,7 +486,7 @@ class TestDevice(object):
         Skip any multipathed paths, see:
         https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
         """
-        id_wwn = a_device['ID_WWN_WITH_EXTENSION']
+        id_wwn = a_device.properties['ID_WWN_WITH_EXTENSION']
         assert a_device.subsystem == u'block'
 
         id_path = '/dev/disk/by-id'
