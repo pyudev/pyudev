@@ -27,7 +27,7 @@ from select import select
 import pytest
 import mock
 
-from pyudev import Monitor, MonitorObserver, Device
+from pyudev import Monitor, MonitorObserver, Devices
 
 from tests.utils.udev import DeviceDatabase
 
@@ -49,7 +49,7 @@ def monitor(request):
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
     device = random.choice(list(DeviceDatabase.db()))
-    return Device.from_path(context, device.device_path)
+    return Devices.from_path(context, device.device_path)
 
 
 @contextmanager

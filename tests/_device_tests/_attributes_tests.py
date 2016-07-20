@@ -36,7 +36,7 @@ from hypothesis import strategies
 
 import pytest
 
-from pyudev import Device
+from pyudev import Devices
 
 from ..utils import is_unicode_string
 
@@ -57,7 +57,7 @@ class TestAttributes(object):
         """
         Test that attribute value exists and is instance of bytes.
         """
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert all(isinstance(device.attributes.get(key), bytes) \
            for key in device_datum.attributes.keys())
 
@@ -94,7 +94,7 @@ class TestAttributes(object):
         """
         Test that attribute exists for actual device and is unicode.
         """
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert all(is_unicode_string(device.attributes.asstring(key)) \
            for key in device_datum.attributes.keys())
 
@@ -104,7 +104,7 @@ class TestAttributes(object):
         """
         Test that integer result is an int or ValueError raised.
         """
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for key, value in device_datum.attributes.items():
             try:
                 value = int(value)
@@ -118,7 +118,7 @@ class TestAttributes(object):
         """
         Test that bool result is a bool or ValueError raised.
         """
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         for key, value in device_datum.attributes.items():
             if value in ('0', '1'):
                 assert device.attributes.asbool(key) in (False, True)

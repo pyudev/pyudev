@@ -33,7 +33,7 @@ from hypothesis import strategies
 import pytest
 import mock
 
-from pyudev import Device
+from pyudev import Devices
 
 from ..utils import is_unicode_string
 
@@ -60,7 +60,7 @@ class TestTags(object):
         """
         Test that iteration yields all tags and contains checks them.
         """
-        device = Device.from_path(a_context, device_datum.device_path)
+        device = Devices.from_path(a_context, device_datum.device_path)
         assert frozenset(device.tags) == frozenset(device_datum.tags)
         assert all(is_unicode_string(tag) for tag in device.tags)
 

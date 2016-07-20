@@ -13,7 +13,7 @@ def main():
     Find a device which exists but which is not among devices listed.
     """
     context = pyudev.Context()
-    device = pyudev.Device.from_name(context, 'block', 'sda1')
+    device = pyudev.Devices.from_name(context, 'block', 'sda1')
     no_subsys_dev = None
     for dev in device.ancestors:
         try:

@@ -23,7 +23,7 @@ import random
 import pytest
 import mock
 
-from pyudev import Monitor, Device
+from pyudev import Monitor, Devices
 
 from tests.utils.udev import DeviceDatabase
 
@@ -36,7 +36,7 @@ def monitor(request):
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
     device = random.choice(list(DeviceDatabase.db()))
-    return Device.from_path(context, device.device_path)
+    return Devices.from_path(context, device.device_path)
 
 
 def test_fake_monitor(fake_monitor, fake_monitor_device):
@@ -117,7 +117,7 @@ class ObserverTestBase(object):
 
         # test add event
         self.start_event_loop(pytest.load_dummy)
-        device = Device.from_path(context, '/devices/virtual/net/dummy0')
+        device = Devices.from_path(context, '/devices/virtual/net/dummy0')
         event_callback.assert_called_with(device)
 
         event_callback.reset_mock()
