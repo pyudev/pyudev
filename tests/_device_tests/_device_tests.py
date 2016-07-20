@@ -329,12 +329,12 @@ class TestDevice(object):
     @settings(max_examples=5)
     def test_iteration(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for property in device.properties:
-            assert is_unicode_string(property)
+        for prop in device.properties:
+            assert is_unicode_string(prop)
         # test that iteration really yields all properties
         device_properties = set(device.properties)
-        for property in device_datum.properties:
-            assert property in device_properties
+        for prop in device_datum.properties:
+            assert prop in device_properties
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=100)
