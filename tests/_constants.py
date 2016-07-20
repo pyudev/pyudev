@@ -53,7 +53,7 @@ def _check_device(device):
         return False
 
 _DEVICE_DATA = udev.DeviceDatabase.db()
-_DEVICES = [Device.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
+_DEVICES = [Devices.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 
 _DEVICE_STRATEGY = strategies.sampled_from(_CONTEXT.list_devices())
 _DEVICE_STRATEGY = _DEVICE_STRATEGY.filter(_check_device)
