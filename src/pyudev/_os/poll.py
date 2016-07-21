@@ -35,37 +35,66 @@ import select
 from pyudev._util import eintr_retry_call
 
 
+class Status(object):
+    """
+    Status of polled fd.
+    """
+    pass
+
+
+class Ready(Status):
+    """
+    Fd is ready to be read.
+    """
+    pass
+Ready = Ready()
+
+
+class HungUp(Status):
+    """
+    Fd has hung up.
+    """
+    pass
+HungUp = HungUp()
+
+
+class Statuses(object):
+    READY = Ready
+    HUNGUP = HungUp
+
+
 class Poll(object):
     """A poll object.
 
     This object essentially provides a more convenient interface around
     :class:`select.poll`.
 
+    It polls file descriptors exclusively for POLLIN value.
     """
-
-    _EVENT_TO_MASK = {'r': select.POLLIN,
-                      'w': select.POLLOUT}
 
     @staticmethod
     def _has_event(events, event):
+        """
+        Whether events has event.
+
+        :param int events: a bit vector of events
+        :param int event: a single event
+        :returns: True if event is among events, otherwise False
+        :rtype: bool
+        """
         return events & event != 0
 
     @classmethod
-    def for_events(cls, *events):
-        """Listen for ``events``.
+    def for_events(cls, *fds):
+        """Listen for POLLIN events on ``fds``.
 
-        ``events`` is a list of ``(fd, event)`` pairs, where ``fd`` is a file
-        descriptor or file object and ``event`` either ``'r'`` or ``'w'``.  If
-        ``r``, listen for whether that is ready to be read.  If ``w``, listen
-        for whether the channel is ready to be written to.
-
+        :param fds: a list of file descriptors
+        :returns: a Poll object set up to recognize the specified events
+        :rtype: Poll
         """
         notifier = eintr_retry_call(select.poll)
-        for fd, event in events:
-            mask = cls._EVENT_TO_MASK.get(event)
-            if not mask:
-                raise ValueError('Unknown event type: {0!r}'.format(event))
-            notifier.register(fd, mask)
+        for fd in fds:
+            notifier.register(fd, select.POLLIN)
         return cls(notifier)
 
     def __init__(self, notifier):
@@ -86,15 +115,14 @@ class Poll(object):
 
         Return a list of all events that occurred before ``timeout``, where
         each event is a pair ``(fd, event)``. ``fd`` is the integral file
-        descriptor, and ``event`` a string indicating the event type.  If
-        ``'r'``, there is data to read from ``fd``.  If ``'w'``, ``fd`` is
-        writable without blocking now.  If ``'h'``, the file descriptor was
-        hung up (i.e. the remote side of a pipe was closed).
+        descriptor, and ``event`` a Status object indicating the event type.
 
+        :rtype: list of tuple of file descriptor * Status
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
-        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
+        events = eintr_retry_call(self._notifier.poll, timeout)
+        return list(self._parse_events(events))
 
     def _parse_events(self, events):
         """Parse ``events``.
@@ -102,7 +130,9 @@ class Poll(object):
         ``events`` is a list of events as returned by
         :meth:`select.poll.poll()`.
 
-        Yield all parsed events.
+        Yield all parsed events as tuple of file descriptor and Status
+
+        :raises IOError: on select.POLLNVAL and select.POLLERR
 
         """
         for fd, event_mask in events:
@@ -112,8 +142,6 @@ class Poll(object):
                 raise IOError('Error while polling fd: {0!r}'.format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
-                yield fd, 'r'
-            if self._has_event(event_mask, select.POLLOUT):
-                yield fd, 'w'
+                yield fd, Statuses.READY
             if self._has_event(event_mask, select.POLLHUP):
-                yield fd, 'h'
+                yield fd, Statuses.HUNGUP
