@@ -48,9 +48,7 @@ REQUIRED_BLACKLIST = [
     r'^\.git.+',
     r'\.travis\.yml$',
     r'^MANIFEST\.in$',
-    r'^Makefile$',
-    r'^Vagrantfile$',
-    r'^vagrant/provision.sh$',
+    r'^Makefile$'
 ]
 
 

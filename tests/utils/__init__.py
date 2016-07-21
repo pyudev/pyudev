@@ -24,7 +24,7 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import libudev
 from . import udev
 
+from .misc import failed_health_check_wrapper
 from .misc import is_unicode_string

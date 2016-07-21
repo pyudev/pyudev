@@ -21,7 +21,7 @@ from __future__ import (print_function, division, unicode_literals,
 import pytest
 import mock
 
-from pyudev import Monitor, Device
+from pyudev import Monitor, Devices
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    return Device.from_path(context, '/devices/platform')
+    return Devices.from_path(context, '/devices/platform')
 
 
 ACTIONS = ('add', 'remove', 'change', 'move')
@@ -123,7 +123,7 @@ class DeprecatedObserverTestBase(object):
 
         # test add event
         self.start_event_loop(pytest.load_dummy)
-        device = Device.from_path(context, '/devices/virtual/net/dummy0')
+        device = Devices.from_path(context, '/devices/virtual/net/dummy0')
         event_callback.assert_called_with('add', device)
         added_callback.assert_called_with(device)
         assert not removed_callback.called

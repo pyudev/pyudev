@@ -39,6 +39,7 @@ import random
 import subprocess
 from collections import Iterable, Sized
 
+
 class UDevAdm(object):
     """
     Wrap ``udevadm`` utility.
@@ -101,6 +102,11 @@ class UDevAdm(object):
         return int(self._execute('--version'))
 
     def _execute(self, *args):
+        """
+        Execute a udevadm command.
+
+        :raises CalledProcessError:
+        """
         command = [self.udevadm] + list(args)
         proc = subprocess.Popen(command, stdout=subprocess.PIPE)
         output = proc.communicate()[0].strip()
@@ -109,34 +115,49 @@ class UDevAdm(object):
         return output
 
     def _execute_query(self, device_path, query_type='all'):
+        """
+        Execute a "udevadm info" query.
+
+        :raises CalledProcessError:
+        """
         output = self._execute('info', '--root', '--path', device_path,
                                '--query', query_type)
         return output.decode(sys.getfilesystemencoding())
 
     def query_devices(self):
+        """
+        Generate devices from udevadm database.
+
+        Yields sys paths, minus the initial '/sys'.
+
+        :raises CalledProcessError:
+        """
         database = self._execute('info', '--export-db').decode(
             sys.getfilesystemencoding()).splitlines()
-        for line in database:
-            line = line.strip()
-            if not line:
-                continue
-            typ, value = line.split(': ', 1)
-            if typ == 'P':
-                yield value
+
+        return (l[3:] for l in (l.strip() for l in database) if l[:3] == "P: ")
 
     def query_device_properties(self, device_path):
         """
-            Return map of properties.
+        Return map of properties.
 
-            :returns: a map of properties on the device
-            :rtype: dict of str * str
+        :returns: a map of properties on the device
+        :rtype: dict of str * str
+
+        :raises CalledProcessError:
         """
-        properties = {}
-        for line in self._execute_query(device_path, 'property').splitlines():
-            line = line.strip()
-            prop, value = line.split('=', 1)
-            properties[prop] = value
-        return properties
+        pairs = [
+           l.strip().split('=', 1) for l in \
+              self._execute_query(device_path, 'property').splitlines()
+        ]
+
+        if self.adm().query_udev_version() < 230:
+            num_pairs = len(pairs)
+            indices = [i for i in range(num_pairs) if pairs[i][1] == ""]
+            pairs = [pairs[i] for i in range(num_pairs) if \
+               i not in indices and i - 1 not in indices]
+
+        return dict(pairs)
 
     def query_device_attributes(self, device_path):
         output = self._execute(
@@ -186,6 +207,16 @@ class DeviceData(object):
         Get the ``sysfs`` path of the device.
         """
         return '/sys' + self.device_path
+
+    @property
+    def exists(self):
+        """
+        Whether this device has some real existance on machine.
+
+        :returns: True if the device does exist, otherwise False.
+        :rtype: bool
+        """
+        return os.path.exists(self.sys_path)
 
     @property
     def properties(self):
@@ -280,10 +311,13 @@ class DeviceDatabase(Iterable, Sized):
         self._devices = set(self._udevadm.query_devices())
 
     def __iter__(self):
-        return (DeviceData(d, self._udevadm) for d in self._devices)
+        return (
+           d for d in (DeviceData(d, self._udevadm) for d in self._devices) \
+              if d.exists
+        )
 
     def __len__(self):
-        return len(self._devices)
+        return sum(1 for _ in self)
 
     def find_device_data(self, device_path):
         """
@@ -294,32 +328,5 @@ class DeviceDatabase(Iterable, Sized):
         Return a :class:`DeviceData` object containing the data for the given
         device, or ``None`` if the device was not found.
         """
-        if device_path in self._devices:
-            return DeviceData(device_path, self._udevadm)
-        else:
-            return None
-
-def get_device_sample(udev_database, device=None, sample_size=None):
-    """
-    Compute a sample of the udev device database.
-
-    :param udev_database: the udev database
-    :param device: the unique device to compute the data for
-    :param sample_size: the size of the sample to compute
-    :type sample_size: int or NoneType
-    :returns: a sample of udev devices
-    :rtype: list of :class:`DeviceData`
-    :raises ValueError: if the specified device does not exist
-
-    If no sample size and no device specified, returns all devices.
-    """
-    if device is not None:
-        device_data = udev_database.find_device_data(device)
-        if not device_data:
-            raise ValueError('{0} does not exist'.format(device))
-        return [device_data]
-    elif sample_size is not None:
-        actual_size = min(sample_size, len(udev_database))
-        return random.sample(list(udev_database), actual_size)
-    else:
-        return list(udev_database)
+        data = DeviceData(device_path, self._udevadm)
+        return data if data.exists and data in self else None

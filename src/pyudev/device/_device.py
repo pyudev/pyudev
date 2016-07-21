@@ -243,7 +243,7 @@ class Devices(object):
               d.attributes.get('ifindex') == ifindex),
            None
         )
-        if dev:
+        if dev is not None:
             return dev
         else:
             raise DeviceNotFoundByInterfaceIndexError(ifindex)
@@ -525,7 +525,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         parent = self.parent
-        while parent:
+        while parent is not None:
             yield parent
             parent = parent.parent
 
@@ -677,7 +677,7 @@ class Device(Mapping):
         .. versionadded:: 0.5
         """
         driver = self._libudev.udev_device_get_driver(self)
-        return ensure_unicode_string(driver) if driver else None
+        return ensure_unicode_string(driver) if driver is not None else None
 
     @property
     def device_node(self):
@@ -698,7 +698,7 @@ class Device(Mapping):
            :meth:`from_device_file()`.
         """
         node = self._libudev.udev_device_get_devnode(self)
-        return ensure_unicode_string(node) if node else None
+        return ensure_unicode_string(node) if node is not None else None
 
     @property
     def device_number(self):
@@ -825,7 +825,7 @@ class Device(Mapping):
         .. versionadded:: 0.16
         """
         action = self._libudev.udev_device_get_action(self)
-        return ensure_unicode_string(action) if action else None
+        return ensure_unicode_string(action) if action is not None else None
 
     @property
     def sequence_number(self):
@@ -859,6 +859,15 @@ class Device(Mapping):
         # Attributes, because Attributes refers to this object through
         # Attributes.device.
         return Attributes(self)
+
+    @property
+    def properties(self):
+        """
+        The udev properties of this object as read-only Properties mapping.
+
+        .. versionadded:: 0.21
+        """
+        return Properties(self)
 
     @property
     def tags(self):
@@ -898,8 +907,153 @@ class Device(Mapping):
 
         Return a generator yielding the names of all properties of this
         device as unicode strings.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
         """
-        properties = self._libudev.udev_device_get_properties_list_entry(self)
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__iter__()
+
+    def __len__(self):
+        """
+        Return the amount of properties defined for this device as integer.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
+        """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__len__()
+
+    def __getitem__(self, prop):
+        """
+        Get the given property from this device.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as unicode string, or raise a
+        :exc:`~exceptions.KeyError`, if the given property is not defined
+        for this device.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Access properties with Device.properties.
+        """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Access properties with Device.properties.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.__getitem__(prop)
+
+    def asint(self, prop):
+        """
+        Get the given property from this device as integer.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return the property value as integer. Raise a
+        :exc:`~exceptions.KeyError`, if the given property is not defined
+        for this device, or a :exc:`~exceptions.ValueError`, if the property
+        value cannot be converted to an integer.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Use Device.properties.asint() instead.
+        """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.properties.asint instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.asint(prop)
+
+    def asbool(self, prop):
+        """
+        Get the given property from this device as boolean.
+
+        A boolean property has either a value of ``'1'`` or of ``'0'``,
+        where ``'1'`` stands for ``True``, and ``'0'`` for ``False``.  Any
+        other value causes a :exc:`~exceptions.ValueError` to be raised.
+
+        ``prop`` is a unicode or byte string containing the name of the
+        property.
+
+        Return ``True``, if the property value is ``'1'`` and ``False``, if
+        the property value is ``'0'``.  Any other value raises a
+        :exc:`~exceptions.ValueError`.  Raise a :exc:`~exceptions.KeyError`,
+        if the given property is not defined for this device.
+
+        .. deprecated:: 0.21
+           Will be removed in 1.0. Use Device.properties.asbool() instead.
+        """
+        import warnings
+        warnings.warn(
+           'Will be removed in 1.0. Use Device.properties.asbool instead.',
+           DeprecationWarning,
+           stacklevel=2
+        )
+        return self.properties.asbool(prop)
+
+    def __hash__(self):
+        return hash(self.device_path)
+
+    def __eq__(self, other):
+        if isinstance(other, Device):
+            return self.device_path == other.device_path
+        else:
+            return self.device_path == other
+
+    def __ne__(self, other):
+        if isinstance(other, Device):
+            return self.device_path != other.device_path
+        else:
+            return self.device_path != other
+
+    def __gt__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __lt__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __le__(self, other):
+        raise TypeError('Device not orderable')
+
+    def __ge__(self, other):
+        raise TypeError('Device not orderable')
+
+
+class Properties(Mapping):
+    """
+    udev properties :class:`Device` objects.
+
+    .. versionadded:: 0.21
+    """
+
+    def __init__(self, device):
+        self.device = device
+        self._libudev = device._libudev
+
+    def __iter__(self):
+        """
+        Iterate over the names of all properties defined for the device.
+
+        Return a generator yielding the names of all properties of this
+        device as unicode strings.
+        """
+        properties = \
+           self._libudev.udev_device_get_properties_list_entry(self.device)
         for name, _ in udev_list_iterate(self._libudev, properties):
             yield ensure_unicode_string(name)
 
@@ -907,7 +1061,8 @@ class Device(Mapping):
         """
         Return the amount of properties defined for this device as integer.
         """
-        properties = self._libudev.udev_device_get_properties_list_entry(self)
+        properties = \
+           self._libudev.udev_device_get_properties_list_entry(self.device)
         return sum(1 for _ in udev_list_iterate(self._libudev, properties))
 
     def __getitem__(self, prop):
@@ -922,7 +1077,9 @@ class Device(Mapping):
         for this device.
         """
         value = self._libudev.udev_device_get_property_value(
-            self, ensure_byte_string(prop))
+           self.device,
+           ensure_byte_string(prop)
+        )
         if value is None:
             raise KeyError(prop)
         return ensure_unicode_string(value)
@@ -958,33 +1115,6 @@ class Device(Mapping):
         if the given property is not defined for this device.
         """
         return string_to_bool(self[prop])
-
-    def __hash__(self):
-        return hash(self.device_path)
-
-    def __eq__(self, other):
-        if isinstance(other, Device):
-            return self.device_path == other.device_path
-        else:
-            return self.device_path == other
-
-    def __ne__(self, other):
-        if isinstance(other, Device):
-            return self.device_path != other.device_path
-        else:
-            return self.device_path != other
-
-    def __gt__(self, other):
-        raise TypeError('Device not orderable')
-
-    def __lt__(self, other):
-        raise TypeError('Device not orderable')
-
-    def __le__(self, other):
-        raise TypeError('Device not orderable')
-
-    def __ge__(self, other):
-        raise TypeError('Device not orderable')
 
 
 class Attributes(object):

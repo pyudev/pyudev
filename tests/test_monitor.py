@@ -18,6 +18,7 @@
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
+import random
 
 from datetime import datetime, timedelta
 from contextlib import contextmanager
@@ -26,10 +27,9 @@ from select import select
 import pytest
 import mock
 
-from pyudev import Monitor, MonitorObserver, Device
+from pyudev import Monitor, MonitorObserver, Devices
 
 from tests.utils.udev import DeviceDatabase
-from tests.utils.udev import get_device_sample
 
 from tests._constants import _UDEV_TEST
 
@@ -48,8 +48,8 @@ def monitor(request):
 @pytest.fixture
 def fake_monitor_device(request):
     context = request.getfuncargvalue('context')
-    device = get_device_sample(DeviceDatabase.db(), sample_size=1)[0]
-    return Device.from_path(context, device.device_path)
+    device = random.choice(list(DeviceDatabase.db()))
+    return Devices.from_path(context, device.device_path)
 
 
 @contextmanager

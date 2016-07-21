@@ -29,7 +29,13 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from functools import wraps
+
 import six
+
+import pytest
+
+from hypothesis.core import FailedHealthCheck
 
 
 def is_unicode_string(value):
@@ -38,3 +44,28 @@ def is_unicode_string(value):
     (``unicode`` in python 2, ``str`` in python 3), ``False`` otherwise.
     """
     return isinstance(value, unicode if six.PY2 else str)
+
+def failed_health_check_wrapper(func):
+    """
+    If the test fails a health check, calls skip().
+    """
+
+    @wraps(func)
+    def the_func(*args):
+        """
+        Catch a hypothesis FailedHealthCheck exception and log it as a skip.
+        """
+        try:
+            func(*args)
+        except FailedHealthCheck:
+            func_code = six.get_function_code(func)
+            pytest.skip(
+               'failed health check for %s() (%s: %s)' % \
+               (
+                  func_code.co_name,
+                  func_code.co_filename,
+                  func_code.co_firstlineno
+               )
+            )
+
+    return the_func
