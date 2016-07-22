@@ -65,13 +65,43 @@ class HungUp(Status):
 HungUp = HungUp() # pylint: disable=invalid-name
 
 
+class NotOpen(Status):
+    """
+    Fd descriptor is not open.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+NotOpen = NotOpen() # pylint: disable=invalid-name
+
+
+class Error(Status):
+    """
+    An error condition of some sort.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+Error = Error() # pylint: disable=invalid-name
+
+
+class Unknown(Status):
+    """
+    An unknown status.
+    """
+    # pylint: disable=too-few-public-methods
+    pass
+Unknown = Unknown() # pylint: disable=invalid-name
+
+
 class Statuses(object):
     """
     Statuses for file descriptor.
     """
     # pylint: disable=too-few-public-methods
-    READY = Ready
+    ERROR = Error
     HUNGUP = HungUp
+    NOTOPEN = NotOpen
+    READY = Ready
+    UNKNOWN = Unknown
 
 
 class Poll(object):
@@ -147,12 +177,31 @@ class Poll(object):
 
         """
         for fd, event_mask in events:
-            if self._has_event(event_mask, select.POLLNVAL):
+            status = self._parse_event_mask(event_mask)
+            if status is Statuses.NOTOPEN:
                 raise IOError('File descriptor not open: {0!r}'.format(fd))
-            elif self._has_event(event_mask, select.POLLERR):
+            elif status is Statuses.ERROR:
                 raise IOError('Error while polling fd: {0!r}'.format(fd))
 
-            if self._has_event(event_mask, select.POLLIN):
-                yield fd, Statuses.READY
-            if self._has_event(event_mask, select.POLLHUP):
-                yield fd, Statuses.HUNGUP
+            if status in (Statuses.HUNGUP, Statuses.READY):
+                yield fd, status
+
+    def _parse_event_mask(self, mask):
+        """
+        Parse an event mask.
+
+        :param int mask: the mask indicating events
+        :returns: the most important aspect of the status
+        :rtype: Status
+        """
+        if self._has_event(mask, select.POLLNVAL):
+            return Statuses.NOTOPEN
+        elif self._has_event(mask, select.POLLERR):
+            return Statuses.ERROR
+
+        if self._has_event(mask, select.POLLIN):
+            return Statuses.READY
+        if self._has_event(mask, select.POLLHUP):
+            return Statuses.HUNGUP
+
+        return Statuses.UNKNOWN
