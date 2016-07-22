@@ -61,7 +61,7 @@ from pyudev.core import Context
 from pyudev.core import Enumerator
 
 from pyudev.monitor import Monitor
-from pyudev.monitor import MonitorObserver
+from pyudev.observer import MonitorObserver
 
 from pyudev.version import __version__
 from pyudev.version import __version_info__
