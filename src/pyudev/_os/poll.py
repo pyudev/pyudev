@@ -159,28 +159,7 @@ class Poll(object):
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
         events = eintr_retry_call(self._notifier.poll, timeout)
-        return list(self._parse_events(events))
-
-    def _parse_events(self, events):
-        """Parse ``events``.
-
-        ``events`` is a list of events as returned by
-        :meth:`select.poll.poll()`.
-
-        Yield all parsed events as tuple of file descriptor and Status
-
-        :raises IOError: on select.POLLNVAL and select.POLLERR
-
-        """
-        for fd, event_mask in events:
-            status = self._parse_event_mask(event_mask)
-            if status is Statuses.NOTOPEN:
-                raise IOError('File descriptor not open: {0!r}'.format(fd))
-            elif status is Statuses.ERROR:
-                raise IOError('Error while polling fd: {0!r}'.format(fd))
-
-            if status in (Statuses.HUNGUP, Statuses.READY):
-                yield fd, status
+        return [(fd, self._parse_event_mask(mask)) for (fd, mask) in events]
 
     def _parse_event_mask(self, mask):
         """
