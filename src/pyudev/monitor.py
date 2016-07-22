@@ -537,14 +537,15 @@ class MonitorObserver(Thread):
               If it's an event on the monitor, read devices from the monitor.
                  Use a timeout of 0, because there is an event on the monitor
                  or this code point would not have been reached.
-              If it is any other event, raise an EnvironmentError.
+              If it is any other event, raise an error. 
 
-        :raises EnvironmentError: if an unexpected event found
+        :raises DeviceMonitorError: if an unexpected event found
         """
         self.monitor.start()
         notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
         while True:
-            for file_descriptor, status in eintr_retry_call(notifier.poll):
+            entries = eintr_retry_call(notifier.poll)
+            for file_descriptor, status in entries:
                 if file_descriptor == self._stop_event.source.fileno():
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
@@ -557,10 +558,13 @@ class MonitorObserver(Thread):
                            self.monitor.poll,
                            timeout=0
                         )
-                        for device in iter(read_device, None):
-                            self._callback(device)
+                        try:
+                            for device in iter(read_device, None):
+                                self._callback(device)
+                        except DeviceMonitorError:
+                            raise # FIXME: fixup the monitor
                     else:
-                        raise EnvironmentError('Observed monitor hung up')
+                        raise DeviceMonitorError() # FIXME
 
     def send_stop(self):
         """
