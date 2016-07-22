@@ -284,15 +284,15 @@ filesystems to a file, for example:
 
 >>> monitor = pyudev.Monitor.from_netlink(context)
 >>> monitor.filter_by('block')
->>> def log_event(action, device):
+>>> def log_event(device):
 ...    if 'ID_FS_TYPE' in device.properties:
 ...        with open('filesystems.log', 'a+') as stream:
-...            print('{0} - {1}'.format(action, device.get('ID_FS_LABEL')), file=stream)
+...            print('{0} - {1}'.format(device.action, device.get('ID_FS_LABEL')), file=stream)
 ...
->>> observer = pyudev.MonitorObserver(monitor, log_event)
+>>> observer = pyudev.MonitorObserver(monitor, callback=log_event)
 >>> observer.start()
 
-The ``observer`` gets an event handler (``log_event()`` in this case) which is
+The ``observer`` gets a callback (``log_event()`` in this case) which is
 asynchronously invoked on every event emitted by the underlying ``monitor``
 after the observer has been started using :meth:`~threading.Thread.start()`.
 
