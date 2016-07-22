@@ -37,13 +37,13 @@ from collections import Iterable
 from collections import Mapping
 from datetime import timedelta
 
-from pyudev.device._errors import DeviceNotFoundAtPathError
-from pyudev.device._errors import DeviceNotFoundByFileError
-from pyudev.device._errors import DeviceNotFoundByInterfaceIndexError
-from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
-from pyudev.device._errors import DeviceNotFoundByNameError
-from pyudev.device._errors import DeviceNotFoundByNumberError
-from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+from pyudev._errors import DeviceNotFoundAtPathError
+from pyudev._errors import DeviceNotFoundByFileError
+from pyudev._errors import DeviceNotFoundByInterfaceIndexError
+from pyudev._errors import DeviceNotFoundByKernelDeviceError
+from pyudev._errors import DeviceNotFoundByNameError
+from pyudev._errors import DeviceNotFoundByNumberError
+from pyudev._errors import DeviceNotFoundInEnvironmentError
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
