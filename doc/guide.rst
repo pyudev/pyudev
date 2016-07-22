@@ -140,12 +140,11 @@ object.  For instance, you can directly query the :attr:`device_node` and the
 /dev/sda2 (partition)
 /dev/sda3 (partition)
 
-For all other properties, :class:`Device` provides a dictionary-like interface
-to directly access the device properties.  You'll get the same information as
-with the generic properties:
+For other udev properties, :class:`Device` provides a mapping interface
+to access the device properties by means of its properties attribute.
 
 >>> for device in context.list_devices(subsystem='block'):
-...    print('{0} ({1})'.format(device['DEVNAME'], device['DEVTYPE']))
+...    print('{0} ({1})'.format(device.properties['DEVNAME'], device.properties['DEVTYPE']))
 ...
 /dev/sr0 (disk)
 /dev/sda (disk)
@@ -171,7 +170,7 @@ like the filesystem type.  :class:`Device` provides a convenient mapping
 interface for this purpose:
 
 >>> for device in context.list_devices(subsystem='block', DEVTYPE='partition'):
-...     print('{0} ({1})'.format(device.device_node, device.get('ID_FS_TYPE')))
+...     print('{0} ({1})'.format(device.device_node, device.properties.get('ID_FS_TYPE')))
 ...
 /dev/sda1 (ext3)
 /dev/sda2 (swap)
@@ -286,7 +285,7 @@ filesystems to a file, for example:
 >>> monitor = pyudev.Monitor.from_netlink(context)
 >>> monitor.filter_by('block')
 >>> def log_event(action, device):
-...    if 'ID_FS_TYPE' in device:
+...    if 'ID_FS_TYPE' in device.properties:
 ...        with open('filesystems.log', 'a+') as stream:
 ...            print('{0} - {1}'.format(action, device.get('ID_FS_LABEL')), file=stream)
 ...
