@@ -19,7 +19,7 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	PYTHONPATH=src pylint src/pyudev reproducers/*.py \
+	PYTHONPATH=src pylint src/pyudev \
 		--reports=no \
 		--disable=I \
 		--disable=bad-continuation \
