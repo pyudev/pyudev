@@ -93,6 +93,10 @@ Unknown = Unknown() # pylint: disable=invalid-name
 
 
 class Statuses(object):
+    """
+    All available elements of type Status.
+    """
+    # pylint: disable=too-few-public-methods
     ERROR = Error
     HUNGUP = HungUp
     NOTOPEN = NotOpen
