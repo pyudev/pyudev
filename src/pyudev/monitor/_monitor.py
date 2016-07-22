@@ -353,11 +353,12 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
+
         events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
-        if events:
-            return self._receive_device()
-        else:
+        if events == []:
             return None
+        else:
+            return self._receive_device()
 
     def receive_device(self):
         """
