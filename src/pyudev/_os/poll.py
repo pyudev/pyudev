@@ -159,9 +159,11 @@ class Poll(object):
         descriptor, and ``event`` a Status object indicating the event type.
 
         :rtype: list of tuple of file descriptor * Status
+
+        The number of the elements in the list is at most the number of file
+        descriptors registered with this object. Some file descriptors
+        may not have any events associated with them.
         """
-        # Return a list to allow clients to determine whether there are any
-        # events at all with a simple truthiness test.
         events = eintr_retry_call(self._notifier.poll, timeout)
         return [(fd, self._parse_event_mask(mask)) for (fd, mask) in events]
 
