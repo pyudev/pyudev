@@ -36,6 +36,8 @@ from functools import partial
 
 from pyudev.device import Device
 
+from pyudev._errors import DeviceMonitorError
+
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
 
@@ -340,6 +342,8 @@ class Monitor(object):
         occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
         failed.
 
+        :raises DeviceMonitorError:
+
         .. seealso::
 
            :attr:`Device.action`
@@ -358,8 +362,12 @@ class Monitor(object):
         events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
         if events == []:
             return None
-        else:
+
+        _, status = events[0]
+        if status is poll.Statuses.READY:
             return self._receive_device()
+        else:
+            raise DeviceMonitorError()
 
     def receive_device(self):
         """
