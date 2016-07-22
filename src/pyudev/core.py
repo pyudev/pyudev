@@ -30,7 +30,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 from pyudev.device import Devices
-from pyudev.device._errors import DeviceNotFoundAtPathError
+from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._ctypeslib.libudev import ERROR_CHECKERS
 from pyudev._ctypeslib.libudev import SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library

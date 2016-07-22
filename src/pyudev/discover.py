@@ -36,8 +36,9 @@ import os
 import re
 import six
 
+from pyudev._errors import DeviceNotFoundError
+
 from pyudev.device import Devices
-from pyudev.device import DeviceNotFoundError
 
 
 def wrap_exception(func):
