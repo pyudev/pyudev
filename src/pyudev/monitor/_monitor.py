@@ -35,11 +35,15 @@ import errno
 
 from pyudev.device import Device
 
+from pyudev._errors import DeviceMonitorError
+
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
 
 from pyudev._os import pipe
 from pyudev._os import poll
+
+from ._shared import poll_err_str
 
 
 class Monitor(object):
@@ -339,6 +343,8 @@ class Monitor(object):
         occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
         failed.
 
+        :raises DeviceMonitorError:
+
         .. seealso::
 
            :attr:`Device.action`
@@ -349,6 +355,7 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
+
         if timeout is not None and timeout > 0:
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
@@ -357,8 +364,12 @@ class Monitor(object):
         events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
         if events == []:
             return None
-        else:
+
+        fd, status = events[0]
+        if status is poll.Statuses.READY:
             return self._receive_device()
+        else:
+            raise DeviceMonitorError(poll_err_str(fd, status))
 
     def receive_device(self):
         """
