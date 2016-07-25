@@ -38,6 +38,10 @@ from pyudev._util import eintr_retry_call
 from pyudev._os import pipe
 from pyudev._os import poll
 
+from pyudev._errors import DeviceMonitorError
+
+from ._shared import poll_err_str
+
 
 class MonitorObserver(Thread):
     """
@@ -147,7 +151,8 @@ class MonitorObserver(Thread):
                         for device in iter(read_device, None):
                             self._callback(device)
                     else:
-                        raise EnvironmentError('Observed monitor hung up')
+                        msg = poll_err_str(file_descriptor, status)
+                        raise DeviceMonitorError(msg)
 
     def send_stop(self):
         """
