@@ -30,6 +30,8 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import select
+
 from threading import Thread
 from functools import partial
 
@@ -137,12 +139,17 @@ class MonitorObserver(Thread):
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno() and event == 'r':
-                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
-                    for device in iter(read_device, None):
-                        self._callback(device)
-                else:
-                    raise EnvironmentError('Observed monitor hung up')
+                elif file_descriptor == self.monitor.fileno():
+                    if event == select.POLLIN:
+                        read_device = partial(
+                           eintr_retry_call,
+                           self.monitor.poll,
+                           timeout=0
+                        )
+                        for device in iter(read_device, None):
+                            self._callback(device)
+                    else:
+                        raise EnvironmentError('Monitor problem.')
 
     def send_stop(self):
         """

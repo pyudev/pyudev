@@ -44,10 +44,6 @@ class Poll(object):
     It polls file descriptors exclusively for POLLIN value.
     """
 
-    @staticmethod
-    def _has_event(events, event):
-        return events & event != 0
-
     @classmethod
     def for_events(cls, *fds):
         """Listen for POLLIN events on ``fds``.
@@ -79,30 +75,6 @@ class Poll(object):
 
         Return a list of all events that occurred before ``timeout``, where
         each event is a pair ``(fd, event)``. ``fd`` is the integral file
-        descriptor, and ``event`` a string indicating the event type.  If
-        ``'r'``, there is data to read from ``fd``.  If ``'h'``, the file
-        descriptor was hung up (i.e. the remote side of a pipe was closed).
+        descriptor, and ``event`` a bitmask indicating the event type.
         """
-        # Return a list to allow clients to determine whether there are any
-        # events at all with a simple truthiness test.
-        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
-
-    def _parse_events(self, events):
-        """Parse ``events``.
-
-        ``events`` is a list of events as returned by
-        :meth:`select.poll.poll()`.
-
-        Yield all parsed events.
-
-        """
-        for fd, event_mask in events:
-            if self._has_event(event_mask, select.POLLNVAL):
-                raise IOError('File descriptor not open: {0!r}'.format(fd))
-            elif self._has_event(event_mask, select.POLLERR):
-                raise IOError('Error while polling fd: {0!r}'.format(fd))
-
-            if self._has_event(event_mask, select.POLLIN):
-                yield fd, 'r'
-            if self._has_event(event_mask, select.POLLHUP):
-                yield fd, 'h'
+        return eintr_retry_call(self._notifier.poll, timeout)
