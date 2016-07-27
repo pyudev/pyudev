@@ -132,14 +132,16 @@ class MonitorObserver(Thread):
     def run(self):
         self.monitor.start()
         notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
+        stop_event_fileno = self._stop_event.source.fileno()
+        monitor_fileno = self.monitor.fileno()
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):
-                if file_descriptor == self._stop_event.source.fileno():
+                if file_descriptor == stop_event_fileno:
                     # in case of a stop event, close our pipe side, and
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno():
+                elif file_descriptor == monitor_fileno:
                     if event == select.POLLIN:
                         read_device = partial(
                            eintr_retry_call,
