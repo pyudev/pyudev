@@ -129,6 +129,23 @@ class MonitorObserver(Thread):
             self._stop_event = pipe.Pipe.open()
         Thread.start(self)
 
+    def _handle_monitor(self, fd, mask):
+        """
+        Handle a poll event on the monitor.
+
+        :param fd: file descriptor for the monitor
+        :param int event: the event mask (from select)
+
+        :raises EnvironmentError: if mask not equal to POLLIN
+        """
+        if mask == select.POLLIN:
+            read_device = \
+               partial(eintr_retry_call, self.monitor.poll, timeout=0)
+            for device in iter(read_device, None):
+                self._callback(device)
+        else:
+            raise EnvironmentError('Monitor problem.')
+
     def run(self):
         self.monitor.start()
         notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
@@ -142,16 +159,7 @@ class MonitorObserver(Thread):
                     self._stop_event.source.close()
                     return
                 elif file_descriptor == monitor_fileno:
-                    if event == select.POLLIN:
-                        read_device = partial(
-                           eintr_retry_call,
-                           self.monitor.poll,
-                           timeout=0
-                        )
-                        for device in iter(read_device, None):
-                            self._callback(device)
-                    else:
-                        raise EnvironmentError('Monitor problem.')
+                    self._handle_monitor(file_descriptor, event)
 
     def send_stop(self):
         """
