@@ -40,6 +40,8 @@ from pyudev._util import eintr_retry_call
 from pyudev._os import pipe
 from pyudev._os import poll
 
+from pyudev._errors import DeviceMonitorError
+
 
 class MonitorObserver(Thread):
     """
@@ -136,7 +138,7 @@ class MonitorObserver(Thread):
         :param fd: file descriptor for the monitor
         :param int event: the event mask (from select)
 
-        :raises EnvironmentError: if mask not equal to POLLIN
+        :raises DeviceMonitorError: if mask not equal to POLLIN
         """
         if mask == select.POLLIN:
             read_device = \
@@ -144,9 +146,17 @@ class MonitorObserver(Thread):
             for device in iter(read_device, None):
                 self._callback(device)
         else:
-            raise EnvironmentError('Monitor problem.')
+            raise DeviceMonitorError(
+               "error when polling monitor device file descriptor (%d): %d" % \
+               (fd, mask)
+            )
 
     def run(self):
+        """
+        Run method for this thread.
+
+        :raises DeviceMonitorError: if there is a problem with the Monitor
+        """
         self.monitor.start()
         notifier = poll.Poll.for_events(self.monitor, self._stop_event.source)
         stop_event_fileno = self._stop_event.source.fileno()

@@ -32,8 +32,11 @@ from __future__ import unicode_literals
 
 import os
 import errno
+import select
 
 from pyudev.device import Device
+
+from pyudev._errors import DeviceMonitorError
 
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
@@ -336,8 +339,9 @@ class Monitor(object):
            This method implicitly calls :meth:`start()`.
 
         Return the received :class:`Device`, or ``None`` if a timeout
-        occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
-        failed.
+        occurred. Raise DeviceMonitorError if event retrieval failed.
+
+        :raises DeviceMonitorError:
 
         .. seealso::
 
@@ -349,6 +353,7 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
+
         if timeout is not None and timeout > 0:
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
@@ -357,8 +362,15 @@ class Monitor(object):
         events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
         if events == []:
             return None
-        else:
+
+        fd, status = events[0]
+        if status == select.POLLIN:
             return self._receive_device()
+        else:
+            raise DeviceMonitorError(
+               "error when polling monitor device file descriptor (%d): %d" % \
+               (fd, status)
+            )
 
     def receive_device(self):
         """
