@@ -308,7 +308,7 @@ class Monitor(object):
                 else:
                     raise
 
-    def poll(self, timeout=None):
+    def poll(self, timeout=None, max_retries=0):
         """
         Poll for a device event.
 
@@ -333,6 +333,12 @@ class Monitor(object):
         seconds. If omitted or ``None``, this method blocks until a device
         event is available. If ``0``, this method just polls and will never
         block.
+
+        ``max_retries`` is the maximum number of times to read again from the
+        buffer without getting an event before raising an exception. A value of
+        None means that the Monitor will retry indefinitely. A value of 0 means
+        that it will try only once to read an event. A negative value is
+        unacceptable. The default is 0.
 
         .. note::
 
@@ -359,18 +365,32 @@ class Monitor(object):
             timeout = int(timeout * 1000)
         self.start()
 
-        events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
-        if events == []:
-            return None
+        reads = 0
+        fd = None
+        status = None
+        max_reads = None if max_retries is None else max_retries + 1
+        while max_reads is None or reads < max_reads:
+            events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
+            if events == []:
+                return None
 
-        fd, status = events[0]
-        if status == select.POLLIN:
-            return self._receive_device()
-        else:
-            raise DeviceMonitorError(
-               "error when polling monitor device file descriptor (%d): %d" % \
-               (fd, status)
-            )
+            fd, status = events[0]
+            if status & select.POLLIN != 0:
+                device = None
+                try:
+                    device = self._receive_device()
+                except EnvironmentError:
+                    pass
+                reads += 1
+
+                if device is not None:
+                    return device
+            else:
+                break
+        raise DeviceMonitorError(
+           "error when polling monitor device file descriptor (%d): %d" % \
+           (fd, status)
+        )
 
     def receive_device(self):
         """

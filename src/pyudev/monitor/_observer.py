@@ -138,9 +138,9 @@ class MonitorObserver(Thread):
         :param fd: file descriptor for the monitor
         :param int event: the event mask (from select)
 
-        :raises DeviceMonitorError: if mask not equal to POLLIN
+        :raises DeviceMonitorError: if mask does not include POLLIN
         """
-        if mask == select.POLLIN:
+        if mask & select.POLLIN != 0:
             read_device = \
                partial(eintr_retry_call, self.monitor.poll, timeout=0)
             for device in iter(read_device, None):
