@@ -85,14 +85,27 @@ class MonitorObserver(Thread):
        :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
-    def __init__(self, monitor, event_handler=None, callback=None, *args,
-                 **kwargs):
+    def __init__(
+        self,
+        monitor,
+        event_handler=None,
+        callback=None,
+        max_retries=0,
+        *args,
+        **kwargs
+    ):
         """
         Create a new observer for the given ``monitor``.
 
         ``monitor`` is the :class:`Monitor` to observe. ``callback`` is the
         callable to invoke on events, with the signature ``callback(device)``
         where ``device`` is the :class:`Device` that caused the event.
+
+        ``max_retries`` is the maximum number of times to read again from the
+        buffer without getting an event before raising an exception. A value of
+        None means that the Monitor will retry indefinitely. A value of 0 means
+        that it will try only once to read an event. A negative value is
+        unacceptable. The default is 0.
 
         .. warning::
 
@@ -124,6 +137,7 @@ class MonitorObserver(Thread):
                           'Use Monitor.poll() instead.', DeprecationWarning)
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback
+        self._max_retries = max_retries
 
     def start(self):
         """Start the observer thread."""
@@ -141,8 +155,12 @@ class MonitorObserver(Thread):
         :raises DeviceMonitorError: if mask does not include POLLIN
         """
         if mask & select.POLLIN != 0:
-            read_device = \
-               partial(eintr_retry_call, self.monitor.poll, timeout=0)
+            read_device = partial(
+               eintr_retry_call,
+               self.monitor.poll,
+               timeout=0,
+               max_retries=self._max_retries
+            )
             for device in iter(read_device, None):
                 self._callback(device)
         else:

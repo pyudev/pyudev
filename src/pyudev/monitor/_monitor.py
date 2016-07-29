@@ -375,7 +375,9 @@ class Monitor(object):
                 return None
 
             fd, status = events[0]
-            if status & select.POLLIN != 0:
+            if status == select.POLLIN:
+                return self._receive_device()
+            elif status & select.POLLIN != 0 and status & select.POLLERR != 0:
                 device = None
                 try:
                     device = self._receive_device()

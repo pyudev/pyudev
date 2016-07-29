@@ -69,7 +69,7 @@ class FakeMonitor(object):
     def start(self):
         self.started = True
 
-    def poll(self, timeout=None):
+    def poll(self, timeout=None, max_retries=0):
         rlist, _, _ = select([self._event_source], [], [], timeout)
         if self._event_source in rlist:
             os.read(self._event_source, 1)
