@@ -91,6 +91,11 @@ class DeviceNotFoundByKernelDeviceError(DeviceNotFoundError):
     systemd.journal-fields man pages.
     """
 
+class DeviceNotFoundByLinkError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was found
+    from the given device link.
+    """
 
 class DeviceNotFoundByNameError(DeviceNotFoundError):
     """
