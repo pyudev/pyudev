@@ -32,6 +32,7 @@ import gc
 
 # pylint: disable=unused-import
 from ._device_tests._devices_tests import TestDevices
+from ._device_tests._devices_tests import TestFromDeviceLink
 from ._device_tests._device_tests import TestDevice
 from ._device_tests._attributes_tests import TestAttributes
 from ._device_tests._tags_tests import TestTags
