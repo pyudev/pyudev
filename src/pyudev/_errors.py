@@ -88,9 +88,14 @@ class DeviceNotFoundByKernelDeviceError(DeviceNotFoundError):
     from the given kernel device string.
 
     The format of the kernel device string is defined in the
-    systemd.journal-fields man pagees.
+    systemd.journal-fields man pages.
     """
 
+class DeviceNotFoundByLinkError(DeviceNotFoundError):
+    """
+    A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was found
+    from the given device link.
+    """
 
 class DeviceNotFoundByNameError(DeviceNotFoundError):
     """

@@ -41,6 +41,7 @@ from __future__ import unicode_literals
 
 from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._errors import DeviceNotFoundByFileError
+from pyudev._errors import DeviceNotFoundByLinkError
 from pyudev._errors import DeviceNotFoundByNameError
 from pyudev._errors import DeviceNotFoundByNumberError
 from pyudev._errors import DeviceNotFoundError

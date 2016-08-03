@@ -46,6 +46,7 @@ from pyudev.device import Attributes, Tags
 
 from ..utils import is_unicode_string
 
+from .._constants import _CONTEXT
 from .._constants import _CONTEXT_STRATEGY
 from .._constants import _DEVICE_DATA
 from .._constants import _DEVICES
@@ -301,8 +302,7 @@ class TestDevice(object):
         # see TestAttributes for complete attribute tests
         assert isinstance(a_device.attributes, Attributes)
 
-    @given(_CONTEXT_STRATEGY)
-    def test_no_leak(self, a_context):
+    def test_no_leak(self):
         """
         Regression test for issue #32, modelled after the script which revealed
         this issue.
@@ -314,7 +314,7 @@ class TestDevice(object):
 
         https://github.com/lunaryorn/pyudev/issues/32
         """
-        for _ in a_context.list_devices(subsystem='usb'):
+        for _ in _CONTEXT.list_devices(subsystem='usb'):
             pass
         # make sure that no memory leaks
         assert not gc.garbage
