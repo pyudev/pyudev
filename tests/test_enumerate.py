@@ -30,13 +30,13 @@ from pyudev import Enumerator
 
 from ._constants import _ATTRIBUTE_STRATEGY
 from ._constants import _CONTEXT_STRATEGY
-from ._constants import _DEVICE_STRATEGY
 from ._constants import _MATCH_PROPERTY_STRATEGY
 from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
 from ._constants import _TAG_STRATEGY
 from ._constants import _UDEV_TEST
 from ._constants import _UDEV_VERSION
+from ._constants import device_strategy
 
 from .utils import failed_health_check_wrapper
 
@@ -209,35 +209,6 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
-    def test_match_attribute_match(self, context, pair):
-        """
-        Test match returns matching devices.
-        """
-        key, value = pair
-        _test_direct_and_complement(
-           context,
-           frozenset(context.list_devices().match_attribute(key, value)),
-           lambda d: d.attributes.get(key) == value
-        )
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
-    def test_match_attribute_nomatch(self, context, pair):
-        """
-        Test that nomatch returns no devices with attribute value match.
-        """
-        key, value = pair
-
-        _test_direct_and_complement(
-           context,
-           frozenset(
-              context.list_devices().match_attribute(key, value, nomatch=True)
-           ),
-           lambda d: d.attributes.get(key) != value
-        )
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
     @settings(max_examples=50)
     def test_match_attribute_nomatch_unfulfillable(self, context, pair):
         """
@@ -330,7 +301,7 @@ class TestEnumerator(object):
     @failed_health_check_wrapper
     @given(
        _CONTEXT_STRATEGY,
-       _DEVICE_STRATEGY.filter(lambda d: d.parent is not None)
+       device_strategy(filter_func=lambda d: d.parent is not None)
     )
     @settings(max_examples=5)
     def test_match_parent(self, context, device):

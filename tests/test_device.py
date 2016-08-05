@@ -30,57 +30,11 @@ from __future__ import (print_function, division, unicode_literals,
 
 import gc
 
-import pytest
-
-from ._constants import _DEVICE_DATA
-
-# pylint: disable=too-few-public-methods
-
-if len(_DEVICE_DATA) > 0:
-    # pylint: disable=unused-import
-    from ._device_tests._devices_tests import TestDevices
-else:
-    class TestDevices(object):
-        """ Not enough devices available. """
-
-        def test_all(self):
-            """ Always skipped test. """
-            pytest.skip("skipping all devices tests, not enough devices")
-
-if len(_DEVICE_DATA) > 0:
-    # pylint: disable=unused-import
-    from ._device_tests._device_tests import TestDevice
-else:
-    class TestDevice(object):
-        """ Not enough devices available. """
-
-        def test_all(self):
-            """ Always skipped test. """
-            pytest.skip("skipping all device tests, not enough devices")
-
-
-if len(_DEVICE_DATA) > 0:
-    # pylint: disable=unused-import
-    from ._device_tests._attributes_tests import TestAttributes
-else:
-    class TestAttributes(object):
-        """ Not enough devices available. """
-
-        def test_all(self):
-            """ Always skipped test. """
-            pytest.skip("skipping all attributes tests, not enough devices")
-
-if len(_DEVICE_DATA) > 0:
-    # pylint: disable=unused-import
-    from ._device_tests._tags_tests import TestTags
-else:
-    class TestTags(object):
-        """ Not enough devices available. """
-
-        def test_all(self):
-            """ Always skipped test. """
-            pytest.skip("skipping all tags tests, not enough devices")
-
+# pylint: disable=unused-import
+from ._device_tests._devices_tests import TestDevices
+from ._device_tests._device_tests import TestDevice
+from ._device_tests._attributes_tests import TestAttributes
+from ._device_tests._tags_tests import TestTags
 
 def test_garbage():
     """
