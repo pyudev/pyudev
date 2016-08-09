@@ -340,6 +340,29 @@ class Devices(object):
             )
 
     @classmethod
+    def from_persistent_name(cls, context, category, name_type, name):
+        """
+        Get a device from a persistant name.
+
+        :param Context context: the pyudev context
+        :param str category: the category, e.g., disk, input, snd
+        :param str name_type: the type of name, e.g., path, uuid, id.
+        :param str name: the persistant name of the device
+
+        :returns: the Device corresponding to the persistant name
+        :rtype: Device
+        :raises: DeviceNotFoundError if no device found
+        """
+        device_link = os.path.join(
+           context.device_path,
+           category,
+           "by=%s" % name_type,
+           name
+        )
+        return cls.from_device_link(device_link)
+
+
+    @classmethod
     def METHODS(cls): # pylint: disable=invalid-name
         """
         Return methods that obtain a :class:`Device` from a variety of
