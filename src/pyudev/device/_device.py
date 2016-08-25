@@ -335,19 +335,20 @@ class Device(Mapping):
     """
     A single device with attached attributes and properties.
 
-    This class subclasses the ``Mapping`` ABC, providing a read-only
-    dictionary mapping property names to the corresponding values.
-    Therefore all well-known dicitionary methods and operators
-    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
-    properties.
-
-    Aside of the properties, a device also has a set of udev-specific
-    attributes like the path inside ``sysfs``.
+    A device also has a set of udev-specific attributes like the path
+    inside ``sysfs``.
 
     :class:`Device` objects compare equal and unequal to other devices and
     to strings (based on :attr:`device_path`).  However, there is no
     ordering on :class:`Device` objects, and the corresponding operators
     ``>``, ``<``, ``<=`` and ``>=`` raise :exc:`~exceptions.TypeError`.
+
+    .. warning::
+
+       Currently, Device extends Mapping. The mapping that it stores is that
+       of udev property names to udev property values. This use is deprecated
+       and Device will no longer extend Mapping in 1.0. To look up udev
+       properties, use the Device.properties property.
 
     .. warning::
 
