@@ -39,6 +39,7 @@ import pytest
 from pyudev import Devices
 from pyudev import DeviceNotFoundAtPathError
 from pyudev import DeviceNotFoundByFileError
+from pyudev import DeviceNotFoundByLinkError
 from pyudev import DeviceNotFoundByNameError
 from pyudev import DeviceNotFoundByNumberError
 from pyudev import DeviceNotFoundInEnvironmentError
@@ -252,3 +253,57 @@ class TestDevices(object):
         """
         with pytest.raises(DeviceNotFoundInEnvironmentError):
             Devices.from_environment(_CONTEXT)
+
+class TestFromDeviceLink(object):
+    """
+    Tests for from_device_link() method.
+    """
+
+    @failed_health_check_wrapper
+    @given(
+       _CONTEXT_STRATEGY,
+       device_strategy(filter_func=lambda x: any(x.device_links))
+    )
+    @settings(max_examples=5)
+    def test_from_device_link(self, a_context, a_device):
+        """
+        Verify that from_device_link() yields correct device.
+        """
+        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
+
+        assert all(
+           Devices.from_device_link(a_context, link) == a_device \
+              for link in a_device.device_links
+        )
+
+    def test_from_non_link(self, tmpdir):
+        """
+        Test that non link raises an exception.
+        """
+        filename = tmpdir.join('test_from_device_link_non_existing')
+        filename.ensure(file=True)
+        with pytest.raises(DeviceNotFoundByLinkError):
+            Devices.from_device_link(_CONTEXT, str(filename))
+
+    def test_from_broken_link(self, tmpdir):
+        """
+        Test that broken link raises an exception.
+        """
+        filename = tmpdir.join('removable')
+        filename.ensure(file=True)
+        linkname = os.path.join(str(tmpdir), 'broken')
+        os.symlink(str(filename), linkname)
+        os.remove(str(filename))
+        with pytest.raises(DeviceNotFoundByLinkError):
+            Devices.from_device_link(_CONTEXT, linkname)
+
+    def test_from_bad_link(self, tmpdir):
+        """
+        Test that link to non_device raises an exception.
+        """
+        filename = tmpdir.join('not_a_device')
+        filename.ensure(file=True)
+        linkname = os.path.join(str(tmpdir), 'broken')
+        os.symlink(str(filename), linkname)
+        with pytest.raises(DeviceNotFoundByFileError):
+            Devices.from_device_link(_CONTEXT, linkname)

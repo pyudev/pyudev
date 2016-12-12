@@ -41,6 +41,7 @@ from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._errors import DeviceNotFoundByFileError
 from pyudev._errors import DeviceNotFoundByInterfaceIndexError
 from pyudev._errors import DeviceNotFoundByKernelDeviceError
+from pyudev._errors import DeviceNotFoundByLinkError
 from pyudev._errors import DeviceNotFoundByNameError
 from pyudev._errors import DeviceNotFoundByNumberError
 from pyudev._errors import DeviceNotFoundInEnvironmentError
@@ -309,6 +310,57 @@ class Devices(object):
         if not device:
             raise DeviceNotFoundInEnvironmentError()
         return Device(context, device)
+
+    @classmethod
+    def from_device_link(cls, context, device_link):
+        """
+        Create a new device from a link to a device node.
+
+        :param Context context: the pyudev context
+        :param str device_link: a link to a device node
+
+        :returns: the Device corresponding to ``device_link``
+        :rtype: Device
+
+        :raises: DeviceNotFoundError if no device found
+
+        .. versionadded:: 0.22
+        """
+        if os.path.islink(device_link):
+            if os.path.exists(device_link):
+                device_node = os.path.realpath(device_link)
+                return cls.from_device_file(context, device_node)
+            else:
+                raise DeviceNotFoundByLinkError(
+                   "path %s is a broken link" % device_link
+                )
+        else:
+            raise DeviceNotFoundByLinkError(
+               "path %s is not a link" % device_link
+            )
+
+    @classmethod
+    def from_persistent_name(cls, context, category, name_type, name):
+        """
+        Get a device from a persistant name.
+
+        :param Context context: the pyudev context
+        :param str category: the category, e.g., disk, input, snd
+        :param str name_type: the type of name, e.g., path, uuid, id.
+        :param str name: the persistant name of the device
+
+        :returns: the Device corresponding to the persistant name
+        :rtype: Device
+        :raises: DeviceNotFoundError if no device found
+        """
+        device_link = os.path.join(
+           context.device_path,
+           category,
+           "by=%s" % name_type,
+           name
+        )
+        return cls.from_device_link(device_link)
+
 
     @classmethod
     def METHODS(cls): # pylint: disable=invalid-name
