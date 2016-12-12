@@ -185,3 +185,10 @@ class DeviceValueError(DeviceError):
             return fmt_str % (self._value, self._param, self._msg)
         else:
             return self._FMT_STR % (self._value, self._param)
+
+
+class DeviceMonitorError(DeviceError):
+    """
+    Raised when something goes wrong with monitoring a device.
+    """
+    pass

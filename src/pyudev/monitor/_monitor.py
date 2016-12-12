@@ -17,24 +17,26 @@
 
 
 """
-    pyudev.monitor
-    ==============
+    pyudev.monitor._monitor
+    =======================
 
     Monitor implementation.
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import errno
-from threading import Thread
-from functools import partial
+import select
 
 from pyudev.device import Device
+
+from pyudev._errors import DeviceMonitorError
 
 from pyudev._util import eintr_retry_call
 from pyudev._util import ensure_byte_string
@@ -306,7 +308,7 @@ class Monitor(object):
                 else:
                     raise
 
-    def poll(self, timeout=None):
+    def poll(self, timeout=None, max_retries=0):
         """
         Poll for a device event.
 
@@ -332,13 +334,20 @@ class Monitor(object):
         event is available. If ``0``, this method just polls and will never
         block.
 
+        ``max_retries`` is the maximum number of times to read again from the
+        buffer without getting an event before raising an exception. A value of
+        None means that the Monitor will retry indefinitely. A value of 0 means
+        that it will try only once to read an event. A negative value is
+        unacceptable. The default is 0.
+
         .. note::
 
            This method implicitly calls :meth:`start()`.
 
         Return the received :class:`Device`, or ``None`` if a timeout
-        occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
-        failed.
+        occurred. Raise DeviceMonitorError if event retrieval failed.
+
+        :raises DeviceMonitorError:
 
         .. seealso::
 
@@ -350,14 +359,40 @@ class Monitor(object):
 
         .. versionadded:: 0.16
         """
+
         if timeout is not None and timeout > 0:
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
-            return self._receive_device()
-        else:
-            return None
+
+        reads = 0
+        fd = None
+        status = None
+        max_reads = None if max_retries is None else max_retries + 1
+        while max_reads is None or reads < max_reads:
+            events = eintr_retry_call(poll.Poll.for_events(self).poll, timeout)
+            if events == []:
+                return None
+
+            fd, status = events[0]
+            if status == select.POLLIN:
+                return self._receive_device()
+            elif status & select.POLLIN != 0 and status & select.POLLERR != 0:
+                device = None
+                try:
+                    device = self._receive_device()
+                except EnvironmentError:
+                    pass
+                reads += 1
+
+                if device is not None:
+                    return device
+            else:
+                break
+        raise DeviceMonitorError(
+           "error when polling monitor device file descriptor (%d): %d" % \
+           (fd, status)
+        )
 
     def receive_device(self):
         """
@@ -424,159 +459,3 @@ class Monitor(object):
             device = self.poll()
             if device is not None:
                 yield device.action, device
-
-
-class MonitorObserver(Thread):
-    """
-    An asynchronous observer for device events.
-
-    This class subclasses :class:`~threading.Thread` class to asynchronously
-    observe a :class:`Monitor` in a background thread:
-
-    >>> from pyudev import Context, Monitor, MonitorObserver
-    >>> context = Context()
-    >>> monitor = Monitor.from_netlink(context)
-    >>> monitor.filter_by(subsystem='input')
-    >>> def print_device_event(device):
-    ...     print('background event {0.action}: {0.device_path}'.format(device))
-    >>> observer = MonitorObserver(monitor, callback=print_device_event, name='monitor-observer')
-    >>> observer.daemon
-    True
-    >>> observer.start()
-
-    In the above example, input device events will be printed in background,
-    until :meth:`stop()` is called on ``observer``.
-
-    .. note::
-
-       Instances of this class are always created as daemon thread.  If you do
-       not want to use daemon threads for monitoring, you need explicitly set
-       :attr:`~threading.Thread.daemon` to ``False`` before invoking
-       :meth:`~threading.Thread.start()`.
-
-    .. seealso::
-
-       :attr:`Device.action`
-          The action that created this event.
-
-       :attr:`Device.sequence_number`
-          The sequence number of this event.
-
-    .. versionadded:: 0.14
-
-    .. versionchanged:: 0.15
-       :meth:`Monitor.start()` is implicitly called when the thread is started.
-    """
-
-    def __init__(self, monitor, event_handler=None, callback=None, *args,
-                 **kwargs):
-        """
-        Create a new observer for the given ``monitor``.
-
-        ``monitor`` is the :class:`Monitor` to observe. ``callback`` is the
-        callable to invoke on events, with the signature ``callback(device)``
-        where ``device`` is the :class:`Device` that caused the event.
-
-        .. warning::
-
-           ``callback`` is invoked in the observer thread, hence the observer
-           is blocked while callback executes.
-
-        ``args`` and ``kwargs`` are passed unchanged to the constructor of
-        :class:`~threading.Thread`.
-
-        .. deprecated:: 0.16
-           The ``event_handler`` argument will be removed in 1.0. Use
-           the ``callback`` argument instead.
-        .. versionchanged:: 0.16
-           Add ``callback`` argument.
-        """
-        if callback is None and event_handler is None:
-            raise ValueError('callback missing')
-        elif callback is not None and event_handler is not None:
-            raise ValueError('Use either callback or event handler')
-
-        Thread.__init__(self, *args, **kwargs)
-        self.monitor = monitor
-        # observer threads should not keep the interpreter alive
-        self.daemon = True
-        self._stop_event = None
-        if event_handler is not None:
-            import warnings
-            warnings.warn('"event_handler" argument will be removed in 1.0. '
-                          'Use Monitor.poll() instead.', DeprecationWarning)
-            callback = lambda d: event_handler(d.action, d)
-        self._callback = callback
-
-    def start(self):
-        """Start the observer thread."""
-        if not self.is_alive():
-            self._stop_event = pipe.Pipe.open()
-        Thread.start(self)
-
-    def run(self):
-        self.monitor.start()
-        notifier = poll.Poll.for_events(
-            (self.monitor, 'r'), (self._stop_event.source, 'r'))
-        while True:
-            for file_descriptor, event in eintr_retry_call(notifier.poll):
-                if file_descriptor == self._stop_event.source.fileno():
-                    # in case of a stop event, close our pipe side, and
-                    # return from the thread
-                    self._stop_event.source.close()
-                    return
-                elif file_descriptor == self.monitor.fileno() and event == 'r':
-                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
-                    for device in iter(read_device, None):
-                        self._callback(device)
-                else:
-                    raise EnvironmentError('Observed monitor hung up')
-
-    def send_stop(self):
-        """
-        Send a stop signal to the background thread.
-
-        The background thread will eventually exit, but it may still be running
-        when this method returns.  This method is essentially the asynchronous
-        equivalent to :meth:`stop()`.
-
-        .. note::
-
-           The underlying :attr:`monitor` is *not* stopped.
-        """
-        if self._stop_event is None:
-            return
-        with self._stop_event.sink:
-            # emit a stop event to the thread
-            eintr_retry_call(self._stop_event.sink.write, b'\x01')
-            self._stop_event.sink.flush()
-
-    def stop(self):
-        """
-        Synchronously stop the background thread.
-
-        .. note::
-
-           This method can safely be called from the observer thread. In this
-           case it is equivalent to :meth:`send_stop()`.
-
-        Send a stop signal to the backgroud (see :meth:`send_stop`), and waits
-        for the background thread to exit (see :meth:`~threading.Thread.join`)
-        if the current thread is *not* the observer thread.
-
-        After this method returns in a thread *that is not the observer
-        thread*, the ``callback`` is guaranteed to not be invoked again
-        anymore.
-
-        .. note::
-
-           The underlying :attr:`monitor` is *not* stopped.
-
-        .. versionchanged:: 0.16
-           This method can be called from the observer thread.
-        """
-        self.send_stop()
-        try:
-            self.join()
-        except RuntimeError:
-            pass
