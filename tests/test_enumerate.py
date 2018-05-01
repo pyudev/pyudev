@@ -316,13 +316,6 @@ class TestEnumerator(object):
         parent = device.parent
         children = list(context.list_devices().match_parent(parent))
         assert device in children
-        if _UDEV_VERSION >= 175:
-            assert parent in children
-        else:
-            if parent.subsystem is not None:
-                assert parent in children
-            else:
-                assert parent not in children
 
 
 class TestEnumeratorMatchCombinations(object):
