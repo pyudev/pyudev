@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     pyudev.device._errors
     =====================
@@ -32,6 +31,7 @@ from __future__ import unicode_literals
 import abc
 
 from six import add_metaclass
+
 
 @add_metaclass(abc.ABCMeta)
 class DeviceError(Exception):
@@ -76,11 +76,13 @@ class DeviceNotFoundByFileError(DeviceNotFoundError):
     found from the given filename.
     """
 
+
 class DeviceNotFoundByInterfaceIndexError(DeviceNotFoundError):
     """
     A :exc:`DeviceNotFoundError` indicating that no :class:`Device` was found
     from the given interface index.
     """
+
 
 class DeviceNotFoundByKernelDeviceError(DeviceNotFoundError):
     """

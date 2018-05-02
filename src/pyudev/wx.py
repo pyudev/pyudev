@@ -12,7 +12,6 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 # pylint: disable=anomalous-backslash-in-string
-
 """pyudev.wx
     =========
 
@@ -30,7 +29,6 @@
 
 """
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
@@ -38,7 +36,6 @@ from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent
 
 import pyudev
-
 
 DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
 
@@ -98,8 +95,7 @@ class MonitorObserver(EvtHandler):
         if self._observer_thread is not None:
             return
         self._observer_thread = pyudev.MonitorObserver(
-            self.monitor, callback=self._emit_event,
-            name='wx-observer-thread')
+            self.monitor, callback=self._emit_event, name='wx-observer-thread')
         self._observer_thread.start()
 
     def stop(self):

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     pyudev.tests.test_device
     ========================
@@ -23,7 +22,6 @@
 
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
-
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
@@ -35,6 +33,7 @@ from ._device_tests._devices_tests import TestDevices
 from ._device_tests._device_tests import TestDevice
 from ._device_tests._attributes_tests import TestAttributes
 from ._device_tests._tags_tests import TestTags
+
 
 def test_garbage():
     """

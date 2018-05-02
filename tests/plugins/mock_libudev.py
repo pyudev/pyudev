@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """plugins.mock_libudev
     ====================
 
@@ -35,7 +33,6 @@ from contextlib import contextmanager
 from collections import namedtuple
 
 import mock
-
 
 Node = namedtuple('Node', 'name value next')
 
@@ -79,9 +76,10 @@ def libudev_list(libudev, function, items):
     the second the item value, or a single element, which is the item name.
     The item value is ``None`` in this case.
     """
-    functions_to_patch = [function, 'udev_list_entry_get_next',
-                          'udev_list_entry_get_name',
-                          'udev_list_entry_get_value']
+    functions_to_patch = [
+        function, 'udev_list_entry_get_next', 'udev_list_entry_get_name',
+        'udev_list_entry_get_value'
+    ]
     mocks = dict((f, mock.DEFAULT) for f in functions_to_patch)
     with mock.patch.multiple(libudev, **mocks):
         udev_list = LinkedList.from_iterable(items)

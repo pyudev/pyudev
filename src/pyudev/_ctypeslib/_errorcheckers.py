@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     pyudev._ctypeslib._errorcheckers
     ================================
@@ -27,11 +26,9 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-
 import os
 import errno
 from ctypes import get_errno
-
 
 ERRNO_EXCEPTIONS = {
     errno.ENOMEM: MemoryError,

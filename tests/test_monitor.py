@@ -15,7 +15,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 import random
@@ -64,7 +63,6 @@ def patch_filter_by(type):
 
 
 class TestMonitor(object):
-
     def test_from_netlink_invalid_source(self, context):
         with pytest.raises(ValueError) as exc_info:
             Monitor.from_netlink(context, source='invalid_source')
@@ -83,8 +81,8 @@ class TestMonitor(object):
     def test_from_netlink_source_udev_mock(self, context):
         funcname = 'udev_monitor_new_from_netlink'
         spec = lambda c, s: None
-        with mock.patch.object(context._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                context._libudev, funcname, autospec=spec) as func:
             func.return_value = mock.sentinel.monitor
             monitor = Monitor.from_netlink(context)
             assert monitor._as_parameter_ is mock.sentinel.monitor
@@ -104,8 +102,8 @@ class TestMonitor(object):
     def test_from_netlink_source_kernel_mock(self, context):
         funcname = 'udev_monitor_new_from_netlink'
         spec = lambda c, s: None
-        with mock.patch.object(context._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                context._libudev, funcname, autospec=spec) as func:
             func.return_value = mock.sentinel.monitor
             monitor = Monitor.from_netlink(context, 'kernel')
             assert monitor._as_parameter_ is mock.sentinel.monitor
@@ -119,8 +117,8 @@ class TestMonitor(object):
     def test_fileno_mock(self, monitor):
         funcname = 'udev_monitor_get_fd'
         spec = lambda m: None
-        with mock.patch.object(monitor._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                monitor._libudev, funcname, autospec=spec) as func:
             func.return_value = mock.sentinel.fileno
             assert monitor.fileno() is mock.sentinel.fileno
             func.assert_called_once_with(monitor)
@@ -207,8 +205,8 @@ class TestMonitor(object):
     def test_start_mock(self, monitor):
         funcname = 'udev_monitor_enable_receiving'
         spec = lambda m: None
-        with mock.patch.object(monitor._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                monitor._libudev, funcname, autospec=spec) as func:
             assert not monitor.started
             monitor.start()
             assert monitor.started
@@ -226,8 +224,8 @@ class TestMonitor(object):
     def test_set_receive_buffer_size_mock(self, monitor):
         funcname = 'udev_monitor_set_receive_buffer_size'
         spec = lambda m, s: None
-        with mock.patch.object(monitor._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                monitor._libudev, funcname, autospec=spec) as func:
             monitor.set_receive_buffer_size(1000)
             func.assert_called_once_with(monitor, 1000)
 
@@ -299,7 +297,6 @@ class TestMonitor(object):
 
 
 class TestMonitorObserver(object):
-
     def callback(self, device):
         self.events.append(device)
         if len(self.events) >= 2:
@@ -314,15 +311,10 @@ class TestMonitorObserver(object):
         if use_deprecated:
             if pytest.__version__ == '2.8.4':
                 self.observer = MonitorObserver(
-                   monitor,
-                   event_handler=self.event_handler
-                )
+                    monitor, event_handler=self.event_handler)
             else:
                 self.observer = pytest.deprecated_call(
-                   MonitorObserver,
-                   monitor,
-                   event_handler=self.event_handler
-                )
+                    MonitorObserver, monitor, event_handler=self.event_handler)
         else:
             self.observer = MonitorObserver(monitor, callback=self.callback)
         return self.observer

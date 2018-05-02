@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     utils.misc
     =============
@@ -44,6 +43,7 @@ def is_unicode_string(value):
     (``unicode`` in python 2, ``str`` in python 3), ``False`` otherwise.
     """
     return isinstance(value, unicode if six.PY2 else str)
+
 
 def failed_health_check_wrapper(func):
     """

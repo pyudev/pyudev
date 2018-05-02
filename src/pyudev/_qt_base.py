@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev._qt_base
     ===============
@@ -34,16 +32,18 @@ import six
 
 from pyudev.device import Device
 
+
 class MonitorObserverMixin(object):
     """
     Base mixin for pyqt monitor observers.
     """
+
     # pylint: disable=too-few-public-methods
 
     def _setup_notifier(self, monitor, notifier_class):
         self.monitor = monitor
-        self.notifier = notifier_class(
-            monitor.fileno(), notifier_class.Read, self)
+        self.notifier = notifier_class(monitor.fileno(), notifier_class.Read,
+                                       self)
         self.notifier.activated[int].connect(self._process_udev_event)
 
     @property
@@ -84,13 +84,16 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
     """
     Obsolete monitor observer mixin.
     """
+
     # pylint: disable=too-few-public-methods
 
     def _setup_notifier(self, monitor, notifier_class):
         MonitorObserverMixin._setup_notifier(self, monitor, notifier_class)
         self._action_signal_map = {
-            'add': self.deviceAdded, 'remove': self.deviceRemoved,
-            'change': self.deviceChanged, 'move': self.deviceMoved,
+            'add': self.deviceAdded,
+            'remove': self.deviceRemoved,
+            'change': self.deviceChanged,
+            'move': self.deviceMoved,
         }
         import warnings
         warnings.warn('Will be removed in 1.0. '
@@ -102,6 +105,7 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
         signal = self._action_signal_map.get(device.action)
         if signal is not None:
             signal.emit(device)
+
 
 def make_init(qobject, socket_notifier):
     """
@@ -150,14 +154,10 @@ class MonitorObserverGenerator(object):
 
         """
         return type(
-           str("MonitorObserver"),
-           (qobject, MonitorObserverMixin),
-           {
-              str("__init__") : make_init(qobject, socket_notifier),
-              str("deviceEvent") : signal(Device)
-           }
-        )
-
+            str("MonitorObserver"), (qobject, MonitorObserverMixin), {
+                str("__init__"): make_init(qobject, socket_notifier),
+                str("deviceEvent"): signal(Device)
+            })
 
 
 class QUDevMonitorObserverGenerator(object):
@@ -189,19 +189,24 @@ class QUDevMonitorObserverGenerator(object):
 
         """
         return type(
-           str("QUDevMonitorObserver"),
-           (qobject, QUDevMonitorObserverMixin),
-           {
-              str("__init__") : make_init(qobject, socket_notifier),
-              #: emitted upon arbitrary device events
-              str("deviceEvent") : signal(six.text_type, Device),
-              #: emitted if a device was added
-              str("deviceAdded") : signal(Device),
-              #: emitted if a device was removed
-              str("deviceRemoved") : signal(Device),
-              #: emitted if a device was changed
-              str("deviceChanged") : signal(Device),
-              #: emitted if a device was moved
-              str("deviceMoved") : signal(Device)
-           }
-        )
+            str("QUDevMonitorObserver"),
+            (qobject, QUDevMonitorObserverMixin),
+            {
+                str("__init__"):
+                make_init(qobject, socket_notifier),
+                #: emitted upon arbitrary device events
+                str("deviceEvent"):
+                signal(six.text_type, Device),
+                #: emitted if a device was added
+                str("deviceAdded"):
+                signal(Device),
+                #: emitted if a device was removed
+                str("deviceRemoved"):
+                signal(Device),
+                #: emitted if a device was changed
+                str("deviceChanged"):
+                signal(Device),
+                #: emitted if a device was moved
+                str("deviceMoved"):
+                signal(Device)
+            })
