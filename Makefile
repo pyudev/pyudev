@@ -59,3 +59,7 @@ view:
 
 archive:
 	git archive --output=./archive.tar.gz HEAD
+
+.PHONY: test-travis
+test-travis:
+	py.test --junitxml=tests.xml --enable-privileged -rfEsxX
