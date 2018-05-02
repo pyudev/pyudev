@@ -200,77 +200,6 @@ class TestEnumerator(object):
            for device in devices
         )
 
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
-    @settings(max_examples=50)
-    def test_match_attribute_nomatch_unfulfillable(self, context, pair):
-        """
-        Match and no match for a key/value gives empty set.
-        """
-        key, value = pair
-        devices = context.list_devices()
-        devices.match_attribute(key, value)
-        devices.match_attribute(key, value, nomatch=True)
-        assert not list(devices)
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
-    @settings(max_examples=50)
-    def test_match_attribute_nomatch_complete(self, context, pair):
-        """
-        Test that w/ respect to the universe of devices returned by
-        list_devices() a match and its inverse are complements of each other.
-        """
-        key, value = pair
-        m_devices = frozenset(context.list_devices().match_attribute(
-            key, value))
-        nm_devices = frozenset(context.list_devices().match_attribute(
-            key, value, nomatch=True))
-        _test_intersection_and_union(context, m_devices, nm_devices)
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _ATTRIBUTE_STRATEGY)
-    @settings(max_examples=50)
-    def test_match_attribute_string(self, context, pair):
-        """
-        Test that matching attribute as string works.
-        """
-        key, value = pair
-        devices = context.list_devices().match_attribute(key, value)
-        assert all(device.attributes.get(key) == value for device in devices)
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY,
-           _ATTRIBUTE_STRATEGY.filter(lambda x: _is_int(x[1])))
-    @settings(max_examples=50)
-    def test_match_attribute_int(self, context, pair):
-        """
-        Test matching integer attribute.
-        """
-        key, value = pair
-        int_value = int(value)
-        devices = context.list_devices().match_attribute(key, int_value)
-        for device in devices:
-            attributes = device.attributes
-            assert attributes.get(key) == value
-            assert device.attributes.asint(key) == int_value
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY,
-           _ATTRIBUTE_STRATEGY.filter(lambda x: _is_bool(x[1])))
-    @settings(max_examples=50)
-    def test_match_attribute_bool(self, context, pair):
-        """
-        Test matching boolean attribute.
-        """
-        key, value = pair
-        bool_value = True if int(value) == 1 else False
-        devices = context.list_devices().match_attribute(key, bool_value)
-        for device in devices:
-            attributes = device.attributes
-            assert attributes.get(key) == value
-            assert attributes.asbool(key) == bool_value
-
     @_UDEV_TEST(154, "test_match_tag")
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _TAG_STRATEGY)
@@ -332,33 +261,6 @@ class TestEnumeratorMatchCombinations(object):
            frozenset(enumeration),
            lambda d: any(
               d.properties.get(key) == value for key, value in ppairs
-           )
-        )
-
-    @given(_CONTEXT_STRATEGY,
-           strategies.lists(
-               elements=_ATTRIBUTE_STRATEGY,
-               min_size=2,
-               max_size=3,
-               unique_by=lambda p: p[0]))
-    @settings(max_examples=20)
-    def test_combined_attribute_matches(self, context, apairs):
-        """
-        Test for conjunction of attributes.
-
-        If matching multiple attributes, then the result is the intersection of
-        the matching sets, i.e., the resulting filter is a conjunction.
-        """
-        enumeration = context.list_devices()
-
-        for key, value in apairs:
-            enumeration.match_attribute(key, value)
-
-        _test_direct_and_complement(
-           context,
-           frozenset(enumeration),
-           lambda d: all(
-              d.attributes.get(key) == value for key, value in apairs
            )
         )
 
