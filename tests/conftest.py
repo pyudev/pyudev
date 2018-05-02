@@ -22,13 +22,13 @@ import pytest
 
 import pyudev
 
-
 pytest_plugins = [
     str('tests.plugins.fake_monitor'),
     str('tests.plugins.privileged'),
     str('tests.plugins.mock_libudev'),
     str('tests.plugins.travis'),
 ]
+
 
 @pytest.fixture
 def context(request):

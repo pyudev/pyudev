@@ -51,8 +51,7 @@ def test_ensure_byte_string_none():
 
 @pytest.mark.conversion
 def test_ensure_unicode_string():
-    assert is_unicode_string(
-        _util.ensure_unicode_string(b'hello world'))
+    assert is_unicode_string(_util.ensure_unicode_string(b'hello world'))
     assert _util.ensure_unicode_string(b'hello world') == 'hello world'
     hello = 'hello world'
     assert _util.ensure_unicode_string(hello) is hello
@@ -114,8 +113,8 @@ def test_udev_list_iterate_mock():
     items = [('spam', 'eggs'), ('foo', 'bar')]
     with pytest.libudev_list(libudev, 'udev_enumerate_get_list_entry', items):
         udev_list = libudev.udev_enumerate_get_list_entry()
-        assert list(_util.udev_list_iterate(libudev, udev_list)) == [
-            ('spam', 'eggs'), ('foo', 'bar')]
+        assert list(_util.udev_list_iterate(
+            libudev, udev_list)) == [('spam', 'eggs'), ('foo', 'bar')]
 
 
 def raise_valueerror():
@@ -123,6 +122,8 @@ def raise_valueerror():
 
 
 _CHAR_DEVICES = list(_CONTEXT.list_devices(subsystem="tty"))
+
+
 @pytest.mark.skipif(len(_CHAR_DEVICES) == 0, reason='no tty devices')
 @given(strategies.sampled_from(_CHAR_DEVICES))
 @settings(min_satisfying_examples=1, max_examples=5)
@@ -132,7 +133,10 @@ def test_get_device_type_character_device(a_device):
     """
     assert _util.get_device_type(a_device.device_node) == 'char'
 
+
 _BLOCK_DEVICES = list(_CONTEXT.list_devices(subsystem="block"))
+
+
 @pytest.mark.skipif(len(_BLOCK_DEVICES) == 0, reason='no block devices')
 @given(strategies.sampled_from(_BLOCK_DEVICES))
 @settings(min_satisfying_examples=1, max_examples=5)
@@ -141,6 +145,7 @@ def test_get_device_type_block_device(a_device):
     Check that the device type of a block device is actually block.
     """
     assert _util.get_device_type(a_device.device_node) == 'block'
+
 
 def test_get_device_type_no_device_file(tmpdir):
     filename = tmpdir.join('test')
@@ -168,6 +173,7 @@ def test_eintr_retry_call(tmpdir):
     def handle_alarm(signum, frame):
         # pylint: disable=unused-argument
         pass
+
     orig_alarm = signal.getsignal(signal.SIGALRM)
 
     # Open an empty file and use it to wait for exceptions which should
@@ -187,7 +193,8 @@ def test_eintr_retry_call(tmpdir):
 
         # Ensure that wrapping the call does not raise EINTR
         signal.alarm(1)
-        assert _util.eintr_retry_call(select.select, [], [], [3], 2) == ([], [], [])
+        assert _util.eintr_retry_call(select.select, [], [], [3],
+                                      2) == ([], [], [])
     finally:
         os.close(fd)
         signal.signal(signal.SIGALRM, orig_alarm)

@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev._os.pipe
     ===============
@@ -90,13 +88,12 @@ def _get_pipe2_implementation():
 
 Return a function implementing ``pipe2``."""
     if hasattr(os, 'pipe2'):
-        return os.pipe2 # pylint: disable=no-member
+        return os.pipe2  # pylint: disable=no-member
     else:
         try:
             libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
             return (partial(_pipe2_ctypes, libc)
-                    if hasattr(libc, 'pipe2') else
-                    _pipe2_by_pipe)
+                    if hasattr(libc, 'pipe2') else _pipe2_by_pipe)
         except ImportError:
             return _pipe2_by_pipe
 

@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     plugins.privileged
     ==================
@@ -27,7 +26,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
@@ -38,9 +36,11 @@ import pytest
 
 def pytest_addoption(parser):
     group = parser.getgroup('privileged', 'tests with privileged operations')
-    group.addoption('--enable-privileged', action='store_true',
-                    help='Enable tests that required privileged operations',
-                    default=False)
+    group.addoption(
+        '--enable-privileged',
+        action='store_true',
+        help='Enable tests that required privileged operations',
+        default=False)
 
 
 def check_privileges_or_skip():

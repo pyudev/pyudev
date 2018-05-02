@@ -39,7 +39,6 @@ ACTIONS = ('add', 'remove', 'change', 'move')
 
 
 class DeprecatedObserverTestBase(object):
-
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0
@@ -98,8 +97,8 @@ class DeprecatedObserverTestBase(object):
         self.connect_signal(action_callback, action=action)
         funcname = 'udev_device_get_action'
         spec = lambda d: None
-        with mock.patch.object(fake_monitor_device._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                fake_monitor_device._libudev, funcname, autospec=spec) as func:
             func.return_value = action.encode('ascii')
             self.start_event_loop(fake_monitor.trigger_event)
             func.assert_called_with(fake_monitor_device)
@@ -166,8 +165,7 @@ class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
         self.app = self.qtcore.QCoreApplication.instance()
         if not self.app:
             self.app = self.qtcore.QCoreApplication([])
-        self.qtcore.QTimer.singleShot(
-            self_stop_timeout, self.stop_event_loop)
+        self.qtcore.QTimer.singleShot(self_stop_timeout, self.stop_event_loop)
 
     def start_event_loop(self, start_callback):
         self.qtcore.QTimer.singleShot(0, start_callback)
@@ -212,6 +210,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
         # drop the sender argument from glib signal connections
         def _wrapper(obj, *args, **kwargs):
             return callback(*args, **kwargs)
+
         if action is None:
             self.observer.connect('device-event', _wrapper)
         else:
@@ -226,6 +225,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
         def _wrapper(*args, **kwargs):
             start_callback(*args, **kwargs)
             return False
+
         self.event_sources.append(self.glib.timeout_add(0, _wrapper))
         self.mainloop.run()
 
@@ -234,10 +234,9 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
         return False
 
 
-@pytest.mark.skipif(str('"DISPLAY" not in os.environ'),
-                    reason='Display required for wxPython')
+@pytest.mark.skipif(
+    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
 class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
-
     def setup(self):
         self.wx = pytest.importorskip('wx')
 
@@ -245,21 +244,25 @@ class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
         from pyudev import wx
         self.observer = wx.WxUDevMonitorObserver(monitor)
         self.action_event_map = {
-                'add': wx.EVT_DEVICE_ADDED,
-                'remove': wx.EVT_DEVICE_REMOVED,
-                'change': wx.EVT_DEVICE_CHANGED,
-                'move': wx.EVT_DEVICE_MOVED
+            'add': wx.EVT_DEVICE_ADDED,
+            'remove': wx.EVT_DEVICE_REMOVED,
+            'change': wx.EVT_DEVICE_CHANGED,
+            'move': wx.EVT_DEVICE_MOVED
         }
 
     def connect_signal(self, callback, action=None):
         if action is None:
             from pyudev.wx import EVT_DEVICE_EVENT
+
             def _wrapper(event):
                 return callback(event.action, event.device)
+
             self.observer.Bind(EVT_DEVICE_EVENT, _wrapper)
         else:
+
             def _wrapper(event):
                 return callback(event.device)
+
             self.observer.Bind(self.action_event_map[action], _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
