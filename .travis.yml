@@ -3,12 +3,6 @@ branches:
     - master
     - develop-0.22
 language: python
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "pypy"
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libudev-dev
@@ -16,8 +10,20 @@ install:
   - pip install .
   - pip install -r requirements.txt
 
-env:
-    matrix:
-        - TASK=test-travis
+matrix:
+    include:
+        - python: 3.6
+          env: TASK=fmt-travis
+        - python: 2.7
+          env: TASK=test-travis
+        - python: 3.4
+          env: TASK=test-travis
+        - python: 3.5
+          env: TASK=test-travis
+        - python: 3.6
+          env: TASK=test-travis
+        - python: pypy
+          env: TASK=test-travis
+
 
 script: make -f Makefile $TASK
