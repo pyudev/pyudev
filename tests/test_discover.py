@@ -46,7 +46,7 @@ from hypothesis import settings
 from hypothesis import strategies
 
 _CONTEXT = pyudev.Context()
-_DEVICES = _CONTEXT.list_devices()
+_DEVICES = [d for d in _CONTEXT.list_devices()]
 
 NUM_TESTS = 5
 

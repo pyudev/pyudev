@@ -90,7 +90,7 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
-    @settings(max_examples=50)
+    @settings(max_examples=10)
     def test_match_subsystem(self, context, subsystem):
         """
         Subsystem match matches devices w/ correct subsystem.
@@ -102,7 +102,7 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
-    @settings(max_examples=5)
+    @settings(max_examples=1)
     def test_match_subsystem_nomatch(self, context, subsystem):
         """
         Subsystem no match gets no subsystem with subsystem.
@@ -126,7 +126,7 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
-    @settings(max_examples=5)
+    @settings(max_examples=1)
     def test_match_subsystem_nomatch_complete(self, context, subsystem):
         """
         Test that w/ respect to the universe of devices returned by
@@ -155,7 +155,7 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY)
-    @settings(max_examples=50)
+    @settings(max_examples=25)
     def test_match_property_string(self, context, pair):
         """
         Match property only gets devices with that property.
@@ -243,7 +243,7 @@ class TestEnumeratorMatchCombinations(object):
                min_size=2,
                max_size=3,
                unique_by=lambda p: p[0]))
-    @settings(max_examples=20)
+    @settings(max_examples=2)
     def test_combined_property_matches(self, context, ppairs):
         """
         Test for behaviour as observed in #1
