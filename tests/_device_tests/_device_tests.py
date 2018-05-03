@@ -352,7 +352,7 @@ class TestDevice(object):
            frozenset(device.properties.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=100)
+    @settings(max_examples=1)
     def test_getitem(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:

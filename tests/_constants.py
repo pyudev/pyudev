@@ -53,7 +53,7 @@ def _check_device(device):
         return False
 
 
-_DEVICE_DATA = udev.DeviceDatabase.db()
+_DEVICE_DATA = [d for d in udev.DeviceDatabase.db()]
 _DEVICES = [Devices.from_path(_CONTEXT, d.device_path) for d in _DEVICE_DATA]
 
 
@@ -69,7 +69,7 @@ def device_strategy(require_existing=True, filter_func=lambda x: True):
     :type filter_func: Device -> bool
     """
     strategy = strategies.sampled_from(
-        x for x in _CONTEXT.list_devices() if filter_func(x))
+        [x for x in _CONTEXT.list_devices() if filter_func(x)])
 
     if require_existing:
         strategy = strategy.filter(_check_device)
@@ -89,7 +89,7 @@ _SUBSYSTEM_STRATEGY = _SUBSYSTEM_STRATEGY.filter(lambda s: s != 'i2c')
 _SYSNAME_STRATEGY = device_strategy().map(lambda x: x.sys_name)
 
 _PROPERTY_STRATEGY = device_strategy().flatmap(
-    lambda d: strategies.sampled_from(d.properties.items()))
+    lambda d: strategies.sampled_from([p for p in d.properties.items()]))
 
 _MATCH_PROPERTY_STRATEGY = \
    _PROPERTY_STRATEGY.filter(lambda p: p[0][-4:] != "_ENC")
@@ -104,7 +104,7 @@ _ATTRIBUTES_STRATEGY = device_strategy().map(lambda d: d.attributes)
 # an attribute key and value pair
 _ATTRIBUTE_STRATEGY = \
    _ATTRIBUTES_STRATEGY.flatmap(
-      lambda attrs: strategies.sampled_from(attrs.available_attributes).map(
+      lambda attrs: strategies.sampled_from([a for a in attrs.available_attributes]).map(
          lambda key: (key, attrs.get(key))
       )
    )
@@ -119,11 +119,11 @@ if _UDEV_VERSION <= 230:
        )
 
 # the tags object for a given device
-_TAGS_STRATEGY = device_strategy().map(lambda d: d.tags)
+_TAGS_STRATEGY = device_strategy().map(lambda d: [t for t in d.tags])
 
 # an arbitrary tag belonging to a given device
 _TAG_STRATEGY = \
-        _TAGS_STRATEGY.filter(lambda t: sum(1 for _ in t) != 0).flatmap(
+        _TAGS_STRATEGY.filter(lambda t: t != []).flatmap(
            strategies.sampled_from
         )
 
