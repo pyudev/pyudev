@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev.core
     ===========
@@ -24,7 +22,6 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
-
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
@@ -319,9 +316,8 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (self._libudev.udev_enumerate_add_match_sysattr
-                 if not nomatch else
-                 self._libudev.udev_enumerate_add_nomatch_sysattr)
+        match = (self._libudev.udev_enumerate_add_match_sysattr if not nomatch
+                 else self._libudev.udev_enumerate_add_nomatch_sysattr)
         match(self, ensure_byte_string(attribute),
               property_value_to_bytes(value))
         return self
@@ -338,7 +334,8 @@ class Enumerator(object):
 
         .. versionadded:: 0.6
         """
-        self._libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
+        self._libudev.udev_enumerate_add_match_tag(self,
+                                                   ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):

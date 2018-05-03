@@ -16,7 +16,6 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 # pylint: disable=anomalous-backslash-in-string
-
 """
     pyudev.pyqt4
     ============
@@ -34,7 +33,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -47,18 +45,10 @@ from ._qt_base import QUDevMonitorObserverGenerator
 
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-   QtCore.QObject,
-   QtCore.pyqtSignal,
-   QtCore.QSocketNotifier
-)
-
-
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)
 """
 .. deprecated:: 0.17
    Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
 """
 QUDevMonitorObserver = QUDevMonitorObserverGenerator.make_monitor_observer(
-   QtCore.QObject,
-   QtCore.pyqtSignal,
-   QtCore.QSocketNotifier
-)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)

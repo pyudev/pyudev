@@ -27,6 +27,7 @@ from pyudev import Monitor, Devices
 
 from tests.utils.udev import DeviceDatabase
 
+
 @pytest.fixture
 def monitor(request):
     return Monitor.from_netlink(request.getfuncargvalue('context'))
@@ -50,7 +51,6 @@ def test_fake_monitor(fake_monitor, fake_monitor_device):
 
 
 class ObserverTestBase(object):
-
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0
@@ -127,7 +127,6 @@ class ObserverTestBase(object):
 
 
 class QtObserverTestBase(ObserverTestBase):
-
     def setup(self):
         self.qtcore = pytest.importorskip('{0}.QtCore'.format(
             self.BINDING_NAME))
@@ -144,8 +143,7 @@ class QtObserverTestBase(ObserverTestBase):
         self.app = self.qtcore.QCoreApplication.instance()
         if not self.app:
             self.app = self.qtcore.QCoreApplication([])
-        self.qtcore.QTimer.singleShot(
-            self_stop_timeout, self.stop_event_loop)
+        self.qtcore.QTimer.singleShot(self_stop_timeout, self.stop_event_loop)
 
     def start_event_loop(self, start_callback):
         self.qtcore.QTimer.singleShot(0, start_callback)
@@ -166,8 +164,8 @@ class TestPyQt4Observer(QtObserverTestBase):
 class TestPyQt5Observer(QtObserverTestBase):
     BINDING_NAME = 'PyQt5'
 
-class TestGlibObserver(ObserverTestBase):
 
+class TestGlibObserver(ObserverTestBase):
     def setup(self):
         self.event_sources = []
         self.glib = pytest.importorskip('glib')
@@ -198,6 +196,7 @@ class TestGlibObserver(ObserverTestBase):
         def _wrapper(*args, **kwargs):
             start_callback(*args, **kwargs)
             return False
+
         self.event_sources.append(self.glib.timeout_add(0, _wrapper))
         self.mainloop.run()
 
@@ -206,10 +205,9 @@ class TestGlibObserver(ObserverTestBase):
         return False
 
 
-@pytest.mark.skipif(str('"DISPLAY" not in os.environ'),
-                    reason='Display required for wxPython')
+@pytest.mark.skipif(
+    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
 class TestWxObserver(ObserverTestBase):
-
     def setup(self):
         self.wx = pytest.importorskip('wx')
 

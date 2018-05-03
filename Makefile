@@ -59,3 +59,15 @@ view:
 
 archive:
 	git archive --output=./archive.tar.gz HEAD
+
+.PHONY: test-travis
+test-travis:
+	py.test --junitxml=tests.xml --enable-privileged -rfEsxX
+
+.PHONY: fmt
+fmt:
+	yapf --style pep8 --recursive --in-place setup.py src tests
+
+.PHONY: fmt-travis
+fmt-travis:
+	yapf --style pep8 --recursive --diff setup.py src tests

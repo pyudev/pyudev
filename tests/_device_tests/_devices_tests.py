@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
 Tests methods belonging to Devices class.
 
@@ -101,16 +100,14 @@ class TestDevices(object):
         Test that getting a new device based on the name and subsystem
         yields an equivalent device.
         """
-        new_device = Devices.from_name(
-           a_context,
-           a_device.subsystem,
-           a_device.sys_name
-        )
+        new_device = Devices.from_name(a_context, a_device.subsystem,
+                                       a_device.sys_name)
         assert new_device == a_device
 
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
-    def test_from_name_no_device_in_existing_subsystem(self, a_context, subsys):
+    def test_from_name_no_device_in_existing_subsystem(self, a_context,
+                                                       subsys):
         """
         Verify that a real subsystem and non-existant name causes an
         exception to be raised.
@@ -133,9 +130,8 @@ class TestDevices(object):
 
     @failed_health_check_wrapper
     @given(
-       _CONTEXT_STRATEGY,
-       device_strategy(filter_func=lambda x: x.device_node is not None)
-    )
+        _CONTEXT_STRATEGY,
+        device_strategy(filter_func=lambda x: x.device_node is not None))
     @settings(max_examples=5)
     def test_from_device_number(self, a_context, a_device):
         """
@@ -149,9 +145,8 @@ class TestDevices(object):
 
     @failed_health_check_wrapper
     @given(
-       _CONTEXT_STRATEGY,
-       device_strategy(filter_func=lambda x: x.device_node is not None)
-    )
+        _CONTEXT_STRATEGY,
+        device_strategy(filter_func=lambda x: x.device_node is not None))
     @settings(max_examples=5)
     def test_from_device_number_wrong_type(self, a_context, a_device):
         """
@@ -166,11 +161,8 @@ class TestDevices(object):
             # this either fails, in which case the caught exception is
             # raised, or succeeds, but returns a wrong device
             # (device numbers are not unique across device types)
-            device = Devices.from_device_number(
-               a_context,
-               typ,
-               a_device.device_number
-            )
+            device = Devices.from_device_number(a_context, typ,
+                                                a_device.device_number)
             # if it succeeds, the resulting device must not match the
             # one, we are actually looking for!
             assert device != a_device
@@ -188,9 +180,8 @@ class TestDevices(object):
 
     @failed_health_check_wrapper
     @given(
-       _CONTEXT_STRATEGY,
-       device_strategy(filter_func=lambda x: x.device_node is not None)
-    )
+        _CONTEXT_STRATEGY,
+        device_strategy(filter_func=lambda x: x.device_node is not None))
     @settings(max_examples=5)
     def test_from_device_file(self, a_context, a_device):
         """
@@ -201,9 +192,8 @@ class TestDevices(object):
 
     @failed_health_check_wrapper
     @given(
-       _CONTEXT_STRATEGY,
-       device_strategy(filter_func=lambda x: any(x.device_links))
-    )
+        _CONTEXT_STRATEGY,
+        device_strategy(filter_func=lambda x: any(x.device_links)))
     @settings(max_examples=5)
     def test_from_device_file_links(self, a_context, a_device):
         """

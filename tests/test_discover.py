@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     tests.test_discover
     ===================
@@ -23,7 +22,6 @@
 
     .. moduleauthor:: mulhern <amulhern@redhat.com>
 """
-
 
 from __future__ import absolute_import
 from __future__ import division
@@ -47,11 +45,11 @@ from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies
 
-
 _CONTEXT = pyudev.Context()
-_DEVICES = _CONTEXT.list_devices()
+_DEVICES = [d for d in _CONTEXT.list_devices()]
 
 NUM_TESTS = 5
+
 
 class TestUtilities(object):
     """
@@ -105,6 +103,7 @@ class TestUtilities(object):
             links.append(device_node)
         return links
 
+
 class TestDiscovery(object):
     """
     Test discovery of an object from limited bits of its description.
@@ -115,9 +114,8 @@ class TestDiscovery(object):
     _DISCOVER.setup(_CONTEXT)
 
     @given(
-       strategies.sampled_from(_DEVICES).filter(lambda x: x.device_number),
-       strategies.text(":, -/+=").filter(lambda x: x)
-    )
+        strategies.sampled_from(_DEVICES).filter(lambda x: x.device_number),
+        strategies.text(":, -/+=").filter(lambda x: x))
     @settings(max_examples=NUM_TESTS)
     def test_device_number(self, a_device, a_string):
         """
@@ -138,7 +136,7 @@ class TestDiscovery(object):
         """
         for path in TestUtilities.get_paths(a_device):
             res = DevicePathHypothesis.get_devices(self._CONTEXT, path)
-            assert res == set((a_device,))
+            assert res == set((a_device, ))
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=NUM_TESTS)
@@ -154,10 +152,9 @@ class TestDiscovery(object):
         assert a_device in res
 
     _devices = [d for d in _DEVICES if list(d.device_links)]
+
     @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason="no device with device links"
-    )
+        len(_devices) == 0, reason="no device with device links")
     @given(strategies.sampled_from(_devices))
     @settings(max_examples=NUM_TESTS, min_satisfying_examples=1)
     def test_device_file(self, a_device):
@@ -170,17 +167,13 @@ class TestDiscovery(object):
         assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
         links = TestUtilities.get_files(a_device)
         devs = frozenset(
-           d for l in links for d in DeviceFileHypothesis.get_devices(
-              self._CONTEXT,
-              l
-           )
-        )
-        assert devs == set((a_device,))
+            d for l in links
+            for d in DeviceFileHypothesis.get_devices(self._CONTEXT, l))
+        assert devs == set((a_device, ))
 
     @given(
-       strategies.sampled_from(_DEVICES),
-       strategies.text(":, -/+=").filter(lambda x: x)
-    )
+        strategies.sampled_from(_DEVICES),
+        strategies.text(":, -/+=").filter(lambda x: x))
     @settings(max_examples=NUM_TESTS)
     def test_anything(self, a_device, a_string):
         """
@@ -194,10 +187,7 @@ class TestDiscovery(object):
         values.extend(TestUtilities.get_files(a_device))
 
         results = frozenset(
-           d for v in values for d in self._DISCOVER.get_devices(
-              self._CONTEXT,
-              v
-           )
-        )
+            d for v in values
+            for d in self._DISCOVER.get_devices(self._CONTEXT, v))
 
         assert a_device in results

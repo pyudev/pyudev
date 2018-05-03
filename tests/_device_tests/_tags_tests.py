@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
 Tests methods belonging to Devices class.
 
@@ -42,6 +41,7 @@ from ._device_tests import _DEVICE_DATA
 from ._device_tests import _DEVICES
 from ._device_tests import _UDEV_TEST
 
+
 class TestTags(object):
     """
     Test methods of the ``Tags`` class.
@@ -50,10 +50,8 @@ class TestTags(object):
     pytestmark = _UDEV_TEST(154, "TestTags")
 
     _device_data = [d for d in _DEVICE_DATA if d.tags]
-    @pytest.mark.skipif(
-       len(_device_data) == 0,
-       reason="no device with tags"
-    )
+
+    @pytest.mark.skipif(len(_device_data) == 0, reason="no device with tags")
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
     @settings(max_examples=5, min_satisfying_examples=1)
     def test_iteration_and_contains(self, a_context, device_datum):
@@ -75,7 +73,6 @@ class TestTags(object):
             func = a_device._libudev.udev_device_get_tags_list_entry
             func.assert_called_once_with(a_device)
 
-
     @_UDEV_TEST(172, "test_contans_mock")
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -85,8 +82,8 @@ class TestTags(object):
         """
         funcname = 'udev_device_has_tag'
         spec = lambda d, t: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = 1
             assert 'foo' in a_device.tags
             func.assert_called_once_with(a_device, b'foo')

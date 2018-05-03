@@ -6,3 +6,5 @@ hypothesis
 
 # documentation requirements
 sphinx>=1.0.7
+
+yapf

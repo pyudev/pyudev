@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     utils.udev
     =====================
@@ -160,8 +159,8 @@ class UDevAdm(object):
         return dict(pairs)
 
     def query_device_attributes(self, device_path):
-        output = self._execute(
-            'info', '--attribute-walk', '--path', device_path)
+        output = self._execute('info', '--attribute-walk', '--path',
+                               device_path)
         attribute_dump = output.decode(
             sys.getfilesystemencoding()).splitlines()
         attributes = {}
@@ -291,7 +290,7 @@ class DeviceDatabase(Iterable, Sized):
     _db = None
 
     @classmethod
-    def db(cls, renew=False): # pylint: disable=invalid-name
+    def db(cls, renew=False):  # pylint: disable=invalid-name
         """
         Get a database object.
 
@@ -304,7 +303,6 @@ class DeviceDatabase(Iterable, Sized):
             if udevadm:
                 cls._db = DeviceDatabase(udevadm)
         return cls._db
-
 
     def __init__(self, udevadm):
         self._udevadm = udevadm
