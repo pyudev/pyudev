@@ -353,8 +353,7 @@ class Monitor(object):
         self.start()
         if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
-        else:
-            return None
+        return None
 
     def receive_device(self):
         """

@@ -49,8 +49,7 @@ def exception_from_errno(errnum):
     errorstr = os.strerror(errnum)
     if exception is not None:
         return exception(errorstr)
-    else:
-        return EnvironmentError(errnum, errorstr)
+    return EnvironmentError(errnum, errorstr)
 
 
 def check_negative_errorcode(result, func, *args):

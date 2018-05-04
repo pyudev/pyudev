@@ -71,9 +71,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_sys_path'):
             return ensure_unicode_string(self._libudev.udev_get_sys_path(self))
-        else:
-            # Fixed path since udev 183
-            return '/sys'
+        return '/sys'  # Fixed path since udev 183
 
     @property
     def device_path(self):
@@ -82,9 +80,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_dev_path'):
             return ensure_unicode_string(self._libudev.udev_get_dev_path(self))
-        else:
-            # Fixed path since udev 183
-            return '/dev'
+        return '/dev'  # Fixed path since udev 183
 
     @property
     def run_path(self):
@@ -98,8 +94,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_run_path'):
             return ensure_unicode_string(self._libudev.udev_get_run_path(self))
-        else:
-            return '/run/udev'
+        return '/run/udev'
 
     @property
     def log_priority(self):
