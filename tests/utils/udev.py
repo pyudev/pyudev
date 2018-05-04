@@ -271,8 +271,7 @@ class DeviceData(object):
         """
         if self.device_node:
             return os.stat(self.device_node).st_rdev
-        else:
-            return 0
+        return 0
 
 
 class DeviceDatabase(Iterable, Sized):
