@@ -34,11 +34,8 @@ from ctypes import c_char_p
 from ctypes import c_int
 from ctypes import c_uint
 from ctypes import c_ulonglong
-from ctypes import CDLL
 from ctypes import Structure
 from ctypes import POINTER
-
-from ctypes.util import find_library
 
 from ._errorcheckers import check_errno_on_nonzero_return
 from ._errorcheckers import check_errno_on_null_pointer_return

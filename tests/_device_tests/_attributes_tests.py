@@ -27,7 +27,6 @@ from __future__ import unicode_literals
 
 import os
 import stat
-import sys
 
 from hypothesis import given
 from hypothesis import settings
