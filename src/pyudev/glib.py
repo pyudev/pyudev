@@ -86,6 +86,7 @@ class _ObserverMixin(object):
 
 
 class MonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -126,6 +127,7 @@ gobject.type_register(MonitorObserver)
 
 
 class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
