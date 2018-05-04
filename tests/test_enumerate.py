@@ -18,14 +18,11 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-import pytest
 import mock
 
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies
-
-from pyudev import Enumerator
 
 from ._constants import _ATTRIBUTE_STRATEGY
 from ._constants import _CONTEXT_STRATEGY
@@ -34,7 +31,6 @@ from ._constants import _SUBSYSTEM_STRATEGY
 from ._constants import _SYSNAME_STRATEGY
 from ._constants import _TAG_STRATEGY
 from ._constants import _UDEV_TEST
-from ._constants import _UDEV_VERSION
 from ._constants import device_strategy
 
 from .utils import failed_health_check_wrapper

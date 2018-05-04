@@ -33,7 +33,6 @@ from hypothesis import strategies
 import pytest
 
 from pyudev import Context
-from pyudev import Device
 from pyudev import Devices
 from pyudev import DeviceNotFoundError
 

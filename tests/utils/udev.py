@@ -34,7 +34,6 @@ import sys
 import os
 import re
 import errno
-import random
 import subprocess
 from collections import Iterable, Sized
 
