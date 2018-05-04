@@ -32,8 +32,8 @@ from ctypes import c_int
 
 from ._errorcheckers import check_errno_on_nonzero_return
 
-fd_pair = c_int * 2
+FD_PAIR = c_int * 2
 
-SIGNATURES = dict(pipe2=([fd_pair, c_int], c_int), )
+SIGNATURES = dict(pipe2=([FD_PAIR, c_int], c_int), )
 
 ERROR_CHECKERS = dict(pipe2=check_errno_on_nonzero_return, )
