@@ -469,7 +469,7 @@ class MonitorObserver(Thread):
                  event_handler=None,
                  callback=None,
                  *args,
-                 **kwargs):
+                 **kwargs):  # pylint: disable=keyword-arg-before-vararg
         """
         Create a new observer for the given ``monitor``.
 
