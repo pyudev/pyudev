@@ -24,8 +24,5 @@
 """
 
 __version_info__ = (0, 21, 0, '')
-__version__ = "%s%s" % \
-   (
-      ".".join(str(x) for x in __version_info__[:3]),
-      "".join(str(x) for x in __version_info__[3:])
-   )
+__version__ = "%s%s" % (".".join(str(x) for x in __version_info__[:3]),
+                        "".join(str(x) for x in __version_info__[3:]))

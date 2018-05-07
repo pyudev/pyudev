@@ -236,11 +236,8 @@ class Devices(object):
         This method is only appropriate for network devices.
         """
         network_devices = context.list_devices(subsystem='net')
-        dev = next(
-           (d for d in network_devices if \
-              d.attributes.get('ifindex') == ifindex),
-           None
-        )
+        dev = next((d for d in network_devices
+                    if d.attributes.get('ifindex') == ifindex), None)
         if dev is not None:
             return dev
         else:
