@@ -37,7 +37,7 @@ from wx.lib.newevent import NewEvent
 
 import pyudev
 
-DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
+DeviceEvent, EVT_DEVICE_EVENT = NewEvent()  # pylint: disable=invalid-name
 
 
 class MonitorObserver(EvtHandler):
@@ -112,10 +112,10 @@ class MonitorObserver(EvtHandler):
         PostEvent(self, DeviceEvent(device=device))
 
 
-DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
-DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
-DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
-DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
+DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()  # pylint: disable=invalid-name
+DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()  # pylint: disable=invalid-name
+DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()  # pylint: disable=invalid-name
+DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()  # pylint: disable=invalid-name
 
 
 class WxUDevMonitorObserver(MonitorObserver):
