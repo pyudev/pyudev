@@ -33,7 +33,7 @@ from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 from wx import EvtHandler, PostEvent
-from wx.lib.newevent import NewEvent
+from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
 
 import pyudev
 
