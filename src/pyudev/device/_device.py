@@ -648,9 +648,9 @@ class Device(Mapping):
         .. versionadded:: 0.10
         """
         device_type = self._libudev.udev_device_get_devtype(self)
-        if device_type is not None:
-            return ensure_unicode_string(device_type)
-        return device_type
+        if device_type is None:
+            return None
+        return ensure_unicode_string(device_type)
 
     @property
     def driver(self):
