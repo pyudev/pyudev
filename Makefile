@@ -22,11 +22,9 @@ pylint:
 	PYTHONPATH=src pylint src/pyudev \
 		--reports=no \
 		--disable=I \
-		--disable=bad-continuation \
 		--disable=duplicate-code \
 		--argument-rgx="[a-z_][a-z0-9_]{1,30}" \
 		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.* \
 		--variable-rgx="[a-z_][a-z0-9_]{1,30}" \
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 

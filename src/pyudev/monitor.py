@@ -353,8 +353,7 @@ class Monitor(object):
         self.start()
         if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
-        else:
-            return None
+        return None
 
     def receive_device(self):
         """
@@ -470,7 +469,7 @@ class MonitorObserver(Thread):
                  event_handler=None,
                  callback=None,
                  *args,
-                 **kwargs):
+                 **kwargs):  # pylint: disable=keyword-arg-before-vararg
         """
         Create a new observer for the given ``monitor``.
 

@@ -332,10 +332,10 @@ class DeviceFileHypothesis(Hypothesis):
         if '/' in key:
             device = func(context, key)
             return frozenset((device, )) if device is not None else frozenset()
-        else:
-            files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
-            devices = (func(context, f) for f in files)
-            return frozenset(d for d in devices if d is not None)
+
+        files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
+        devices = (func(context, f) for f in files)
+        return frozenset(d for d in devices if d is not None)
 
 
 class Discovery(object):

@@ -7,4 +7,7 @@ hypothesis==3.56.5
 # documentation requirements
 sphinx>=1.0.7
 
+# linting
+pylint
+
 yapf==0.21.0

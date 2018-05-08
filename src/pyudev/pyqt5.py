@@ -34,7 +34,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator
 

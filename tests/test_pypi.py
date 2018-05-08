@@ -29,7 +29,6 @@ if sys.version_info[0] < 3:
 
 import py.path
 import pytest
-import docutils.utils  # Work around Docutils bug 214
 from docutils import io, readers
 from docutils.core import publish_doctree, Publisher
 from docutils.transforms import TransformError

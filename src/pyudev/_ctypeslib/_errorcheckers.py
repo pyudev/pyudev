@@ -47,13 +47,12 @@ def exception_from_errno(errnum):
     """
     exception = ERRNO_EXCEPTIONS.get(errnum)
     errorstr = os.strerror(errnum)
-    if exception is not None:
-        return exception(errorstr)
-    else:
+    if exception is None:
         return EnvironmentError(errnum, errorstr)
+    return exception(errorstr)
 
 
-def check_negative_errorcode(result, func, *args):
+def check_negative_errorcode(result, _func, *_args):
     """Error checker for funtions, which return negative error codes.
 
     If ``result`` is smaller than ``0``, it is interpreted as negative error
@@ -74,7 +73,7 @@ def check_negative_errorcode(result, func, *args):
         return result
 
 
-def check_errno_on_nonzero_return(result, func, *args):
+def check_errno_on_nonzero_return(result, _func, *_args):
     """Error checker to check the system ``errno`` as returned by
     :func:`ctypes.get_errno()`.
 
@@ -89,7 +88,7 @@ def check_errno_on_nonzero_return(result, func, *args):
     return result
 
 
-def check_errno_on_null_pointer_return(result, func, *args):
+def check_errno_on_null_pointer_return(result, _func, *_args):
     """Error checker to check the system ``errno`` as returned by
     :func:`ctypes.get_errno()`.
 

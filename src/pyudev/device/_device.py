@@ -236,11 +236,8 @@ class Devices(object):
         This method is only appropriate for network devices.
         """
         network_devices = context.list_devices(subsystem='net')
-        dev = next(
-           (d for d in network_devices if \
-              d.attributes.get('ifindex') == ifindex),
-           None
-        )
+        dev = next((d for d in network_devices
+                    if d.attributes.get('ifindex') == ifindex), None)
         if dev is not None:
             return dev
         else:
@@ -648,10 +645,9 @@ class Device(Mapping):
         .. versionadded:: 0.10
         """
         device_type = self._libudev.udev_device_get_devtype(self)
-        if device_type is not None:
-            return ensure_unicode_string(device_type)
-        else:
-            return device_type
+        if device_type is None:
+            return None
+        return ensure_unicode_string(device_type)
 
     @property
     def driver(self):
@@ -995,14 +991,12 @@ class Device(Mapping):
     def __eq__(self, other):
         if isinstance(other, Device):
             return self.device_path == other.device_path
-        else:
-            return self.device_path == other
+        return self.device_path == other
 
     def __ne__(self, other):
         if isinstance(other, Device):
             return self.device_path != other.device_path
-        else:
-            return self.device_path != other
+        return self.device_path != other
 
     def __gt__(self, other):
         raise TypeError('Device not orderable')
@@ -1233,8 +1227,7 @@ class Tags(Iterable, Container):
             return bool(
                 self._libudev.udev_device_has_tag(self.device,
                                                   ensure_byte_string(tag)))
-        else:  # pragma: no cover
-            return any(t == tag for t in self)
+        return any(t == tag for t in self)  # pragma: no cover
 
     def __contains__(self, tag):
         """

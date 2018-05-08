@@ -37,8 +37,8 @@ from __future__ import (print_function, division, unicode_literals,
 
 # thanks to absolute imports, this really imports the glib binding and not this
 # module again
-import glib
-import gobject
+import glib  # pylint: disable=import-error
+import gobject  # pylint: disable=import-error
 
 
 class _ObserverMixin(object):
@@ -68,13 +68,16 @@ class _ObserverMixin(object):
     def enabled(self, value):
         if value and self.event_source is None:
             # pylint: disable=attribute-defined-outside-init
+            # pylint: disable=no-member
             self.event_source = glib.io_add_watch(self.monitor, glib.IO_IN,
                                                   self._process_udev_event)
         elif not value and self.event_source is not None:
+            # pylint: disable=no-member
             glib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
         # pylint: disable=unused-argument
+        # pylint: disable=no-member
         if condition == glib.IO_IN:
             device = self.monitor.poll(timeout=0)
             if device is not None:
@@ -86,6 +89,7 @@ class _ObserverMixin(object):
 
 
 class MonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -126,6 +130,7 @@ gobject.type_register(MonitorObserver)
 
 
 class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 

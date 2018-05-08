@@ -39,7 +39,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from PySide import QtCore
+from PySide import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator
 from ._qt_base import QUDevMonitorObserverGenerator

@@ -38,8 +38,8 @@ import os
 import fcntl
 from functools import partial
 
-from pyudev._ctypeslib.libc import fd_pair
 from pyudev._ctypeslib.libc import ERROR_CHECKERS
+from pyudev._ctypeslib.libc import FD_PAIR
 from pyudev._ctypeslib.libc import SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
 
@@ -56,7 +56,7 @@ def _pipe2_ctypes(libc, flags):
     Return a pair of file descriptors ``(r, w)``.
 
     """
-    fds = fd_pair()
+    fds = FD_PAIR()
     libc.pipe2(fds, flags)
     return fds[0], fds[1]
 

@@ -185,5 +185,4 @@ class DeviceValueError(DeviceError):
         if self._msg:
             fmt_str = self._FMT_STR + ": %s"
             return fmt_str % (self._value, self._param, self._msg)
-        else:
-            return self._FMT_STR % (self._value, self._param)
+        return self._FMT_STR % (self._value, self._param)

@@ -82,8 +82,7 @@ def property_value_to_bytes(value):
         value = int(value)
     if isinstance(value, bytes):
         return value
-    else:
-        return ensure_byte_string(six.text_type(value))
+    return ensure_byte_string(six.text_type(value))
 
 
 def string_to_bool(value):
