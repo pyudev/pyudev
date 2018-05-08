@@ -269,9 +269,8 @@ class DeviceData(object):
         Get the device number as integer or 0 if the device has no device
         number.
         """
-        if self.device_node:
-            return os.stat(self.device_node).st_rdev
-        return 0
+        device_node = self.device_node
+        return 0 if device_node is None else os.stat(device_node).st_rdev
 
 
 class DeviceDatabase(Iterable, Sized):
