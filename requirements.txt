@@ -8,6 +8,6 @@ hypothesis==3.56.10
 sphinx>=1.0.7
 
 # linting
-pylint==1.9.0
+pylint==1.9.1
 
 yapf==0.21.0
