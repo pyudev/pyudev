@@ -1,0 +1,6 @@
+requirements:
+    - pyup_requirements/default.txt:
+        update: all
+        pin: True
+    - pyup_requirements/python2.txt:
+        update: False

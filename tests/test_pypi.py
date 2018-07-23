@@ -40,7 +40,8 @@ README = os.path.join(SOURCE_DIRECTORY, 'README.rst')
 
 # Files in the repository that don't need to be present in the sdist
 REQUIRED_BLACKLIST = [
-    r'^\.git.+', r'\.travis\.yml$', r'^MANIFEST\.in$', r'^Makefile$'
+    r'^\.git.+', r'\.pyup\.yml', r'\.travis\.yml$', r'^MANIFEST\.in$',
+    r'^Makefile$', r'pyup_requirements'
 ]
 
 
