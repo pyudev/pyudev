@@ -162,9 +162,9 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
         gobject.GObject.__init__(self)
         self._setup_observer(monitor)
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.glib.MonitorObserver instead.',
-                      DeprecationWarning)
+        warnings.warn(
+            'Will be removed in 1.0. '
+            'Use pyudev.glib.MonitorObserver instead.', DeprecationWarning)
 
     def _emit_event(self, device):
         self.emit('device-event', device.action, device)

@@ -204,10 +204,9 @@ class TestEnumerator(object):
         """
         Test that matches returned for tag actually have tag.
         """
-        _test_direct_and_complement(context,
-                                    frozenset(
-                                        context.list_devices().match_tag(tag)),
-                                    lambda d: tag in d.tags)
+        _test_direct_and_complement(
+            context, frozenset(context.list_devices().match_tag(tag)),
+            lambda d: tag in d.tags)
 
     @failed_health_check_wrapper
     @given(
