@@ -96,9 +96,9 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
             'move': self.deviceMoved,
         }
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.pyqt4.MonitorObserver instead.',
-                      DeprecationWarning)
+        warnings.warn(
+            'Will be removed in 1.0. '
+            'Use pyudev.pyqt4.MonitorObserver instead.', DeprecationWarning)
 
     def _emit_event(self, device):
         self.deviceEvent.emit(device.action, device)

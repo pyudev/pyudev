@@ -135,9 +135,9 @@ class WxUDevMonitorObserver(MonitorObserver):
     def __init__(self, monitor):
         MonitorObserver.__init__(self, monitor)
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.wx.MonitorObserver instead.',
-                      DeprecationWarning)
+        warnings.warn(
+            'Will be removed in 1.0. '
+            'Use pyudev.wx.MonitorObserver instead.', DeprecationWarning)
 
     def _emit_event(self, device):
         PostEvent(self, DeviceEvent(action=device.action, device=device))

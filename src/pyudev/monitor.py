@@ -412,9 +412,10 @@ class Monitor(object):
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use an explicit loop over '
-                      '"poll()" instead, or monitor asynchronously with '
-                      '"MonitorObserver".', DeprecationWarning)
+        warnings.warn(
+            'Will be removed in 1.0. Use an explicit loop over '
+            '"poll()" instead, or monitor asynchronously with '
+            '"MonitorObserver".', DeprecationWarning)
         self.start()
         while True:
             device = self.poll()
@@ -503,8 +504,9 @@ class MonitorObserver(Thread):
         self._stop_event = None
         if event_handler is not None:
             import warnings
-            warnings.warn('"event_handler" argument will be removed in 1.0. '
-                          'Use Monitor.poll() instead.', DeprecationWarning)
+            warnings.warn(
+                '"event_handler" argument will be removed in 1.0. '
+                'Use Monitor.poll() instead.', DeprecationWarning)
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback
 
