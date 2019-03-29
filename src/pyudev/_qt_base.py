@@ -26,9 +26,6 @@
 # isort: FUTURE
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-# isort: THIRDPARTY
-import six
-
 # isort: LOCAL
 from pyudev.device import Device
 
@@ -201,7 +198,7 @@ class QUDevMonitorObserverGenerator(object):
             {
                 str("__init__"): make_init(qobject, socket_notifier),
                 #: emitted upon arbitrary device events
-                str("deviceEvent"): signal(six.text_type, Device),
+                str("deviceEvent"): signal(str, Device),
                 #: emitted if a device was added
                 str("deviceAdded"): signal(Device),
                 #: emitted if a device was removed

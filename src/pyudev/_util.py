@@ -32,9 +32,6 @@ import os
 import stat
 import sys
 
-# isort: THIRDPARTY
-import six
-
 try:
     # isort: STDLIB
     from subprocess import check_output
@@ -64,7 +61,7 @@ def ensure_unicode_string(value):
     decoded with the filesystem encoding (as in
     :func:`sys.getfilesystemencoding()`).
     """
-    if not isinstance(value, six.text_type):
+    if not isinstance(value, str):
         value = value.decode(sys.getfilesystemencoding())
     return value
 
@@ -86,7 +83,7 @@ def property_value_to_bytes(value):
         value = int(value)
     if isinstance(value, bytes):
         return value
-    return ensure_byte_string(six.text_type(value))
+    return ensure_byte_string(str(value))
 
 
 def string_to_bool(value):

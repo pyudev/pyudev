@@ -29,18 +29,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 # isort: STDLIB
 import abc
 
-# isort: THIRDPARTY
-from six import add_metaclass
 
-
-@add_metaclass(abc.ABCMeta)
 class DeviceError(Exception):
     """
     Any error raised when messing around w/ or trying to discover devices.
     """
 
+    __metaclass__ = abc.ABCMeta
 
-@add_metaclass(abc.ABCMeta)
+
 class DeviceNotFoundError(DeviceError):
     """
     An exception indicating that no :class:`Device` was found.
@@ -48,6 +45,8 @@ class DeviceNotFoundError(DeviceError):
     .. versionchanged:: 0.5
        Rename from ``NoSuchDeviceError`` to its current name.
     """
+
+    __metaclass__ = abc.ABCMeta
 
 
 class DeviceNotFoundAtPathError(DeviceNotFoundError):
