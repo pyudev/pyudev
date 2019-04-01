@@ -35,7 +35,8 @@ from __future__ import (print_function, division, unicode_literals,
 from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
 
-import pyudev
+# for some reason, pylint thinks pyudev is a third party import
+import pyudev  # pylint: disable=wrong-import-order
 
 DeviceEvent, EVT_DEVICE_EVENT = NewEvent()  # pylint: disable=invalid-name
 
