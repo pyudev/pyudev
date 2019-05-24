@@ -32,6 +32,7 @@ from operator import attrgetter
 from contextlib import contextmanager
 from collections import namedtuple
 
+import pytest
 import mock
 
 Node = namedtuple('Node', 'name value next')
@@ -93,5 +94,6 @@ def libudev_list(libudev, function, items):
 EXPOSED_FUNCTIONS = [libudev_list]
 
 
-def pytest_namespace():
-    return dict((f.__name__, f) for f in EXPOSED_FUNCTIONS)
+def pytest_configure():
+    for f in EXPOSED_FUNCTIONS:
+        setattr(pytest, f.__name__, f)
