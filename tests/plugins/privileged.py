@@ -71,5 +71,6 @@ def unload_dummy():
 EXPOSED_FUNCTIONS = [load_dummy, unload_dummy]
 
 
-def pytest_namespace():
-    return dict((f.__name__, f) for f in EXPOSED_FUNCTIONS)
+def pytest_configure():
+    for f in EXPOSED_FUNCTIONS:
+        setattr(pytest, f.__name__, f)
