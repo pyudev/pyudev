@@ -38,8 +38,9 @@ def is_on_travis_ci():
 EXPOSED_FUNCTIONS = [is_on_travis_ci]
 
 
-def pytest_namespace():
-    return dict((f.__name__, f) for f in EXPOSED_FUNCTIONS)
+def pytest_configure():
+    for f in EXPOSED_FUNCTIONS:
+        setattr(pytest, f.__name__, f)
 
 
 def pytest_runtest_setup(item):
