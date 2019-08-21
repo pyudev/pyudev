@@ -26,12 +26,12 @@ from pyudev import Monitor, Devices
 
 @pytest.fixture
 def monitor(request):
-    return Monitor.from_netlink(request.getfuncargvalue('context'))
+    return Monitor.from_netlink(request.getfixturevalue('context'))
 
 
 @pytest.fixture
 def fake_monitor_device(request):
-    context = request.getfuncargvalue('context')
+    context = request.getfixturevalue('context')
     return Devices.from_path(context, '/devices/platform')
 
 
