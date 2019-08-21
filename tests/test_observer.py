@@ -30,12 +30,12 @@ from tests.utils.udev import DeviceDatabase
 
 @pytest.fixture
 def monitor(request):
-    return Monitor.from_netlink(request.getfuncargvalue('context'))
+    return Monitor.from_netlink(request.getfixturevalue('context'))
 
 
 @pytest.fixture
 def fake_monitor_device(request):
-    context = request.getfuncargvalue('context')
+    context = request.getfixturevalue('context')
     device = random.choice(list(DeviceDatabase.db()))
     return Devices.from_path(context, device.device_path)
 
