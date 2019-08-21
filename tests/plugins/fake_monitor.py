@@ -94,4 +94,4 @@ def fake_monitor(request):
        To use this funcarg, you have to provide the ``fake_monitor_device``
        funcarg!
     """
-    return FakeMonitor(request.getfuncargvalue('fake_monitor_device'))
+    return FakeMonitor(request.getfixturevalue('fake_monitor_device'))
