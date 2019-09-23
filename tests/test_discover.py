@@ -156,7 +156,7 @@ class TestDiscovery(object):
     @pytest.mark.skipif(
         len(_devices) == 0, reason="no device with device links")
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=NUM_TESTS, min_satisfying_examples=1)
+    @settings(max_examples=NUM_TESTS)
     def test_device_file(self, a_device):
         """
         Test lookup by device file.
