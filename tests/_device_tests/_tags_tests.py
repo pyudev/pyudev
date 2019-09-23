@@ -53,7 +53,7 @@ class TestTags(object):
 
     @pytest.mark.skipif(len(_device_data) == 0, reason="no device with tags")
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_iteration_and_contains(self, a_context, device_datum):
         """
         Test that iteration yields all tags and contains checks them.
