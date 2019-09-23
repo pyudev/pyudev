@@ -68,7 +68,7 @@ class TestDevice(object):
     @pytest.mark.skipif(len(_devices) == 0, reason='no device with a parent')
     @_UDEV_TEST(172, "test_child_of_parents")
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_child_of_parent(self, a_device):
         assert a_device in a_device.parent.children
 
@@ -77,7 +77,7 @@ class TestDevice(object):
     @pytest.mark.skipif(len(_devices) == 0, reason='no device with a child')
     @_UDEV_TEST(172, "test_children")
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_children(self, a_device):
         children = list(a_device.children)
         for child in children:
@@ -98,7 +98,7 @@ class TestDevice(object):
         len(_devices) == 0,
         reason='no device with a parent in the same subsystem')
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_find_parent(self, a_device):
         parent = a_device.find_parent(a_device.subsystem)
         assert parent.subsystem == a_device.subsystem
@@ -370,7 +370,7 @@ class TestDevice(object):
     @pytest.mark.skipif(
         len(_device_data) == 0, reason='no device with a DEVNAME property')
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_getitem_devname(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         data_devname = os.path.join(a_context.device_path,
@@ -467,7 +467,7 @@ class TestDevice(object):
     @pytest.mark.skipif(
         len(_devices) == 0, reason='unsafe to check ID_WWN_WITH_EXTENSION')
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_id_wwn_with_extension(self, a_device):
         """
         Test that the ID_WWN_WITH_EXTENSION has a corresponding link.

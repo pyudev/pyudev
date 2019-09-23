@@ -126,7 +126,7 @@ _CHAR_DEVICES = list(_CONTEXT.list_devices(subsystem="tty"))
 
 @pytest.mark.skipif(len(_CHAR_DEVICES) == 0, reason='no tty devices')
 @given(strategies.sampled_from(_CHAR_DEVICES))
-@settings(min_satisfying_examples=1, max_examples=5)
+@settings(max_examples=5)
 def test_get_device_type_character_device(a_device):
     """
     Check that the device type of a character device is actually char.
@@ -139,7 +139,7 @@ _BLOCK_DEVICES = list(_CONTEXT.list_devices(subsystem="block"))
 
 @pytest.mark.skipif(len(_BLOCK_DEVICES) == 0, reason='no block devices')
 @given(strategies.sampled_from(_BLOCK_DEVICES))
-@settings(min_satisfying_examples=1, max_examples=5)
+@settings(max_examples=5)
 def test_get_device_type_block_device(a_device):
     """
     Check that the device type of a block device is actually block.
