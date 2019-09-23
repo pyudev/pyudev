@@ -30,9 +30,9 @@ from __future__ import unicode_literals
 
 import os
 import re
-from collections import Container
-from collections import Iterable
-from collections import Mapping
+from collections.abc import Container
+from collections.abc import Iterable
+from collections.abc import Mapping
 from datetime import timedelta
 
 from pyudev._errors import DeviceNotFoundAtPathError

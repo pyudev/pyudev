@@ -35,7 +35,7 @@ import os
 import re
 import errno
 import subprocess
-from collections import Iterable, Sized
+from collections.abc import Iterable, Sized
 
 
 class UDevAdm(object):
