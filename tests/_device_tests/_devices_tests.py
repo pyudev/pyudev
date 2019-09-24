@@ -189,31 +189,6 @@ class TestDevices(object):
         device = Devices.from_device_file(a_context, a_device.device_node)
         assert a_device == device
 
-    @failed_health_check_wrapper
-    @given(
-        _CONTEXT_STRATEGY,
-        device_strategy(filter_func=lambda x: any(x.device_links)))
-    @settings(max_examples=5)
-    def test_from_device_file_links(self, a_context, a_device):
-        """
-        For each link in DEVLINKS, test that the constructed device's
-        path matches the orginal devices path.
-
-        This does not hold true in the case of multipath. In this case
-        udevadm's DEVLINKS fields holds some links that do not actually
-        point to the originating device.
-
-        See: https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
-        """
-        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
-
-        for link in a_device.device_links:
-            link = os.path.join(a_context.device_path, link)
-
-            device = Devices.from_device_file(a_context, link)
-            assert device == a_device
-            assert link in device.device_links
-
     def test_from_device_file_no_device_file(self, tmpdir):
         """
         Verify that a file that is not a device file will cause an exception
