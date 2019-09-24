@@ -153,24 +153,6 @@ class TestDiscovery(object):
 
     _devices = [d for d in _DEVICES if list(d.device_links)]
 
-    @pytest.mark.skipif(
-        len(_devices) == 0, reason="no device with device links")
-    @given(strategies.sampled_from(_devices))
-    @settings(max_examples=NUM_TESTS)
-    def test_device_file(self, a_device):
-        """
-        Test lookup by device file.
-
-        Skip any devices that are multipath device paths because links
-        may point to other paths in multipath group (rhbz#1263441).
-        """
-        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
-        links = TestUtilities.get_files(a_device)
-        devs = frozenset(
-            d for l in links
-            for d in DeviceFileHypothesis.get_devices(self._CONTEXT, l))
-        assert devs == set((a_device, ))
-
     @given(
         strategies.sampled_from(_DEVICES),
         strategies.text(":, -/+=").filter(lambda x: x))
