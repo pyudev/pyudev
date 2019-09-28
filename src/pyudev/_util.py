@@ -145,9 +145,6 @@ def eintr_retry_call(func, *args, **kwargs):
     This function is based on _eintr_retry_call in python's subprocess.py.
     """
 
-    # select.error inherits from Exception instead of OSError in Python 2
-    import select
-
     while True:
         try:
             return func(*args, **kwargs)
