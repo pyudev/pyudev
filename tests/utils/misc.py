@@ -22,7 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 from functools import wraps
 
 import six

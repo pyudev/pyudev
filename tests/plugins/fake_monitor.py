@@ -27,7 +27,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import os
 from select import select
 

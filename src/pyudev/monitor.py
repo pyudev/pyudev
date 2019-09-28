@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import os
 import errno
 from threading import Thread

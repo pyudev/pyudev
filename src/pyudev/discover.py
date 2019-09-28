@@ -22,7 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 import abc
 import functools
 import os

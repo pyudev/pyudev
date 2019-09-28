@@ -31,7 +31,6 @@
 
 """
 
-
 # thanks to absolute imports, this really imports the glib binding and not this
 # module again
 import glib  # pylint: disable=import-error
@@ -115,7 +114,7 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
         'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+                         (gobject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):
@@ -144,15 +143,15 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
 
     __gsignals__ = {
         'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
+                         (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
         'device-added': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+                         (gobject.TYPE_PYOBJECT, )),
         'device-removed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
+                           (gobject.TYPE_PYOBJECT, )),
         'device-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
+                           (gobject.TYPE_PYOBJECT, )),
         'device-moved': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+                         (gobject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):

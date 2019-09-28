@@ -28,7 +28,6 @@
     .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
-
 from PyQt5 import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator

@@ -28,7 +28,6 @@ r"""pyudev.wx
 
 """
 
-
 from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
 

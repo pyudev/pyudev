@@ -22,7 +22,6 @@
     .. moduleauthor:: mulhern <amulhern@redhat.com>
 """
 
-
 import os
 
 import pyudev

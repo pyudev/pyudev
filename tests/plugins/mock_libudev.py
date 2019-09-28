@@ -24,7 +24,6 @@
 
 """
 
-
 from operator import attrgetter
 from contextlib import contextmanager
 from collections import namedtuple

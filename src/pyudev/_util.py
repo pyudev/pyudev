@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 try:
     from subprocess import check_output
 except ImportError:

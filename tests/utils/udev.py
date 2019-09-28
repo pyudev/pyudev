@@ -24,7 +24,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 import sys
 import os
 import re

@@ -22,7 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 import gc
 
 # pylint: disable=unused-import

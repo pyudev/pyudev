@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from subprocess import Popen, CalledProcessError, PIPE
 
 

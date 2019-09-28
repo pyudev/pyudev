@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from pyudev.device import Devices
 from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._ctypeslib.libudev import ERROR_CHECKERS

@@ -19,7 +19,6 @@ Tests methods belonging to Device class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 import re
 import os
 import operator

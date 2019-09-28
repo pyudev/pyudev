@@ -20,7 +20,6 @@
     Error checkers for ctypes wrappers.
 """
 
-
 import os
 import errno
 from ctypes import get_errno

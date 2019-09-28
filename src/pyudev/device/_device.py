@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import os
 import re
 from collections import Container

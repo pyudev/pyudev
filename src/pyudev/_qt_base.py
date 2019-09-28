@@ -22,7 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import six
 
 from pyudev.device import Device
@@ -187,21 +186,15 @@ class QUDevMonitorObserverGenerator:
             "QUDevMonitorObserver",
             (qobject, QUDevMonitorObserverMixin),
             {
-                "__init__":
-                make_init(qobject, socket_notifier),
+                "__init__": make_init(qobject, socket_notifier),
                 #: emitted upon arbitrary device events
-                "deviceEvent":
-                signal(str, Device),
+                "deviceEvent": signal(str, Device),
                 #: emitted if a device was added
-                "deviceAdded":
-                signal(Device),
+                "deviceAdded": signal(Device),
                 #: emitted if a device was removed
-                "deviceRemoved":
-                signal(Device),
+                "deviceRemoved": signal(Device),
                 #: emitted if a device was changed
-                "deviceChanged":
-                signal(Device),
+                "deviceChanged": signal(Device),
                 #: emitted if a device was moved
-                "deviceMoved":
-                signal(Device)
+                "deviceMoved": signal(Device)
             })

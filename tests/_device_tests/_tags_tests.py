@@ -19,7 +19,6 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies

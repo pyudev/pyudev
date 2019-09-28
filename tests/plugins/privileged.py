@@ -25,7 +25,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from subprocess import call
 
 import pytest

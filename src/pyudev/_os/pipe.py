@@ -28,7 +28,6 @@
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import os
 import fcntl
 from functools import partial

@@ -32,7 +32,6 @@ r"""
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from PyQt4 import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator

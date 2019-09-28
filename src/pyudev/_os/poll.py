@@ -22,7 +22,6 @@
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 import select
 
 from pyudev._util import eintr_retry_call

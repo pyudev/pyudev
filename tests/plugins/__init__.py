@@ -21,4 +21,3 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
-

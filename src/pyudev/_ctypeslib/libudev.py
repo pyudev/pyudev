@@ -23,7 +23,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from ctypes import c_char
 from ctypes import c_char_p
 from ctypes import c_int

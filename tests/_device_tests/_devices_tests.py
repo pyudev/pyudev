@@ -19,7 +19,6 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 import os
 import stat
 

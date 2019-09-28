@@ -22,7 +22,6 @@
     .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
-
 from ctypes import CDLL
 from ctypes.util import find_library
 

@@ -33,7 +33,6 @@ r"""
     .. versionadded:: 0.6
 """
 
-
 from PySide import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator

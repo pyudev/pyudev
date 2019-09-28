@@ -22,7 +22,6 @@
     .. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
 """
 
-
 import abc
 
 from six import add_metaclass

@@ -22,7 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-
 from hypothesis import strategies
 
 import pytest

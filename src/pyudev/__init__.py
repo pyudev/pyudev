@@ -31,7 +31,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._errors import DeviceNotFoundByFileError
 from pyudev._errors import DeviceNotFoundByNameError
