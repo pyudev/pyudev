@@ -2,8 +2,8 @@
 pyudev
 ######
 
-.. image:: https://secure.travis-ci.org/pyudev/pyudev.png?branch=develop
-   :target: http://travis-ci.org/pyudev/pyudev
+.. image:: https://travis-ci.org/pyudev/pyudev.svg
+    :target: https://travis-ci.org/pyudev/pyudev
 
 http://pyudev.readthedocs.org
 
