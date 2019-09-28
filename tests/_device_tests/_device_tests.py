@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -20,10 +19,6 @@ Tests methods belonging to Device class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import re
 import os
@@ -52,7 +47,7 @@ from .._constants import _DEVICES
 from .._constants import _UDEV_TEST
 
 
-class TestDevice(object):
+class TestDevice:
     """
     Test ``Device`` methods.
     """
@@ -479,7 +474,7 @@ class TestDevice(object):
         https://bugzilla.redhat.com/show_bug.cgi?id=1263441.
         """
         id_wwn = a_device.properties['ID_WWN_WITH_EXTENSION']
-        assert a_device.subsystem == u'block'
+        assert a_device.subsystem == 'block'
 
         id_path = '/dev/disk/by-id'
         link_name = "wwn-%s" % id_wwn

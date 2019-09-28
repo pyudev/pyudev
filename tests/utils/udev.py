@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -25,10 +24,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import sys
 import os
@@ -38,7 +33,7 @@ import subprocess
 from collections import Iterable, Sized
 
 
-class UDevAdm(object):
+class UDevAdm:
     """
     Wrap ``udevadm`` utility.
     """
@@ -62,7 +57,7 @@ class UDevAdm(object):
                 # executable
                 udevadm.query_udev_version()
                 return udevadm
-            except EnvironmentError as error:
+            except OSError as error:
                 if error.errno != errno.ENOENT:
                     raise
 
@@ -77,7 +72,7 @@ class UDevAdm(object):
         if cls._adm is None:
             try:
                 cls._adm = cls.find()
-            except EnvironmentError:
+            except OSError:
                 pass
         return cls._adm
 
@@ -187,7 +182,7 @@ class UDevAdm(object):
             return None
 
 
-class DeviceData(object):
+class DeviceData:
     """
     Data for a single device.
     """
@@ -197,7 +192,7 @@ class DeviceData(object):
         self._udevadm = udevadm
 
     def __repr__(self):
-        return '{0}({1})'.format(self.__class__.__name__, self.device_path)
+        return '{}({})'.format(self.__class__.__name__, self.device_path)
 
     @property
     def sys_path(self):

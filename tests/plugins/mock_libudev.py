@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -25,8 +24,6 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 from operator import attrgetter
 from contextlib import contextmanager
@@ -38,7 +35,7 @@ import mock
 Node = namedtuple('Node', 'name value next')
 
 
-class LinkedList(object):
+class LinkedList:
     """
     Linked list class to mock libudev list functions.
     """
@@ -81,7 +78,7 @@ def libudev_list(libudev, function, items):
         function, 'udev_list_entry_get_next', 'udev_list_entry_get_name',
         'udev_list_entry_get_value'
     ]
-    mocks = dict((f, mock.DEFAULT) for f in functions_to_patch)
+    mocks = {f: mock.DEFAULT for f in functions_to_patch}
     with mock.patch.multiple(libudev, **mocks):
         udev_list = LinkedList.from_iterable(items)
         getattr(libudev, function).return_value = udev_list.first

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,10 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import abc
 import functools
@@ -59,8 +54,7 @@ def wrap_exception(func):
     return the_func
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Hypothesis(object):
+class Hypothesis(metaclass=abc.ABCMeta):
     """
     Represents a hypothesis about the meaning of the device identifier.
     """
@@ -297,7 +291,7 @@ class DeviceFileHypothesis(Hypothesis):
         devices = context.list_devices()
         devices_with_links = (d for d in devices if list(d.device_links))
         links = (l for d in devices_with_links for l in d.device_links)
-        return sorted(set(os.path.dirname(l) for l in links))
+        return sorted({os.path.dirname(l) for l in links})
 
     @classmethod
     def setup(cls, context):
@@ -338,7 +332,7 @@ class DeviceFileHypothesis(Hypothesis):
         return frozenset(d for d in devices if d is not None)
 
 
-class Discovery(object):
+class Discovery:
     # pylint: disable=too-few-public-methods
     """
     Provides discovery methods for devices.

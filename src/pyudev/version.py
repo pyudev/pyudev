@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -24,5 +23,5 @@
 """
 
 __version_info__ = (0, 21, 0, '')
-__version__ = "%s%s" % (".".join(str(x) for x in __version_info__[:3]),
+__version__ = "{}{}".format(".".join(str(x) for x in __version_info__[:3]),
                         "".join(str(x) for x in __version_info__[3:]))

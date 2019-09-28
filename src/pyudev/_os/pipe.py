@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -29,10 +28,6 @@
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import fcntl
@@ -121,7 +116,7 @@ def set_fd_status_flag(fd, flag):
     fcntl.fcntl(fd, fcntl.F_SETFL, flags | flag)
 
 
-class Pipe(object):
+class Pipe:
     """A unix pipe.
 
     A pipe object provides two file objects: :attr:`source` is a readable file

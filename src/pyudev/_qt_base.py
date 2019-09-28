@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,17 +22,13 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import six
 
 from pyudev.device import Device
 
 
-class MonitorObserverMixin(object):
+class MonitorObserverMixin:
     """
     Base mixin for pyqt monitor observers.
     """
@@ -125,7 +120,7 @@ def make_init(qobject, socket_notifier):
     return __init__
 
 
-class MonitorObserverGenerator(object):
+class MonitorObserverGenerator:
     """
     Class to generate a MonitorObserver class.
     """
@@ -154,13 +149,13 @@ class MonitorObserverGenerator(object):
 
         """
         return type(
-            str("MonitorObserver"), (qobject, MonitorObserverMixin), {
-                str("__init__"): make_init(qobject, socket_notifier),
-                str("deviceEvent"): signal(Device)
+            "MonitorObserver", (qobject, MonitorObserverMixin), {
+                "__init__": make_init(qobject, socket_notifier),
+                "deviceEvent": signal(Device)
             })
 
 
-class QUDevMonitorObserverGenerator(object):
+class QUDevMonitorObserverGenerator:
     """
     Class to generate a MonitorObserver class.
     """
@@ -189,24 +184,24 @@ class QUDevMonitorObserverGenerator(object):
 
         """
         return type(
-            str("QUDevMonitorObserver"),
+            "QUDevMonitorObserver",
             (qobject, QUDevMonitorObserverMixin),
             {
-                str("__init__"):
+                "__init__":
                 make_init(qobject, socket_notifier),
                 #: emitted upon arbitrary device events
-                str("deviceEvent"):
-                signal(six.text_type, Device),
+                "deviceEvent":
+                signal(str, Device),
                 #: emitted if a device was added
-                str("deviceAdded"):
+                "deviceAdded":
                 signal(Device),
                 #: emitted if a device was removed
-                str("deviceRemoved"):
+                "deviceRemoved":
                 signal(Device),
                 #: emitted if a device was changed
-                str("deviceChanged"):
+                "deviceChanged":
                 signal(Device),
                 #: emitted if a device was moved
-                str("deviceMoved"):
+                "deviceMoved":
                 signal(Device)
             })

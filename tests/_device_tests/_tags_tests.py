@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -20,10 +19,6 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from hypothesis import given
 from hypothesis import settings
@@ -42,7 +37,7 @@ from ._device_tests import _DEVICES
 from ._device_tests import _UDEV_TEST
 
 
-class TestTags(object):
+class TestTags:
     """
     Test methods of the ``Tags`` class.
     """

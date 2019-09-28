@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,8 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import os
 import errno
@@ -40,7 +37,7 @@ from pyudev._os import pipe
 from pyudev._os import poll
 
 
-class Monitor(object):
+class Monitor:
     """
     A synchronous device event monitor.
 
@@ -113,12 +110,12 @@ class Monitor(object):
         failed.
         """
         if source not in ('kernel', 'udev'):
-            raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
+            raise ValueError('Invalid source: {!r}. Must be one of "udev" '
                              'or "kernel"'.format(source))
         monitor = context._libudev.udev_monitor_new_from_netlink(
             context, ensure_byte_string(source))
         if not monitor:
-            raise EnvironmentError('Could not create udev monitor')
+            raise OSError('Could not create udev monitor')
         return cls(context, monitor)
 
     @property
@@ -133,7 +130,7 @@ class Monitor(object):
 
     def fileno(self):
         # pylint: disable=anomalous-backslash-in-string
-        """
+        r"""
         Return the file description associated with this monitor as integer.
 
         This is really a real file descriptor ;), which can be watched and
@@ -293,7 +290,7 @@ class Monitor(object):
             try:
                 device_p = self._libudev.udev_monitor_receive_device(self)
                 return Device(self.context, device_p) if device_p else None
-            except EnvironmentError as error:
+            except OSError as error:
                 if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
                     # No data available
                     return None
@@ -531,7 +528,7 @@ class MonitorObserver(Thread):
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
-                    raise EnvironmentError('Observed monitor hung up')
+                    raise OSError('Observed monitor hung up')
 
     def send_stop(self):
         """

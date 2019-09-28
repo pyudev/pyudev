@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,10 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import re
@@ -51,7 +46,7 @@ from pyudev._util import udev_list_iterate
 # pylint: disable=too-many-lines
 
 
-class Devices(object):
+class Devices:
     """
     Class for constructing :class:`Device` objects from various kinds of data.
     """
@@ -218,7 +213,7 @@ class Devices(object):
         try:
             device_type = get_device_type(filename)
             device_number = os.stat(filename).st_rdev
-        except (EnvironmentError, ValueError) as err:
+        except (OSError, ValueError) as err:
             raise DeviceNotFoundByFileError(err)
 
         return cls.from_device_number(context, device_type, device_number)
@@ -1092,7 +1087,7 @@ class Properties(Mapping):
         return string_to_bool(self[prop])
 
 
-class Attributes(object):
+class Attributes:
     """
     udev attributes for :class:`Device` objects.
 

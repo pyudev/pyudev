@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import random
 import syslog
@@ -38,7 +35,7 @@ def test_udev_version():
     assert udev_version() > 150
 
 
-class TestContext(object):
+class TestContext:
     def test_sys_path(self, context):
         assert is_unicode_string(context.sys_path)
         assert context.sys_path == '/sys'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import mock
 
@@ -79,7 +76,7 @@ def _test_intersection_and_union(context, matches, nomatches):
     assert matches | nomatches == frozenset(context.list_devices())
 
 
-class TestEnumerator(object):
+class TestEnumerator:
     """
     Test the Enumerator class.
     """
@@ -228,7 +225,7 @@ class TestEnumerator(object):
         assert device in children
 
 
-class TestEnumeratorMatchCombinations(object):
+class TestEnumeratorMatchCombinations:
     """
     Test combinations of matches.
     """
@@ -312,7 +309,7 @@ class TestEnumeratorMatchCombinations(object):
         )
 
 
-class TestEnumeratorMatchMethod(object):
+class TestEnumeratorMatchMethod:
     """
     Test the behavior of Enumerator.match.
 

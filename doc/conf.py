@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -16,8 +15,6 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import sys
 import os
@@ -34,7 +31,7 @@ sys.path.append(os.path.normpath(
     os.path.join(doc_directory, os.pardir, 'tests')))
 
 
-class Mock(object):
+class Mock:
     """
     Mock modules.
 
@@ -95,8 +92,8 @@ master_doc = 'index'
 exclude_patterns = ['_build/*']
 source_suffix = '.rst'
 
-project = u'pyudev'
-copyright = u'2010, 2011 Sebastian Wiesner'
+project = 'pyudev'
+copyright = '2010, 2011 Sebastian Wiesner'
 version = '.'.join(pyudev.__version__.split('.')[:2])
 release = pyudev.__version__
 
@@ -122,7 +119,7 @@ class UDevVersion(Directive):
     def run(self):
         udevversion = self.arguments[0]
         para = nodes.paragraph(udevversion, '', classes=['udevversion'])
-        text = 'Required udev version: {0}'.format(*self.arguments)
+        text = 'Required udev version: {}'.format(*self.arguments)
         node = nodes.inline(udevversion, text, classes=['versionmodified'])
         para.append(node)
         return [para]

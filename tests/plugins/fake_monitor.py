@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -28,8 +27,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import os
 from select import select
@@ -37,7 +34,7 @@ from select import select
 import pytest
 
 
-class FakeMonitor(object):
+class FakeMonitor:
     """
     A fake :class:`~pyudev.Monitor` which allows you to trigger arbitrary
     events.

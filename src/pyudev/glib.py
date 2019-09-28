@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -32,8 +31,6 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 # thanks to absolute imports, this really imports the glib binding and not this
 # module again
@@ -41,7 +38,7 @@ import glib  # pylint: disable=import-error
 import gobject  # pylint: disable=import-error
 
 
-class _ObserverMixin(object):
+class _ObserverMixin:
     """Mixin to provide observer behavior to the old and the new API."""
 
     # pylint: disable=too-few-public-methods
@@ -117,7 +114,7 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # python versions.  We could also remove the "unicode_literals" import,
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_PYOBJECT, )),
     }
 
@@ -146,15 +143,15 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
     }
 
     __gsignals__ = {
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-event': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-added': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_PYOBJECT, )),
-        str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-removed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                                 (gobject.TYPE_PYOBJECT, )),
-        str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                                 (gobject.TYPE_PYOBJECT, )),
-        str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
+        'device-moved': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_PYOBJECT, )),
     }
 

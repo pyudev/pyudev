@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Free Software Foundation; either version 2.1 of the License, or (at your
 # option) any later version.
 
@@ -12,7 +11,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 # pylint: disable=anomalous-backslash-in-string
-"""pyudev.wx
+r"""pyudev.wx
     =========
 
     Wx integration.
@@ -29,8 +28,6 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 from wx import EvtHandler, PostEvent
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module

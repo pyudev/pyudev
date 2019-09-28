@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import pytest
 import mock
@@ -38,7 +35,7 @@ def fake_monitor_device(request):
 ACTIONS = ('add', 'remove', 'change', 'move')
 
 
-class DeprecatedObserverTestBase(object):
+class DeprecatedObserverTestBase:
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0
@@ -146,12 +143,12 @@ class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
     }
 
     def setup(self):
-        self.qtcore = pytest.importorskip('{0}.QtCore'.format(
+        self.qtcore = pytest.importorskip('{}.QtCore'.format(
             self.BINDING_NAME))
 
     def create_observer(self, monitor):
         name = self.BINDING_NAME.lower()
-        mod = __import__('pyudev.{0}'.format(name), None, None, [name])
+        mod = __import__('pyudev.{}'.format(name), None, None, [name])
         self.observer = mod.QUDevMonitorObserver(monitor)
 
     def connect_signal(self, callback, action=None):
@@ -235,7 +232,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
 
 @pytest.mark.skipif(
-    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
+    '"DISPLAY" not in os.environ', reason='Display required for wxPython')
 class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
     def setup(self):
         self.wx = pytest.importorskip('wx')

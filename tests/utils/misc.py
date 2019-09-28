@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,10 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from functools import wraps
 
@@ -58,7 +53,7 @@ def failed_health_check_wrapper(func):
         try:
             func(*args)
         except FailedHealthCheck:
-            func_code = six.get_function_code(func)
+            func_code = func.__code__
             pytest.skip(
                'failed health check for %s() (%s: %s)' % \
                (

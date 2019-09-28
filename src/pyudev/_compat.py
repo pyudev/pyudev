@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2011 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,16 +22,13 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 from subprocess import Popen, CalledProcessError, PIPE
 
 
 def check_output(command):
     """
-    Compatibility with :func:`subprocess.check_output` from Python 2.7 and
-    upwards.
+    Compatibility with :func:`subprocess.check_output`.
     """
     proc = Popen(command, stdout=PIPE)
     output = proc.communicate()[0]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,18 +14,16 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import pytest
 
 import pyudev
 
 pytest_plugins = [
-    str('tests.plugins.fake_monitor'),
-    str('tests.plugins.privileged'),
-    str('tests.plugins.mock_libudev'),
-    str('tests.plugins.travis'),
+    'tests.plugins.fake_monitor',
+    'tests.plugins.privileged',
+    'tests.plugins.mock_libudev',
+    'tests.plugins.travis',
 ]
 
 

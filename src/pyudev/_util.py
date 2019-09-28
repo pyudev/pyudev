@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,8 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 try:
     from subprocess import check_output
@@ -60,7 +57,7 @@ def ensure_unicode_string(value):
     decoded with the filesystem encoding (as in
     :func:`sys.getfilesystemencoding()`).
     """
-    if not isinstance(value, six.text_type):
+    if not isinstance(value, str):
         value = value.decode(sys.getfilesystemencoding())
     return value
 
@@ -82,7 +79,7 @@ def property_value_to_bytes(value):
         value = int(value)
     if isinstance(value, bytes):
         return value
-    return ensure_byte_string(six.text_type(value))
+    return ensure_byte_string(str(value))
 
 
 def string_to_bool(value):
@@ -94,7 +91,7 @@ def string_to_bool(value):
     :exc:`~exceptions.ValueError`.
     """
     if value not in ('1', '0'):
-        raise ValueError('Not a boolean value: {0!r}'.format(value))
+        raise ValueError('Not a boolean value: {!r}'.format(value))
     return value == '1'
 
 
@@ -133,7 +130,7 @@ def get_device_type(filename):
     elif stat.S_ISBLK(mode):
         return 'block'
     else:
-        raise ValueError('not a device file: {0!r}'.format(filename))
+        raise ValueError('not a device file: {!r}'.format(filename))
 
 
 def eintr_retry_call(func, *args, **kwargs):
@@ -157,7 +154,7 @@ def eintr_retry_call(func, *args, **kwargs):
     while True:
         try:
             return func(*args, **kwargs)
-        except (OSError, IOError, select.error) as err:
+        except OSError as err:
             # If this is not an IOError or OSError, it's the old select.error
             # type, which means that the errno is only accessible via subscript
             if isinstance(err, (OSError, IOError)):
@@ -190,8 +187,8 @@ def udev_version():
     could not be converted to an integer.  Raise
     :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
     not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
-    ``udevadm`` returned a non-zero exit code.  On Python 2.7 or newer, the
-    ``output`` attribute of this exception is correctly set.
+    ``udevadm`` returned a non-zero exit code. The ``output`` attribute of this
+    exception is correctly set.
 
     .. versionadded:: 0.8
     """

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,8 +22,6 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import gc
 

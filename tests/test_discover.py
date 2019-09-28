@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 Anne Mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,10 +22,6 @@
     .. moduleauthor:: mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 
@@ -51,7 +46,7 @@ _DEVICES = [d for d in _CONTEXT.list_devices()]
 NUM_TESTS = 5
 
 
-class TestUtilities(object):
+class TestUtilities:
     """
     Some utilities used by the actual tests.
     """
@@ -69,7 +64,7 @@ class TestUtilities(object):
         device_number = a_device.device_number
         major_number = os.major(device_number)
         minor_number = os.minor(device_number)
-        pair_number = "%s%s%s" % (major_number, a_string, minor_number)
+        pair_number = "{}{}{}".format(major_number, a_string, minor_number)
         return (str(device_number), pair_number)
 
     @staticmethod
@@ -104,7 +99,7 @@ class TestUtilities(object):
         return links
 
 
-class TestDiscovery(object):
+class TestDiscovery:
     """
     Test discovery of an object from limited bits of its description.
     """
@@ -136,7 +131,7 @@ class TestDiscovery(object):
         """
         for path in TestUtilities.get_paths(a_device):
             res = DevicePathHypothesis.get_devices(self._CONTEXT, path)
-            assert res == set((a_device, ))
+            assert res == {a_device}
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=NUM_TESTS)

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 # pylint: disable=anomalous-backslash-in-string
-"""
+r"""
     pyudev.pyside
     =============
 
@@ -34,10 +33,6 @@
     .. versionadded:: 0.6
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from PySide import QtCore  # pylint: disable=import-error
 

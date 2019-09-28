@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 import random
 
 from datetime import datetime, timedelta
@@ -53,7 +50,7 @@ def fake_monitor_device(request):
 
 @contextmanager
 def patch_filter_by(type):
-    add_match = 'udev_monitor_filter_add_match_{0}'.format(type)
+    add_match = 'udev_monitor_filter_add_match_{}'.format(type)
     filter_update = 'udev_monitor_filter_update'
     with pytest.patch_libudev(add_match) as add_match:
         add_match.return_value = 0
@@ -62,11 +59,11 @@ def patch_filter_by(type):
             yield add_match, filter_update
 
 
-class TestMonitor(object):
+class TestMonitor:
     def test_from_netlink_invalid_source(self, context):
         with pytest.raises(ValueError) as exc_info:
             Monitor.from_netlink(context, source='invalid_source')
-        message = ('Invalid source: {0!r}. Must be one of "udev" '
+        message = ('Invalid source: {!r}. Must be one of "udev" '
                    'or "kernel"'.format('invalid_source'))
         assert str(exc_info.value) == message
 
@@ -296,7 +293,7 @@ class TestMonitor(object):
         iterator.close()
 
 
-class TestMonitorObserver(object):
+class TestMonitorObserver:
     def callback(self, device):
         self.events.append(device)
         if len(self.events) >= 2:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2015 mulhern <amulhern@redhat.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,25 +22,19 @@
     .. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import abc
 
 from six import add_metaclass
 
 
-@add_metaclass(abc.ABCMeta)
-class DeviceError(Exception):
+class DeviceError(Exception, metaclass=abc.ABCMeta):
     """
     Any error raised when messing around w/ or trying to discover devices.
     """
 
 
-@add_metaclass(abc.ABCMeta)
-class DeviceNotFoundError(DeviceError):
+class DeviceNotFoundError(DeviceError, metaclass=abc.ABCMeta):
     """
     An exception indicating that no :class:`Device` was found.
 
@@ -67,7 +60,7 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
         return self.args[0]
 
     def __str__(self):
-        return 'No device at {0!r}'.format(self.sys_path)
+        return 'No device at {!r}'.format(self.sys_path)
 
 
 class DeviceNotFoundByFileError(DeviceNotFoundError):

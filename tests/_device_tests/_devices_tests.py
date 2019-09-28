@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -20,10 +19,6 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import stat
@@ -50,7 +45,7 @@ from .._constants import device_strategy
 from ..utils import failed_health_check_wrapper
 
 
-class TestDevices(object):
+class TestDevices:
     """
     Test ``Devices`` methods.
     """

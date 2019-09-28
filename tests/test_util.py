@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import sys
 
@@ -101,7 +98,7 @@ def test_string_to_bool_false():
 def test_string_to_bool_invalid_value():
     with pytest.raises(ValueError) as exc_info:
         _util.string_to_bool('foo')
-    assert str(exc_info.value) == 'Not a boolean value: {0!r}'.format('foo')
+    assert str(exc_info.value) == 'Not a boolean value: {!r}'.format('foo')
 
 
 def test_udev_list_iterate_no_entry():
@@ -152,7 +149,7 @@ def test_get_device_type_no_device_file(tmpdir):
     filename.ensure(file=True)
     with pytest.raises(ValueError) as excinfo:
         _util.get_device_type(str(filename))
-    message = 'not a device file: {0!r}'.format(str(filename))
+    message = 'not a device file: {!r}'.format(str(filename))
     assert str(excinfo.value) == message
 
 

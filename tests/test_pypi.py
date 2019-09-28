@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011, 2012, 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -15,8 +14,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 import sys
 import re
@@ -140,7 +137,7 @@ def render_readme_like_pypi(source, output_encoding='unicode'):
             continue
         o = urlparse(uri)
         if o.scheme not in ALLOWED_SCHEMES:
-            raise TransformError('link scheme not allowed: {0}'.format(uri))
+            raise TransformError('link scheme not allowed: {}'.format(uri))
 
     # now turn the transformed document into HTML
     reader = readers.doctree.Reader(parser_name='null')
@@ -168,7 +165,7 @@ def test_manifest_complete():
     assert required_files == included_files
 
 
-@pytest.mark.skipif(str('sys.version_info[0] > 2'))
+@pytest.mark.skipif('sys.version_info[0] > 2')
 def test_description_rendering():
     with open(README, 'r', encoding='utf-8') as source:
         output = render_readme_like_pypi(source.read())

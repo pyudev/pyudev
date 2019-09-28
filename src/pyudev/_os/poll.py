@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2013 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,17 +22,13 @@
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import select
 
 from pyudev._util import eintr_retry_call
 
 
-class Poll(object):
+class Poll:
     """A poll object.
 
     This object essentially provides a more convenient interface around
@@ -61,7 +56,7 @@ class Poll(object):
         for fd, event in events:
             mask = cls._EVENT_TO_MASK.get(event)
             if not mask:
-                raise ValueError('Unknown event type: {0!r}'.format(event))
+                raise ValueError('Unknown event type: {!r}'.format(event))
             notifier.register(fd, mask)
         return cls(notifier)
 
@@ -105,9 +100,9 @@ class Poll(object):
         """
         for fd, event_mask in events:
             if self._has_event(event_mask, select.POLLNVAL):
-                raise IOError('File descriptor not open: {0!r}'.format(fd))
+                raise OSError('File descriptor not open: {!r}'.format(fd))
             elif self._has_event(event_mask, select.POLLERR):
-                raise IOError('Error while polling fd: {0!r}'.format(fd))
+                raise OSError('Error while polling fd: {!r}'.format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
                 yield fd, 'r'

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright (C) 2010, 2011 Sebastian Wiesner <lunaryorn@gmail.com>
 
 # This library is free software; you can redistribute it and/or modify it
@@ -23,8 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
 
 from pyudev.device import Devices
 from pyudev._errors import DeviceNotFoundAtPathError
@@ -38,7 +35,7 @@ from pyudev._util import property_value_to_bytes
 from pyudev._util import udev_list_iterate
 
 
-class Context(object):
+class Context:
     """
     A device database connection.
 
@@ -142,7 +139,7 @@ class Context(object):
         return Enumerator(self).match(**kwargs)
 
 
-class Enumerator(object):
+class Enumerator:
     """
     A filtered iterable of devices.
 
