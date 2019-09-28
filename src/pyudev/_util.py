@@ -32,8 +32,6 @@ import sys
 import stat
 import errno
 
-import six
-
 
 def ensure_byte_string(value):
     """

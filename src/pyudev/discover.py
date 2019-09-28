@@ -26,7 +26,6 @@ import abc
 import functools
 import os
 import re
-import six
 
 from pyudev._errors import DeviceNotFoundError
 

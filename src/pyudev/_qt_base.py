@@ -22,8 +22,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-import six
-
 from pyudev.device import Device
 
 

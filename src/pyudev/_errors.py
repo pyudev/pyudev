@@ -24,8 +24,6 @@
 
 import abc
 
-from six import add_metaclass
-
 
 class DeviceError(Exception, metaclass=abc.ABCMeta):
     """
