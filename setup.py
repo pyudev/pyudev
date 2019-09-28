@@ -18,8 +18,6 @@
 import os
 import sys
 import setuptools
-if sys.version_info[0] < 3:
-    from codecs import open
 
 
 def local_file(name):
@@ -47,8 +45,7 @@ setuptools.setup(
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries',

@@ -19,9 +19,6 @@ import re
 import os
 import subprocess
 from distutils.filelist import FileList
-if sys.version_info[0] < 3:
-    from codecs import open
-    from urlparse import urlparse
 
 import py.path
 import pytest
@@ -162,10 +159,3 @@ def test_manifest_complete():
     required_files = sorted(_get_required_files())
     included_files = sorted(_get_manifest_files())
     assert required_files == included_files
-
-
-@pytest.mark.skipif('sys.version_info[0] > 2')
-def test_description_rendering():
-    with open(README, 'r', encoding='utf-8') as source:
-        output = render_readme_like_pypi(source.read())
-    assert output

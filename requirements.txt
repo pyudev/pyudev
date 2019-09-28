@@ -1,7 +1,6 @@
 # unit test requirements
 docutils>=0.9
 pytest>=2.8
-mock>=1.0b1
 hypothesis==3.66.1
 
 # documentation requirements
