@@ -13,7 +13,7 @@ Run all pyudev tests against Python 3.2 and PyPy::
 
    tox -e py32,pypy
 
-Pass any arguments you want to :program:`py.test` after two dashes ``--``::
+Pass any arguments you want to :program:`pytest` after two dashes ``--``::
 
    tox -e py32,pypy -- --enable-privileged
 

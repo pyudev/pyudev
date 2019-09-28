@@ -36,6 +36,6 @@ def test_garbage():
     Make sure that all the device tests create no uncollectable objects.
 
     This test must stick at the bottom of this test file to make sure that
-    ``py.test`` always executes it at last.
+    ``pytest`` always executes it at last.
     """
     assert not gc.garbage

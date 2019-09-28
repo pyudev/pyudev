@@ -21,9 +21,9 @@ The following plugins are provided and enabled:
 Command line options
 ~~~~~~~~~~~~~~~~~~~~
 
-The plugin adds the following command line options to :program:`py.test`:
+The plugin adds the following command line options to :program:`pytest`:
 
-.. program:: py.test
+.. program:: pytest
 
 .. option:: --enable-privileged
 

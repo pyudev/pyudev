@@ -60,7 +60,7 @@ archive:
 
 .PHONY: test-travis
 test-travis:
-	py.test --junitxml=tests.xml --enable-privileged -rfEsxX
+	pytest --junitxml=tests.xml --enable-privileged -rfEsxX
 
 .PHONY: fmt
 fmt:
