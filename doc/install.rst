@@ -4,9 +4,9 @@ Installation
 Python versions and implementations
 -----------------------------------
 
-pyudev supports CPython from 2.6 up to the latest Python 3 release, and PyPy
+pyudev supports CPython from 3.1 up to the latest Python 3 release, and PyPy
 1.5. Jython may work, too, but is not tested. Generally any Python
-implementation compatible with CPython 2.6 should work.
+implementation compatible with CPython 3.1 should work.
 
 
 Dependencies
