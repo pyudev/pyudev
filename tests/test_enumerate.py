@@ -260,39 +260,6 @@ class TestEnumeratorMatchCombinations(object):
            )
         )
 
-    @given(_CONTEXT_STRATEGY,
-           strategies.lists(
-               elements=_MATCH_PROPERTY_STRATEGY,
-               min_size=1,
-               max_size=2,
-               unique_by=lambda p: p[0]),
-           strategies.lists(
-               elements=_ATTRIBUTE_STRATEGY,
-               min_size=1,
-               max_size=2,
-               unique_by=lambda p: p[0]))
-    @settings(max_examples=20)
-    def test_combined_matches_of_different_types(self, context, ppairs,
-                                                 apairs):
-        """
-        Require that properties and attributes have a conjunction.
-        """
-        enumeration = context.list_devices()
-        for key, value in ppairs:
-            enumeration.match_property(key, value)
-        for key, value in apairs:
-            enumeration.match_attribute(key, value)
-
-        _test_direct_and_complement(
-           context,
-           frozenset(enumeration),
-           lambda d: all(
-              d.attributes.get(key) == value for key, value in apairs
-           ) and any(
-              d.properties.get(key) == value for key, value in ppairs
-           )
-        )
-
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY, _SYSNAME_STRATEGY,
            _MATCH_PROPERTY_STRATEGY)
     @settings(max_examples=10)
