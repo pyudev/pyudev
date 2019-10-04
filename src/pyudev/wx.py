@@ -32,7 +32,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from wx import EvtHandler, PostEvent
+from wx import EvtHandler, PostEvent  # pylint: disable=import-error
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
 
 # for some reason, pylint thinks pyudev is a third party import
