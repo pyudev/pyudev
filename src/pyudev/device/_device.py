@@ -442,6 +442,7 @@ class Device(Mapping):
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
+        Mapping.__init__(self)
         self.context = context
         self._as_parameter_ = _device
         self._libudev = context._libudev
@@ -1019,6 +1020,7 @@ class Properties(Mapping):
     """
 
     def __init__(self, device):
+        Mapping.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1213,6 +1215,7 @@ class Tags(Iterable, Container):
     # pylint: disable=too-few-public-methods
 
     def __init__(self, device):
+        Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
