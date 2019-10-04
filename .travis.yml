@@ -12,17 +12,17 @@ install:
 
 matrix:
     include:
-        - python: 3.6
+        - python: 3.7
           env: TASK=fmt-travis
-        - python: 3.6
+        - python: 3.7
           env: TASK=pylint
         - python: 2.7
-          env: TASK=test-travis
-        - python: 3.4
           env: TASK=test-travis
         - python: 3.5
           env: TASK=test-travis
         - python: 3.6
+          env: TASK=test-travis
+        - python: 3.7
           env: TASK=test-travis
         - python: pypy
           env: TASK=test-travis
