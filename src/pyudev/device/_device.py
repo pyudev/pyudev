@@ -1215,6 +1215,7 @@ class Tags(Iterable, Container):
     # pylint: disable=too-few-public-methods
 
     def __init__(self, device):
+        # pylint: disable=super-init-not-called
         Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
