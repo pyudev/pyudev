@@ -363,7 +363,9 @@ class TestDevice(object):
                 assert sorted(device.properties[prop].split(':'),) == \
                    sorted(device_datum.properties[prop].split(':'),)
             else:
-                assert device.properties[prop] == device_datum.properties[prop]
+                # Do not test equality of device properties with udevadm oracle.
+                # https://bugzilla.redhat.com/show_bug.cgi?id=1787089
+                pass
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
 
