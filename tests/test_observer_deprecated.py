@@ -105,36 +105,6 @@ class DeprecatedObserverTestBase(object):
         event_callback.assert_called_with(action, fake_monitor_device)
         action_callback.assert_called_with(fake_monitor_device)
 
-    @pytest.mark.privileged
-    def test_events_real(self, context, monitor):
-        # make sure that the module is unloaded initially
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        self.prepare_test(monitor)
-        # setup signal handlers
-        event_callback = mock.Mock(side_effect=self.stop_when_done)
-        added_callback = mock.Mock(side_effect=self.stop_when_done)
-        removed_callback = mock.Mock(side_effect=self.stop_when_done)
-        self.connect_signal(event_callback)
-        self.connect_signal(added_callback, action='add')
-        self.connect_signal(removed_callback, action='remove')
-
-        # test add event
-        self.start_event_loop(pytest.load_dummy)
-        device = Devices.from_path(context, '/devices/virtual/net/dummy0')
-        event_callback.assert_called_with('add', device)
-        added_callback.assert_called_with(device)
-        assert not removed_callback.called
-
-        for callback in (event_callback, added_callback, removed_callback):
-            callback.reset_mock()
-
-        self.start_event_loop(pytest.unload_dummy)
-        event_callback.assert_called_with('remove', device)
-        assert not added_callback.called
-        removed_callback.assert_called_with(device)
-
 
 class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
 

@@ -235,29 +235,6 @@ class TestMonitor(object):
         assert monitor.poll(timeout=1) is None
         assert datetime.now() - now >= timedelta(seconds=1)
 
-    @pytest.mark.privileged
-    @pytest.mark.not_on_travis
-    def test_poll(self, monitor):
-        # forcibly unload the dummy module to avoid hangs
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        # load the dummy device to trigger an add event
-        pytest.load_dummy()
-        select([monitor], [], [])
-        device = monitor.poll()
-        assert device.action == 'add'
-        assert device.sequence_number > 0
-        assert device.subsystem == 'net'
-        assert device.device_path == '/devices/virtual/net/dummy0'
-        # and unload again
-        pytest.unload_dummy()
-        device = monitor.poll()
-        assert device.action == 'remove'
-        assert device.sequence_number > 0
-        assert device.subsystem == 'net'
-        assert device.device_path == '/devices/virtual/net/dummy0'
-
     def test_receive_device(self, monitor):
         """
         Test that Monitor.receive_device is deprecated and calls out to
@@ -270,30 +247,6 @@ class TestMonitor(object):
             event = pytest.deprecated_call(monitor.receive_device)
             assert event[0] == 'spam'
             assert event[1] is device
-
-    @pytest.mark.privileged
-    @pytest.mark.not_on_travis
-    def test_iter(self, monitor):
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        pytest.load_dummy()
-        iterator = iter(monitor)
-        # DeprecationWarning triggered on first invocation of generator
-        action, device = pytest.deprecated_call(next, iterator)
-        assert action == 'add'
-        assert device.action == 'add'
-        assert device.sequence_number > 0
-        assert device.subsystem == 'net'
-        assert device.device_path == '/devices/virtual/net/dummy0'
-        pytest.unload_dummy()
-        action, device = next(iterator)
-        assert action == 'remove'
-        assert device.action == 'remove'
-        assert device.sequence_number > 0
-        assert device.subsystem == 'net'
-        assert device.device_path == '/devices/virtual/net/dummy0'
-        iterator.close()
 
 
 class TestMonitorObserver(object):
@@ -351,21 +304,3 @@ class TestMonitorObserver(object):
         assert not observer.is_alive()
         # check that we got two events
         assert self.events == [fake_monitor_device] * 2
-
-    @pytest.mark.privileged
-    @pytest.mark.not_on_travis
-    def test_real(self, context, monitor):
-        observer = self.make_observer(monitor)
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        observer.start()
-        pytest.load_dummy()
-        pytest.unload_dummy()
-        observer.join(2)
-        if observer.is_alive():
-            observer.stop()
-        assert not observer.is_alive()
-        assert [d.action for d in self.events] == ['add', 'remove']
-        for device in self.events:
-            assert device.device_path == '/devices/virtual/net/dummy0'
