@@ -35,7 +35,12 @@ import os
 import re
 import errno
 import subprocess
-from collections import Iterable, Sized
+
+import six
+six.add_move(
+    six.MovedModule("collections_abc", "collections", "collections.abc"
+                    if sys.version_info >= (3, 3) else "collections"))
+from six.moves import collections_abc
 
 
 class UDevAdm(object):
@@ -272,7 +277,7 @@ class DeviceData(object):
         return 0 if device_node is None else os.stat(device_node).st_rdev
 
 
-class DeviceDatabase(Iterable, Sized):
+class DeviceDatabase(collections_abc.Iterable, collections_abc.Sized):
     """
     The udev device database.
 

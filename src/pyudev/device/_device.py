@@ -30,10 +30,16 @@ from __future__ import unicode_literals
 
 import os
 import re
-from collections import Container
-from collections import Iterable
-from collections import Mapping
+import sys
+
 from datetime import timedelta
+
+import six
+six.add_move(
+    six.MovedModule("collections_abc", "collections", "collections.abc"
+                    if sys.version_info >= (3, 3) else "collections"))
+# pylint: disable=wrong-import-position
+from six.moves import collections_abc
 
 from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._errors import DeviceNotFoundByFileError
@@ -318,7 +324,7 @@ class Devices(object):
         ]
 
 
-class Device(Mapping):
+class Device(collections_abc.Mapping):
     # pylint: disable=too-many-public-methods
     """
     A single device with attached attributes and properties.
@@ -442,7 +448,7 @@ class Device(Mapping):
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
-        Mapping.__init__(self)
+        collections_abc.Mapping.__init__(self)
         self.context = context
         self._as_parameter_ = _device
         self._libudev = context._libudev
@@ -1012,7 +1018,7 @@ class Device(Mapping):
         raise TypeError('Device not orderable')
 
 
-class Properties(Mapping):
+class Properties(collections_abc.Mapping):
     """
     udev properties :class:`Device` objects.
 
@@ -1020,7 +1026,7 @@ class Properties(Mapping):
     """
 
     def __init__(self, device):
-        Mapping.__init__(self)
+        collections_abc.Mapping.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1205,7 +1211,7 @@ class Attributes(object):
         return string_to_bool(self.asstring(attribute))
 
 
-class Tags(Iterable, Container):
+class Tags(collections_abc.Iterable, collections_abc.Container):
     """
     A iterable over :class:`Device` tags.
 
@@ -1216,7 +1222,7 @@ class Tags(Iterable, Container):
 
     def __init__(self, device):
         # pylint: disable=super-init-not-called
-        Iterable.__init__(self)
+        collections_abc.Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
