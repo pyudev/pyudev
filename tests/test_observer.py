@@ -103,28 +103,6 @@ class ObserverTestBase(object):
         self.start_event_loop(fake_monitor.trigger_event)
         event_callback.assert_called_with(fake_monitor_device)
 
-    @pytest.mark.privileged
-    def test_events_real(self, context, monitor):
-        # make sure that the module is unloaded initially
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        self.prepare_test(monitor)
-        # setup signal handlers
-        event_callback = mock.Mock(
-            side_effect=lambda *args: self.stop_event_loop())
-        self.connect_signal(event_callback)
-
-        # test add event
-        self.start_event_loop(pytest.load_dummy)
-        device = Devices.from_path(context, '/devices/virtual/net/dummy0')
-        event_callback.assert_called_with(device)
-
-        event_callback.reset_mock()
-
-        self.start_event_loop(pytest.unload_dummy)
-        event_callback.assert_called_with(device)
-
 
 class QtObserverTestBase(ObserverTestBase):
     def setup(self):
