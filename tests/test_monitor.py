@@ -180,9 +180,10 @@ class TestMonitor(object):
     def test_remove_filter(self, monitor):
         """
         The underlying ``udev_monitor_filter_remove()`` is apparently broken.
-        It always causes ``EINVAL`` from ``setsockopt()``.
+        It always causes ``EINVAL`` from ``setsockopt()``. In some version
+        it changed and it now raises FileNotFoundError.
         """
-        with pytest.raises(ValueError):
+        with pytest.raises(Exception):
             monitor.remove_filter()
 
     def test_remove_filter_mock(self, monitor):
