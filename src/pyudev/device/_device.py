@@ -35,9 +35,14 @@ import sys
 from datetime import timedelta
 
 import six
+
 six.add_move(
-    six.MovedModule("collections_abc", "collections", "collections.abc"
-                    if sys.version_info >= (3, 3) else "collections"))
+    six.MovedModule(
+        "collections_abc",
+        "collections",
+        "collections.abc" if sys.version_info >= (3, 3) else "collections",
+    )
+)
 # pylint: disable=wrong-import-position
 from six.moves import collections_abc
 
@@ -108,7 +113,8 @@ class Devices(object):
         .. versionadded:: 0.18
         """
         device = context._libudev.udev_device_new_from_syspath(
-            context, ensure_byte_string(sys_path))
+            context, ensure_byte_string(sys_path)
+        )
         if not device:
             raise DeviceNotFoundAtPathError(sys_path)
         return Device(context, device)
@@ -138,8 +144,8 @@ class Devices(object):
         """
         sys_name = sys_name.replace("/", "!")
         device = context._libudev.udev_device_new_from_subsystem_sysname(
-            context, ensure_byte_string(subsystem),
-            ensure_byte_string(sys_name))
+            context, ensure_byte_string(subsystem), ensure_byte_string(sys_name)
+        )
         if not device:
             raise DeviceNotFoundByNameError(subsystem, sys_name)
         return Device(context, device)
@@ -182,7 +188,8 @@ class Devices(object):
         .. versionadded:: 0.18
         """
         device = context._libudev.udev_device_new_from_devnum(
-            context, ensure_byte_string(typ[0]), number)
+            context, ensure_byte_string(typ[0]), number
+        )
         if not device:
             raise DeviceNotFoundByNumberError(typ, number)
         return Device(context, device)
@@ -241,9 +248,10 @@ class Devices(object):
 
         This method is only appropriate for network devices.
         """
-        network_devices = context.list_devices(subsystem='net')
-        dev = next((d for d in network_devices
-                    if d.attributes.get('ifindex') == ifindex), None)
+        network_devices = context.list_devices(subsystem="net")
+        dev = next(
+            (d for d in network_devices if d.attributes.get("ifindex") == ifindex), None
+        )
         if dev is not None:
             return dev
         else:
@@ -261,19 +269,20 @@ class Devices(object):
         """
         switch_char = kernel_device[0]
         rest = kernel_device[1:]
-        if switch_char in ('b', 'c'):
-            number_re = re.compile(r'^(?P<major>\d+):(?P<minor>\d+)$')
+        if switch_char in ("b", "c"):
+            number_re = re.compile(r"^(?P<major>\d+):(?P<minor>\d+)$")
             match = number_re.match(rest)
             if match:
                 number = os.makedev(
-                    int(match.group('major')), int(match.group('minor')))
+                    int(match.group("major")), int(match.group("minor"))
+                )
                 return cls.from_device_number(context, switch_char, number)
             else:
                 raise DeviceNotFoundByKernelDeviceError(kernel_device)
-        elif switch_char == 'n':
+        elif switch_char == "n":
             return cls.from_interface_index(context, rest)
-        elif switch_char == '+':
-            (subsystem, _, kernel_device_name) = rest.partition(':')
+        elif switch_char == "+":
+            (subsystem, _, kernel_device_name) = rest.partition(":")
             if kernel_device_name and subsystem:
                 return cls.from_name(context, subsystem, kernel_device_name)
             else:
@@ -318,9 +327,12 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
-        return [  #pragma: no cover
-            cls.from_device_file, cls.from_device_number, cls.from_name,
-            cls.from_path, cls.from_sys_path
+        return [  # pragma: no cover
+            cls.from_device_file,
+            cls.from_device_number,
+            cls.from_name,
+            cls.from_path,
+            cls.from_sys_path,
         ]
 
 
@@ -359,21 +371,23 @@ class Device(collections_abc.Mapping):
     """
 
     @classmethod
-    def from_path(cls, context, path):  #pragma: no cover
+    def from_path(cls, context, path):  # pragma: no cover
         """
         .. versionadded:: 0.4
         .. deprecated:: 0.18
            Use :class:`Devices.from_path` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_path(context, path)
 
     @classmethod
-    def from_sys_path(cls, context, sys_path):  #pragma: no cover
+    def from_sys_path(cls, context, sys_path):  # pragma: no cover
         """
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
@@ -385,66 +399,76 @@ class Device(collections_abc.Mapping):
            Use :class:`Devices.from_sys_path` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_sys_path(context, sys_path)
 
     @classmethod
-    def from_name(cls, context, subsystem, sys_name):  #pragma: no cover
+    def from_name(cls, context, subsystem, sys_name):  # pragma: no cover
         """
         .. versionadded:: 0.5
         .. deprecated:: 0.18
            Use :class:`Devices.from_name` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_name(context, subsystem, sys_name)
 
     @classmethod
-    def from_device_number(cls, context, typ, number):  #pragma: no cover
+    def from_device_number(cls, context, typ, number):  # pragma: no cover
         """
         .. versionadded:: 0.11
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_number` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_device_number(context, typ, number)
 
     @classmethod
-    def from_device_file(cls, context, filename):  #pragma: no cover
+    def from_device_file(cls, context, filename):  # pragma: no cover
         """
         .. versionadded:: 0.15
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_file` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_device_file(context, filename)
 
     @classmethod
-    def from_environment(cls, context):  #pragma: no cover
+    def from_environment(cls, context):  # pragma: no cover
         """
         .. versionadded:: 0.6
         .. deprecated:: 0.18
            Use :class:`Devices.from_environment` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            "Will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
@@ -457,7 +481,7 @@ class Device(collections_abc.Mapping):
         self._libudev.udev_device_unref(self)
 
     def __repr__(self):
-        return 'Device({0.sys_path!r})'.format(self)
+        return "Device({0.sys_path!r})".format(self)
 
     @property
     def parent(self):
@@ -541,7 +565,8 @@ class Device(collections_abc.Mapping):
         if device_type is not None:
             device_type = ensure_byte_string(device_type)
         parent = self._libudev.udev_device_get_parent_with_subsystem_devtype(
-            self, subsystem, device_type)
+            self, subsystem, device_type
+        )
         if not parent:
             return None
         # parent device is not referenced, thus forcibly acquire a reference
@@ -559,10 +584,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use Device.ancestors instead.',
+            "Will be removed in 1.0. Use Device.ancestors instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.ancestors
 
     @property
@@ -571,8 +598,7 @@ class Device(collections_abc.Mapping):
         Absolute path of this device in ``sysfs`` including the ``sysfs``
         mount point as unicode string.
         """
-        return ensure_unicode_string(
-            self._libudev.udev_device_get_syspath(self))
+        return ensure_unicode_string(self._libudev.udev_device_get_syspath(self))
 
     @property
     def device_path(self):
@@ -584,8 +610,7 @@ class Device(collections_abc.Mapping):
         mount point.  However, the path is absolute and starts with a slash
         ``'/'``.
         """
-        return ensure_unicode_string(
-            self._libudev.udev_device_get_devpath(self))
+        return ensure_unicode_string(self._libudev.udev_device_get_devpath(self))
 
     @property
     def subsystem(self):
@@ -603,8 +628,7 @@ class Device(collections_abc.Mapping):
         """
         Device file name inside ``sysfs`` as unicode string.
         """
-        return ensure_unicode_string(
-            self._libudev.udev_device_get_sysname(self))
+        return ensure_unicode_string(self._libudev.udev_device_get_sysname(self))
 
     @property
     def sys_number(self):
@@ -754,8 +778,7 @@ class Device(collections_abc.Mapping):
 
         .. versionadded:: 0.8
         """
-        microseconds = self._libudev.udev_device_get_usec_since_initialized(
-            self)
+        microseconds = self._libudev.udev_device_get_usec_since_initialized(self)
         return timedelta(microseconds=microseconds)
 
     @property
@@ -903,10 +926,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Access properties with Device.properties.',
+            "Will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.properties.__iter__()
 
     def __len__(self):
@@ -917,10 +942,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Access properties with Device.properties.',
+            "Will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.properties.__len__()
 
     def __getitem__(self, prop):
@@ -938,10 +965,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Access properties with Device.properties.',
+            "Will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.properties.__getitem__(prop)
 
     def asint(self, prop):
@@ -960,10 +989,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Use Device.properties.asint() instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use Device.properties.asint instead.',
+            "Will be removed in 1.0. Use Device.properties.asint instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.properties.asint(prop)
 
     def asbool(self, prop):
@@ -986,10 +1017,12 @@ class Device(collections_abc.Mapping):
            Will be removed in 1.0. Use Device.properties.asbool() instead.
         """
         import warnings
+
         warnings.warn(
-            'Will be removed in 1.0. Use Device.properties.asbool instead.',
+            "Will be removed in 1.0. Use Device.properties.asbool instead.",
             DeprecationWarning,
-            stacklevel=2)
+            stacklevel=2,
+        )
         return self.properties.asbool(prop)
 
     def __hash__(self):
@@ -1006,16 +1039,16 @@ class Device(collections_abc.Mapping):
         return self.device_path != other
 
     def __gt__(self, other):
-        raise TypeError('Device not orderable')
+        raise TypeError("Device not orderable")
 
     def __lt__(self, other):
-        raise TypeError('Device not orderable')
+        raise TypeError("Device not orderable")
 
     def __le__(self, other):
-        raise TypeError('Device not orderable')
+        raise TypeError("Device not orderable")
 
     def __ge__(self, other):
-        raise TypeError('Device not orderable')
+        raise TypeError("Device not orderable")
 
 
 class Properties(collections_abc.Mapping):
@@ -1037,8 +1070,7 @@ class Properties(collections_abc.Mapping):
         Return a generator yielding the names of all properties of this
         device as unicode strings.
         """
-        properties = \
-           self._libudev.udev_device_get_properties_list_entry(self.device)
+        properties = self._libudev.udev_device_get_properties_list_entry(self.device)
         for name, _ in udev_list_iterate(self._libudev, properties):
             yield ensure_unicode_string(name)
 
@@ -1046,8 +1078,7 @@ class Properties(collections_abc.Mapping):
         """
         Return the amount of properties defined for this device as integer.
         """
-        properties = \
-           self._libudev.udev_device_get_properties_list_entry(self.device)
+        properties = self._libudev.udev_device_get_properties_list_entry(self.device)
         return sum(1 for _ in udev_list_iterate(self._libudev, properties))
 
     def __getitem__(self, prop):
@@ -1062,7 +1093,8 @@ class Properties(collections_abc.Mapping):
         for this device.
         """
         value = self._libudev.udev_device_get_property_value(
-            self.device, ensure_byte_string(prop))
+            self.device, ensure_byte_string(prop)
+        )
         if value is None:
             raise KeyError(prop)
         return ensure_unicode_string(value)
@@ -1127,7 +1159,7 @@ class Attributes(object):
 
         See rhbz#1267584.
         """
-        if not hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
+        if not hasattr(self._libudev, "udev_device_get_sysattr_list_entry"):
             return  # pragma: no cover
         attrs = self._libudev.udev_device_get_sysattr_list_entry(self.device)
         for attribute, _ in udev_list_iterate(self._libudev, attrs):
@@ -1144,7 +1176,8 @@ class Attributes(object):
         :raises KeyError: if no value found
         """
         value = self._libudev.udev_device_get_sysattr_value(
-            self.device, ensure_byte_string(attribute))
+            self.device, ensure_byte_string(attribute)
+        )
         if value is None:
             raise KeyError(attribute)
         return value
@@ -1233,10 +1266,10 @@ class Tags(collections_abc.Iterable, collections_abc.Container):
             :param tag: unicode string with name of tag
             :rtype: bool
         """
-        if hasattr(self._libudev, 'udev_device_has_tag'):
+        if hasattr(self._libudev, "udev_device_has_tag"):
             return bool(
-                self._libudev.udev_device_has_tag(self.device,
-                                                  ensure_byte_string(tag)))
+                self._libudev.udev_device_has_tag(self.device, ensure_byte_string(tag))
+            )
         return any(t == tag for t in self)  # pragma: no cover
 
     def __contains__(self, tag):

@@ -40,4 +40,5 @@ from ._qt_base import MonitorObserverGenerator
 
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier
+)

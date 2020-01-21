@@ -16,8 +16,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import sys
 import os
@@ -27,11 +26,9 @@ from docutils.parsers.rst import Directive
 
 # add the pyudev source directory to our path
 doc_directory = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.normpath(
-    os.path.join(doc_directory, os.pardir)))
+sys.path.append(os.path.normpath(os.path.join(doc_directory, os.pardir)))
 # add the tests directory to our path to point autodoc on the testsuite plugins
-sys.path.append(os.path.normpath(
-    os.path.join(doc_directory, os.pardir, 'tests')))
+sys.path.append(os.path.normpath(os.path.join(doc_directory, os.pardir, "tests")))
 
 
 class Mock(object):
@@ -55,7 +52,7 @@ class Mock(object):
         return self.__class__()
 
     def __getattr__(self, attribute):
-        if attribute in ('__file__', '__path__'):
+        if attribute in ("__file__", "__path__"):
             return os.devnull
         else:
             # return the *class* object here.  Mocked attributes may be used as
@@ -68,46 +65,57 @@ class Mock(object):
 
 # mock out native modules used throughout pyudev to enable Sphinx autodoc even
 # if these modules are unavailable, as on readthedocs.org
-Mock.mock_modules('PyQt5', 'PyQt5.QtCore',
-                  'PyQt4', 'PyQt4.QtCore',
-                  'PySide', 'PySide.QtCore',
-                  'glib', 'gobject',
-                  'wx', 'wx.lib', 'wx.lib.newevent',
-                  'pyudev._libudev')
+Mock.mock_modules(
+    "PyQt5",
+    "PyQt5.QtCore",
+    "PyQt4",
+    "PyQt4.QtCore",
+    "PySide",
+    "PySide.QtCore",
+    "glib",
+    "gobject",
+    "wx",
+    "wx.lib",
+    "wx.lib.newevent",
+    "pyudev._libudev",
+)
 
 
 # mock out the NewEvent function of wxPython.  Let's praise the silly wx API
 def NewEventMock():
-    yield 'event_class'
-    yield 'event_constant'
+    yield "event_class"
+    yield "event_constant"
 
-sys.modules['wx.lib.newevent'].NewEvent = NewEventMock
+
+sys.modules["wx.lib.newevent"].NewEvent = NewEventMock
 
 
 import pyudev
 
-needs_sphinx = '1.0'
+needs_sphinx = "1.0"
 
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.autosummary',
-              'sphinx.ext.intersphinx']
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.autosummary", "sphinx.ext.intersphinx"]
 
-master_doc = 'index'
-exclude_patterns = ['_build/*']
-source_suffix = '.rst'
+master_doc = "index"
+exclude_patterns = ["_build/*"]
+source_suffix = ".rst"
 
-project = u'pyudev'
-copyright = u'2010, 2011 Sebastian Wiesner'
-version = '.'.join(pyudev.__version__.split('.')[:2])
+project = "pyudev"
+copyright = "2010, 2011 Sebastian Wiesner"
+version = ".".join(pyudev.__version__.split(".")[:2])
 release = pyudev.__version__
 
-templates_path = ['_templates']
-html_theme = 'classic'
+templates_path = ["_templates"]
+html_theme = "classic"
 html_static_path = []
-html_sidebars = {'**': ['info.html', 'localtoc.html', 'relations.html',
-                        'sourcelink.html']}
+html_sidebars = {
+    "**": ["info.html", "localtoc.html", "relations.html", "sourcelink.html"]
+}
 
-intersphinx_mapping = {'python': ('http://docs.python.org/', None),
-                       'pytest': ('http://pytest.org/latest', None)}
+intersphinx_mapping = {
+    "python": ("http://docs.python.org/", None),
+    "pytest": ("http://pytest.org/latest", None),
+}
 
 
 class UDevVersion(Directive):
@@ -115,20 +123,22 @@ class UDevVersion(Directive):
     Directive to document the minimum udev version to use an attribute or
     method
     """
+
     has_content = False
     required_arguments = 1
     option_spec = {}
 
     def run(self):
         udevversion = self.arguments[0]
-        para = nodes.paragraph(udevversion, '', classes=['udevversion'])
-        text = 'Required udev version: {0}'.format(*self.arguments)
-        node = nodes.inline(udevversion, text, classes=['versionmodified'])
+        para = nodes.paragraph(udevversion, "", classes=["udevversion"])
+        text = "Required udev version: {0}".format(*self.arguments)
+        node = nodes.inline(udevversion, text, classes=["versionmodified"])
         para.append(node)
         return [para]
 
 
 def setup(app):
     from sphinx.ext.autodoc import cut_lines
-    app.connect('autodoc-process-docstring', cut_lines(2, what=['module']))
-    app.add_directive('udevversion', UDevVersion)
+
+    app.connect("autodoc-process-docstring", cut_lines(2, what=["module"]))
+    app.add_directive("udevversion", UDevVersion)

@@ -15,8 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import pytest
 import mock
@@ -26,16 +25,16 @@ from pyudev import Monitor, Devices
 
 @pytest.fixture
 def monitor(request):
-    return Monitor.from_netlink(request.getfixturevalue('context'))
+    return Monitor.from_netlink(request.getfixturevalue("context"))
 
 
 @pytest.fixture
 def fake_monitor_device(request):
-    context = request.getfixturevalue('context')
-    return Devices.from_path(context, '/devices/platform')
+    context = request.getfixturevalue("context")
+    return Devices.from_path(context, "/devices/platform")
 
 
-ACTIONS = ('add', 'remove', 'change', 'move')
+ACTIONS = ("add", "remove", "change", "move")
 
 
 class DeprecatedObserverTestBase(object):
@@ -87,19 +86,19 @@ class DeprecatedObserverTestBase(object):
         # test that the monitor attribute is correct
         assert self.observer.monitor is fake_monitor
 
-    @pytest.mark.parametrize('action', ACTIONS, ids=ACTIONS)
-    def test_events_fake_monitor(self, action, fake_monitor,
-                                 fake_monitor_device):
+    @pytest.mark.parametrize("action", ACTIONS, ids=ACTIONS)
+    def test_events_fake_monitor(self, action, fake_monitor, fake_monitor_device):
         self.prepare_test(fake_monitor)
         event_callback = mock.Mock(side_effect=self.stop_when_done)
         action_callback = mock.Mock(side_effect=self.stop_when_done)
         self.connect_signal(event_callback)
         self.connect_signal(action_callback, action=action)
-        funcname = 'udev_device_get_action'
+        funcname = "udev_device_get_action"
         spec = lambda d: None
         with mock.patch.object(
-                fake_monitor_device._libudev, funcname, autospec=spec) as func:
-            func.return_value = action.encode('ascii')
+            fake_monitor_device._libudev, funcname, autospec=spec
+        ) as func:
+            func.return_value = action.encode("ascii")
             self.start_event_loop(fake_monitor.trigger_event)
             func.assert_called_with(fake_monitor_device)
         event_callback.assert_called_with(action, fake_monitor_device)
@@ -109,19 +108,18 @@ class DeprecatedObserverTestBase(object):
 class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
 
     ACTION_SIGNAL_MAP = {
-        'add': 'deviceAdded',
-        'remove': 'deviceRemoved',
-        'change': 'deviceChanged',
-        'move': 'deviceMoved',
+        "add": "deviceAdded",
+        "remove": "deviceRemoved",
+        "change": "deviceChanged",
+        "move": "deviceMoved",
     }
 
     def setup(self):
-        self.qtcore = pytest.importorskip('{0}.QtCore'.format(
-            self.BINDING_NAME))
+        self.qtcore = pytest.importorskip("{0}.QtCore".format(self.BINDING_NAME))
 
     def create_observer(self, monitor):
         name = self.BINDING_NAME.lower()
-        mod = __import__('pyudev.{0}'.format(name), None, None, [name])
+        mod = __import__("pyudev.{0}".format(name), None, None, [name])
         self.observer = mod.QUDevMonitorObserver(monitor)
 
     def connect_signal(self, callback, action=None):
@@ -146,27 +144,27 @@ class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
 
 
 class TestDeprecatedPysideObserver(DeprecatedQtObserverTestBase):
-    BINDING_NAME = 'PySide'
+    BINDING_NAME = "PySide"
 
 
 class TestDeprecatedPyQt4Observer(DeprecatedQtObserverTestBase):
-    BINDING_NAME = 'PyQt4'
+    BINDING_NAME = "PyQt4"
 
 
 class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
     ACTION_SIGNAL_MAP = {
-        'add': 'device-added',
-        'remove': 'device-removed',
-        'change': 'device-changed',
-        'move': 'device-moved',
+        "add": "device-added",
+        "remove": "device-removed",
+        "change": "device-changed",
+        "move": "device-moved",
     }
 
     def setup(self):
         self.event_sources = []
-        self.glib = pytest.importorskip('glib')
+        self.glib = pytest.importorskip("glib")
         # make sure that we also have gobject
-        pytest.importorskip('gobject')
+        pytest.importorskip("gobject")
 
     def teardown(self):
         for source in self.event_sources:
@@ -174,6 +172,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
     def create_observer(self, monitor):
         from pyudev.glib import GUDevMonitorObserver
+
         self.observer = GUDevMonitorObserver(monitor)
 
     def connect_signal(self, callback, action=None):
@@ -182,14 +181,15 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
             return callback(*args, **kwargs)
 
         if action is None:
-            self.observer.connect('device-event', _wrapper)
+            self.observer.connect("device-event", _wrapper)
         else:
             self.observer.connect(self.ACTION_SIGNAL_MAP[action], _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.mainloop = self.glib.MainLoop()
         self.event_sources.append(
-            self.glib.timeout_add(self_stop_timeout, self.stop_event_loop))
+            self.glib.timeout_add(self_stop_timeout, self.stop_event_loop)
+        )
 
     def start_event_loop(self, start_callback):
         def _wrapper(*args, **kwargs):
@@ -205,19 +205,21 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
 
 @pytest.mark.skipif(
-    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
+    str('"DISPLAY" not in os.environ'), reason="Display required for wxPython"
+)
 class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
     def setup(self):
-        self.wx = pytest.importorskip('wx')
+        self.wx = pytest.importorskip("wx")
 
     def create_observer(self, monitor):
         from pyudev import wx
+
         self.observer = wx.WxUDevMonitorObserver(monitor)
         self.action_event_map = {
-            'add': wx.EVT_DEVICE_ADDED,
-            'remove': wx.EVT_DEVICE_REMOVED,
-            'change': wx.EVT_DEVICE_CHANGED,
-            'move': wx.EVT_DEVICE_MOVED
+            "add": wx.EVT_DEVICE_ADDED,
+            "remove": wx.EVT_DEVICE_REMOVED,
+            "change": wx.EVT_DEVICE_CHANGED,
+            "move": wx.EVT_DEVICE_MOVED,
         }
 
     def connect_signal(self, callback, action=None):

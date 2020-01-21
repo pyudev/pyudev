@@ -82,7 +82,7 @@ class TestUtilities(object):
         :rtype: tuple of str
         """
         sys_path = a_device.sys_path
-        (_, _, truncated_path) = sys_path[1:].partition('/')
+        (_, _, truncated_path) = sys_path[1:].partition("/")
         return (sys_path, truncated_path, a_device.device_path)
 
     @staticmethod
@@ -115,7 +115,8 @@ class TestDiscovery(object):
 
     @given(
         strategies.sampled_from(_DEVICES).filter(lambda x: x.device_number),
-        strategies.text(":, -/+=").filter(lambda x: x))
+        strategies.text(":, -/+=").filter(lambda x: x),
+    )
     @settings(max_examples=NUM_TESTS)
     def test_device_number(self, a_device, a_string):
         """
@@ -136,7 +137,7 @@ class TestDiscovery(object):
         """
         for path in TestUtilities.get_paths(a_device):
             res = DevicePathHypothesis.get_devices(self._CONTEXT, path)
-            assert res == set((a_device, ))
+            assert res == set((a_device,))
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=NUM_TESTS)
@@ -155,13 +156,14 @@ class TestDiscovery(object):
 
     @given(
         strategies.sampled_from(_DEVICES),
-        strategies.text(":, -/+=").filter(lambda x: x))
+        strategies.text(":, -/+=").filter(lambda x: x),
+    )
     @settings(max_examples=NUM_TESTS)
     def test_anything(self, a_device, a_string):
         """
         Grab any of the likely candidates for looking up a device.
         """
-        assume(not 'DM_MULTIPATH_TIMESTAMP' in a_device.properties)
+        assume(not "DM_MULTIPATH_TIMESTAMP" in a_device.properties)
 
         values = list(TestUtilities.get_device_numbers(a_device, a_string))
         values.extend(TestUtilities.get_paths(a_device))
@@ -169,7 +171,7 @@ class TestDiscovery(object):
         values.extend(TestUtilities.get_files(a_device))
 
         results = frozenset(
-            d for v in values
-            for d in self._DISCOVER.get_devices(self._CONTEXT, v))
+            d for v in values for d in self._DISCOVER.get_devices(self._CONTEXT, v)
+        )
 
         assert a_device in results

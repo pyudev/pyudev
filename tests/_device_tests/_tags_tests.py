@@ -65,11 +65,10 @@ class TestTags(object):
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
     def test_iteration_mock(self, a_device):
-        funcname = 'udev_device_get_tags_list_entry'
-        with pytest.libudev_list(a_device._libudev, funcname,
-                                 [b'spam', b'eggs']):
+        funcname = "udev_device_get_tags_list_entry"
+        with pytest.libudev_list(a_device._libudev, funcname, [b"spam", b"eggs"]):
             tags = list(a_device.tags)
-            assert tags == ['spam', 'eggs']
+            assert tags == ["spam", "eggs"]
             func = a_device._libudev.udev_device_get_tags_list_entry
             func.assert_called_once_with(a_device)
 
@@ -80,10 +79,9 @@ class TestTags(object):
         """
         Test that ``udev_device_has_tag`` is called if available.
         """
-        funcname = 'udev_device_has_tag'
+        funcname = "udev_device_has_tag"
         spec = lambda d, t: None
-        with mock.patch.object(
-                a_device._libudev, funcname, autospec=spec) as func:
+        with mock.patch.object(a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = 1
-            assert 'foo' in a_device.tags
-            func.assert_called_once_with(a_device, b'foo')
+            assert "foo" in a_device.tags
+            func.assert_called_once_with(a_device, b"foo")

@@ -37,9 +37,14 @@ import errno
 import subprocess
 
 import six
+
 six.add_move(
-    six.MovedModule("collections_abc", "collections", "collections.abc"
-                    if sys.version_info >= (3, 3) else "collections"))
+    six.MovedModule(
+        "collections_abc",
+        "collections",
+        "collections.abc" if sys.version_info >= (3, 3) else "collections",
+    )
+)
 from six.moves import collections_abc
 
 
@@ -48,7 +53,7 @@ class UDevAdm(object):
     Wrap ``udevadm`` utility.
     """
 
-    CANDIDATES = ['/sbin/udevadm', 'udevadm']
+    CANDIDATES = ["/sbin/udevadm", "udevadm"]
     _adm = None
 
     @classmethod
@@ -102,7 +107,7 @@ class UDevAdm(object):
         :returns: the udevadm version
         :rtype: int
         """
-        return int(self._execute('--version'))
+        return int(self._execute("--version"))
 
     def _execute(self, *args):
         """
@@ -117,14 +122,15 @@ class UDevAdm(object):
             raise subprocess.CalledProcessError(proc.returncode, command)
         return output
 
-    def _execute_query(self, device_path, query_type='all'):
+    def _execute_query(self, device_path, query_type="all"):
         """
         Execute a "udevadm info" query.
 
         :raises CalledProcessError:
         """
-        output = self._execute('info', '--root', '--path', device_path,
-                               '--query', query_type)
+        output = self._execute(
+            "info", "--root", "--path", device_path, "--query", query_type
+        )
         return output.decode(sys.getfilesystemencoding())
 
     def query_devices(self):
@@ -135,8 +141,11 @@ class UDevAdm(object):
 
         :raises CalledProcessError:
         """
-        database = self._execute('info', '--export-db').decode(
-            sys.getfilesystemencoding()).splitlines()
+        database = (
+            self._execute("info", "--export-db")
+            .decode(sys.getfilesystemencoding())
+            .splitlines()
+        )
 
         return (l[3:] for l in (l.strip() for l in database) if l[:3] == "P: ")
 
@@ -150,41 +159,42 @@ class UDevAdm(object):
         :raises CalledProcessError:
         """
         pairs = [
-           l.strip().split('=', 1) for l in \
-              self._execute_query(device_path, 'property').splitlines()
+            l.strip().split("=", 1)
+            for l in self._execute_query(device_path, "property").splitlines()
         ]
 
         if self.adm().query_udev_version() < 230:
             num_pairs = len(pairs)
             indices = [i for i in range(num_pairs) if pairs[i][1] == ""]
-            pairs = [pairs[i] for i in range(num_pairs) if \
-               i not in indices and i - 1 not in indices]
+            pairs = [
+                pairs[i]
+                for i in range(num_pairs)
+                if i not in indices and i - 1 not in indices
+            ]
 
         return dict(pairs)
 
     def query_device_attributes(self, device_path):
-        output = self._execute('info', '--attribute-walk', '--path',
-                               device_path)
-        attribute_dump = output.decode(
-            sys.getfilesystemencoding()).splitlines()
+        output = self._execute("info", "--attribute-walk", "--path", device_path)
+        attribute_dump = output.decode(sys.getfilesystemencoding()).splitlines()
         attributes = {}
         for line in attribute_dump:
             line = line.strip()
-            if line.startswith('looking at parent device'):
+            if line.startswith("looking at parent device"):
                 # we don't continue with attributes of parent devices, we only
                 # want the attributes of the given device
                 break
-            if line.startswith('ATTR'):
-                name, value = line.split('==', 1)
+            if line.startswith("ATTR"):
+                name, value = line.split("==", 1)
                 # remove quotation marks from attribute value
                 value = value[1:-1]
                 # remove prefix from attribute name
-                name = re.search('{(.*)}', name).group(1)
+                name = re.search("{(.*)}", name).group(1)
                 attributes[name] = value
         return attributes
 
     def query_device(self, device_path, query_type):
-        if query_type not in ('symlink', 'name'):
+        if query_type not in ("symlink", "name"):
             raise ValueError(query_type)
         try:
             return self._execute_query(device_path, query_type)
@@ -202,14 +212,14 @@ class DeviceData(object):
         self._udevadm = udevadm
 
     def __repr__(self):
-        return '{0}({1})'.format(self.__class__.__name__, self.device_path)
+        return "{0}({1})".format(self.__class__.__name__, self.device_path)
 
     @property
     def sys_path(self):
         """
         Get the ``sysfs`` path of the device.
         """
-        return '/sys' + self.device_path
+        return "/sys" + self.device_path
 
     @property
     def exists(self):
@@ -248,7 +258,7 @@ class DeviceData(object):
         """
         Get the device tags as list of strings.
         """
-        tags = self.properties.get('TAGS', '').split(':')
+        tags = self.properties.get("TAGS", "").split(":")
         return [t for t in tags if t]
 
     @property
@@ -257,14 +267,14 @@ class DeviceData(object):
         Get the device node path as string, or ``None`` if the device has no
         device node.
         """
-        return self._udevadm.query_device(self.device_path, 'name')
+        return self._udevadm.query_device(self.device_path, "name")
 
     @property
     def device_links(self):
         """
         Get the device links as list of strings.
         """
-        links = self._udevadm.query_device(self.device_path, 'symlink')
+        links = self._udevadm.query_device(self.device_path, "symlink")
         return links.split() if links else []
 
     @property
@@ -312,8 +322,7 @@ class DeviceDatabase(collections_abc.Iterable, collections_abc.Sized):
 
     def __iter__(self):
         return (
-           d for d in (DeviceData(d, self._udevadm) for d in self._devices) \
-              if d.exists
+            d for d in (DeviceData(d, self._udevadm) for d in self._devices) if d.exists
         )
 
     def __len__(self):

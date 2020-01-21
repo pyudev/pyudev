@@ -15,8 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import random
 
@@ -30,12 +29,12 @@ from tests.utils.udev import DeviceDatabase
 
 @pytest.fixture
 def monitor(request):
-    return Monitor.from_netlink(request.getfixturevalue('context'))
+    return Monitor.from_netlink(request.getfixturevalue("context"))
 
 
 @pytest.fixture
 def fake_monitor_device(request):
-    context = request.getfixturevalue('context')
+    context = request.getfixturevalue("context")
     device = random.choice(list(DeviceDatabase.db()))
     return Devices.from_path(context, device.device_path)
 
@@ -96,8 +95,7 @@ class ObserverTestBase(object):
 
     def test_events_fake_monitor(self, fake_monitor, fake_monitor_device):
         self.prepare_test(fake_monitor)
-        event_callback = mock.Mock(
-            side_effect=lambda *args: self.stop_event_loop())
+        event_callback = mock.Mock(side_effect=lambda *args: self.stop_event_loop())
         self.connect_signal(event_callback)
 
         self.start_event_loop(fake_monitor.trigger_event)
@@ -106,12 +104,11 @@ class ObserverTestBase(object):
 
 class QtObserverTestBase(ObserverTestBase):
     def setup(self):
-        self.qtcore = pytest.importorskip('{0}.QtCore'.format(
-            self.BINDING_NAME))
+        self.qtcore = pytest.importorskip("{0}.QtCore".format(self.BINDING_NAME))
 
     def create_observer(self, monitor):
         name = self.BINDING_NAME.lower()
-        mod = __import__('pyudev.{0}'.format(name), None, None, [name])
+        mod = __import__("pyudev.{0}".format(name), None, None, [name])
         self.observer = mod.MonitorObserver(monitor)
 
     def connect_signal(self, callback):
@@ -132,23 +129,23 @@ class QtObserverTestBase(ObserverTestBase):
 
 
 class TestPysideObserver(QtObserverTestBase):
-    BINDING_NAME = 'PySide'
+    BINDING_NAME = "PySide"
 
 
 class TestPyQt4Observer(QtObserverTestBase):
-    BINDING_NAME = 'PyQt4'
+    BINDING_NAME = "PyQt4"
 
 
 class TestPyQt5Observer(QtObserverTestBase):
-    BINDING_NAME = 'PyQt5'
+    BINDING_NAME = "PyQt5"
 
 
 class TestGlibObserver(ObserverTestBase):
     def setup(self):
         self.event_sources = []
-        self.glib = pytest.importorskip('glib')
+        self.glib = pytest.importorskip("glib")
         # make sure that we also have gobject
-        pytest.importorskip('gobject')
+        pytest.importorskip("gobject")
 
     def teardown(self):
         for source in self.event_sources:
@@ -156,6 +153,7 @@ class TestGlibObserver(ObserverTestBase):
 
     def create_observer(self, monitor):
         from pyudev.glib import MonitorObserver
+
         self.observer = MonitorObserver(monitor)
 
     def connect_signal(self, callback):
@@ -163,12 +161,13 @@ class TestGlibObserver(ObserverTestBase):
         def _wrapper(obj, *args, **kwargs):
             return callback(*args, **kwargs)
 
-        self.observer.connect('device-event', _wrapper)
+        self.observer.connect("device-event", _wrapper)
 
     def create_event_loop(self, self_stop_timeout=5000):
         self.mainloop = self.glib.MainLoop()
         self.event_sources.append(
-            self.glib.timeout_add(self_stop_timeout, self.stop_event_loop))
+            self.glib.timeout_add(self_stop_timeout, self.stop_event_loop)
+        )
 
     def start_event_loop(self, start_callback):
         def _wrapper(*args, **kwargs):
@@ -184,13 +183,15 @@ class TestGlibObserver(ObserverTestBase):
 
 
 @pytest.mark.skipif(
-    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
+    str('"DISPLAY" not in os.environ'), reason="Display required for wxPython"
+)
 class TestWxObserver(ObserverTestBase):
     def setup(self):
-        self.wx = pytest.importorskip('wx')
+        self.wx = pytest.importorskip("wx")
 
     def create_observer(self, monitor):
         from pyudev import wx
+
         self.observer = wx.MonitorObserver(monitor)
 
     def connect_signal(self, callback):

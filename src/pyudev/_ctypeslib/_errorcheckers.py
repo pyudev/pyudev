@@ -33,7 +33,7 @@ from ctypes import get_errno
 ERRNO_EXCEPTIONS = {
     errno.ENOMEM: MemoryError,
     errno.EOVERFLOW: OverflowError,
-    errno.EINVAL: ValueError
+    errno.EINVAL: ValueError,
 }
 
 

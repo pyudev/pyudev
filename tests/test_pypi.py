@@ -15,14 +15,14 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import sys
 import re
 import os
 import subprocess
 from distutils.filelist import FileList
+
 if sys.version_info[0] < 3:
     from codecs import open
     from urlparse import urlparse
@@ -35,24 +35,23 @@ from docutils.transforms import TransformError
 
 TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 SOURCE_DIRECTORY = os.path.abspath(os.path.join(TEST_DIRECTORY, os.pardir))
-MANIFEST = os.path.join(SOURCE_DIRECTORY, 'MANIFEST.in')
-README = os.path.join(SOURCE_DIRECTORY, 'README.rst')
+MANIFEST = os.path.join(SOURCE_DIRECTORY, "MANIFEST.in")
+README = os.path.join(SOURCE_DIRECTORY, "README.rst")
 
 # Files in the repository that don't need to be present in the sdist
-REQUIRED_BLACKLIST = [
-    r'^\.git.+', r'\.travis\.yml$', r'^MANIFEST\.in$', r'^Makefile$'
-]
+REQUIRED_BLACKLIST = [r"^\.git.+", r"\.travis\.yml$", r"^MANIFEST\.in$", r"^Makefile$"]
 
 
 def _get_required_files():
-    if not os.path.isdir(os.path.join(SOURCE_DIRECTORY, '.git')):
-        pytest.skip('Not in git clone')
-    git = py.path.local.sysfind('git')
+    if not os.path.isdir(os.path.join(SOURCE_DIRECTORY, ".git")):
+        pytest.skip("Not in git clone")
+    git = py.path.local.sysfind("git")
     if not git:
-        pytest.skip('git not available')
+        pytest.skip("git not available")
     ls_files = subprocess.Popen(
-        ['git', 'ls-files'], cwd=SOURCE_DIRECTORY, stdout=subprocess.PIPE)
-    output = ls_files.communicate()[0].decode('utf-8')
+        ["git", "ls-files"], cwd=SOURCE_DIRECTORY, stdout=subprocess.PIPE
+    )
+    output = ls_files.communicate()[0].decode("utf-8")
     for filename in output.splitlines():
         if not any(re.search(p, filename) for p in REQUIRED_BLACKLIST):
             yield filename
@@ -66,10 +65,10 @@ def _get_manifest_files():
         filelist.findall()
     finally:
         os.chdir(old_wd)
-    with open(MANIFEST, 'r', encoding='utf-8') as source:
+    with open(MANIFEST, "r", encoding="utf-8") as source:
         for line in source:
             filelist.process_template_line(line.strip())
-    filelist.process_template_line('prune .tox')
+    filelist.process_template_line("prune .tox")
     return filelist.files
 
 
@@ -101,15 +100,15 @@ def trim_docstring(text):
     while trimmed and not trimmed[0]:
         trimmed.pop(0)
     # Return a single string:
-    return '\n'.join(trimmed)
+    return "\n".join(trimmed)
 
 
-ALLOWED_SCHEMES = '''file ftp gopher hdl http https imap mailto mms news nntp
+ALLOWED_SCHEMES = """file ftp gopher hdl http https imap mailto mms news nntp
 prospero rsync rtsp rtspu sftp shttp sip sips snews svn svn+ssh telnet
-wais'''.split()
+wais""".split()
 
 
-def render_readme_like_pypi(source, output_encoding='unicode'):
+def render_readme_like_pypi(source, output_encoding="unicode"):
     """
     Render a ReST document just like PyPI does.
     """
@@ -117,46 +116,44 @@ def render_readme_like_pypi(source, output_encoding='unicode'):
     source = trim_docstring(source)
 
     settings_overrides = {
-        'raw_enabled': 0,  # no raw HTML code
-        'file_insertion_enabled': 0,  # no file/URL access
-        'halt_level': 2,  # at warnings or errors, raise an exception
-        'report_level': 5,  # never report problems with the reST code
+        "raw_enabled": 0,  # no raw HTML code
+        "file_insertion_enabled": 0,  # no file/URL access
+        "halt_level": 2,  # at warnings or errors, raise an exception
+        "report_level": 5,  # never report problems with the reST code
     }
 
     parts = None
 
     # Convert reStructuredText to HTML using Docutils.
-    document = publish_doctree(
-        source=source, settings_overrides=settings_overrides)
+    document = publish_doctree(source=source, settings_overrides=settings_overrides)
 
     for node in document.traverse():
-        if node.tagname == '#text':
+        if node.tagname == "#text":
             continue
-        if node.hasattr('refuri'):
-            uri = node['refuri']
-        elif node.hasattr('uri'):
-            uri = node['uri']
+        if node.hasattr("refuri"):
+            uri = node["refuri"]
+        elif node.hasattr("uri"):
+            uri = node["uri"]
         else:
             continue
         o = urlparse(uri)
         if o.scheme not in ALLOWED_SCHEMES:
-            raise TransformError('link scheme not allowed: {0}'.format(uri))
+            raise TransformError("link scheme not allowed: {0}".format(uri))
 
     # now turn the transformed document into HTML
-    reader = readers.doctree.Reader(parser_name='null')
+    reader = readers.doctree.Reader(parser_name="null")
     pub = Publisher(
-        reader,
-        source=io.DocTreeInput(document),
-        destination_class=io.StringOutput)
-    pub.set_writer('html')
+        reader, source=io.DocTreeInput(document), destination_class=io.StringOutput
+    )
+    pub.set_writer("html")
     pub.process_programmatic_settings(None, settings_overrides, None)
     pub.set_destination(None, None)
     pub.publish()
     parts = pub.writer.parts
 
-    output = parts['body']
+    output = parts["body"]
 
-    if output_encoding != 'unicode':
+    if output_encoding != "unicode":
         output = output.encode(output_encoding)
 
     return output
@@ -168,8 +165,8 @@ def test_manifest_complete():
     assert required_files == included_files
 
 
-@pytest.mark.skipif(str('sys.version_info[0] > 2'))
+@pytest.mark.skipif(str("sys.version_info[0] > 2"))
 def test_description_rendering():
-    with open(README, 'r', encoding='utf-8') as source:
+    with open(README, "r", encoding="utf-8") as source:
         output = render_readme_like_pypi(source.read())
     assert output

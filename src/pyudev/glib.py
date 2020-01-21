@@ -32,8 +32,7 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 # thanks to absolute imports, this really imports the glib binding and not this
 # module again
@@ -69,8 +68,9 @@ class _ObserverMixin(object):
         if value and self.event_source is None:
             # pylint: disable=attribute-defined-outside-init
             # pylint: disable=no-member
-            self.event_source = glib.io_add_watch(self.monitor, glib.IO_IN,
-                                                  self._process_udev_event)
+            self.event_source = glib.io_add_watch(
+                self.monitor, glib.IO_IN, self._process_udev_event
+            )
         elif not value and self.event_source is not None:
             # pylint: disable=no-member
             glib.source_remove(self.event_source)
@@ -85,7 +85,7 @@ class _ObserverMixin(object):
         return True
 
     def _emit_event(self, device):
-        self.emit('device-event', device)
+        self.emit("device-event", device)
 
 
 class MonitorObserver(gobject.GObject, _ObserverMixin):
@@ -117,8 +117,11 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # python versions.  We could also remove the "unicode_literals" import,
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+        str("device-event"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+        )
     }
 
     def __init__(self, monitor):
@@ -139,35 +142,52 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
     """
 
     _action_signal_map = {
-        'add': 'device-added',
-        'remove': 'device-removed',
-        'change': 'device-changed',
-        'move': 'device-moved'
+        "add": "device-added",
+        "remove": "device-removed",
+        "change": "device-changed",
+        "move": "device-moved",
     }
 
     __gsignals__ = {
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
-        str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
-        str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
-        str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+        str("device-event"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT),
+        ),
+        str("device-added"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+        ),
+        str("device-removed"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+        ),
+        str("device-changed"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+        ),
+        str("device-moved"): (
+            gobject.SIGNAL_RUN_LAST,
+            gobject.TYPE_NONE,
+            (gobject.TYPE_PYOBJECT,),
+        ),
     }
 
     def __init__(self, monitor):
         gobject.GObject.__init__(self)
         self._setup_observer(monitor)
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.glib.MonitorObserver instead.',
-                      DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. " "Use pyudev.glib.MonitorObserver instead.",
+            DeprecationWarning,
+        )
 
     def _emit_event(self, device):
-        self.emit('device-event', device.action, device)
+        self.emit("device-event", device.action, device)
         signal = self._action_signal_map.get(device.action)
         if signal is not None:
             self.emit(signal, device)

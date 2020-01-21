@@ -60,12 +60,8 @@ def failed_health_check_wrapper(func):
         except FailedHealthCheck:
             func_code = six.get_function_code(func)
             pytest.skip(
-               'failed health check for %s() (%s: %s)' % \
-               (
-                  func_code.co_name,
-                  func_code.co_filename,
-                  func_code.co_firstlineno
-               )
+                "failed health check for %s() (%s: %s)"
+                % (func_code.co_name, func_code.co_filename, func_code.co_firstlineno)
             )
 
     return the_func

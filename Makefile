@@ -64,8 +64,8 @@ test-travis:
 
 .PHONY: fmt
 fmt:
-	yapf --style pep8 --recursive --in-place setup.py src tests
+	black .
 
 .PHONY: fmt-travis
 fmt-travis:
-	yapf --style pep8 --recursive --diff setup.py src tests
+	black . --check

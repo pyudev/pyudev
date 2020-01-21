@@ -46,10 +46,12 @@ from ._qt_base import QUDevMonitorObserverGenerator
 
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.Signal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.Signal, QtCore.QSocketNotifier
+)
 """
 .. deprecated:: 0.17
    Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
 """
 QUDevMonitorObserver = QUDevMonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.Signal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.Signal, QtCore.QSocketNotifier
+)

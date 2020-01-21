@@ -29,8 +29,7 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 from wx import EvtHandler, PostEvent  # pylint: disable=import-error
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
@@ -96,7 +95,8 @@ class MonitorObserver(EvtHandler):
         if self._observer_thread is not None:
             return
         self._observer_thread = pyudev.MonitorObserver(
-            self.monitor, callback=self._emit_event, name='wx-observer-thread')
+            self.monitor, callback=self._emit_event, name="wx-observer-thread"
+        )
         self._observer_thread.start()
 
     def stop(self):
@@ -127,18 +127,20 @@ class WxUDevMonitorObserver(MonitorObserver):
     """
 
     _action_event_map = {
-        'add': DeviceAddedEvent,
-        'remove': DeviceRemovedEvent,
-        'change': DeviceChangedEvent,
-        'move': DeviceMovedEvent
+        "add": DeviceAddedEvent,
+        "remove": DeviceRemovedEvent,
+        "change": DeviceChangedEvent,
+        "move": DeviceMovedEvent,
     }
 
     def __init__(self, monitor):
         MonitorObserver.__init__(self, monitor)
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.wx.MonitorObserver instead.',
-                      DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. " "Use pyudev.wx.MonitorObserver instead.",
+            DeprecationWarning,
+        )
 
     def _emit_event(self, device):
         PostEvent(self, DeviceEvent(action=device.action, device=device))

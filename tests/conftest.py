@@ -15,17 +15,16 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import pytest
 
 import pyudev
 
 pytest_plugins = [
-    str('tests.plugins.fake_monitor'),
-    str('tests.plugins.mock_libudev'),
-    str('tests.plugins.travis'),
+    str("tests.plugins.fake_monitor"),
+    str("tests.plugins.mock_libudev"),
+    str("tests.plugins.travis"),
 ]
 
 
@@ -37,4 +36,4 @@ def context(request):
     try:
         return pyudev.Context()
     except ImportError:
-        pytest.skip('udev not available')
+        pytest.skip("udev not available")

@@ -23,8 +23,7 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 try:
     from subprocess import check_output
@@ -93,9 +92,9 @@ def string_to_bool(value):
     ``False`` is returned.  Any other value raises a
     :exc:`~exceptions.ValueError`.
     """
-    if value not in ('1', '0'):
-        raise ValueError('Not a boolean value: {0!r}'.format(value))
-    return value == '1'
+    if value not in ("1", "0"):
+        raise ValueError("Not a boolean value: {0!r}".format(value))
+    return value == "1"
 
 
 def udev_list_iterate(libudev, entry):
@@ -129,11 +128,11 @@ def get_device_type(filename):
     """
     mode = os.stat(filename).st_mode
     if stat.S_ISCHR(mode):
-        return 'char'
+        return "char"
     elif stat.S_ISBLK(mode):
-        return 'block'
+        return "block"
     else:
-        raise ValueError('not a device file: {0!r}'.format(filename))
+        raise ValueError("not a device file: {0!r}".format(filename))
 
 
 def eintr_retry_call(func, *args, **kwargs):
@@ -195,5 +194,5 @@ def udev_version():
 
     .. versionadded:: 0.8
     """
-    output = ensure_unicode_string(check_output(['udevadm', '--version']))
+    output = ensure_unicode_string(check_output(["udevadm", "--version"]))
     return int(output.strip())

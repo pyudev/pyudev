@@ -19,6 +19,7 @@
 import os
 import sys
 import setuptools
+
 if sys.version_info[0] < 3:
     from codecs import open
 
@@ -33,30 +34,30 @@ with open(local_file("src/pyudev/version.py")) as o:
     exec(o.read())
 
 setuptools.setup(
-    name='pyudev',
+    name="pyudev",
     version=__version__,
-    url='http://pyudev.readthedocs.org/',
-    author='Sebastian Wiesner',
-    author_email='lunaryorn@gmail.com',
-    description='A libudev binding',
-    long_description=open(README, encoding='utf-8').read(),
-    platforms=['Linux'],
-    license='LGPL 2.1+',
+    url="http://pyudev.readthedocs.org/",
+    author="Sebastian Wiesner",
+    author_email="lunaryorn@gmail.com",
+    description="A libudev binding",
+    long_description=open(README, encoding="utf-8").read(),
+    platforms=["Linux"],
+    license="LGPL 2.1+",
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
-        'Operating System :: POSIX :: Linux',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: System :: Hardware',
-        'Topic :: System :: Operating System Kernels :: Linux',
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: System :: Hardware",
+        "Topic :: System :: Operating System Kernels :: Linux",
     ],
-    install_requires=['six'],
+    install_requires=["six"],
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
 )

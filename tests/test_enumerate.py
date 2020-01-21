@@ -15,8 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import mock
 
@@ -94,7 +93,8 @@ class TestEnumerator(object):
         _test_direct_and_complement(
             context,
             frozenset(context.list_devices().match_subsystem(subsystem)),
-            lambda d: d.subsystem == subsystem)
+            lambda d: d.subsystem == subsystem,
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -105,8 +105,9 @@ class TestEnumerator(object):
         """
         _test_direct_and_complement(
             context,
-            frozenset(context.list_devices().match_subsystem(
-                subsystem, nomatch=True)), lambda d: d.subsystem != subsystem)
+            frozenset(context.list_devices().match_subsystem(subsystem, nomatch=True)),
+            lambda d: d.subsystem != subsystem,
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
@@ -132,10 +133,10 @@ class TestEnumerator(object):
         so with respect to the whole universe of devices, the two are
         not complements of each other.
         """
-        m_devices = frozenset(
-            context.list_devices().match_subsystem(subsystem))
-        nm_devices = frozenset(context.list_devices().match_subsystem(
-            subsystem, nomatch=True))
+        m_devices = frozenset(context.list_devices().match_subsystem(subsystem))
+        nm_devices = frozenset(
+            context.list_devices().match_subsystem(subsystem, nomatch=True)
+        )
         _test_intersection_and_union(context, m_devices, nm_devices)
 
     @failed_health_check_wrapper
@@ -146,8 +147,10 @@ class TestEnumerator(object):
         A sysname lookup only gives devices with that sysname.
         """
         _test_direct_and_complement(
-            context, frozenset(context.list_devices().match_sys_name(sysname)),
-            lambda d: d.sys_name == sysname)
+            context,
+            frozenset(context.list_devices().match_sys_name(sysname)),
+            lambda d: d.sys_name == sysname,
+        )
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY)
@@ -160,11 +163,11 @@ class TestEnumerator(object):
         _test_direct_and_complement(
             context,
             frozenset(context.list_devices().match_property(key, value)),
-            lambda d: d.properties.get(key) == value)
+            lambda d: d.properties.get(key) == value,
+        )
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY,
-           _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1])))
+    @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1])))
     @settings(max_examples=50)
     def test_match_property_int(self, context, pair):
         """
@@ -174,14 +177,13 @@ class TestEnumerator(object):
         key, value = pair
         devices = context.list_devices().match_property(key, int(value))
         assert all(
-           device.properties[key] == value and \
-           device.properties.asint(key) == int(value) \
-           for device in devices
+            device.properties[key] == value
+            and device.properties.asint(key) == int(value)
+            for device in devices
         )
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY,
-           _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1])))
+    @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1])))
     @settings(max_examples=10)
     def test_match_property_bool(self, context, pair):
         """
@@ -191,9 +193,9 @@ class TestEnumerator(object):
         bool_value = True if int(value) == 1 else False
         devices = context.list_devices().match_property(key, bool_value)
         assert all(
-           device.properties[key] == value and \
-           device.properties.asbool(key) == bool_value \
-           for device in devices
+            device.properties[key] == value
+            and device.properties.asbool(key) == bool_value
+            for device in devices
         )
 
     @_UDEV_TEST(154, "test_match_tag")
@@ -204,15 +206,16 @@ class TestEnumerator(object):
         """
         Test that matches returned for tag actually have tag.
         """
-        _test_direct_and_complement(context,
-                                    frozenset(
-                                        context.list_devices().match_tag(tag)),
-                                    lambda d: tag in d.tags)
+        _test_direct_and_complement(
+            context,
+            frozenset(context.list_devices().match_tag(tag)),
+            lambda d: tag in d.tags,
+        )
 
     @failed_health_check_wrapper
     @given(
-        _CONTEXT_STRATEGY,
-        device_strategy(filter_func=lambda d: d.parent is not None))
+        _CONTEXT_STRATEGY, device_strategy(filter_func=lambda d: d.parent is not None)
+    )
     @settings(max_examples=5)
     def test_match_parent(self, context, device):
         """
@@ -233,12 +236,15 @@ class TestEnumeratorMatchCombinations(object):
     Test combinations of matches.
     """
 
-    @given(_CONTEXT_STRATEGY,
-           strategies.lists(
-               elements=_MATCH_PROPERTY_STRATEGY,
-               min_size=2,
-               max_size=3,
-               unique_by=lambda p: p[0]))
+    @given(
+        _CONTEXT_STRATEGY,
+        strategies.lists(
+            elements=_MATCH_PROPERTY_STRATEGY,
+            min_size=2,
+            max_size=3,
+            unique_by=lambda p: p[0],
+        ),
+    )
     @settings(max_examples=2)
     def test_combined_property_matches(self, context, ppairs):
         """
@@ -253,15 +259,17 @@ class TestEnumeratorMatchCombinations(object):
             enumeration.match_property(key, value)
 
         _test_direct_and_complement(
-           context,
-           frozenset(enumeration),
-           lambda d: any(
-              d.properties.get(key) == value for key, value in ppairs
-           )
+            context,
+            frozenset(enumeration),
+            lambda d: any(d.properties.get(key) == value for key, value in ppairs),
         )
 
-    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY, _SYSNAME_STRATEGY,
-           _MATCH_PROPERTY_STRATEGY)
+    @given(
+        _CONTEXT_STRATEGY,
+        _SUBSYSTEM_STRATEGY,
+        _SYSNAME_STRATEGY,
+        _MATCH_PROPERTY_STRATEGY,
+    )
     @settings(max_examples=10)
     def test_match(self, context, subsystem, sysname, ppair):
         """
@@ -269,13 +277,17 @@ class TestEnumeratorMatchCombinations(object):
         """
         prop_name, prop_value = ppair
         kwargs = {prop_name: prop_value}
-        devices = frozenset(context.list_devices().match(
-            subsystem=subsystem, sys_name=sysname, **kwargs))
+        devices = frozenset(
+            context.list_devices().match(
+                subsystem=subsystem, sys_name=sysname, **kwargs
+            )
+        )
         _test_direct_and_complement(
-           context,
-           devices,
-           lambda d: d.subsystem == subsystem and d.sys_name == sysname and \
-              d.properties.get(prop_name) == prop_value
+            context,
+            devices,
+            lambda d: d.subsystem == subsystem
+            and d.sys_name == sysname
+            and d.properties.get(prop_name) == prop_value,
         )
 
 
@@ -296,8 +308,8 @@ class TestEnumeratorMatchMethod(object):
         Test that special keyword subsystem results in a match_subsystem call.
         """
         with mock.patch.object(
-                enumerator, 'match_subsystem',
-                autospec=True) as match_subsystem:
+            enumerator, "match_subsystem", autospec=True
+        ) as match_subsystem:
             enumerator.match(subsystem=mock.sentinel.subsystem)
             match_subsystem.assert_called_with(mock.sentinel.subsystem)
 
@@ -308,7 +320,8 @@ class TestEnumeratorMatchMethod(object):
         Test that special keyword sys_name results in a match_sys_name call.
         """
         with mock.patch.object(
-                enumerator, 'match_sys_name', autospec=True) as match_sys_name:
+            enumerator, "match_sys_name", autospec=True
+        ) as match_sys_name:
             enumerator.match(sys_name=mock.sentinel.sys_name)
             match_sys_name.assert_called_with(mock.sentinel.sys_name)
 
@@ -318,8 +331,7 @@ class TestEnumeratorMatchMethod(object):
         """
         Test that special keyword tag results in a match_tag call.
         """
-        with mock.patch.object(
-                enumerator, 'match_tag', autospec=True) as match_tag:
+        with mock.patch.object(enumerator, "match_tag", autospec=True) as match_tag:
             enumerator.match(tag=mock.sentinel.tag)
             match_tag.assert_called_with(mock.sentinel.tag)
 
@@ -331,7 +343,8 @@ class TestEnumeratorMatchMethod(object):
         Test that special keyword 'parent' results in a match parent call.
         """
         with mock.patch.object(
-                enumerator, 'match_parent', autospec=True) as match_parent:
+            enumerator, "match_parent", autospec=True
+        ) as match_parent:
             enumerator.match(parent=mock.sentinel.parent)
             match_parent.assert_called_with(mock.sentinel.parent)
 
@@ -342,9 +355,10 @@ class TestEnumeratorMatchMethod(object):
         Test that non-special keyword args are treated as properties.
         """
         with mock.patch.object(
-                enumerator, 'match_property', autospec=True) as match_property:
+            enumerator, "match_property", autospec=True
+        ) as match_property:
             enumerator.match(eggs=mock.sentinel.eggs, spam=mock.sentinel.spam)
             assert match_property.call_count == 2
             posargs = [args for args, _ in match_property.call_args_list]
-            assert ('spam', mock.sentinel.spam) in posargs
-            assert ('eggs', mock.sentinel.eggs) in posargs
+            assert ("spam", mock.sentinel.spam) in posargs
+            assert ("eggs", mock.sentinel.eggs) in posargs

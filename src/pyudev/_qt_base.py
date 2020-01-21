@@ -42,8 +42,7 @@ class MonitorObserverMixin(object):
 
     def _setup_notifier(self, monitor, notifier_class):
         self.monitor = monitor
-        self.notifier = notifier_class(monitor.fileno(), notifier_class.Read,
-                                       self)
+        self.notifier = notifier_class(monitor.fileno(), notifier_class.Read, self)
         self.notifier.activated[int].connect(self._process_udev_event)
 
     @property
@@ -90,15 +89,17 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
     def _setup_notifier(self, monitor, notifier_class):
         MonitorObserverMixin._setup_notifier(self, monitor, notifier_class)
         self._action_signal_map = {
-            'add': self.deviceAdded,
-            'remove': self.deviceRemoved,
-            'change': self.deviceChanged,
-            'move': self.deviceMoved,
+            "add": self.deviceAdded,
+            "remove": self.deviceRemoved,
+            "change": self.deviceChanged,
+            "move": self.deviceMoved,
         }
         import warnings
-        warnings.warn('Will be removed in 1.0. '
-                      'Use pyudev.pyqt4.MonitorObserver instead.',
-                      DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. " "Use pyudev.pyqt4.MonitorObserver instead.",
+            DeprecationWarning,
+        )
 
     def _emit_event(self, device):
         self.deviceEvent.emit(device.action, device)
@@ -129,6 +130,7 @@ class MonitorObserverGenerator(object):
     """
     Class to generate a MonitorObserver class.
     """
+
     # pylint: disable=too-few-public-methods
 
     @staticmethod
@@ -154,16 +156,20 @@ class MonitorObserverGenerator(object):
 
         """
         return type(
-            str("MonitorObserver"), (qobject, MonitorObserverMixin), {
+            str("MonitorObserver"),
+            (qobject, MonitorObserverMixin),
+            {
                 str("__init__"): make_init(qobject, socket_notifier),
-                str("deviceEvent"): signal(Device)
-            })
+                str("deviceEvent"): signal(Device),
+            },
+        )
 
 
 class QUDevMonitorObserverGenerator(object):
     """
     Class to generate a MonitorObserver class.
     """
+
     # pylint: disable=too-few-public-methods
 
     @staticmethod
@@ -192,21 +198,16 @@ class QUDevMonitorObserverGenerator(object):
             str("QUDevMonitorObserver"),
             (qobject, QUDevMonitorObserverMixin),
             {
-                str("__init__"):
-                make_init(qobject, socket_notifier),
+                str("__init__"): make_init(qobject, socket_notifier),
                 #: emitted upon arbitrary device events
-                str("deviceEvent"):
-                signal(six.text_type, Device),
+                str("deviceEvent"): signal(six.text_type, Device),
                 #: emitted if a device was added
-                str("deviceAdded"):
-                signal(Device),
+                str("deviceAdded"): signal(Device),
                 #: emitted if a device was removed
-                str("deviceRemoved"):
-                signal(Device),
+                str("deviceRemoved"): signal(Device),
                 #: emitted if a device was changed
-                str("deviceChanged"):
-                signal(Device),
+                str("deviceChanged"): signal(Device),
                 #: emitted if a device was moved
-                str("deviceMoved"):
-                signal(Device)
-            })
+                str("deviceMoved"): signal(Device),
+            },
+        )

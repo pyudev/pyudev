@@ -27,8 +27,7 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import os
 from select import select
@@ -55,7 +54,7 @@ class FakeMonitor(object):
         """
         Trigger an event on clients of this monitor.
         """
-        os.write(self._event_sink, b'\x01')
+        os.write(self._event_sink, b"\x01")
 
     def fileno(self):
         return self._event_source
@@ -93,4 +92,4 @@ def fake_monitor(request):
        To use this funcarg, you have to provide the ``fake_monitor_device``
        funcarg!
     """
-    return FakeMonitor(request.getfixturevalue('fake_monitor_device'))
+    return FakeMonitor(request.getfixturevalue("fake_monitor_device"))

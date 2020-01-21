@@ -41,7 +41,7 @@ class Poll(object):
 
     """
 
-    _EVENT_TO_MASK = {'r': select.POLLIN, 'w': select.POLLOUT}
+    _EVENT_TO_MASK = {"r": select.POLLIN, "w": select.POLLOUT}
 
     @staticmethod
     def _has_event(events, event):
@@ -61,7 +61,7 @@ class Poll(object):
         for fd, event in events:
             mask = cls._EVENT_TO_MASK.get(event)
             if not mask:
-                raise ValueError('Unknown event type: {0!r}'.format(event))
+                raise ValueError("Unknown event type: {0!r}".format(event))
             notifier.register(fd, mask)
         return cls(notifier)
 
@@ -91,8 +91,7 @@ class Poll(object):
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
-        return list(
-            self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
+        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
 
     def _parse_events(self, events):
         """Parse ``events``.
@@ -105,13 +104,13 @@ class Poll(object):
         """
         for fd, event_mask in events:
             if self._has_event(event_mask, select.POLLNVAL):
-                raise IOError('File descriptor not open: {0!r}'.format(fd))
+                raise IOError("File descriptor not open: {0!r}".format(fd))
             elif self._has_event(event_mask, select.POLLERR):
-                raise IOError('Error while polling fd: {0!r}'.format(fd))
+                raise IOError("Error while polling fd: {0!r}".format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
-                yield fd, 'r'
+                yield fd, "r"
             if self._has_event(event_mask, select.POLLOUT):
-                yield fd, 'w'
+                yield fd, "w"
             if self._has_event(event_mask, select.POLLHUP):
-                yield fd, 'h'
+                yield fd, "h"

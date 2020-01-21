@@ -54,6 +54,7 @@ class TestDevices(object):
     """
     Test ``Devices`` methods.
     """
+
     # pylint: disable=invalid-name
 
     @given(_CONTEXT_STRATEGY, device_strategy())
@@ -71,8 +72,9 @@ class TestDevices(object):
         from_path() yields the same value, even if initial '/' is missing.
         """
         path = a_device.device_path
-        assert Devices.from_path(a_context, path[1:]) == \
-               Devices.from_path(a_context, path)
+        assert Devices.from_path(a_context, path[1:]) == Devices.from_path(
+            a_context, path
+        )
 
     @given(_CONTEXT_STRATEGY, device_strategy())
     @settings(max_examples=5)
@@ -86,7 +88,7 @@ class TestDevices(object):
         """
         Verify that a non-existant sys_path causes an exception.
         """
-        sys_path = 'there_will_not_be_such_a_device'
+        sys_path = "there_will_not_be_such_a_device"
         with pytest.raises(DeviceNotFoundAtPathError) as exc_info:
             Devices.from_sys_path(_CONTEXT, sys_path)
         error = exc_info.value
@@ -99,53 +101,52 @@ class TestDevices(object):
         Test that getting a new device based on the name and subsystem
         yields an equivalent device.
         """
-        new_device = Devices.from_name(a_context, a_device.subsystem,
-                                       a_device.sys_name)
+        new_device = Devices.from_name(a_context, a_device.subsystem, a_device.sys_name)
         assert new_device == a_device
 
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
-    def test_from_name_no_device_in_existing_subsystem(self, a_context,
-                                                       subsys):
+    def test_from_name_no_device_in_existing_subsystem(self, a_context, subsys):
         """
         Verify that a real subsystem and non-existant name causes an
         exception to be raised.
         """
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
-            Devices.from_name(a_context, subsys, 'foobar')
+            Devices.from_name(a_context, subsys, "foobar")
         error = exc_info.value
         assert error.subsystem == subsys
-        assert error.sys_name == 'foobar'
+        assert error.sys_name == "foobar"
 
     def test_from_name_nonexisting_subsystem(self):
         """
         Verify that a non-existant subsystem causes an exception.
         """
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
-            Devices.from_name(_CONTEXT, 'no_such_subsystem', 'foobar')
+            Devices.from_name(_CONTEXT, "no_such_subsystem", "foobar")
         error = exc_info.value
-        assert error.subsystem == 'no_such_subsystem'
-        assert error.sys_name == 'foobar'
+        assert error.subsystem == "no_such_subsystem"
+        assert error.sys_name == "foobar"
 
     @failed_health_check_wrapper
     @given(
         _CONTEXT_STRATEGY,
-        device_strategy(filter_func=lambda x: x.device_node is not None))
+        device_strategy(filter_func=lambda x: x.device_node is not None),
+    )
     @settings(max_examples=5)
     def test_from_device_number(self, a_context, a_device):
         """
         Verify that from_device_number() yields the correct device.
         """
         mode = os.stat(a_device.device_node).st_mode
-        typ = 'block' if stat.S_ISBLK(mode) else 'char'
-        device = \
-           Devices.from_device_number(a_context, typ, a_device.device_number)
+        typ = "block" if stat.S_ISBLK(mode) else "char"
+        device = Devices.from_device_number(a_context, typ, a_device.device_number)
         assert a_device == device
 
     @failed_health_check_wrapper
     @given(
         _CONTEXT_STRATEGY,
-        device_strategy(filter_func=lambda x: x.device_node is not None))
+        device_strategy(filter_func=lambda x: x.device_node is not None),
+    )
     @settings(max_examples=5)
     def test_from_device_number_wrong_type(self, a_context, a_device):
         """
@@ -155,13 +156,12 @@ class TestDevices(object):
         mode = os.stat(a_device.device_node).st_mode
         # deliberately use the wrong type here to cause either failure
         # or at least device mismatch
-        typ = 'char' if stat.S_ISBLK(mode) else 'block'
+        typ = "char" if stat.S_ISBLK(mode) else "block"
         try:
             # this either fails, in which case the caught exception is
             # raised, or succeeds, but returns a wrong device
             # (device numbers are not unique across device types)
-            device = Devices.from_device_number(a_context, typ,
-                                                a_device.device_number)
+            device = Devices.from_device_number(a_context, typ, a_device.device_number)
             # if it succeeds, the resulting device must not match the
             # one, we are actually looking for!
             assert device != a_device
@@ -175,12 +175,13 @@ class TestDevices(object):
         Verify that a non-existant subsystem always results in an exception.
         """
         with pytest.raises(DeviceNotFoundByNumberError):
-            Devices.from_device_number(_CONTEXT, 'foobar', 100)
+            Devices.from_device_number(_CONTEXT, "foobar", 100)
 
     @failed_health_check_wrapper
     @given(
         _CONTEXT_STRATEGY,
-        device_strategy(filter_func=lambda x: x.device_node is not None))
+        device_strategy(filter_func=lambda x: x.device_node is not None),
+    )
     @settings(max_examples=5)
     def test_from_device_file(self, a_context, a_device):
         """
@@ -194,7 +195,7 @@ class TestDevices(object):
         Verify that a file that is not a device file will cause an exception
         to be raised.
         """
-        filename = tmpdir.join('test')
+        filename = tmpdir.join("test")
         filename.ensure(file=True)
         with pytest.raises(DeviceNotFoundByFileError):
             Devices.from_device_file(_CONTEXT, str(filename))
@@ -204,7 +205,7 @@ class TestDevices(object):
         Test that an OSError is raised when constructing a ``Device`` from
         a file that does not actually exist.
         """
-        filename = tmpdir.join('test_from_device_file_non_existing')
+        filename = tmpdir.join("test_from_device_file_non_existing")
         assert not tmpdir.check(file=True)
         with pytest.raises(DeviceNotFoundByFileError):
             Devices.from_device_file(_CONTEXT, str(filename))

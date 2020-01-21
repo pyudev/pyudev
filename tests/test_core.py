@@ -15,8 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 import random
 import syslog
@@ -41,16 +40,16 @@ def test_udev_version():
 class TestContext(object):
     def test_sys_path(self, context):
         assert is_unicode_string(context.sys_path)
-        assert context.sys_path == '/sys'
+        assert context.sys_path == "/sys"
 
     def test_device_path(self, context):
         assert is_unicode_string(context.device_path)
-        assert context.device_path == '/dev'
+        assert context.device_path == "/dev"
 
     @_UDEV_TEST(167, "test_run_path")
     def test_run_path(self, context):
         assert is_unicode_string(context.run_path)
-        assert context.run_path == '/run/udev'
+        assert context.run_path == "/run/udev"
 
     def test_log_priority_get(self, context):
         assert isinstance(context.log_priority, int)
@@ -58,18 +57,16 @@ class TestContext(object):
 
     def test_log_priority_get_mock(self, context):
         spec = lambda c: None
-        funcname = 'udev_get_log_priority'
-        with mock.patch.object(
-                context._libudev, funcname, autospec=spec) as func:
+        funcname = "udev_get_log_priority"
+        with mock.patch.object(context._libudev, funcname, autospec=spec) as func:
             func.return_value = mock.sentinel.log_priority
             assert context.log_priority is mock.sentinel.log_priority
             func.assert_called_once_with(context)
 
     def test_log_priority_set_mock(self, context):
         spec = lambda c, p: None
-        funcname = 'udev_set_log_priority'
-        with mock.patch.object(
-                context._libudev, funcname, autospec=spec) as func:
+        funcname = "udev_set_log_priority"
+        with mock.patch.object(context._libudev, funcname, autospec=spec) as func:
             context.log_priority = mock.sentinel.log_priority
             func.assert_called_once_with(context, mock.sentinel.log_priority)
 
@@ -77,7 +74,8 @@ class TestContext(object):
         # FIXME: This adds UDEV_LOG properties?!
         old_priority = context.log_priority
         available_levels = [
-            l for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)
+            l
+            for l in range(syslog.LOG_EMERG, syslog.LOG_DEBUG + 1)
             if l != old_priority
         ]
         new_priority = random.choice(available_levels)

@@ -25,8 +25,7 @@
 
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+from __future__ import print_function, division, unicode_literals, absolute_import
 
 from operator import attrgetter
 from contextlib import contextmanager
@@ -35,7 +34,7 @@ from collections import namedtuple
 import pytest
 import mock
 
-Node = namedtuple('Node', 'name value next')
+Node = namedtuple("Node", "name value next")
 
 
 class LinkedList(object):
@@ -78,16 +77,18 @@ def libudev_list(libudev, function, items):
     The item value is ``None`` in this case.
     """
     functions_to_patch = [
-        function, 'udev_list_entry_get_next', 'udev_list_entry_get_name',
-        'udev_list_entry_get_value'
+        function,
+        "udev_list_entry_get_next",
+        "udev_list_entry_get_name",
+        "udev_list_entry_get_value",
     ]
     mocks = dict((f, mock.DEFAULT) for f in functions_to_patch)
     with mock.patch.multiple(libudev, **mocks):
         udev_list = LinkedList.from_iterable(items)
         getattr(libudev, function).return_value = udev_list.first
-        libudev.udev_list_entry_get_name.side_effect = attrgetter('name')
-        libudev.udev_list_entry_get_value.side_effect = attrgetter('value')
-        libudev.udev_list_entry_get_next.side_effect = attrgetter('next')
+        libudev.udev_list_entry_get_name.side_effect = attrgetter("name")
+        libudev.udev_list_entry_get_value.side_effect = attrgetter("value")
+        libudev.udev_list_entry_get_next.side_effect = attrgetter("next")
         yield
 
 
