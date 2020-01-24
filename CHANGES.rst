@@ -1,3 +1,15 @@
+0.22.0 (Jan, 2020)
+==================
+
+- Add a six-enabled move for collections move imports:
+  https://github.com/pyudev/pyudev/pull/386
+- Fix any newly introduced pylint errors
+- Numerous improvements or updates to the test infrastructure
+- A number of test updates
+- Require yapf 0.21.0 for Python formatting
+- Various documentation fixes and updates
+
+
 0.21.0 (July 20, 2016)
 ======================
 
