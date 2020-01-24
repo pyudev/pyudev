@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev._os.poll
     ===============
@@ -43,8 +41,7 @@ class Poll(object):
 
     """
 
-    _EVENT_TO_MASK = {'r': select.POLLIN,
-                      'w': select.POLLOUT}
+    _EVENT_TO_MASK = {'r': select.POLLIN, 'w': select.POLLOUT}
 
     @staticmethod
     def _has_event(events, event):
@@ -94,7 +91,8 @@ class Poll(object):
         """
         # Return a list to allow clients to determine whether there are any
         # events at all with a simple truthiness test.
-        return list(self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
+        return list(
+            self._parse_events(eintr_retry_call(self._notifier.poll, timeout)))
 
     def _parse_events(self, events):
         """Parse ``events``.

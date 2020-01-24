@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev.discover
     ===============
@@ -36,8 +34,9 @@ import os
 import re
 import six
 
+from pyudev._errors import DeviceNotFoundError
+
 from pyudev.device import Devices
-from pyudev.device import DeviceNotFoundError
 
 
 def wrap_exception(func):
@@ -59,6 +58,7 @@ def wrap_exception(func):
 
     return the_func
 
+
 @six.add_metaclass(abc.ABCMeta)
 class Hypothesis(object):
     """
@@ -67,7 +67,7 @@ class Hypothesis(object):
 
     @classmethod
     @abc.abstractmethod
-    def match(cls, value): # pragma: no cover
+    def match(cls, value):  # pragma: no cover
         """
         Match the given string according to the hypothesis.
 
@@ -84,7 +84,7 @@ class Hypothesis(object):
 
     @classmethod
     @abc.abstractmethod
-    def lookup(cls, context, key): # pragma: no cover
+    def lookup(cls, context, key):  # pragma: no cover
         """
         Lookup the given string according to the hypothesis.
 
@@ -137,14 +137,10 @@ class DeviceNumberHypothesis(Hypothesis):
         :returns: the device number or None
         :rtype: int or NoneType
         """
-        major_minor_re = re.compile(
-           r'^(?P<major>\d+)(\D+)(?P<minor>\d+)$'
-        )
+        major_minor_re = re.compile(r'^(?P<major>\d+)(\D+)(?P<minor>\d+)$')
         match = major_minor_re.match(value)
         return match and os.makedev(
-           int(match.group('major')),
-           int(match.group('minor'))
-        )
+            int(match.group('major')), int(match.group('minor')))
 
     @classmethod
     def _match_number(cls, value):
@@ -222,7 +218,7 @@ class DevicePathHypothesis(Hypothesis):
         :rtype: frozenset of :class:`Device`
         """
         res = wrap_exception(Devices.from_path)(context, key)
-        return frozenset((res,)) if res is not None else frozenset()
+        return frozenset((res, )) if res is not None else frozenset()
 
 
 class DeviceNameHypothesis(Hypothesis):
@@ -280,17 +276,10 @@ class DeviceFileHypothesis(Hypothesis):
     """
 
     _LINK_DIRS = [
-       '/dev',
-       '/dev/disk/by-id',
-       '/dev/disk/by-label',
-       '/dev/disk/by-partlabel',
-       '/dev/disk/by-partuuid',
-       '/dev/disk/by-path',
-       '/dev/disk/by-uuid',
-       '/dev/input/by-path',
-       '/dev/mapper',
-       '/dev/md',
-       '/dev/vg'
+        '/dev', '/dev/disk/by-id', '/dev/disk/by-label',
+        '/dev/disk/by-partlabel', '/dev/disk/by-partuuid', '/dev/disk/by-path',
+        '/dev/disk/by-uuid', '/dev/input/by-path', '/dev/mapper', '/dev/md',
+        '/dev/vg'
     ]
 
     @classmethod
@@ -342,11 +331,11 @@ class DeviceFileHypothesis(Hypothesis):
         func = wrap_exception(Devices.from_device_file)
         if '/' in key:
             device = func(context, key)
-            return frozenset((device,)) if device is not None else frozenset()
-        else:
-            files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
-            devices = (func(context, f) for f in files)
-            return frozenset(d for d in devices if d is not None)
+            return frozenset((device, )) if device is not None else frozenset()
+
+        files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
+        devices = (func(context, f) for f in files)
+        return frozenset(d for d in devices if d is not None)
 
 
 class Discovery(object):
@@ -356,10 +345,8 @@ class Discovery(object):
     """
 
     _HYPOTHESES = [
-       DeviceFileHypothesis,
-       DeviceNameHypothesis,
-       DeviceNumberHypothesis,
-       DevicePathHypothesis
+        DeviceFileHypothesis, DeviceNameHypothesis, DeviceNumberHypothesis,
+        DevicePathHypothesis
     ]
 
     def __init__(self):
@@ -386,5 +373,4 @@ class Discovery(object):
         :rtype: frozenset of :class:`Device`
         """
         return frozenset(
-           d for h in self._hypotheses for d in h.get_devices(context, value)
-        )
+            d for h in self._hypotheses for d in h.get_devices(context, value))

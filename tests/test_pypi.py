@@ -15,7 +15,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
@@ -30,25 +29,18 @@ if sys.version_info[0] < 3:
 
 import py.path
 import pytest
-import docutils.utils  # Work around Docutils bug 214
 from docutils import io, readers
 from docutils.core import publish_doctree, Publisher
 from docutils.transforms import TransformError
 
-
 TEST_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-SOURCE_DIRECTORY = os.path.abspath(os.path.join(
-    TEST_DIRECTORY, os.pardir))
+SOURCE_DIRECTORY = os.path.abspath(os.path.join(TEST_DIRECTORY, os.pardir))
 MANIFEST = os.path.join(SOURCE_DIRECTORY, 'MANIFEST.in')
 README = os.path.join(SOURCE_DIRECTORY, 'README.rst')
 
-
 # Files in the repository that don't need to be present in the sdist
 REQUIRED_BLACKLIST = [
-    r'^\.git.+',
-    r'\.travis\.yml$',
-    r'^MANIFEST\.in$',
-    r'^Makefile$'
+    r'^\.git.+', r'\.travis\.yml$', r'^MANIFEST\.in$', r'^Makefile$'
 ]
 
 
@@ -58,8 +50,8 @@ def _get_required_files():
     git = py.path.local.sysfind('git')
     if not git:
         pytest.skip('git not available')
-    ls_files = subprocess.Popen(['git', 'ls-files'], cwd=SOURCE_DIRECTORY,
-                                stdout=subprocess.PIPE)
+    ls_files = subprocess.Popen(
+        ['git', 'ls-files'], cwd=SOURCE_DIRECTORY, stdout=subprocess.PIPE)
     output = ls_files.communicate()[0].decode('utf-8')
     for filename in output.splitlines():
         if not any(re.search(p, filename) for p in REQUIRED_BLACKLIST):
@@ -129,13 +121,13 @@ def render_readme_like_pypi(source, output_encoding='unicode'):
         'file_insertion_enabled': 0,  # no file/URL access
         'halt_level': 2,  # at warnings or errors, raise an exception
         'report_level': 5,  # never report problems with the reST code
-        }
+    }
 
     parts = None
 
     # Convert reStructuredText to HTML using Docutils.
-    document = publish_doctree(source=source,
-        settings_overrides=settings_overrides)
+    document = publish_doctree(
+        source=source, settings_overrides=settings_overrides)
 
     for node in document.traverse():
         if node.tagname == '#text':
@@ -152,7 +144,9 @@ def render_readme_like_pypi(source, output_encoding='unicode'):
 
     # now turn the transformed document into HTML
     reader = readers.doctree.Reader(parser_name='null')
-    pub = Publisher(reader, source=io.DocTreeInput(document),
+    pub = Publisher(
+        reader,
+        source=io.DocTreeInput(document),
         destination_class=io.StringOutput)
     pub.set_writer('html')
     pub.process_programmatic_settings(None, settings_overrides, None)

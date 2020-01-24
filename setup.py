@@ -16,20 +16,21 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-
 import os
 import sys
 import setuptools
 if sys.version_info[0] < 3:
     from codecs import open
 
+
 def local_file(name):
     return os.path.relpath(os.path.join(os.path.dirname(__file__), name))
+
 
 README = local_file("README.rst")
 
 with open(local_file("src/pyudev/version.py")) as o:
-        exec(o.read())
+    exec(o.read())
 
 setuptools.setup(
     name='pyudev',
@@ -55,9 +56,7 @@ setuptools.setup(
         'Topic :: System :: Hardware',
         'Topic :: System :: Operating System Kernels :: Linux',
     ],
-    install_requires = [
-        'six'
-    ],
+    install_requires=['six'],
     package_dir={"": "src"},
     packages=setuptools.find_packages("src"),
-    )
+)

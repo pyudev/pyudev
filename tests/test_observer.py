@@ -27,14 +27,15 @@ from pyudev import Monitor, Devices
 
 from tests.utils.udev import DeviceDatabase
 
+
 @pytest.fixture
 def monitor(request):
-    return Monitor.from_netlink(request.getfuncargvalue('context'))
+    return Monitor.from_netlink(request.getfixturevalue('context'))
 
 
 @pytest.fixture
 def fake_monitor_device(request):
-    context = request.getfuncargvalue('context')
+    context = request.getfixturevalue('context')
     device = random.choice(list(DeviceDatabase.db()))
     return Devices.from_path(context, device.device_path)
 
@@ -50,7 +51,6 @@ def test_fake_monitor(fake_monitor, fake_monitor_device):
 
 
 class ObserverTestBase(object):
-
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0
@@ -103,31 +103,8 @@ class ObserverTestBase(object):
         self.start_event_loop(fake_monitor.trigger_event)
         event_callback.assert_called_with(fake_monitor_device)
 
-    @pytest.mark.privileged
-    def test_events_real(self, context, monitor):
-        # make sure that the module is unloaded initially
-        pytest.unload_dummy()
-        monitor.filter_by('net')
-        monitor.start()
-        self.prepare_test(monitor)
-        # setup signal handlers
-        event_callback = mock.Mock(
-            side_effect=lambda *args: self.stop_event_loop())
-        self.connect_signal(event_callback)
-
-        # test add event
-        self.start_event_loop(pytest.load_dummy)
-        device = Devices.from_path(context, '/devices/virtual/net/dummy0')
-        event_callback.assert_called_with(device)
-
-        event_callback.reset_mock()
-
-        self.start_event_loop(pytest.unload_dummy)
-        event_callback.assert_called_with(device)
-
 
 class QtObserverTestBase(ObserverTestBase):
-
     def setup(self):
         self.qtcore = pytest.importorskip('{0}.QtCore'.format(
             self.BINDING_NAME))
@@ -144,8 +121,7 @@ class QtObserverTestBase(ObserverTestBase):
         self.app = self.qtcore.QCoreApplication.instance()
         if not self.app:
             self.app = self.qtcore.QCoreApplication([])
-        self.qtcore.QTimer.singleShot(
-            self_stop_timeout, self.stop_event_loop)
+        self.qtcore.QTimer.singleShot(self_stop_timeout, self.stop_event_loop)
 
     def start_event_loop(self, start_callback):
         self.qtcore.QTimer.singleShot(0, start_callback)
@@ -166,8 +142,8 @@ class TestPyQt4Observer(QtObserverTestBase):
 class TestPyQt5Observer(QtObserverTestBase):
     BINDING_NAME = 'PyQt5'
 
-class TestGlibObserver(ObserverTestBase):
 
+class TestGlibObserver(ObserverTestBase):
     def setup(self):
         self.event_sources = []
         self.glib = pytest.importorskip('glib')
@@ -198,6 +174,7 @@ class TestGlibObserver(ObserverTestBase):
         def _wrapper(*args, **kwargs):
             start_callback(*args, **kwargs)
             return False
+
         self.event_sources.append(self.glib.timeout_add(0, _wrapper))
         self.mainloop.run()
 
@@ -206,10 +183,9 @@ class TestGlibObserver(ObserverTestBase):
         return False
 
 
-@pytest.mark.skipif(str('"DISPLAY" not in os.environ'),
-                    reason='Display required for wxPython')
+@pytest.mark.skipif(
+    str('"DISPLAY" not in os.environ'), reason='Display required for wxPython')
 class TestWxObserver(ObserverTestBase):
-
     def setup(self):
         self.wx = pytest.importorskip('wx')
 

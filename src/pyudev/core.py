@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev.core
     ===========
@@ -25,12 +23,11 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 from pyudev.device import Devices
-from pyudev.device._errors import DeviceNotFoundAtPathError
+from pyudev._errors import DeviceNotFoundAtPathError
 from pyudev._ctypeslib.libudev import ERROR_CHECKERS
 from pyudev._ctypeslib.libudev import SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
@@ -74,9 +71,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_sys_path'):
             return ensure_unicode_string(self._libudev.udev_get_sys_path(self))
-        else:
-            # Fixed path since udev 183
-            return '/sys'
+        return '/sys'  # Fixed path since udev 183
 
     @property
     def device_path(self):
@@ -85,9 +80,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_dev_path'):
             return ensure_unicode_string(self._libudev.udev_get_dev_path(self))
-        else:
-            # Fixed path since udev 183
-            return '/dev'
+        return '/dev'  # Fixed path since udev 183
 
     @property
     def run_path(self):
@@ -101,8 +94,7 @@ class Context(object):
         """
         if hasattr(self._libudev, 'udev_get_run_path'):
             return ensure_unicode_string(self._libudev.udev_get_run_path(self))
-        else:
-            return '/run/udev'
+        return '/run/udev'
 
     @property
     def log_priority(self):
@@ -319,9 +311,8 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (self._libudev.udev_enumerate_add_match_sysattr
-                 if not nomatch else
-                 self._libudev.udev_enumerate_add_nomatch_sysattr)
+        match = (self._libudev.udev_enumerate_add_match_sysattr if not nomatch
+                 else self._libudev.udev_enumerate_add_nomatch_sysattr)
         match(self, ensure_byte_string(attribute),
               property_value_to_bytes(value))
         return self
@@ -338,7 +329,8 @@ class Enumerator(object):
 
         .. versionadded:: 0.6
         """
-        self._libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
+        self._libudev.udev_enumerate_add_match_tag(self,
+                                                   ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):

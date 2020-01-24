@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev._os.pipe
     ===============
@@ -40,8 +38,8 @@ import os
 import fcntl
 from functools import partial
 
-from pyudev._ctypeslib.libc import fd_pair
 from pyudev._ctypeslib.libc import ERROR_CHECKERS
+from pyudev._ctypeslib.libc import FD_PAIR
 from pyudev._ctypeslib.libc import SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
 
@@ -58,7 +56,7 @@ def _pipe2_ctypes(libc, flags):
     Return a pair of file descriptors ``(r, w)``.
 
     """
-    fds = fd_pair()
+    fds = FD_PAIR()
     libc.pipe2(fds, flags)
     return fds[0], fds[1]
 
@@ -90,13 +88,12 @@ def _get_pipe2_implementation():
 
 Return a function implementing ``pipe2``."""
     if hasattr(os, 'pipe2'):
-        return os.pipe2 # pylint: disable=no-member
+        return os.pipe2  # pylint: disable=no-member
     else:
         try:
             libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
             return (partial(_pipe2_ctypes, libc)
-                    if hasattr(libc, 'pipe2') else
-                    _pipe2_by_pipe)
+                    if hasattr(libc, 'pipe2') else _pipe2_by_pipe)
         except ImportError:
             return _pipe2_by_pipe
 

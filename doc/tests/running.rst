@@ -15,7 +15,7 @@ Run all pyudev tests against Python 2.7, Python 3.2 and PyPy::
 
 Pass any arguments you want to :program:`py.test` after two dashes ``--``::
 
-   tox -e py27,py32,pypy -- --enable-privileged
+   tox -e py27,py32,pypy -- --<argument>
 
 
 Notes
@@ -30,12 +30,3 @@ tests are run against a random sample by default.  With the command line
 options provided by :mod:`~tests.plugins.udev_database` you can configure the
 size of this sample, or run the tests against a single device or the whole
 database.
-
-
-Privileged tests
-~~~~~~~~~~~~~~~~
-
-Some tests need to execute privileged operations like loading or unloading of
-kernel modules to trigger real udev events.  These tests are disabled by
-default.  Refer to :mod:`~tests.plugins.privileged` for more information on how
-to enable these tests and configure them properly.

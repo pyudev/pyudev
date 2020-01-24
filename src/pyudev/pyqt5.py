@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     pyudev.pyqt5
     ============
@@ -30,20 +29,15 @@
     .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator
 
-
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-   QtCore.QObject,
-   QtCore.pyqtSignal,
-   QtCore.QSocketNotifier
-)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)

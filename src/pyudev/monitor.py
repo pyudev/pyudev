@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev.monitor
     ==============
@@ -24,7 +22,6 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
-
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
@@ -356,8 +353,7 @@ class Monitor(object):
         self.start()
         if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
             return self._receive_device()
-        else:
-            return None
+        return None
 
     def receive_device(self):
         """
@@ -468,8 +464,12 @@ class MonitorObserver(Thread):
        :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
-    def __init__(self, monitor, event_handler=None, callback=None, *args,
-                 **kwargs):
+    def __init__(self,
+                 monitor,
+                 event_handler=None,
+                 callback=None,
+                 *args,
+                 **kwargs):  # pylint: disable=keyword-arg-before-vararg
         """
         Create a new observer for the given ``monitor``.
 
@@ -516,8 +516,8 @@ class MonitorObserver(Thread):
 
     def run(self):
         self.monitor.start()
-        notifier = poll.Poll.for_events(
-            (self.monitor, 'r'), (self._stop_event.source, 'r'))
+        notifier = poll.Poll.for_events((self.monitor, 'r'),
+                                        (self._stop_event.source, 'r'))
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):
                 if file_descriptor == self._stop_event.source.fileno():
@@ -526,7 +526,8 @@ class MonitorObserver(Thread):
                     self._stop_event.source.close()
                     return
                 elif file_descriptor == self.monitor.fileno() and event == 'r':
-                    read_device = partial(eintr_retry_call, self.monitor.poll, timeout=0)
+                    read_device = partial(
+                        eintr_retry_call, self.monitor.poll, timeout=0)
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:

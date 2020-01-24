@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev.device._device
     =====================
@@ -32,18 +30,24 @@ from __future__ import unicode_literals
 
 import os
 import re
-from collections import Container
-from collections import Iterable
-from collections import Mapping
+import sys
+
 from datetime import timedelta
 
-from pyudev.device._errors import DeviceNotFoundAtPathError
-from pyudev.device._errors import DeviceNotFoundByFileError
-from pyudev.device._errors import DeviceNotFoundByInterfaceIndexError
-from pyudev.device._errors import DeviceNotFoundByKernelDeviceError
-from pyudev.device._errors import DeviceNotFoundByNameError
-from pyudev.device._errors import DeviceNotFoundByNumberError
-from pyudev.device._errors import DeviceNotFoundInEnvironmentError
+import six
+six.add_move(
+    six.MovedModule("collections_abc", "collections", "collections.abc"
+                    if sys.version_info >= (3, 3) else "collections"))
+# pylint: disable=wrong-import-position
+from six.moves import collections_abc
+
+from pyudev._errors import DeviceNotFoundAtPathError
+from pyudev._errors import DeviceNotFoundByFileError
+from pyudev._errors import DeviceNotFoundByInterfaceIndexError
+from pyudev._errors import DeviceNotFoundByKernelDeviceError
+from pyudev._errors import DeviceNotFoundByNameError
+from pyudev._errors import DeviceNotFoundByNumberError
+from pyudev._errors import DeviceNotFoundInEnvironmentError
 from pyudev._util import ensure_byte_string
 from pyudev._util import ensure_unicode_string
 from pyudev._util import get_device_type
@@ -51,6 +55,7 @@ from pyudev._util import string_to_bool
 from pyudev._util import udev_list_iterate
 
 # pylint: disable=too-many-lines
+
 
 class Devices(object):
     """
@@ -224,7 +229,6 @@ class Devices(object):
 
         return cls.from_device_number(context, device_type, device_number)
 
-
     @classmethod
     def from_interface_index(cls, context, ifindex):
         """
@@ -238,16 +242,12 @@ class Devices(object):
         This method is only appropriate for network devices.
         """
         network_devices = context.list_devices(subsystem='net')
-        dev = next(
-           (d for d in network_devices if \
-              d.attributes.get('ifindex') == ifindex),
-           None
-        )
+        dev = next((d for d in network_devices
+                    if d.attributes.get('ifindex') == ifindex), None)
         if dev is not None:
             return dev
         else:
             raise DeviceNotFoundByInterfaceIndexError(ifindex)
-
 
     @classmethod
     def from_kernel_device(cls, context, kernel_device):
@@ -266,9 +266,7 @@ class Devices(object):
             match = number_re.match(rest)
             if match:
                 number = os.makedev(
-                   int(match.group('major')),
-                   int(match.group('minor'))
-                )
+                    int(match.group('major')), int(match.group('minor')))
                 return cls.from_device_number(context, switch_char, number)
             else:
                 raise DeviceNotFoundByKernelDeviceError(kernel_device)
@@ -282,7 +280,6 @@ class Devices(object):
                 raise DeviceNotFoundByKernelDeviceError(kernel_device)
         else:
             raise DeviceNotFoundByKernelDeviceError(kernel_device)
-
 
     @classmethod
     def from_environment(cls, context):
@@ -311,7 +308,7 @@ class Devices(object):
         return Device(context, device)
 
     @classmethod
-    def METHODS(cls): # pylint: disable=invalid-name
+    def METHODS(cls):  # pylint: disable=invalid-name
         """
         Return methods that obtain a :class:`Device` from a variety of
         different data.
@@ -321,33 +318,31 @@ class Devices(object):
 
         .. versionadded:: 0.18
         """
-        return [ #pragma: no cover
-           cls.from_device_file,
-           cls.from_device_number,
-           cls.from_name,
-           cls.from_path,
-           cls.from_sys_path
+        return [  #pragma: no cover
+            cls.from_device_file, cls.from_device_number, cls.from_name,
+            cls.from_path, cls.from_sys_path
         ]
 
 
-class Device(Mapping):
+class Device(collections_abc.Mapping):
     # pylint: disable=too-many-public-methods
     """
     A single device with attached attributes and properties.
 
-    This class subclasses the ``Mapping`` ABC, providing a read-only
-    dictionary mapping property names to the corresponding values.
-    Therefore all well-known dicitionary methods and operators
-    (e.g. ``.keys()``, ``.items()``, ``in``) are available to access device
-    properties.
-
-    Aside of the properties, a device also has a set of udev-specific
-    attributes like the path inside ``sysfs``.
+    A device also has a set of udev-specific attributes like the path
+    inside ``sysfs``.
 
     :class:`Device` objects compare equal and unequal to other devices and
     to strings (based on :attr:`device_path`).  However, there is no
     ordering on :class:`Device` objects, and the corresponding operators
     ``>``, ``<``, ``<=`` and ``>=`` raise :exc:`~exceptions.TypeError`.
+
+    .. warning::
+
+       Currently, Device extends Mapping. The mapping that it stores is that
+       of udev property names to udev property values. This use is deprecated
+       and Device will no longer extend Mapping in 1.0. To look up udev
+       properties, use the Device.properties property.
 
     .. warning::
 
@@ -364,7 +359,7 @@ class Device(Mapping):
     """
 
     @classmethod
-    def from_path(cls, context, path): #pragma: no cover
+    def from_path(cls, context, path):  #pragma: no cover
         """
         .. versionadded:: 0.4
         .. deprecated:: 0.18
@@ -372,14 +367,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_path(context, path)
 
     @classmethod
-    def from_sys_path(cls, context, sys_path): #pragma: no cover
+    def from_sys_path(cls, context, sys_path):  #pragma: no cover
         """
         .. versionchanged:: 0.4
            Raise :exc:`NoSuchDeviceError` instead of returning ``None``, if
@@ -392,14 +386,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_sys_path(context, sys_path)
 
     @classmethod
-    def from_name(cls, context, subsystem, sys_name): #pragma: no cover
+    def from_name(cls, context, subsystem, sys_name):  #pragma: no cover
         """
         .. versionadded:: 0.5
         .. deprecated:: 0.18
@@ -407,14 +400,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_name(context, subsystem, sys_name)
 
     @classmethod
-    def from_device_number(cls, context, typ, number): #pragma: no cover
+    def from_device_number(cls, context, typ, number):  #pragma: no cover
         """
         .. versionadded:: 0.11
         .. deprecated:: 0.18
@@ -422,14 +414,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_device_number(context, typ, number)
 
     @classmethod
-    def from_device_file(cls, context, filename): #pragma: no cover
+    def from_device_file(cls, context, filename):  #pragma: no cover
         """
         .. versionadded:: 0.15
         .. deprecated:: 0.18
@@ -437,14 +428,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_device_file(context, filename)
 
     @classmethod
-    def from_environment(cls, context): #pragma: no cover
+    def from_environment(cls, context):  #pragma: no cover
         """
         .. versionadded:: 0.6
         .. deprecated:: 0.18
@@ -452,13 +442,13 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use equivalent Devices method instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use equivalent Devices method instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
+        collections_abc.Mapping.__init__(self)
         self.context = context
         self._as_parameter_ = _device
         self._libudev = context._libudev
@@ -570,10 +560,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use Device.ancestors instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use Device.ancestors instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.ancestors
 
     @property
@@ -663,10 +652,9 @@ class Device(Mapping):
         .. versionadded:: 0.10
         """
         device_type = self._libudev.udev_device_get_devtype(self)
-        if device_type is not None:
-            return ensure_unicode_string(device_type)
-        else:
-            return device_type
+        if device_type is None:
+            return None
+        return ensure_unicode_string(device_type)
 
     @property
     def driver(self):
@@ -843,7 +831,7 @@ class Device(Mapping):
         The system attributes of this device as read-only
         :class:`Attributes` mapping.
 
-        System attributes are basically normal files inside the the device
+        System attributes are basically normal files inside the device
         directory.  These files contain all sorts of information about the
         device, which may not be reflected by properties.  These attributes
         are commonly used for matching in udev rules, and can be printed
@@ -851,6 +839,9 @@ class Device(Mapping):
 
         The values of these attributes are not always proper strings, and
         can contain arbitrary bytes.
+
+        :returns: an Attributes object, useful for reading attributes
+        :rtype: Attributes
 
         .. versionadded:: 0.5
         """
@@ -913,10 +904,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Access properties with Device.properties.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Access properties with Device.properties.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.properties.__iter__()
 
     def __len__(self):
@@ -928,10 +918,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Access properties with Device.properties.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Access properties with Device.properties.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.properties.__len__()
 
     def __getitem__(self, prop):
@@ -950,10 +939,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Access properties with Device.properties.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Access properties with Device.properties.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.properties.__getitem__(prop)
 
     def asint(self, prop):
@@ -973,10 +961,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use Device.properties.asint instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use Device.properties.asint instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.properties.asint(prop)
 
     def asbool(self, prop):
@@ -1000,10 +987,9 @@ class Device(Mapping):
         """
         import warnings
         warnings.warn(
-           'Will be removed in 1.0. Use Device.properties.asbool instead.',
-           DeprecationWarning,
-           stacklevel=2
-        )
+            'Will be removed in 1.0. Use Device.properties.asbool instead.',
+            DeprecationWarning,
+            stacklevel=2)
         return self.properties.asbool(prop)
 
     def __hash__(self):
@@ -1012,14 +998,12 @@ class Device(Mapping):
     def __eq__(self, other):
         if isinstance(other, Device):
             return self.device_path == other.device_path
-        else:
-            return self.device_path == other
+        return self.device_path == other
 
     def __ne__(self, other):
         if isinstance(other, Device):
             return self.device_path != other.device_path
-        else:
-            return self.device_path != other
+        return self.device_path != other
 
     def __gt__(self, other):
         raise TypeError('Device not orderable')
@@ -1034,7 +1018,7 @@ class Device(Mapping):
         raise TypeError('Device not orderable')
 
 
-class Properties(Mapping):
+class Properties(collections_abc.Mapping):
     """
     udev properties :class:`Device` objects.
 
@@ -1042,6 +1026,7 @@ class Properties(Mapping):
     """
 
     def __init__(self, device):
+        collections_abc.Mapping.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1077,9 +1062,7 @@ class Properties(Mapping):
         for this device.
         """
         value = self._libudev.udev_device_get_property_value(
-           self.device,
-           ensure_byte_string(prop)
-        )
+            self.device, ensure_byte_string(prop))
         if value is None:
             raise KeyError(prop)
         return ensure_unicode_string(value)
@@ -1145,7 +1128,7 @@ class Attributes(object):
         See rhbz#1267584.
         """
         if not hasattr(self._libudev, 'udev_device_get_sysattr_list_entry'):
-            return # pragma: no cover
+            return  # pragma: no cover
         attrs = self._libudev.udev_device_get_sysattr_list_entry(self.device)
         for attribute, _ in udev_list_iterate(self._libudev, attrs):
             yield ensure_unicode_string(attribute)
@@ -1161,9 +1144,7 @@ class Attributes(object):
         :raises KeyError: if no value found
         """
         value = self._libudev.udev_device_get_sysattr_value(
-           self.device,
-           ensure_byte_string(attribute)
-        )
+            self.device, ensure_byte_string(attribute))
         if value is None:
             raise KeyError(attribute)
         return value
@@ -1230,7 +1211,7 @@ class Attributes(object):
         return string_to_bool(self.asstring(attribute))
 
 
-class Tags(Iterable, Container):
+class Tags(collections_abc.Iterable, collections_abc.Container):
     """
     A iterable over :class:`Device` tags.
 
@@ -1240,6 +1221,8 @@ class Tags(Iterable, Container):
     # pylint: disable=too-few-public-methods
 
     def __init__(self, device):
+        # pylint: disable=super-init-not-called
+        collections_abc.Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1251,10 +1234,10 @@ class Tags(Iterable, Container):
             :rtype: bool
         """
         if hasattr(self._libudev, 'udev_device_has_tag'):
-            return bool(self._libudev.udev_device_has_tag(
-                self.device, ensure_byte_string(tag)))
-        else: # pragma: no cover
-            return any(t == tag for t in self)
+            return bool(
+                self._libudev.udev_device_has_tag(self.device,
+                                                  ensure_byte_string(tag)))
+        return any(t == tag for t in self)  # pragma: no cover
 
     def __contains__(self, tag):
         """

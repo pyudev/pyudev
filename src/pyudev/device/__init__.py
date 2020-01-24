@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     pyudev.device
     =============
@@ -24,14 +23,7 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-
 from ._device import Attributes
 from ._device import Device
 from ._device import Devices
 from ._device import Tags
-from ._errors import DeviceNotFoundAtPathError
-from ._errors import DeviceNotFoundByFileError
-from ._errors import DeviceNotFoundByNameError
-from ._errors import DeviceNotFoundByNumberError
-from ._errors import DeviceNotFoundError
-from ._errors import DeviceNotFoundInEnvironmentError

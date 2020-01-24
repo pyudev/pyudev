@@ -2,7 +2,12 @@
 docutils>=0.9
 pytest>=2.8
 mock>=1.0b1
-hypothesis
+hypothesis==4.11.7
 
 # documentation requirements
 sphinx>=1.0.7
+
+# linting
+pylint==1.9.4
+
+yapf==0.21.0

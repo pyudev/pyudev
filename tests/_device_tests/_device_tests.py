@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
 Tests methods belonging to Device class.
 
@@ -46,6 +45,7 @@ from pyudev.device import Attributes, Tags
 
 from ..utils import is_unicode_string
 
+from .._constants import _CONTEXT
 from .._constants import _CONTEXT_STRATEGY
 from .._constants import _DEVICE_DATA
 from .._constants import _DEVICES
@@ -64,18 +64,20 @@ class TestDevice(object):
            isinstance(a_device.parent, Device)
 
     _devices = [d for d in _DEVICES if d.parent is not None]
+
     @pytest.mark.skipif(len(_devices) == 0, reason='no device with a parent')
     @_UDEV_TEST(172, "test_child_of_parents")
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_child_of_parent(self, a_device):
         assert a_device in a_device.parent.children
 
     _devices = [d for d in _DEVICES if list(d.children)]
+
     @pytest.mark.skipif(len(_devices) == 0, reason='no device with a child')
     @_UDEV_TEST(172, "test_children")
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_children(self, a_device):
         children = list(a_device.children)
         for child in children:
@@ -91,12 +93,12 @@ class TestDevice(object):
             child = ancestor
 
     _devices = [d for d in _DEVICES if d.find_parent(d.subsystem) is not None]
+
     @pytest.mark.skipif(
         len(_devices) == 0,
-        reason='no device with a parent in the same subsystem'
-    )
+        reason='no device with a parent in the same subsystem')
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_find_parent(self, a_device):
         parent = a_device.find_parent(a_device.subsystem)
         assert parent.subsystem == a_device.subsystem
@@ -107,47 +109,40 @@ class TestDevice(object):
     def test_find_parent_no_devtype_mock(self, a_device):
         funcname = 'udev_device_get_parent_with_subsystem_devtype'
         spec = lambda d, s, t: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as get_parent:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as get_parent:
             get_parent.return_value = mock.sentinel.parent_device
             funcname = 'udev_device_ref'
             spec = lambda d: None
-            with mock.patch.object(a_device._libudev, funcname,
-                                   autospec=spec) as device_ref:
+            with mock.patch.object(
+                    a_device._libudev, funcname, autospec=spec) as device_ref:
                 device_ref.return_value = mock.sentinel.referenced_device
                 parent = a_device.find_parent('subsystem')
                 assert isinstance(parent, Device)
                 assert parent._as_parameter_ is mock.sentinel.referenced_device
-                get_parent.assert_called_once_with(
-                   a_device,
-                   b'subsystem',
-                   None
-                )
-                device_ref.assert_called_once_with(
-                   mock.sentinel.parent_device
-                )
+                get_parent.assert_called_once_with(a_device, b'subsystem',
+                                                   None)
+                device_ref.assert_called_once_with(mock.sentinel.parent_device)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
     def test_find_parent_with_devtype_mock(self, a_device):
         funcname = 'udev_device_get_parent_with_subsystem_devtype'
         spec = lambda d, s, t: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as get_parent:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as get_parent:
             get_parent.return_value = mock.sentinel.parent_device
             funcname = 'udev_device_ref'
             spec = lambda d: None
-            with mock.patch.object(a_device._libudev, funcname,
-                                   autospec=spec) as device_ref:
+            with mock.patch.object(
+                    a_device._libudev, funcname, autospec=spec) as device_ref:
                 device_ref.return_value = mock.sentinel.referenced_device
                 parent = a_device.find_parent('subsystem', 'devtype')
                 assert isinstance(parent, Device)
                 assert parent._as_parameter_ is mock.sentinel.referenced_device
-                get_parent.assert_called_once_with(
-                    a_device, b'subsystem', b'devtype')
-                device_ref.assert_called_once_with(
-                   mock.sentinel.parent_device
-                )
+                get_parent.assert_called_once_with(a_device, b'subsystem',
+                                                   b'devtype')
+                device_ref.assert_called_once_with(mock.sentinel.parent_device)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -239,8 +234,8 @@ class TestDevice(object):
     def test_is_initialized_mock(self, a_device):
         funcname = 'udev_device_get_is_initialized'
         spec = lambda d: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = False
             assert not a_device.is_initialized
             func.assert_called_once_with(a_device)
@@ -257,8 +252,8 @@ class TestDevice(object):
     def test_time_since_initialized_mock(self, a_device):
         funcname = 'udev_device_get_usec_since_initialized'
         spec = lambda d: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = 100
             assert a_device.time_since_initialized.microseconds == 100
             func.assert_called_once_with(a_device)
@@ -281,8 +276,8 @@ class TestDevice(object):
     def test_action_mock(self, a_device):
         funcname = 'udev_device_get_action'
         spec = lambda d: None
-        with mock.patch.object(a_device._libudev, funcname,
-                               autospec=spec) as func:
+        with mock.patch.object(
+                a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = b'spam'
             assert a_device.action == 'spam'
             func.assert_called_once_with(a_device)
@@ -301,8 +296,7 @@ class TestDevice(object):
         # see TestAttributes for complete attribute tests
         assert isinstance(a_device.attributes, Attributes)
 
-    @given(_CONTEXT_STRATEGY)
-    def test_no_leak(self, a_context):
+    def test_no_leak(self):
         """
         Regression test for issue #32, modelled after the script which revealed
         this issue.
@@ -314,7 +308,7 @@ class TestDevice(object):
 
         https://github.com/lunaryorn/pyudev/issues/32
         """
-        for _ in a_context.list_devices(subsystem='usb'):
+        for _ in _CONTEXT.list_devices(subsystem='usb'):
             pass
         # make sure that no memory leaks
         assert not gc.garbage
@@ -358,7 +352,7 @@ class TestDevice(object):
            frozenset(device.properties.keys())
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
-    @settings(max_examples=100)
+    @settings(max_examples=1)
     def test_getitem(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
@@ -369,19 +363,20 @@ class TestDevice(object):
                 assert sorted(device.properties[prop].split(':'),) == \
                    sorted(device_datum.properties[prop].split(':'),)
             else:
-                assert device.properties[prop] == device_datum.properties[prop]
+                # Do not test equality of device properties with udevadm oracle.
+                # https://bugzilla.redhat.com/show_bug.cgi?id=1787089
+                pass
 
     _device_data = [d for d in _DEVICE_DATA if 'DEVNAME' in d.properties]
+
     @pytest.mark.skipif(
-        len(_device_data) == 0,
-        reason='no device with a DEVNAME property'
-    )
+        len(_device_data) == 0, reason='no device with a DEVNAME property')
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_device_data))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_getitem_devname(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        data_devname = os.path.join(
-            a_context.device_path, device_datum.properties['DEVNAME'])
+        data_devname = os.path.join(a_context.device_path,
+                                    device_datum.properties['DEVNAME'])
         device_devname = \
            os.path.join(a_context.device_path, device.properties['DEVNAME'])
         assert device_devname == data_devname
@@ -470,12 +465,11 @@ class TestDevice(object):
           'ID_WWN_WITH_EXTENSION' in d.properties and \
           'DM_MULTIPATH_TIMESTAMP' not in d.properties
     ]
+
     @pytest.mark.skipif(
-        len(_devices) == 0,
-        reason='unsafe to check ID_WWN_WITH_EXTENSION'
-    )
+        len(_devices) == 0, reason='unsafe to check ID_WWN_WITH_EXTENSION')
     @given(strategies.sampled_from(_devices))
-    @settings(max_examples=5, min_satisfying_examples=1)
+    @settings(max_examples=5)
     def test_id_wwn_with_extension(self, a_device):
         """
         Test that the ID_WWN_WITH_EXTENSION has a corresponding link.
@@ -491,10 +485,7 @@ class TestDevice(object):
 
         id_path = '/dev/disk/by-id'
         link_name = "wwn-%s" % id_wwn
-        match = next(
-           (d for d in os.listdir(id_path) if d == link_name),
-           None
-        )
+        match = next((d for d in os.listdir(id_path) if d == link_name), None)
         assert match is not None
 
         link_path = os.path.join(id_path, match)

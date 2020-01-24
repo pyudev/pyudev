@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """pyudev.glib
     ===========
 
@@ -33,18 +32,18 @@
 
 """
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
 # thanks to absolute imports, this really imports the glib binding and not this
 # module again
-import glib
-import gobject
+import glib  # pylint: disable=import-error
+import gobject  # pylint: disable=import-error
 
 
 class _ObserverMixin(object):
     """Mixin to provide observer behavior to the old and the new API."""
+
     # pylint: disable=too-few-public-methods
 
     def _setup_observer(self, monitor):
@@ -69,13 +68,16 @@ class _ObserverMixin(object):
     def enabled(self, value):
         if value and self.event_source is None:
             # pylint: disable=attribute-defined-outside-init
-            self.event_source = glib.io_add_watch(
-                self.monitor, glib.IO_IN, self._process_udev_event)
+            # pylint: disable=no-member
+            self.event_source = glib.io_add_watch(self.monitor, glib.IO_IN,
+                                                  self._process_udev_event)
         elif not value and self.event_source is not None:
+            # pylint: disable=no-member
             glib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
         # pylint: disable=unused-argument
+        # pylint: disable=no-member
         if condition == glib.IO_IN:
             device = self.monitor.poll(timeout=0)
             if device is not None:
@@ -87,6 +89,7 @@ class _ObserverMixin(object):
 
 
 class MonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -115,7 +118,7 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
         str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
+                              (gobject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):
@@ -127,6 +130,7 @@ gobject.type_register(MonitorObserver)
 
 
 class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
+    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`glib` mainloop.
 
@@ -135,20 +139,23 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
     """
 
     _action_signal_map = {
-        'add': 'device-added', 'remove': 'device-removed',
-        'change': 'device-changed', 'move': 'device-moved'}
+        'add': 'device-added',
+        'remove': 'device-removed',
+        'change': 'device-changed',
+        'move': 'device-moved'
+    }
 
     __gsignals__ = {
         str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
                               (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
         str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
+                              (gobject.TYPE_PYOBJECT, )),
         str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT,)),
+                                (gobject.TYPE_PYOBJECT, )),
         str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT,)),
+                                (gobject.TYPE_PYOBJECT, )),
         str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT,)),
+                              (gobject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):

@@ -19,14 +19,12 @@ upload-release:
 	python setup.py release register sdist upload
 
 pylint:
-	PYTHONPATH=src pylint src/pyudev reproducers/*.py \
+	PYTHONPATH=src pylint src/pyudev \
 		--reports=no \
 		--disable=I \
-		--disable=bad-continuation \
 		--disable=duplicate-code \
 		--argument-rgx="[a-z_][a-z0-9_]{1,30}" \
 		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.* \
 		--variable-rgx="[a-z_][a-z0-9_]{1,30}" \
 		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
 
@@ -59,3 +57,15 @@ view:
 
 archive:
 	git archive --output=./archive.tar.gz HEAD
+
+.PHONY: test-travis
+test-travis:
+	py.test --junitxml=tests.xml  -rfEsxX
+
+.PHONY: fmt
+fmt:
+	yapf --style pep8 --recursive --in-place setup.py src tests
+
+.PHONY: fmt-travis
+fmt-travis:
+	yapf --style pep8 --recursive --diff setup.py src tests

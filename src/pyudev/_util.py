@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
-
 """
     pyudev._util
     ============
@@ -24,7 +22,6 @@
 
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
-
 
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
@@ -85,8 +82,7 @@ def property_value_to_bytes(value):
         value = int(value)
     if isinstance(value, bytes):
         return value
-    else:
-        return ensure_byte_string(six.text_type(value))
+    return ensure_byte_string(six.text_type(value))
 
 
 def string_to_bool(value):
@@ -172,6 +168,7 @@ def eintr_retry_call(func, *args, **kwargs):
             if error_code == errno.EINTR:
                 continue
             raise
+
 
 def udev_version():
     """

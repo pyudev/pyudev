@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-
 """
     utils.udev
     =====================
@@ -35,9 +34,13 @@ import sys
 import os
 import re
 import errno
-import random
 import subprocess
-from collections import Iterable, Sized
+
+import six
+six.add_move(
+    six.MovedModule("collections_abc", "collections", "collections.abc"
+                    if sys.version_info >= (3, 3) else "collections"))
+from six.moves import collections_abc
 
 
 class UDevAdm(object):
@@ -160,8 +163,8 @@ class UDevAdm(object):
         return dict(pairs)
 
     def query_device_attributes(self, device_path):
-        output = self._execute(
-            'info', '--attribute-walk', '--path', device_path)
+        output = self._execute('info', '--attribute-walk', '--path',
+                               device_path)
         attribute_dump = output.decode(
             sys.getfilesystemencoding()).splitlines()
         attributes = {}
@@ -270,13 +273,11 @@ class DeviceData(object):
         Get the device number as integer or 0 if the device has no device
         number.
         """
-        if self.device_node:
-            return os.stat(self.device_node).st_rdev
-        else:
-            return 0
+        device_node = self.device_node
+        return 0 if device_node is None else os.stat(device_node).st_rdev
 
 
-class DeviceDatabase(Iterable, Sized):
+class DeviceDatabase(collections_abc.Iterable, collections_abc.Sized):
     """
     The udev device database.
 
@@ -291,7 +292,7 @@ class DeviceDatabase(Iterable, Sized):
     _db = None
 
     @classmethod
-    def db(cls, renew=False): # pylint: disable=invalid-name
+    def db(cls, renew=False):  # pylint: disable=invalid-name
         """
         Get a database object.
 
@@ -304,7 +305,6 @@ class DeviceDatabase(Iterable, Sized):
             if udevadm:
                 cls._db = DeviceDatabase(udevadm)
         return cls._db
-
 
     def __init__(self, udevadm):
         self._udevadm = udevadm

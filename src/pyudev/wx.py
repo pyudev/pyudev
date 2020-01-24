@@ -12,7 +12,6 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 # pylint: disable=anomalous-backslash-in-string
-
 """pyudev.wx
     =========
 
@@ -30,17 +29,16 @@
 
 """
 
-
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from wx import EvtHandler, PostEvent
-from wx.lib.newevent import NewEvent
+from wx import EvtHandler, PostEvent  # pylint: disable=import-error
+from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
 
-import pyudev
+# for some reason, pylint thinks pyudev is a third party import
+import pyudev  # pylint: disable=wrong-import-order
 
-
-DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
+DeviceEvent, EVT_DEVICE_EVENT = NewEvent()  # pylint: disable=invalid-name
 
 
 class MonitorObserver(EvtHandler):
@@ -98,8 +96,7 @@ class MonitorObserver(EvtHandler):
         if self._observer_thread is not None:
             return
         self._observer_thread = pyudev.MonitorObserver(
-            self.monitor, callback=self._emit_event,
-            name='wx-observer-thread')
+            self.monitor, callback=self._emit_event, name='wx-observer-thread')
         self._observer_thread.start()
 
     def stop(self):
@@ -116,10 +113,10 @@ class MonitorObserver(EvtHandler):
         PostEvent(self, DeviceEvent(device=device))
 
 
-DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
-DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
-DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
-DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
+DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()  # pylint: disable=invalid-name
+DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()  # pylint: disable=invalid-name
+DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()  # pylint: disable=invalid-name
+DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()  # pylint: disable=invalid-name
 
 
 class WxUDevMonitorObserver(MonitorObserver):
