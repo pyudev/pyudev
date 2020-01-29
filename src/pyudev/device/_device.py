@@ -918,7 +918,7 @@ class Device(collections_abc.Mapping):
         """
         import warnings
         warnings.warn(
-            'Will be removed in 1.0. Access properties with Device.properties.',
+            'Will be removed in 1.0. Access the amount of properties with len(Device.properties). If you are testing if the Device exists, compare explicitly against None.',
             DeprecationWarning,
             stacklevel=2)
         return self.properties.__len__()
