@@ -57,11 +57,10 @@ def ensure_unicode_string(value):
     Return the given ``value`` as unicode string.
 
     If the given ``value`` is not a unicode string, but a byte string, it is
-    decoded with the filesystem encoding (as in
-    :func:`sys.getfilesystemencoding()`).
+    decoded with utf-8.
     """
     if not isinstance(value, six.text_type):
-        value = value.decode(sys.getfilesystemencoding())
+        value = value.decode("utf-8")
     return value
 
 
