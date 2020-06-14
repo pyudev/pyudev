@@ -35,7 +35,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-from gi.repository import GLib, GObject
+from gi.repository import GLib, GObject  # pylint: disable=import-error
 
 
 class _ObserverMixin(object):
