@@ -22,8 +22,8 @@
     :class:`MonitorObserver` integrates device monitoring into the Glib
     mainloop by turing device events into Glib signals.
 
-    :mod:`glib` and :mod:`gobject` from PyGObject_ must be available when
-    importing this module. PyGtk is not required.
+    :mod:`gi.repository.GLib` and :mod:`gi.repository.GObject` from PyGObject_
+    must be available when importing this module. PyGtk is not required.
 
     .. _PyGObject: http://www.pygtk.org/
 
@@ -35,10 +35,7 @@
 from __future__ import (print_function, division, unicode_literals,
                         absolute_import)
 
-# thanks to absolute imports, this really imports the glib binding and not this
-# module again
-import glib  # pylint: disable=import-error
-import gobject  # pylint: disable=import-error
+from gi.repository import GLib, GObject  # pylint: disable=import-error
 
 
 class _ObserverMixin(object):
@@ -69,16 +66,16 @@ class _ObserverMixin(object):
         if value and self.event_source is None:
             # pylint: disable=attribute-defined-outside-init
             # pylint: disable=no-member
-            self.event_source = glib.io_add_watch(self.monitor, glib.IO_IN,
+            self.event_source = GLib.io_add_watch(self.monitor, GLib.IO_IN,
                                                   self._process_udev_event)
         elif not value and self.event_source is not None:
             # pylint: disable=no-member
-            glib.source_remove(self.event_source)
+            GLib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
         # pylint: disable=unused-argument
         # pylint: disable=no-member
-        if condition == glib.IO_IN:
+        if condition == GLib.IO_IN:
             device = self.monitor.poll(timeout=0)
             if device is not None:
                 self._emit_event(device)
@@ -88,13 +85,14 @@ class _ObserverMixin(object):
         self.emit('device-event', device)
 
 
-class MonitorObserver(gobject.GObject, _ObserverMixin):
+class MonitorObserver(GObject.Object, _ObserverMixin):
     # pylint: disable=too-few-public-methods
     """
-    An observer for device events integrating into the :mod:`glib` mainloop.
+    An observer for device events integrating into the :mod:`gi.repository.GLib`
+    mainloop.
 
-    This class inherits :class:`~gobject.GObject` to turn device events into
-    glib signals.
+    This class inherits :class:`~gi.repository.GObject.Object` to turn device
+    events into glib signals.
 
     >>> from pyudev import Context, Monitor
     >>> from pyudev.glib import MonitorObserver
@@ -107,7 +105,7 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
     >>> observer.connect('device-event', device_event)
     >>> monitor.start()
 
-    This class is a child of :class:`gobject.GObject`.
+    This class is a child of :class:`gi.repository.GObject.Object`.
     """
 
     __gsignals__ = {
@@ -117,22 +115,23 @@ class MonitorObserver(gobject.GObject, _ObserverMixin):
         # python versions.  We could also remove the "unicode_literals" import,
         # but I don't want to make exceptions to the standard set of future
         # imports used throughout pyudev for the sake of consistency.
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+        str('device-event'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):
-        gobject.GObject.__init__(self)
+        GObject.Object.__init__(self)
         self._setup_observer(monitor)
 
 
-gobject.type_register(MonitorObserver)
+GObject.type_register(MonitorObserver)
 
 
-class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
+class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
     # pylint: disable=too-few-public-methods
     """
-    An observer for device events integrating into the :mod:`glib` mainloop.
+    An observer for device events integrating into the :mod:`gi.repository.GLib`
+    mainloop.
 
     .. deprecated:: 0.17
        Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
@@ -146,20 +145,20 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
     }
 
     __gsignals__ = {
-        str('device-event'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)),
-        str('device-added'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
-        str('device-removed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
-        str('device-changed'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                                (gobject.TYPE_PYOBJECT, )),
-        str('device-moved'): (gobject.SIGNAL_RUN_LAST, gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, )),
+        str('device-event'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)),
+        str('device-added'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT, )),
+        str('device-removed'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                                (GObject.TYPE_PYOBJECT, )),
+        str('device-changed'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                                (GObject.TYPE_PYOBJECT, )),
+        str('device-moved'): (GObject.SIGNAL_RUN_LAST, GObject.TYPE_NONE,
+                              (GObject.TYPE_PYOBJECT, )),
     }
 
     def __init__(self, monitor):
-        gobject.GObject.__init__(self)
+        GObject.Object.__init__(self)
         self._setup_observer(monitor)
         import warnings
         warnings.warn('Will be removed in 1.0. '
@@ -173,4 +172,4 @@ class GUDevMonitorObserver(gobject.GObject, _ObserverMixin):
             self.emit(signal, device)
 
 
-gobject.type_register(GUDevMonitorObserver)
+GObject.type_register(GUDevMonitorObserver)
