@@ -164,9 +164,8 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
     def setup(self):
         self.event_sources = []
-        self.glib = pytest.importorskip('glib')
-        # make sure that we also have gobject
-        pytest.importorskip('gobject')
+        pytest.importorskip('gi')
+        self.glib = pytest.importorskip('gi.repository.GLib')
 
     def teardown(self):
         for source in self.event_sources:
