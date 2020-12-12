@@ -1,7 +1,7 @@
 # unit test requirements
 docutils>=0.9
 pytest>=2.8
-mock>=1.0b1
+mock>=1.0b1; python_version < "3.3"
 hypothesis==4.11.7
 
 # documentation requirements

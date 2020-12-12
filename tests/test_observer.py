@@ -21,7 +21,10 @@ from __future__ import (print_function, division, unicode_literals,
 import random
 
 import pytest
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from pyudev import Monitor, Devices
 

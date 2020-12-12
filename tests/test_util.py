@@ -21,7 +21,10 @@ from __future__ import (print_function, division, unicode_literals,
 import sys
 
 import pytest
-from mock import Mock
+try:
+    from unittest.mock import Mock
+except ImportError:
+    from mock import Mock
 
 from hypothesis import given
 from hypothesis import settings
