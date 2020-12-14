@@ -33,7 +33,10 @@ from contextlib import contextmanager
 from collections import namedtuple
 
 import pytest
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 Node = namedtuple('Node', 'name value next')
 

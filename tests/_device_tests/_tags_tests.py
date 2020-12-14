@@ -30,7 +30,10 @@ from hypothesis import settings
 from hypothesis import strategies
 
 import pytest
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from pyudev import Devices
 

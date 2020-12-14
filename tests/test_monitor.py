@@ -24,7 +24,10 @@ from contextlib import contextmanager
 from select import select
 
 import pytest
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 from pyudev import Monitor, MonitorObserver, Devices
 
