@@ -1,0 +1,81 @@
+---
+name: pyudev CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  python-checks:
+    strategy:
+      matrix:
+        include:
+          # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
+          - python-version: 3.8.6
+            dependencies: >
+              pytest==4.6.11
+              hypothesis==4.23.8
+              docutils==0.15.2
+            task: PYTHONPATH=./src make -f Makefile test-travis
+          # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
+          - python-version: 3.6.8
+            dependencies: >
+              pytest==4.6.11
+              hypothesis==4.23.8
+              docutils==0.15.2
+            task: PYTHONPATH=./src make -f Makefile test-travis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get -q update
+          sudo apt-get -y install libudev-dev
+      - name: Install dependencies
+        run: pip3 install ${{ matrix.dependencies }}
+      - name: Run test
+        run: ${{ matrix.task }}
+
+  # FORMAT
+  fmt:
+    env:
+      TASK: fmt-travis
+      PYTHON: 3.8.6
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON }}
+      - name: Install dependencies
+        run: |
+          pip3 install black==19.10b
+          pip3 install isort==4.3.21
+      - name: Run test
+        run: make -f Makefile $TASK
+
+  # VERIFICATION OF TEST INFRASTRUCTURE
+  yamllint:
+    env:
+      TASK: yamllint
+      PYTHON: 3.8.6
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON }}
+      - name: Install dependencies
+        run: pip3 install yamllint==1.25.0
+      - name: Run yamllint
+        run: make -f Makefile $TASK

@@ -71,3 +71,7 @@ fmt:
 fmt-travis:
 	isort --recursive --diff --check-only setup.py src tests
 	black . --check
+
+.PHONY: yamllint
+yamllint:
+	yamllint --strict .github/workflows/main.yml
