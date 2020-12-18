@@ -20,29 +20,23 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from hypothesis import given
-from hypothesis import settings
-from hypothesis import strategies
-
+# isort: THIRDPARTY
 import pytest
+from hypothesis import given, settings, strategies
+
+# isort: LOCAL
+from pyudev import Devices
+
+from ..utils import is_unicode_string
+from ._device_tests import _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
+
 try:
     from unittest import mock
 except ImportError:
     import mock
-
-from pyudev import Devices
-
-from ..utils import is_unicode_string
-
-from ._device_tests import _CONTEXT_STRATEGY
-from ._device_tests import _DEVICE_DATA
-from ._device_tests import _DEVICES
-from ._device_tests import _UDEV_TEST
 
 
 class TestTags(object):
@@ -68,11 +62,10 @@ class TestTags(object):
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
     def test_iteration_mock(self, a_device):
-        funcname = 'udev_device_get_tags_list_entry'
-        with pytest.libudev_list(a_device._libudev, funcname,
-                                 [b'spam', b'eggs']):
+        funcname = "udev_device_get_tags_list_entry"
+        with pytest.libudev_list(a_device._libudev, funcname, [b"spam", b"eggs"]):
             tags = list(a_device.tags)
-            assert tags == ['spam', 'eggs']
+            assert tags == ["spam", "eggs"]
             func = a_device._libudev.udev_device_get_tags_list_entry
             func.assert_called_once_with(a_device)
 
@@ -83,10 +76,9 @@ class TestTags(object):
         """
         Test that ``udev_device_has_tag`` is called if available.
         """
-        funcname = 'udev_device_has_tag'
+        funcname = "udev_device_has_tag"
         spec = lambda d, t: None
-        with mock.patch.object(
-                a_device._libudev, funcname, autospec=spec) as func:
+        with mock.patch.object(a_device._libudev, funcname, autospec=spec) as func:
             func.return_value = 1
-            assert 'foo' in a_device.tags
-            func.assert_called_once_with(a_device, b'foo')
+            assert "foo" in a_device.tags
+            func.assert_called_once_with(a_device, b"foo")

@@ -23,19 +23,20 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from pyudev.device import Devices
-from pyudev._errors import DeviceNotFoundAtPathError
-from pyudev._ctypeslib.libudev import ERROR_CHECKERS
-from pyudev._ctypeslib.libudev import SIGNATURES
+# isort: LOCAL
+from pyudev._ctypeslib.libudev import ERROR_CHECKERS, SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
-
-from pyudev._util import ensure_byte_string
-from pyudev._util import ensure_unicode_string
-from pyudev._util import property_value_to_bytes
-from pyudev._util import udev_list_iterate
+from pyudev._errors import DeviceNotFoundAtPathError
+from pyudev._util import (
+    ensure_byte_string,
+    ensure_unicode_string,
+    property_value_to_bytes,
+    udev_list_iterate,
+)
+from pyudev.device import Devices
 
 
 class Context(object):
@@ -58,7 +59,7 @@ class Context(object):
         """
         Create a new context.
         """
-        self._libudev = load_ctypes_library('udev', SIGNATURES, ERROR_CHECKERS)
+        self._libudev = load_ctypes_library("udev", SIGNATURES, ERROR_CHECKERS)
         self._as_parameter_ = self._libudev.udev_new()
 
     def __del__(self):
@@ -69,18 +70,18 @@ class Context(object):
         """
         The ``sysfs`` mount point defaulting to ``/sys'`` as unicode string.
         """
-        if hasattr(self._libudev, 'udev_get_sys_path'):
+        if hasattr(self._libudev, "udev_get_sys_path"):
             return ensure_unicode_string(self._libudev.udev_get_sys_path(self))
-        return '/sys'  # Fixed path since udev 183
+        return "/sys"  # Fixed path since udev 183
 
     @property
     def device_path(self):
         """
         The device directory path defaulting to ``/dev`` as unicode string.
         """
-        if hasattr(self._libudev, 'udev_get_dev_path'):
+        if hasattr(self._libudev, "udev_get_dev_path"):
             return ensure_unicode_string(self._libudev.udev_get_dev_path(self))
-        return '/dev'  # Fixed path since udev 183
+        return "/dev"  # Fixed path since udev 183
 
     @property
     def run_path(self):
@@ -92,9 +93,9 @@ class Context(object):
 
         .. versionadded:: 0.10
         """
-        if hasattr(self._libudev, 'udev_get_run_path'):
+        if hasattr(self._libudev, "udev_get_run_path"):
             return ensure_unicode_string(self._libudev.udev_get_run_path(self))
-        return '/run/udev'
+        return "/run/udev"
 
     @property
     def log_priority(self):
@@ -179,7 +180,7 @@ class Enumerator(object):
         recommended.  Call :method:`Context.list_devices()` instead.
         """
         if not isinstance(context, Context):
-            raise TypeError('Invalid context object')
+            raise TypeError("Invalid context object")
         self.context = context
         self._as_parameter_ = context._libudev.udev_enumerate_new(context)
         self._libudev = context._libudev
@@ -215,16 +216,16 @@ class Enumerator(object):
         .. versionchanged:: 0.13
            Add ``parent`` keyword.
         """
-        subsystem = kwargs.pop('subsystem', None)
+        subsystem = kwargs.pop("subsystem", None)
         if subsystem is not None:
             self.match_subsystem(subsystem)
-        sys_name = kwargs.pop('sys_name', None)
+        sys_name = kwargs.pop("sys_name", None)
         if sys_name is not None:
             self.match_sys_name(sys_name)
-        tag = kwargs.pop('tag', None)
+        tag = kwargs.pop("tag", None)
         if tag is not None:
             self.match_tag(tag)
-        parent = kwargs.pop('parent', None)
+        parent = kwargs.pop("parent", None)
         if parent is not None:
             self.match_parent(parent)
         for prop, value in kwargs.items():
@@ -245,8 +246,11 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = self._libudev.udev_enumerate_add_nomatch_subsystem \
-           if nomatch else self._libudev.udev_enumerate_add_match_subsystem
+        match = (
+            self._libudev.udev_enumerate_add_nomatch_subsystem
+            if nomatch
+            else self._libudev.udev_enumerate_add_match_subsystem
+        )
         match(self, ensure_byte_string(subsystem))
         return self
 
@@ -261,7 +265,8 @@ class Enumerator(object):
         .. versionadded:: 0.8
         """
         self._libudev.udev_enumerate_add_match_sysname(
-            self, ensure_byte_string(sys_name))
+            self, ensure_byte_string(sys_name)
+        )
         return self
 
     def match_property(self, prop, value):
@@ -281,7 +286,8 @@ class Enumerator(object):
         Return the instance again.
         """
         self._libudev.udev_enumerate_add_match_property(
-            self, ensure_byte_string(prop), property_value_to_bytes(value))
+            self, ensure_byte_string(prop), property_value_to_bytes(value)
+        )
         return self
 
     def match_attribute(self, attribute, value, nomatch=False):
@@ -311,10 +317,12 @@ class Enumerator(object):
 
         Return the instance again.
         """
-        match = (self._libudev.udev_enumerate_add_match_sysattr if not nomatch
-                 else self._libudev.udev_enumerate_add_nomatch_sysattr)
-        match(self, ensure_byte_string(attribute),
-              property_value_to_bytes(value))
+        match = (
+            self._libudev.udev_enumerate_add_match_sysattr
+            if not nomatch
+            else self._libudev.udev_enumerate_add_nomatch_sysattr
+        )
+        match(self, ensure_byte_string(attribute), property_value_to_bytes(value))
         return self
 
     def match_tag(self, tag):
@@ -329,8 +337,7 @@ class Enumerator(object):
 
         .. versionadded:: 0.6
         """
-        self._libudev.udev_enumerate_add_match_tag(self,
-                                                   ensure_byte_string(tag))
+        self._libudev.udev_enumerate_add_match_tag(self, ensure_byte_string(tag))
         return self
 
     def match_is_initialized(self):

@@ -29,15 +29,15 @@
     .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: THIRDPARTY
 from PyQt5 import QtCore  # pylint: disable=import-error
 
 from ._qt_base import MonitorObserverGenerator
 
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier
+)

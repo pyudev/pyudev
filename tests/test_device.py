@@ -23,16 +23,16 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 import gc
 
-# pylint: disable=unused-import
-from ._device_tests._devices_tests import TestDevices
-from ._device_tests._device_tests import TestDevice
 from ._device_tests._attributes_tests import TestAttributes
-from ._device_tests._tags_tests import TestTags
+from ._device_tests._device_tests import TestDevice
+from ._device_tests._devices_tests import TestDevices  # pylint: disable=unused-import
+from ._device_tests._tags_tests import TestTags  # pylint: disable=unused-import
 
 
 def test_garbage():

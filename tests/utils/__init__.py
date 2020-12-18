@@ -24,6 +24,4 @@
 """
 
 from . import udev
-
-from .misc import failed_health_check_wrapper
-from .misc import is_unicode_string
+from .misc import failed_health_check_wrapper, is_unicode_string

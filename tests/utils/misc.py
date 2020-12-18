@@ -23,17 +23,15 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 from functools import wraps
 
-import six
-
+# isort: THIRDPARTY
 import pytest
-
+import six
 from hypothesis.core import FailedHealthCheck
 
 
@@ -60,12 +58,8 @@ def failed_health_check_wrapper(func):
         except FailedHealthCheck:
             func_code = six.get_function_code(func)
             pytest.skip(
-               'failed health check for %s() (%s: %s)' % \
-               (
-                  func_code.co_name,
-                  func_code.co_filename,
-                  func_code.co_firstlineno
-               )
+                "failed health check for %s() (%s: %s)"
+                % (func_code.co_name, func_code.co_filename, func_code.co_firstlineno)
             )
 
     return the_func

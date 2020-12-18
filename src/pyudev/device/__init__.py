@@ -23,7 +23,4 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from ._device import Attributes
-from ._device import Device
-from ._device import Devices
-from ._device import Tags
+from ._device import Attributes, Device, Devices, Tags

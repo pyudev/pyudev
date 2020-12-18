@@ -32,36 +32,27 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from pyudev._errors import DeviceNotFoundAtPathError
-from pyudev._errors import DeviceNotFoundByFileError
-from pyudev._errors import DeviceNotFoundByNameError
-from pyudev._errors import DeviceNotFoundByNumberError
-from pyudev._errors import DeviceNotFoundError
-from pyudev._errors import DeviceNotFoundInEnvironmentError
-
-from pyudev.device import Attributes
-from pyudev.device import Device
-from pyudev.device import Devices
-from pyudev.device import Tags
-
-from pyudev.discover import DeviceFileHypothesis
-from pyudev.discover import DeviceNameHypothesis
-from pyudev.discover import DeviceNumberHypothesis
-from pyudev.discover import DevicePathHypothesis
-from pyudev.discover import Discovery
-
-from pyudev.core import Context
-from pyudev.core import Enumerator
-
-from pyudev.monitor import Monitor
-from pyudev.monitor import MonitorObserver
-
-from pyudev.version import __version__
-from pyudev.version import __version_info__
-
+# isort: LOCAL
+from pyudev._errors import (
+    DeviceNotFoundAtPathError,
+    DeviceNotFoundByFileError,
+    DeviceNotFoundByNameError,
+    DeviceNotFoundByNumberError,
+    DeviceNotFoundError,
+    DeviceNotFoundInEnvironmentError,
+)
 from pyudev._util import udev_version
+from pyudev.core import Context, Enumerator
+from pyudev.device import Attributes, Device, Devices, Tags
+from pyudev.discover import (
+    DeviceFileHypothesis,
+    DeviceNameHypothesis,
+    DeviceNumberHypothesis,
+    DevicePathHypothesis,
+    Discovery,
+)
+from pyudev.monitor import Monitor, MonitorObserver
+from pyudev.version import __version__, __version_info__

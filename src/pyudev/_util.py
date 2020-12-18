@@ -23,20 +23,22 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+# isort: STDLIB
+import errno
+import os
+import stat
+import sys
+
+# isort: THIRDPARTY
+import six
 
 try:
     from subprocess import check_output
 except ImportError:
     from pyudev._compat import check_output
-
-import os
-import sys
-import stat
-import errno
-
-import six
 
 
 def ensure_byte_string(value):
@@ -93,9 +95,9 @@ def string_to_bool(value):
     ``False`` is returned.  Any other value raises a
     :exc:`~exceptions.ValueError`.
     """
-    if value not in ('1', '0'):
-        raise ValueError('Not a boolean value: {0!r}'.format(value))
-    return value == '1'
+    if value not in ("1", "0"):
+        raise ValueError("Not a boolean value: {0!r}".format(value))
+    return value == "1"
 
 
 def udev_list_iterate(libudev, entry):
@@ -129,11 +131,11 @@ def get_device_type(filename):
     """
     mode = os.stat(filename).st_mode
     if stat.S_ISCHR(mode):
-        return 'char'
+        return "char"
     elif stat.S_ISBLK(mode):
-        return 'block'
+        return "block"
     else:
-        raise ValueError('not a device file: {0!r}'.format(filename))
+        raise ValueError("not a device file: {0!r}".format(filename))
 
 
 def eintr_retry_call(func, *args, **kwargs):
@@ -195,5 +197,5 @@ def udev_version():
 
     .. versionadded:: 0.8
     """
-    output = ensure_unicode_string(check_output(['udevadm', '--version']))
+    output = ensure_unicode_string(check_output(["udevadm", "--version"]))
     return int(output.strip())

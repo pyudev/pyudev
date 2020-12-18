@@ -29,22 +29,20 @@
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
+# isort: STDLIB
 import fcntl
+import os
 from functools import partial
 
-from pyudev._ctypeslib.libc import ERROR_CHECKERS
-from pyudev._ctypeslib.libc import FD_PAIR
-from pyudev._ctypeslib.libc import SIGNATURES
+# isort: LOCAL
+from pyudev._ctypeslib.libc import ERROR_CHECKERS, FD_PAIR, SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
 
 # Define O_CLOEXEC, if not present in os already
-O_CLOEXEC = getattr(os, 'O_CLOEXEC', 0o2000000)
+O_CLOEXEC = getattr(os, "O_CLOEXEC", 0o2000000)
 
 
 def _pipe2_ctypes(libc, flags):
@@ -87,13 +85,16 @@ def _get_pipe2_implementation():
     """Find the appropriate implementation for ``pipe2``.
 
 Return a function implementing ``pipe2``."""
-    if hasattr(os, 'pipe2'):
+    if hasattr(os, "pipe2"):
         return os.pipe2  # pylint: disable=no-member
     else:
         try:
             libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
-            return (partial(_pipe2_ctypes, libc)
-                    if hasattr(libc, 'pipe2') else _pipe2_by_pipe)
+            return (
+                partial(_pipe2_ctypes, libc)
+                if hasattr(libc, "pipe2")
+                else _pipe2_by_pipe
+            )
         except ImportError:
             return _pipe2_by_pipe
 
@@ -145,8 +146,8 @@ class Pipe(object):
 
         ``source_fd`` is a file descriptor for the readable side of the pipe,
         ``sink_fd`` is a file descriptor for the writeable side."""
-        self.source = os.fdopen(source_fd, 'rb', 0)
-        self.sink = os.fdopen(sink_fd, 'wb', 0)
+        self.source = os.fdopen(source_fd, "rb", 0)
+        self.sink = os.fdopen(sink_fd, "wb", 0)
 
     def close(self):
         """Closes both sides of the pipe."""

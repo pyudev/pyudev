@@ -23,11 +23,10 @@
     .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 from ctypes import CDLL
 from ctypes.util import find_library
 
@@ -52,7 +51,7 @@ def load_ctypes_library(name, signatures, error_checkers):
     """
     library_name = find_library(name)
     if not library_name:
-        raise ImportError('No library named %s' % name)
+        raise ImportError("No library named %s" % name)
     lib = CDLL(library_name, use_errno=True)
     # Add function signatures
     for funcname, signature in signatures.items():

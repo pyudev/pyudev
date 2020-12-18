@@ -24,28 +24,24 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from ctypes import c_char
-from ctypes import c_char_p
-from ctypes import c_int
-from ctypes import c_uint
-from ctypes import c_ulonglong
-from ctypes import Structure
-from ctypes import POINTER
+# isort: STDLIB
+from ctypes import POINTER, Structure, c_char, c_char_p, c_int, c_uint, c_ulonglong
 
-from ._errorcheckers import check_errno_on_nonzero_return
-from ._errorcheckers import check_errno_on_null_pointer_return
-from ._errorcheckers import check_negative_errorcode
+from ._errorcheckers import (
+    check_errno_on_nonzero_return,
+    check_errno_on_null_pointer_return,
+    check_negative_errorcode,
+)
 
 
 class udev(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -57,6 +53,7 @@ class udev_enumerate(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev_enumerate`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -68,6 +65,7 @@ class udev_list_entry(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev_list_entry`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -79,6 +77,7 @@ class udev_device(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev_device`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -90,6 +89,7 @@ class udev_monitor(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev_device`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -101,6 +101,7 @@ class udev_hwdb(Structure):  # pylint: disable=invalid-name
     """
     Dummy for ``udev_hwdb`` structure.
     """
+
     # pylint: disable=too-few-public-methods
     pass
 
@@ -124,12 +125,9 @@ SIGNATURES = dict(
     udev_enumerate_unref=([udev_enumerate_p], None),
     udev_enumerate_add_match_subsystem=([udev_enumerate_p, c_char_p], c_int),
     udev_enumerate_add_nomatch_subsystem=([udev_enumerate_p, c_char_p], c_int),
-    udev_enumerate_add_match_property=([udev_enumerate_p, c_char_p, c_char_p],
-                                       c_int),
-    udev_enumerate_add_match_sysattr=([udev_enumerate_p, c_char_p, c_char_p],
-                                      c_int),
-    udev_enumerate_add_nomatch_sysattr=([udev_enumerate_p, c_char_p, c_char_p],
-                                        c_int),
+    udev_enumerate_add_match_property=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+    udev_enumerate_add_match_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
+    udev_enumerate_add_nomatch_sysattr=([udev_enumerate_p, c_char_p, c_char_p], c_int),
     udev_enumerate_add_match_tag=([udev_enumerate_p, c_char_p], c_int),
     udev_enumerate_add_match_sysname=([udev_enumerate_p, c_char_p], c_int),
     udev_enumerate_add_match_parent=([udev_enumerate_p, udev_device_p], c_int),
@@ -144,15 +142,18 @@ SIGNATURES = dict(
     udev_device_ref=([udev_device_p], udev_device_p),
     udev_device_unref=([udev_device_p], None),
     udev_device_new_from_syspath=([udev_p, c_char_p], udev_device_p),
-    udev_device_new_from_subsystem_sysname=([udev_p, c_char_p, c_char_p],
-                                            udev_device_p),
+    udev_device_new_from_subsystem_sysname=(
+        [udev_p, c_char_p, c_char_p],
+        udev_device_p,
+    ),
     udev_device_new_from_devnum=([udev_p, c_char, dev_t], udev_device_p),
     udev_device_new_from_device_id=([udev_p, c_char_p], udev_device_p),
     udev_device_new_from_environment=([udev_p], udev_device_p),
     udev_device_get_parent=([udev_device_p], udev_device_p),
-    udev_device_get_parent_with_subsystem_devtype=([
-        udev_device_p, c_char_p, c_char_p
-    ], udev_device_p),
+    udev_device_get_parent_with_subsystem_devtype=(
+        [udev_device_p, c_char_p, c_char_p],
+        udev_device_p,
+    ),
     udev_device_get_devpath=([udev_device_p], c_char_p),
     udev_device_get_subsystem=([udev_device_p], c_char_p),
     udev_device_get_syspath=([udev_device_p], c_char_p),
@@ -182,9 +183,10 @@ SIGNATURES = dict(
     udev_monitor_set_receive_buffer_size=([udev_monitor_p, c_int], c_int),
     udev_monitor_get_fd=([udev_monitor_p], c_int),
     udev_monitor_receive_device=([udev_monitor_p], udev_device_p),
-    udev_monitor_filter_add_match_subsystem_devtype=([
-        udev_monitor_p, c_char_p, c_char_p
-    ], c_int),
+    udev_monitor_filter_add_match_subsystem_devtype=(
+        [udev_monitor_p, c_char_p, c_char_p],
+        c_int,
+    ),
     udev_monitor_filter_add_match_tag=([udev_monitor_p, c_char_p], c_int),
     udev_monitor_filter_update=([udev_monitor_p], c_int),
     udev_monitor_filter_remove=([udev_monitor_p], c_int),
@@ -192,8 +194,11 @@ SIGNATURES = dict(
     udev_hwdb_ref=([udev_hwdb_p], udev_hwdb_p),
     udev_hwdb_unref=([udev_hwdb_p], None),
     udev_hwdb_new=([udev_p], udev_hwdb_p),
-    udev_hwdb_get_properties_list_entry=([udev_hwdb_p, c_char_p, c_uint],
-                                         udev_list_entry_p))
+    udev_hwdb_get_properties_list_entry=(
+        [udev_hwdb_p, c_char_p, c_uint],
+        udev_list_entry_p,
+    ),
+)
 
 ERROR_CHECKERS = dict(
     udev_device_get_action=None,
@@ -267,4 +272,5 @@ ERROR_CHECKERS = dict(
     udev_new=None,
     udev_ref=None,
     udev_set_log_priority=None,
-    udev_unref=None)
+    udev_unref=None,
+)

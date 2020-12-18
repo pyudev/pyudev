@@ -23,19 +23,20 @@
     .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 import abc
 import functools
 import os
 import re
+
+# isort: THIRDPARTY
 import six
 
+# isort: LOCAL
 from pyudev._errors import DeviceNotFoundError
-
 from pyudev.device import Devices
 
 
@@ -137,10 +138,11 @@ class DeviceNumberHypothesis(Hypothesis):
         :returns: the device number or None
         :rtype: int or NoneType
         """
-        major_minor_re = re.compile(r'^(?P<major>\d+)(\D+)(?P<minor>\d+)$')
+        major_minor_re = re.compile(r"^(?P<major>\d+)(\D+)(?P<minor>\d+)$")
         match = major_minor_re.match(value)
         return match and os.makedev(
-            int(match.group('major')), int(match.group('minor')))
+            int(match.group("major")), int(match.group("minor"))
+        )
 
     @classmethod
     def _match_number(cls, value):
@@ -151,9 +153,9 @@ class DeviceNumberHypothesis(Hypothesis):
         :returns: the device number or None
         :rtype: int or NoneType
         """
-        number_re = re.compile(r'^(?P<number>\d+)$')
+        number_re = re.compile(r"^(?P<number>\d+)$")
         match = number_re.match(value)
-        return match and int(match.group('number'))
+        return match and int(match.group("number"))
 
     @classmethod
     def match(cls, value):
@@ -175,7 +177,7 @@ class DeviceNumberHypothesis(Hypothesis):
         :rtype: list of str
         """
         sys_path = context.sys_path
-        return os.listdir(os.path.join(sys_path, 'dev'))
+        return os.listdir(os.path.join(sys_path, "dev"))
 
     @classmethod
     def lookup(cls, context, key):
@@ -218,7 +220,7 @@ class DevicePathHypothesis(Hypothesis):
         :rtype: frozenset of :class:`Device`
         """
         res = wrap_exception(Devices.from_path)(context, key)
-        return frozenset((res, )) if res is not None else frozenset()
+        return frozenset((res,)) if res is not None else frozenset()
 
 
 class DeviceNameHypothesis(Hypothesis):
@@ -238,7 +240,7 @@ class DeviceNameHypothesis(Hypothesis):
         :returns: subsystems in sysfs
         """
         sys_path = context.sys_path
-        dirnames = ('bus', 'class', 'subsystem')
+        dirnames = ("bus", "class", "subsystem")
         absnames = (os.path.join(sys_path, name) for name in dirnames)
         realnames = (d for d in absnames if os.path.isdir(d))
         return frozenset(n for d in realnames for n in os.listdir(d))
@@ -276,10 +278,17 @@ class DeviceFileHypothesis(Hypothesis):
     """
 
     _LINK_DIRS = [
-        '/dev', '/dev/disk/by-id', '/dev/disk/by-label',
-        '/dev/disk/by-partlabel', '/dev/disk/by-partuuid', '/dev/disk/by-path',
-        '/dev/disk/by-uuid', '/dev/input/by-path', '/dev/mapper', '/dev/md',
-        '/dev/vg'
+        "/dev",
+        "/dev/disk/by-id",
+        "/dev/disk/by-label",
+        "/dev/disk/by-partlabel",
+        "/dev/disk/by-partuuid",
+        "/dev/disk/by-path",
+        "/dev/disk/by-uuid",
+        "/dev/input/by-path",
+        "/dev/mapper",
+        "/dev/md",
+        "/dev/vg",
     ]
 
     @classmethod
@@ -329,9 +338,9 @@ class DeviceFileHypothesis(Hypothesis):
         A device file may be a device node or a device link.
         """
         func = wrap_exception(Devices.from_device_file)
-        if '/' in key:
+        if "/" in key:
             device = func(context, key)
-            return frozenset((device, )) if device is not None else frozenset()
+            return frozenset((device,)) if device is not None else frozenset()
 
         files = (os.path.join(ld, key) for ld in cls._LINK_DIRS)
         devices = (func(context, f) for f in files)
@@ -345,8 +354,10 @@ class Discovery(object):
     """
 
     _HYPOTHESES = [
-        DeviceFileHypothesis, DeviceNameHypothesis, DeviceNumberHypothesis,
-        DevicePathHypothesis
+        DeviceFileHypothesis,
+        DeviceNameHypothesis,
+        DeviceNumberHypothesis,
+        DevicePathHypothesis,
     ]
 
     def __init__(self):
@@ -373,4 +384,5 @@ class Discovery(object):
         :rtype: frozenset of :class:`Device`
         """
         return frozenset(
-            d for h in self._hypotheses for d in h.get_devices(context, value))
+            d for h in self._hypotheses for d in h.get_devices(context, value)
+        )
