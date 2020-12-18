@@ -21,8 +21,10 @@
     Support for Travis CI.
 """
 
+# isort: STDLIB
 import os
 
+# isort: THIRDPARTY
 import pytest
 
 
@@ -32,7 +34,7 @@ def is_on_travis_ci():
     Return ``True``, if so, or ``False`` otherwise.
 
     """
-    return os.environ.get('TRAVIS', '') == 'true'
+    return os.environ.get("TRAVIS", "") == "true"
 
 
 EXPOSED_FUNCTIONS = [is_on_travis_ci]
@@ -44,8 +46,8 @@ def pytest_configure():
 
 
 def pytest_runtest_setup(item):
-    if not hasattr(item, 'obj'):
+    if not hasattr(item, "obj"):
         return
-    marker = getattr(item.obj, 'not_on_travis', None)
+    marker = getattr(item.obj, "not_on_travis", None)
     if marker and is_on_travis_ci():
-        pytest.skip('Test must not run on Travis CI')
+        pytest.skip("Test must not run on Travis CI")

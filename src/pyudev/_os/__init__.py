@@ -23,5 +23,4 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import pipe
-from . import poll
+from . import pipe, poll

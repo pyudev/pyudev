@@ -23,13 +23,13 @@
     .. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 import abc
 
+# isort: THIRDPARTY
 from six import add_metaclass
 
 
@@ -67,7 +67,7 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
         return self.args[0]
 
     def __str__(self):
-        return 'No device at {0!r}'.format(self.sys_path)
+        return "No device at {0!r}".format(self.sys_path)
 
 
 class DeviceNotFoundByFileError(DeviceNotFoundError):
@@ -118,7 +118,7 @@ class DeviceNotFoundByNameError(DeviceNotFoundError):
         return self.args[1]
 
     def __str__(self):
-        return 'No device {0.sys_name!r} in {0.subsystem!r}'.format(self)
+        return "No device {0.sys_name!r} in {0.subsystem!r}".format(self)
 
 
 class DeviceNotFoundByNumberError(DeviceNotFoundError):
@@ -146,8 +146,7 @@ class DeviceNotFoundByNumberError(DeviceNotFoundError):
         return self.args[1]
 
     def __str__(self):
-        return ('No {0.device_type} device with number '
-                '{0.device_number}'.format(self))
+        return "No {0.device_type} device with number " "{0.device_number}".format(self)
 
 
 class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
@@ -157,7 +156,7 @@ class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):
     """
 
     def __str__(self):
-        return 'No device found in environment'
+        return "No device found in environment"
 
 
 class DeviceValueError(DeviceError):

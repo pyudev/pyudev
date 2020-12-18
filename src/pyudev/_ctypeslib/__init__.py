@@ -23,5 +23,4 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import libc
-from . import libudev
+from . import libc, libudev

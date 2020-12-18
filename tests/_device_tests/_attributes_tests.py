@@ -20,28 +20,22 @@ Tests methods belonging to Attributes class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: STDLIB
 import os
 import stat
 
-from hypothesis import given
-from hypothesis import settings
-from hypothesis import strategies
-
+# isort: THIRDPARTY
 import pytest
+from hypothesis import given, settings, strategies
 
+# isort: LOCAL
 from pyudev import Devices
 
 from ..utils import is_unicode_string
-
-from ._device_tests import _CONTEXT_STRATEGY
-from ._device_tests import _DEVICE_DATA
-from ._device_tests import _DEVICES
-from ._device_tests import _UDEV_TEST
+from ._device_tests import _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
 
 
 class TestAttributes(object):
@@ -56,8 +50,10 @@ class TestAttributes(object):
         Test that attribute value exists and is instance of bytes.
         """
         device = Devices.from_path(a_context, device_datum.device_path)
-        assert all(isinstance(device.attributes.get(key), bytes) \
-           for key in device_datum.attributes.keys())
+        assert all(
+            isinstance(device.attributes.get(key), bytes)
+            for key in device_datum.attributes.keys()
+        )
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
@@ -82,9 +78,9 @@ class TestAttributes(object):
         """
         # pylint: disable=pointless-statement
         with pytest.raises(TypeError):
-            'key' in a_device.attributes
+            "key" in a_device.attributes
         with pytest.raises(TypeError):
-            a_device.attributes['key']
+            a_device.attributes["key"]
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=5)
@@ -93,8 +89,10 @@ class TestAttributes(object):
         Test that attribute exists for actual device and is unicode.
         """
         device = Devices.from_path(a_context, device_datum.device_path)
-        assert all(is_unicode_string(device.attributes.asstring(key)) \
-           for key in device_datum.attributes.keys())
+        assert all(
+            is_unicode_string(device.attributes.asstring(key))
+            for key in device_datum.attributes.keys()
+        )
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
     @settings(max_examples=10)
@@ -118,7 +116,7 @@ class TestAttributes(object):
         """
         device = Devices.from_path(a_context, device_datum.device_path)
         for key, value in device_datum.attributes.items():
-            if value in ('0', '1'):
+            if value in ("0", "1"):
                 assert device.attributes.asbool(key) in (False, True)
             else:
                 with pytest.raises(ValueError):

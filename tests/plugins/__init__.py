@@ -23,5 +23,5 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals

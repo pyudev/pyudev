@@ -33,22 +33,22 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+# isort: THIRDPARTY
 from PyQt4 import QtCore  # pylint: disable=import-error
 
-from ._qt_base import MonitorObserverGenerator
-from ._qt_base import QUDevMonitorObserverGenerator
+from ._qt_base import MonitorObserverGenerator, QUDevMonitorObserverGenerator
 
 # pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier
+)
 """
 .. deprecated:: 0.17
    Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
 """
 QUDevMonitorObserver = QUDevMonitorObserverGenerator.make_monitor_observer(
-    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier)
+    QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier
+)

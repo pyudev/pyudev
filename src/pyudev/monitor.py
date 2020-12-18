@@ -23,21 +23,19 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from __future__ import (print_function, division, unicode_literals,
-                        absolute_import)
+# isort: FUTURE
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
+# isort: STDLIB
 import errno
-from threading import Thread
+import os
 from functools import partial
+from threading import Thread
 
+# isort: LOCAL
+from pyudev._os import pipe, poll
+from pyudev._util import eintr_retry_call, ensure_byte_string
 from pyudev.device import Device
-
-from pyudev._util import eintr_retry_call
-from pyudev._util import ensure_byte_string
-
-from pyudev._os import pipe
-from pyudev._os import poll
 
 
 class Monitor(object):
@@ -90,7 +88,7 @@ class Monitor(object):
         self._libudev.udev_monitor_unref(self)
 
     @classmethod
-    def from_netlink(cls, context, source='udev'):
+    def from_netlink(cls, context, source="udev"):
         """
         Create a monitor by connecting to the kernel daemon through netlink.
 
@@ -112,13 +110,16 @@ class Monitor(object):
         :exc:`~exceptions.EnvironmentError`, if the creation of the monitor
         failed.
         """
-        if source not in ('kernel', 'udev'):
-            raise ValueError('Invalid source: {0!r}. Must be one of "udev" '
-                             'or "kernel"'.format(source))
+        if source not in ("kernel", "udev"):
+            raise ValueError(
+                'Invalid source: {0!r}. Must be one of "udev" '
+                'or "kernel"'.format(source)
+            )
         monitor = context._libudev.udev_monitor_new_from_netlink(
-            context, ensure_byte_string(source))
+            context, ensure_byte_string(source)
+        )
         if not monitor:
-            raise EnvironmentError('Could not create udev monitor')
+            raise EnvironmentError("Could not create udev monitor")
         return cls(context, monitor)
 
     @property
@@ -165,7 +166,8 @@ class Monitor(object):
         if device_type is not None:
             device_type = ensure_byte_string(device_type)
         self._libudev.udev_monitor_filter_add_match_subsystem_devtype(
-            self, subsystem, device_type)
+            self, subsystem, device_type
+        )
         self._libudev.udev_monitor_filter_update(self)
 
     def filter_by_tag(self, tag):
@@ -187,8 +189,7 @@ class Monitor(object):
         .. versionchanged:: 0.15
            This method can also be after :meth:`start()` now.
         """
-        self._libudev.udev_monitor_filter_add_match_tag(
-            self, ensure_byte_string(tag))
+        self._libudev.udev_monitor_filter_add_match_tag(self, ensure_byte_string(tag))
         self._libudev.udev_monitor_filter_update(self)
 
     def remove_filter(self):
@@ -228,8 +229,10 @@ class Monitor(object):
            Will be removed in 1.0. Use :meth:`start()` instead.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use Monitor.start() instead.',
-                      DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. Use Monitor.start() instead.", DeprecationWarning
+        )
         self.start()
 
     def start(self):
@@ -351,7 +354,7 @@ class Monitor(object):
             # .poll() takes timeout in milliseconds
             timeout = int(timeout * 1000)
         self.start()
-        if eintr_retry_call(poll.Poll.for_events((self, 'r')).poll, timeout):
+        if eintr_retry_call(poll.Poll.for_events((self, "r")).poll, timeout):
             return self._receive_device()
         return None
 
@@ -388,8 +391,10 @@ class Monitor(object):
            Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use Monitor.poll() instead.',
-                      DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. Use Monitor.poll() instead.", DeprecationWarning
+        )
         device = self.poll()
         return device.action, device
 
@@ -412,9 +417,13 @@ class Monitor(object):
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
         import warnings
-        warnings.warn('Will be removed in 1.0. Use an explicit loop over '
-                      '"poll()" instead, or monitor asynchronously with '
-                      '"MonitorObserver".', DeprecationWarning)
+
+        warnings.warn(
+            "Will be removed in 1.0. Use an explicit loop over "
+            '"poll()" instead, or monitor asynchronously with '
+            '"MonitorObserver".',
+            DeprecationWarning,
+        )
         self.start()
         while True:
             device = self.poll()
@@ -464,12 +473,9 @@ class MonitorObserver(Thread):
        :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
-    def __init__(self,
-                 monitor,
-                 event_handler=None,
-                 callback=None,
-                 *args,
-                 **kwargs):  # pylint: disable=keyword-arg-before-vararg
+    def __init__(
+        self, monitor, event_handler=None, callback=None, *args, **kwargs
+    ):  # pylint: disable=keyword-arg-before-vararg
         """
         Create a new observer for the given ``monitor``.
 
@@ -492,9 +498,9 @@ class MonitorObserver(Thread):
            Add ``callback`` argument.
         """
         if callback is None and event_handler is None:
-            raise ValueError('callback missing')
+            raise ValueError("callback missing")
         elif callback is not None and event_handler is not None:
-            raise ValueError('Use either callback or event handler')
+            raise ValueError("Use either callback or event handler")
 
         Thread.__init__(self, *args, **kwargs)
         self.monitor = monitor
@@ -503,8 +509,12 @@ class MonitorObserver(Thread):
         self._stop_event = None
         if event_handler is not None:
             import warnings
-            warnings.warn('"event_handler" argument will be removed in 1.0. '
-                          'Use Monitor.poll() instead.', DeprecationWarning)
+
+            warnings.warn(
+                '"event_handler" argument will be removed in 1.0. '
+                "Use Monitor.poll() instead.",
+                DeprecationWarning,
+            )
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback
 
@@ -516,8 +526,9 @@ class MonitorObserver(Thread):
 
     def run(self):
         self.monitor.start()
-        notifier = poll.Poll.for_events((self.monitor, 'r'),
-                                        (self._stop_event.source, 'r'))
+        notifier = poll.Poll.for_events(
+            (self.monitor, "r"), (self._stop_event.source, "r")
+        )
         while True:
             for file_descriptor, event in eintr_retry_call(notifier.poll):
                 if file_descriptor == self._stop_event.source.fileno():
@@ -525,13 +536,14 @@ class MonitorObserver(Thread):
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno() and event == 'r':
+                elif file_descriptor == self.monitor.fileno() and event == "r":
                     read_device = partial(
-                        eintr_retry_call, self.monitor.poll, timeout=0)
+                        eintr_retry_call, self.monitor.poll, timeout=0
+                    )
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
-                    raise EnvironmentError('Observed monitor hung up')
+                    raise EnvironmentError("Observed monitor hung up")
 
     def send_stop(self):
         """
@@ -549,7 +561,7 @@ class MonitorObserver(Thread):
             return
         with self._stop_event.sink:
             # emit a stop event to the thread
-            eintr_retry_call(self._stop_event.sink.write, b'\x01')
+            eintr_retry_call(self._stop_event.sink.write, b"\x01")
             self._stop_event.sink.flush()
 
     def stop(self):
