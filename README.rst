@@ -13,8 +13,8 @@ libudev_ functionality. You can enumerate devices, query device properties and
 attributes or monitor devices, including asynchronous monitoring with threads,
 or within the event loops of Qt, Glib or wxPython.
 
-The binding supports CPython_ 2 (2.6 or newer) and 3 (3.1 or newer), and PyPy_
-1.5 or newer.  It is tested against udev 151 or newer, earlier versions of udev
+The binding supports CPython_ 3 and compatible versions of PyPy_.
+It is tested against udev 151 or newer, earlier versions of udev
 as found on dated Linux systems may work, but are not officially supported.
 
 

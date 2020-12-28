@@ -1,25 +1,7 @@
 Test running
 ============
-
-
-Direct testing using tox_
--------------------------
-
-If you are on a Linux system run all tests with tox_.  This tool automatically
-creates virtualenvs (see virtualenv_), installs all packages required by the
-test suite, and runs the tests.
-
-Run all pyudev tests against Python 2.7, Python 3.2 and PyPy::
-
-   tox -e py27,py32,pypy
-
-Pass any arguments you want to :program:`py.test` after two dashes ``--``::
-
-   tox -e py27,py32,pypy -- --<argument>
-
-
-Notes
------
+See the current CI configuration file to determine what tests are
+currently being run and how to run them.
 
 Device samples
 ~~~~~~~~~~~~~~

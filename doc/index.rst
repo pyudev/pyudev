@@ -3,7 +3,7 @@ pyudev -- pure Python libudev_ binding
 
 pyudev |release| (:doc:`changes`, :doc:`installation <install>`)
 
-pyudev is a :doc:`LGPL licenced <licencing>`, pure Python_ 2/3 binding to
+pyudev is a :doc:`LGPL licenced <licencing>`, pure Python_ 3 binding to
 libudev_, the device and hardware management and information library of Linux.
 
 Almost the complete libudev_ functionality is exposed. You can:
