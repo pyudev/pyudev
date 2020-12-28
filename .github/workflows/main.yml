@@ -31,6 +31,13 @@ jobs:
               hypothesis==4.23.8
               docutils==0.15.2
             task: PYTHONPATH=./src make -f Makefile test-travis
+          # MANDATORY CHECKS USING LOWEST SUPPORTED PYPY INTERPRETER
+          - python-version: pypy-3.6
+            dependencies: >
+              pytest==4.6.11
+              hypothesis==4.23.8
+              docutils==0.15.2
+            task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
