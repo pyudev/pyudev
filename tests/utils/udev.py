@@ -309,7 +309,7 @@ class DeviceDatabase(collections_abc.Iterable, collections_abc.Sized):
         :param bool renew: if renew is True, get a new object
         :returns: a database object
         :rtype: :class:`DeviceDatabase`
-    """
+        """
         if cls._db is None or renew:
             udevadm = UDevAdm.adm()
             if udevadm:

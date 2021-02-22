@@ -66,7 +66,7 @@ jobs:
           python-version: ${{ env.PYTHON }}
       - name: Install dependencies
         run: |
-          pip3 install black==19.10b
+          pip3 install black==20.8b1
           pip3 install isort==4.3.21
       - name: Run test
         run: make -f Makefile $TASK

@@ -84,7 +84,7 @@ def _pipe2_by_pipe(flags):
 def _get_pipe2_implementation():
     """Find the appropriate implementation for ``pipe2``.
 
-Return a function implementing ``pipe2``."""
+    Return a function implementing ``pipe2``."""
     if hasattr(os, "pipe2"):
         return os.pipe2  # pylint: disable=no-member
     else:
