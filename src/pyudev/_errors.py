@@ -169,11 +169,12 @@ class DeviceValueError(DeviceError):
     _FMT_STR = "value '%s' for parameter %s is unacceptable"
 
     def __init__(self, value, param, msg=None):
-        """ Initializer.
+        """
+        Initializer.
 
-            :param object value: the value
-            :param str param: the parameter
-            :param str msg: an explanatory message
+        :param object value: the value
+        :param str param: the parameter
+        :param str msg: an explanatory message
         """
         # pylint: disable=super-init-not-called
         self._value = value

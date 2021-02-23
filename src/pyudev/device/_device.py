@@ -1265,10 +1265,10 @@ class Tags(collections_abc.Iterable, collections_abc.Container):
 
     def _has_tag(self, tag):
         """
-            Whether ``tag`` exists.
+        Whether ``tag`` exists.
 
-            :param tag: unicode string with name of tag
-            :rtype: bool
+        :param tag: unicode string with name of tag
+        :rtype: bool
         """
         if hasattr(self._libudev, "udev_device_has_tag"):
             return bool(
