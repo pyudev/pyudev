@@ -20,6 +20,7 @@ jobs:
           # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
           - python-version: 3.9.2
             dependencies: >
+              six==1.15.0
               pytest==6.0.2
               hypothesis==5.29.4
               docutils==0.16.0
@@ -27,6 +28,7 @@ jobs:
           # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
           - python-version: 3.6.8
             dependencies: >
+              six==1.15.0
               pytest==4.6.11
               hypothesis==4.23.8
               docutils==0.15.2
@@ -34,6 +36,7 @@ jobs:
           # MANDATORY CHECKS USING LOWEST SUPPORTED PYPY INTERPRETER
           - python-version: pypy-3.6
             dependencies: >
+              six==1.15.0
               pytest==4.6.11
               hypothesis==4.23.8
               docutils==0.15.2
