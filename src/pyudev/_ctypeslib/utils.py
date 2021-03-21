@@ -51,7 +51,10 @@ def load_ctypes_library(name, signatures, error_checkers):
     """
     library_name = find_library(name)
     if not library_name:
-        raise ImportError("No library named %s" % name)
+        try:
+            CDLL("libudev.so")
+        except OSError:
+            raise ImportError("No library named %s" % name)
     lib = CDLL(library_name, use_errno=True)
     # Add function signatures
     for funcname, signature in signatures.items():
