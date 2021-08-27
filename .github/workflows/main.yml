@@ -53,36 +53,22 @@ jobs:
       - name: Run test
         run: ${{ matrix.task }}
 
-  # FORMAT
-  fmt:
-    env:
-      TASK: fmt-travis
-      PYTHON: 3.8.6
+  development_environment_checks:
+    strategy:
+      matrix:
+        include:
+          - dependencies: black python3-isort
+            task: fmt-travis
+          - dependencies: yamllint
+            task: yamllint
     runs-on: ubuntu-latest
+    container: fedora:33
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON }}
       - name: Install dependencies
-        run: |
-          pip3 install black==20.8b1
-          pip3 install isort==4.3.21
+        run: >
+          dnf install -y
+          make
+          ${{ matrix.dependencies }}
       - name: Run test
-        run: make -f Makefile $TASK
-
-  # VERIFICATION OF TEST INFRASTRUCTURE
-  yamllint:
-    env:
-      TASK: yamllint
-      PYTHON: 3.8.6
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: ${{ env.PYTHON }}
-      - name: Install dependencies
-        run: pip3 install yamllint==1.26.0
-      - name: Run yamllint
-        run: make -f Makefile $TASK
+        run: make -f Makefile ${{ matrix.task }}
