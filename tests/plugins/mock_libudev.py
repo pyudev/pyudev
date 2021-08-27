@@ -37,8 +37,10 @@ from operator import attrgetter
 import pytest
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 Node = namedtuple("Node", "name value next")

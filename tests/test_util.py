@@ -31,8 +31,10 @@ from pyudev import Context, _util
 from .utils import is_unicode_string
 
 try:
+    # isort: STDLIB
     from unittest.mock import Mock
 except ImportError:
+    # isort: THIRDPARTY
     from mock import Mock
 
 
@@ -174,7 +176,10 @@ def test_get_device_type_not_existing(tmpdir):
 
 
 def test_eintr_retry_call(tmpdir):
-    import os, signal, select
+    # isort: STDLIB
+    import os
+    import select
+    import signal
 
     def handle_alarm(signum, frame):
         # pylint: disable=unused-argument

@@ -26,6 +26,8 @@ from select import select
 
 # isort: THIRDPARTY
 import pytest
+
+# isort: FIRSTPARTY
 from tests._constants import _UDEV_TEST
 from tests.utils.udev import DeviceDatabase
 
@@ -33,8 +35,10 @@ from tests.utils.udev import DeviceDatabase
 from pyudev import Devices, Monitor, MonitorObserver
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 

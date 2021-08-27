@@ -228,6 +228,7 @@ class Monitor(object):
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :meth:`start()` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -390,6 +391,7 @@ class Monitor(object):
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -416,6 +418,7 @@ class Monitor(object):
            Will be removed in 1.0. Use an explicit loop over :meth:`poll()`
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -508,6 +511,7 @@ class MonitorObserver(Thread):
         self.daemon = True
         self._stop_event = None
         if event_handler is not None:
+            # isort: STDLIB
             import warnings
 
             warnings.warn(

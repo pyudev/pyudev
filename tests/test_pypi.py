@@ -33,7 +33,10 @@ from docutils.core import Publisher, publish_doctree
 from docutils.transforms import TransformError
 
 if sys.version_info[0] < 3:
+    # isort: STDLIB
     from codecs import open
+
+    # isort: THIRDPARTY
     from urlparse import urlparse
 
 

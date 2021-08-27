@@ -1,0 +1,29 @@
+---
+name: pyudev weekly
+
+# yamllint disable-line rule:truthy
+on:
+  schedule:
+    - cron: 20 1 * * 6
+  workflow_dispatch:
+
+jobs:
+  next-fedora-python-checks:
+    strategy:
+      matrix:
+        include:
+          - dependencies: black python3-isort
+            task: fmt-travis
+          - dependencies: yamllint
+            task: yamllint
+    runs-on: ubuntu-latest
+    container: fedora:34
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: >
+          dnf install -y
+          make
+          ${{ matrix.dependencies }}
+      - name: make -f Makefile ${{ matrix.task }}
+        run: make -f Makefile ${{ matrix.task }}

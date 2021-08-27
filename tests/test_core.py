@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import random
 import syslog
 
-# isort: THIRDPARTY
+# isort: FIRSTPARTY
 from tests._constants import _UDEV_TEST
 from tests.utils import is_unicode_string
 
@@ -30,8 +30,10 @@ from tests.utils import is_unicode_string
 from pyudev import udev_version
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 

@@ -36,8 +36,10 @@ import sys
 import six
 
 try:
+    # isort: STDLIB
     from subprocess import check_output
 except ImportError:
+    # isort: LOCAL
     from pyudev._compat import check_output
 
 
@@ -154,6 +156,7 @@ def eintr_retry_call(func, *args, **kwargs):
     """
 
     # select.error inherits from Exception instead of OSError in Python 2
+    # isort: STDLIB
     import select
 
     while True:
