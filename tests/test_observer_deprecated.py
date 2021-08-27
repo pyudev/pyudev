@@ -25,8 +25,10 @@ import pytest
 from pyudev import Devices, Monitor
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 
@@ -177,6 +179,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
             self.glib.source_remove(source)
 
     def create_observer(self, monitor):
+        # isort: LOCAL
         from pyudev.glib import GUDevMonitorObserver
 
         self.observer = GUDevMonitorObserver(monitor)
@@ -218,6 +221,7 @@ class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
         self.wx = pytest.importorskip("wx")
 
     def create_observer(self, monitor):
+        # isort: LOCAL
         from pyudev import wx
 
         self.observer = wx.WxUDevMonitorObserver(monitor)
@@ -230,6 +234,7 @@ class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
 
     def connect_signal(self, callback, action=None):
         if action is None:
+            # isort: LOCAL
             from pyudev.wx import EVT_DEVICE_EVENT
 
             def _wrapper(event):

@@ -34,8 +34,10 @@ from ._constants import (
 from .utils import failed_health_check_wrapper
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 

@@ -180,6 +180,7 @@ class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
     def __init__(self, monitor):
         GObject.Object.__init__(self)
         self._setup_observer(monitor)
+        # isort: STDLIB
         import warnings
 
         warnings.warn(

@@ -42,8 +42,10 @@ from .._constants import _CONTEXT, _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _U
 from ..utils import is_unicode_string
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 

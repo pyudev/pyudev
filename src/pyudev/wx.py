@@ -138,6 +138,7 @@ class WxUDevMonitorObserver(MonitorObserver):
 
     def __init__(self, monitor):
         MonitorObserver.__init__(self, monitor)
+        # isort: STDLIB
         import warnings
 
         warnings.warn(

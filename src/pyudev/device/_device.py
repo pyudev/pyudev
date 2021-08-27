@@ -381,6 +381,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_path` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -402,6 +403,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_sys_path` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -418,6 +420,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_name` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -434,6 +437,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_number` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -450,6 +454,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_file` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -466,6 +471,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_environment` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -587,6 +593,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -929,6 +936,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -945,6 +953,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -968,6 +977,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -992,6 +1002,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Use Device.properties.asint() instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
@@ -1020,6 +1031,7 @@ class Device(collections_abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Use Device.properties.asbool() instead.
         """
+        # isort: STDLIB
         import warnings
 
         warnings.warn(

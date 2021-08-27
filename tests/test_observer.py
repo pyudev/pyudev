@@ -23,14 +23,18 @@ import random
 
 # isort: THIRDPARTY
 import pytest
+
+# isort: FIRSTPARTY
 from tests.utils.udev import DeviceDatabase
 
 # isort: LOCAL
 from pyudev import Devices, Monitor
 
 try:
+    # isort: STDLIB
     from unittest import mock
 except ImportError:
+    # isort: THIRDPARTY
     import mock
 
 
@@ -158,6 +162,7 @@ class TestGlibObserver(ObserverTestBase):
             self.glib.source_remove(source)
 
     def create_observer(self, monitor):
+        # isort: LOCAL
         from pyudev.glib import MonitorObserver
 
         self.observer = MonitorObserver(monitor)
@@ -196,11 +201,13 @@ class TestWxObserver(ObserverTestBase):
         self.wx = pytest.importorskip("wx")
 
     def create_observer(self, monitor):
+        # isort: LOCAL
         from pyudev import wx
 
         self.observer = wx.MonitorObserver(monitor)
 
     def connect_signal(self, callback):
+        # isort: LOCAL
         from pyudev.wx import EVT_DEVICE_EVENT
 
         def _wrapper(event):

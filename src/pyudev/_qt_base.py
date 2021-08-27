@@ -94,6 +94,7 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
             "change": self.deviceChanged,
             "move": self.deviceMoved,
         }
+        # isort: STDLIB
         import warnings
 
         warnings.warn(
