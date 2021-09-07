@@ -17,7 +17,7 @@ jobs:
           - dependencies: yamllint
             task: yamllint
     runs-on: ubuntu-latest
-    container: fedora:34
+    container: fedora:34  # NEXT DEVELOPMENT ENVIRONMENT
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
