@@ -75,7 +75,6 @@ def _get_manifest_files():
     with open(MANIFEST, "r", encoding="utf-8") as source:
         for line in source:
             filelist.process_template_line(line.strip())
-    filelist.process_template_line("prune .tox")
     return filelist.files
 
 
