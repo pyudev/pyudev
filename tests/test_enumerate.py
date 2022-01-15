@@ -159,20 +159,6 @@ class TestEnumerator(object):
         )
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY)
-    @settings(max_examples=25)
-    def test_match_property_string(self, context, pair):
-        """
-        Match property only gets devices with that property.
-        """
-        key, value = pair
-        _test_direct_and_complement(
-            context,
-            frozenset(context.list_devices().match_property(key, value)),
-            lambda d: d.properties.get(key) == value,
-        )
-
-    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1])))
     @settings(max_examples=50)
     def test_match_property_int(self, context, pair):
