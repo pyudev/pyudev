@@ -159,22 +159,6 @@ class TestEnumerator(object):
         )
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_int(x[1])))
-    @settings(max_examples=50)
-    def test_match_property_int(self, context, pair):
-        """
-        For a property that might plausibly have an integer value, search
-        using the integer value and verify that the result all match.
-        """
-        key, value = pair
-        devices = context.list_devices().match_property(key, int(value))
-        assert all(
-            device.properties[key] == value
-            and device.properties.asint(key) == int(value)
-            for device in devices
-        )
-
-    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1])))
     @settings(max_examples=10)
     def test_match_property_bool(self, context, pair):
