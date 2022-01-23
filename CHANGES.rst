@@ -1,3 +1,34 @@
+0.23.0
+======
+Recommended development release: Fedora 34
+
+- Update to version 0.23.0:
+  https://github.com/pyudev/pyudev/pull/427
+
+- Officially drop support for Python 2:
+  https://github.com/pyudev/pyudev/pull/414
+
+- Remove external mock dependency:
+  https://github.com/pyudev/pyudev/pull/409
+
+- Enable GLib unit tests:
+  https://github.com/pyudev/pyudev/pull/400
+
+- Switch to new style gi.repository.GLib imports:
+  https://github.com/pyudev/pyudev/pull/399
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/432
+  https://github.com/pyudev/pyudev/pull/430
+  https://github.com/pyudev/pyudev/pull/429
+  https://github.com/pyudev/pyudev/pull/428
+  https://github.com/pyudev/pyudev/pull/424
+  https://github.com/pyudev/pyudev/pull/423
+  https://github.com/pyudev/pyudev/pull/418
+  https://github.com/pyudev/pyudev/pull/415
+  https://github.com/pyudev/pyudev/pull/413
+
+
 0.22.0 (Jan, 2020)
 ==================
 
