@@ -146,19 +146,6 @@ class TestEnumerator(object):
         _test_intersection_and_union(context, m_devices, nm_devices)
 
     @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _SYSNAME_STRATEGY)
-    @settings(max_examples=5)
-    def test_match_sys_name(self, context, sysname):
-        """
-        A sysname lookup only gives devices with that sysname.
-        """
-        _test_direct_and_complement(
-            context,
-            frozenset(context.list_devices().match_sys_name(sysname)),
-            lambda d: d.sys_name == sysname,
-        )
-
-    @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _MATCH_PROPERTY_STRATEGY.filter(lambda x: _is_bool(x[1])))
     @settings(max_examples=10)
     def test_match_property_bool(self, context, pair):
