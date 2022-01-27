@@ -4,5 +4,5 @@ recursive-include tests *.py
 recursive-exclude tests/.hypothesis *.py
 include .isort.cfg
 include CHANGES.rst COPYING README.rst
-include setup.py setup.cfg
+include setup.py
 include pytest.ini
