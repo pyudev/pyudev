@@ -1,3 +1,17 @@
+0.23.1
+======
+Recommended development release: Fedora 34
+
+- Update to version 0.23.1:
+  https://github.com/pyudev/pyudev/pull/440
+
+- Check for existence of _hasattr attribute in Context.__del__ method:
+  https://github.com/pyudev/pyudev/issues/421
+  https://github.com/pyudev/pyudev/pull/439
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/438
+
 0.23.0
 ======
 Recommended development release: Fedora 34
