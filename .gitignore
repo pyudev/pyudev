@@ -2,7 +2,7 @@
 *.pyc
 
 # distutils/distribute metadata and outputs
-pyudev.egg-info/*
+src/pyudev.egg-info/*
 build/*
 dist/*
 

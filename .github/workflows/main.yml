@@ -18,25 +18,16 @@ jobs:
       matrix:
         include:
           # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
-          - python-version: 3.8.6
-            dependencies: >
-              pytest==4.6.11
-              hypothesis==4.23.8
-              docutils==0.15.2
+          - python-version: 3.9.6
+            dependencies: pytest hypothesis docutils six
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
           - python-version: 3.6.8
-            dependencies: >
-              pytest==4.6.11
-              hypothesis==4.23.8
-              docutils==0.15.2
+            dependencies: pytest hypothesis docutils six
             task: PYTHONPATH=./src make -f Makefile test-travis
-          # MANDATORY CHECKS USING LOWEST SUPPORTED PYPY INTERPRETER
-          - python-version: pypy-3.6
-            dependencies: >
-              pytest==4.6.11
-              hypothesis==4.23.8
-              docutils==0.15.2
+          # MANDATORY CHECKS USING PYPY INTERPRETER
+          - python-version: pypy3
+            dependencies: pytest hypothesis docutils six
             task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
     steps:
