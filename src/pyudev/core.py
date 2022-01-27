@@ -63,7 +63,8 @@ class Context(object):
         self._as_parameter_ = self._libudev.udev_new()
 
     def __del__(self):
-        self._libudev.udev_unref(self)
+        if hasattr(self, "_libudev"):
+            self._libudev.udev_unref(self)
 
     @property
     def sys_path(self):
