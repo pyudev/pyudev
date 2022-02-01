@@ -104,19 +104,6 @@ class TestEnumerator(object):
 
     @failed_health_check_wrapper
     @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
-    @settings(max_examples=1)
-    def test_match_subsystem_nomatch(self, context, subsystem):
-        """
-        Subsystem no match gets no subsystem with subsystem.
-        """
-        _test_direct_and_complement(
-            context,
-            frozenset(context.list_devices().match_subsystem(subsystem, nomatch=True)),
-            lambda d: d.subsystem != subsystem,
-        )
-
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _SUBSYSTEM_STRATEGY)
     @settings(max_examples=5)
     def test_match_subsystem_nomatch_unfulfillable(self, context, subsystem):
         """
