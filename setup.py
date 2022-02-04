@@ -45,6 +45,7 @@ setuptools.setup(
     author_email="lunaryorn@gmail.com",
     description="A libudev binding",
     long_description=open(README, encoding="utf-8").read(),
+    long_description_content_type="text/x-rst",
     platforms=["Linux"],
     license="LGPL 2.1+",
     classifiers=[

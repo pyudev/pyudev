@@ -52,6 +52,8 @@ jobs:
             task: fmt-travis
           - dependencies: yamllint
             task: yamllint
+          - dependencies: python python3-build twine
+            task: package
     runs-on: ubuntu-latest
     container: fedora:35  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:

@@ -15,7 +15,7 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 package:
-	(umask 0022; python -m build)
+	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
 
 pylint:
 	PYTHONPATH=src pylint src/pyudev \
