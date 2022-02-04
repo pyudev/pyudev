@@ -1,3 +1,16 @@
+0.23.2
+======
+Recommended development release: Fedora 35
+
+- New release: 0.23.2:
+  https://github.com/pyudev/pyudev/pull/444
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/445
+  https://github.com/pyudev/pyudev/pull/443
+  https://github.com/pyudev/pyudev/pull/442
+
+
 0.23.1
 ======
 Recommended development release: Fedora 34
