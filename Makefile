@@ -17,34 +17,8 @@
 package:
 	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
 
-pylint:
-	PYTHONPATH=src pylint src/pyudev \
-		--reports=no \
-		--disable=I \
-		--disable=duplicate-code \
-		--argument-rgx="[a-z_][a-z0-9_]{1,30}" \
-		--exclude-protected=_libudev \
-		--variable-rgx="[a-z_][a-z0-9_]{1,30}" \
-		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
-
-pylint-tests:
-	PYTHONPATH=src pylint tests \
-		--reports=no \
-		--disable=I \
-		--disable=bad-continuation \
-		--disable=duplicate-code \
-		--disable=no-self-use \
-		--argument-rgx="[a-z_][a-z0-9_]{1,30}" \
-		--exclude-protected=_libudev \
-		--no-docstring-rgx=_.* \
-		--variable-rgx="[a-z_][a-z0-9_]{1,30}" \
-		--msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"
-
-diff-quality:
-	- $(MAKE) pylint > pylint.log
-	- $(MAKE) pylint-tests >> pylint.log
-	diff-quality --violations=pylint pylint.log
-
+lint:
+	pylint setup.py
 
 PYREVERSE_OPTS = --output=pdf
 view:

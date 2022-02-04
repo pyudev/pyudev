@@ -54,6 +54,8 @@ jobs:
             task: yamllint
           - dependencies: python python3-build twine
             task: package
+          - dependencies: pylint python3-six
+            task: lint
     runs-on: ubuntu-latest
     container: fedora:35  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:

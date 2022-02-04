@@ -16,35 +16,40 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+"""
+setup.py
+"""
+
 # isort: STDLIB
 import os
-import sys
 
 # isort: THIRDPARTY
 import setuptools
 
-if sys.version_info[0] < 3:
-    # isort: STDLIB
-    from codecs import open
-
 
 def local_file(name):
+    """
+    Function to obtain the relative path of a filename.
+    """
     return os.path.relpath(os.path.join(os.path.dirname(__file__), name))
 
 
 README = local_file("README.rst")
 
 with open(local_file("src/pyudev/version.py")) as o:
-    exec(o.read())
+    exec(o.read())  # pylint: disable=exec-used
+
+with open(local_file("README.rst"), encoding="utf-8") as o:
+    long_description = o.read()
 
 setuptools.setup(
     name="pyudev",
-    version=__version__,
+    version=__version__,  # pylint: disable=undefined-variable
     url="http://pyudev.readthedocs.org/",
     author="Sebastian Wiesner",
     author_email="lunaryorn@gmail.com",
     description="A libudev binding",
-    long_description=open(README, encoding="utf-8").read(),
+    long_description=long_description,
     long_description_content_type="text/x-rst",
     platforms=["Linux"],
     license="LGPL 2.1+",
