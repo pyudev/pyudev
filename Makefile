@@ -17,6 +17,9 @@
 package:
 	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
 
+lint:
+	pylint setup.py
+
 PYREVERSE_OPTS = --output=pdf
 view:
 	-rm -Rf _pyreverse
