@@ -35,8 +35,8 @@ def check_output(command):
     Compatibility with :func:`subprocess.check_output` from Python 2.7 and
     upwards.
     """
-    proc = Popen(command, stdout=PIPE)
-    output = proc.communicate()[0]
-    if proc.returncode != 0:
-        raise CalledProcessError(proc.returncode, command)
+    with Popen(command, stdout=PIPE) as proc:
+        output = proc.communicate()[0]
+        if proc.returncode != 0:
+            raise CalledProcessError(proc.returncode, command)
     return output
