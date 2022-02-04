@@ -148,20 +148,6 @@ class TestEnumerator(object):
             for device in devices
         )
 
-    @_UDEV_TEST(154, "test_match_tag")
-    @failed_health_check_wrapper
-    @given(_CONTEXT_STRATEGY, _TAG_STRATEGY)
-    @settings(max_examples=50)
-    def test_match_tag(self, context, tag):
-        """
-        Test that matches returned for tag actually have tag.
-        """
-        _test_direct_and_complement(
-            context,
-            frozenset(context.list_devices().match_tag(tag)),
-            lambda d: tag in d.tags,
-        )
-
     @failed_health_check_wrapper
     @given(
         _CONTEXT_STRATEGY, device_strategy(filter_func=lambda d: d.parent is not None)
@@ -185,34 +171,6 @@ class TestEnumeratorMatchCombinations(object):
     """
     Test combinations of matches.
     """
-
-    @given(
-        _CONTEXT_STRATEGY,
-        strategies.lists(
-            elements=_MATCH_PROPERTY_STRATEGY,
-            min_size=2,
-            max_size=3,
-            unique_by=lambda p: p[0],
-        ),
-    )
-    @settings(max_examples=2)
-    def test_combined_property_matches(self, context, ppairs):
-        """
-        Test for behaviour as observed in #1
-
-        If matching multiple properties, then the result is the union of
-        the matching sets, i.e., the resulting filter is a disjunction.
-        """
-        enumeration = context.list_devices()
-
-        for key, value in ppairs:
-            enumeration.match_property(key, value)
-
-        _test_direct_and_complement(
-            context,
-            frozenset(enumeration),
-            lambda d: any(d.properties.get(key) == value for key, value in ppairs),
-        )
 
     @given(
         _CONTEXT_STRATEGY,
