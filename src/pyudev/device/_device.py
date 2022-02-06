@@ -27,14 +27,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 # isort: STDLIB
+import collections
 import os
 import re
 import sys
 from datetime import timedelta
-
-# isort: THIRDPARTY
-import six
-from six.moves import collections_abc
 
 # isort: LOCAL
 from pyudev._errors import (
@@ -53,15 +50,6 @@ from pyudev._util import (
     string_to_bool,
     udev_list_iterate,
 )
-
-six.add_move(
-    six.MovedModule(
-        "collections_abc",
-        "collections",
-        "collections.abc" if sys.version_info >= (3, 3) else "collections",
-    )
-)
-
 
 # pylint: disable=too-many-lines
 
@@ -340,7 +328,7 @@ class Devices(object):
         ]
 
 
-class Device(collections_abc.Mapping):
+class Device(collections.abc.Mapping):
     # pylint: disable=too-many-public-methods
     """
     A single device with attached attributes and properties.
@@ -482,7 +470,7 @@ class Device(collections_abc.Mapping):
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
-        collections_abc.Mapping.__init__(self)
+        collections.abc.Mapping.__init__(self)
         self.context = context
         self._as_parameter_ = _device
         self._libudev = context._libudev
@@ -1067,7 +1055,7 @@ class Device(collections_abc.Mapping):
         raise TypeError("Device not orderable")
 
 
-class Properties(collections_abc.Mapping):
+class Properties(collections.abc.Mapping):
     """
     udev properties :class:`Device` objects.
 
@@ -1075,7 +1063,7 @@ class Properties(collections_abc.Mapping):
     """
 
     def __init__(self, device):
-        collections_abc.Mapping.__init__(self)
+        collections.abc.Mapping.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1260,7 +1248,7 @@ class Attributes(object):
         return string_to_bool(self.asstring(attribute))
 
 
-class Tags(collections_abc.Iterable, collections_abc.Container):
+class Tags(collections.abc.Iterable, collections.abc.Container):
     """
     A iterable over :class:`Device` tags.
 
@@ -1271,7 +1259,7 @@ class Tags(collections_abc.Iterable, collections_abc.Container):
 
     def __init__(self, device):
         # pylint: disable=super-init-not-called
-        collections_abc.Iterable.__init__(self)
+        collections.abc.Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
