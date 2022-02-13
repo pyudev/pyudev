@@ -255,8 +255,6 @@ class Monitor(object):
         """
         if not self._started:
             self._libudev.udev_monitor_enable_receiving(self)
-            # Force monitor FD into non-blocking mode
-            pipe.set_fd_status_flag(self, os.O_NONBLOCK)
             self._started = True
 
     def set_receive_buffer_size(self, size):

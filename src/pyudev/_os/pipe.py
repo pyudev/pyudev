@@ -18,112 +18,19 @@
     pyudev._os.pipe
     ===============
 
-    Fallback implementations for pipe.
-
-    1. pipe2 from python os module
-    2. pipe2 from libc
-    3. pipe from python os module
-
-    The Pipe class wraps the chosen implementation.
+    Class wrapper for pipe.
 
     .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import annotations
 
 # isort: STDLIB
-import fcntl
 import os
-from functools import partial
-
-# isort: LOCAL
-from pyudev._ctypeslib.libc import ERROR_CHECKERS, FD_PAIR, SIGNATURES
-from pyudev._ctypeslib.utils import load_ctypes_library
-
-# Define O_CLOEXEC, if not present in os already
-O_CLOEXEC = getattr(os, "O_CLOEXEC", 0o2000000)
 
 
-def _pipe2_ctypes(libc, flags):
-    """A ``pipe2`` implementation using ``pipe2`` from ctypes.
-
-    ``libc`` is a :class:`ctypes.CDLL` object for libc.  ``flags`` is an
-    integer providing the flags to ``pipe2``.
-
-    Return a pair of file descriptors ``(r, w)``.
-
-    """
-    fds = FD_PAIR()
-    libc.pipe2(fds, flags)
-    return fds[0], fds[1]
-
-
-def _pipe2_by_pipe(flags):
-    """A ``pipe2`` implementation using :func:`os.pipe`.
-
-    ``flags`` is an integer providing the flags to ``pipe2``.
-
-    .. warning::
-
-       This implementation is not atomic!
-
-    Return a pair of file descriptors ``(r, w)``.
-
-    """
-    fds = os.pipe()
-    if flags & os.O_NONBLOCK != 0:
-        for fd in fds:
-            set_fd_status_flag(fd, os.O_NONBLOCK)
-    if flags & O_CLOEXEC != 0:
-        for fd in fds:
-            set_fd_flag(fd, O_CLOEXEC)
-    return fds
-
-
-def _get_pipe2_implementation():
-    """
-    Find the appropriate implementation for ``pipe2``.
-
-    Return a function implementing ``pipe2``."""
-    if hasattr(os, "pipe2"):
-        return os.pipe2  # pylint: disable=no-member
-    else:
-        try:
-            libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
-            return (
-                partial(_pipe2_ctypes, libc)
-                if hasattr(libc, "pipe2")
-                else _pipe2_by_pipe
-            )
-        except ImportError:
-            return _pipe2_by_pipe
-
-
-_PIPE2 = _get_pipe2_implementation()
-
-
-def set_fd_flag(fd, flag):
-    """Set a flag on a file descriptor.
-
-    ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.
-
-    """
-    flags = fcntl.fcntl(fd, fcntl.F_GETFD, 0)
-    fcntl.fcntl(fd, fcntl.F_SETFD, flags | flag)
-
-
-def set_fd_status_flag(fd, flag):
-    """Set a status flag on a file descriptor.
-
-    ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.
-
-    """
-    flags = fcntl.fcntl(fd, fcntl.F_GETFL, 0)
-    fcntl.fcntl(fd, fcntl.F_SETFL, flags | flag)
-
-
-class Pipe(object):
+class Pipe:
     """A unix pipe.
 
     A pipe object provides two file objects: :attr:`source` is a readable file
@@ -135,14 +42,14 @@ class Pipe(object):
     """
 
     @classmethod
-    def open(cls):
+    def open(cls) -> Pipe:
         """Open and return a new :class:`Pipe`.
 
         The pipe uses non-blocking IO."""
-        source, sink = _PIPE2(os.O_NONBLOCK | O_CLOEXEC)
-        return cls(source, sink)
+        source_fd, sink_fd = os.pipe2(os.O_NONBLOCK | os.O_CLOEXEC)
+        return cls(source_fd, sink_fd)
 
-    def __init__(self, source_fd, sink_fd):
+    def __init__(self, source_fd: int, sink_fd: int):
         """Create a new pipe object from the given file descriptors.
 
         ``source_fd`` is a file descriptor for the readable side of the pipe,
@@ -150,7 +57,7 @@ class Pipe(object):
         self.source = os.fdopen(source_fd, "rb", 0)
         self.sink = os.fdopen(sink_fd, "wb", 0)
 
-    def close(self):
+    def close(self) -> None:
         """Closes both sides of the pipe."""
         try:
             self.source.close()
