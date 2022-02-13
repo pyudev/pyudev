@@ -23,4 +23,6 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import libc, libudev
+from . import libudev
+
+__all__ = ("libudev",)
