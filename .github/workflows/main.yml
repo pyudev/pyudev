@@ -18,11 +18,11 @@ jobs:
       matrix:
         include:
           # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
-          - python-version: 3.9.6
+          - python-version: "3.10"
             dependencies: pytest hypothesis docutils
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
-          - python-version: 3.6.8
+          - python-version: "3.9"
             dependencies: pytest hypothesis docutils
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING PYPY INTERPRETER
