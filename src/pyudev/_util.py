@@ -31,13 +31,7 @@ import errno
 import os
 import stat
 import sys
-
-try:
-    # isort: STDLIB
-    from subprocess import check_output
-except ImportError:
-    # isort: LOCAL
-    from pyudev._compat import check_output
+from subprocess import check_output
 
 
 def ensure_byte_string(value):
