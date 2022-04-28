@@ -33,7 +33,7 @@ import select
 from pyudev._util import eintr_retry_call
 
 
-class Poll(object):
+class Poll:
     """A poll object.
 
     This object essentially provides a more convenient interface around
@@ -58,7 +58,7 @@ class Poll(object):
 
         """
         notifier = eintr_retry_call(select.poll)
-        for fd, event in events:
+        for fd, event in events:  # pylint: disable=invalid-name
             mask = cls._EVENT_TO_MASK.get(event)
             if not mask:
                 raise ValueError("Unknown event type: {0!r}".format(event))
@@ -102,10 +102,10 @@ class Poll(object):
         Yield all parsed events.
 
         """
-        for fd, event_mask in events:
+        for fd, event_mask in events:  # pylint: disable=invalid-name
             if self._has_event(event_mask, select.POLLNVAL):
                 raise IOError("File descriptor not open: {0!r}".format(fd))
-            elif self._has_event(event_mask, select.POLLERR):
+            if self._has_event(event_mask, select.POLLERR):
                 raise IOError("Error while polling fd: {0!r}".format(fd))
 
             if self._has_event(event_mask, select.POLLIN):
