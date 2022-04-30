@@ -36,7 +36,7 @@ def local_file(name):
 
 README = local_file("README.rst")
 
-with open(local_file("src/pyudev/version.py")) as o:
+with open(local_file("src/pyudev/version.py"), encoding="utf-8") as o:
     exec(o.read())  # pylint: disable=exec-used
 
 with open(local_file("README.rst"), encoding="utf-8") as o:
