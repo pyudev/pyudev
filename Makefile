@@ -19,7 +19,7 @@ package:
 
 lint:
 	pylint setup.py
-	pylint src/pyudev/_os/poll.py
+	pylint src/pyudev/_os
 
 PYREVERSE_OPTS = --output=pdf
 view:
