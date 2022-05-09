@@ -73,11 +73,11 @@ def _pipe2_by_pipe(flags):
     """
     fds = os.pipe()
     if flags & os.O_NONBLOCK != 0:
-        for fd in fds:
-            set_fd_status_flag(fd, os.O_NONBLOCK)
+        for file_descriptor in fds:
+            set_fd_status_flag(file_descriptor, os.O_NONBLOCK)
     if flags & O_CLOEXEC != 0:
-        for fd in fds:
-            set_fd_flag(fd, O_CLOEXEC)
+        for file_descriptor in fds:
+            set_fd_flag(file_descriptor, O_CLOEXEC)
     return fds
 
 
@@ -88,22 +88,19 @@ def _get_pipe2_implementation():
     Return a function implementing ``pipe2``."""
     if hasattr(os, "pipe2"):
         return os.pipe2  # pylint: disable=no-member
-    else:
-        try:
-            libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
-            return (
-                partial(_pipe2_ctypes, libc)
-                if hasattr(libc, "pipe2")
-                else _pipe2_by_pipe
-            )
-        except ImportError:
-            return _pipe2_by_pipe
+    try:
+        libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
+        return (
+            partial(_pipe2_ctypes, libc) if hasattr(libc, "pipe2") else _pipe2_by_pipe
+        )
+    except ImportError:
+        return _pipe2_by_pipe
 
 
 _PIPE2 = _get_pipe2_implementation()
 
 
-def set_fd_flag(fd, flag):
+def set_fd_flag(fd, flag):  # pylint: disable=invalid-name
     """Set a flag on a file descriptor.
 
     ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.
@@ -113,7 +110,7 @@ def set_fd_flag(fd, flag):
     fcntl.fcntl(fd, fcntl.F_SETFD, flags | flag)
 
 
-def set_fd_status_flag(fd, flag):
+def set_fd_status_flag(fd, flag):  # pylint: disable=invalid-name
     """Set a status flag on a file descriptor.
 
     ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.
@@ -123,7 +120,7 @@ def set_fd_status_flag(fd, flag):
     fcntl.fcntl(fd, fcntl.F_SETFL, flags | flag)
 
 
-class Pipe(object):
+class Pipe:
     """A unix pipe.
 
     A pipe object provides two file objects: :attr:`source` is a readable file
