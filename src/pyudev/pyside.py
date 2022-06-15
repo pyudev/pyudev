@@ -15,17 +15,16 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-# pylint: disable=anomalous-backslash-in-string
 """
     pyudev.pyside
     =============
 
     PySide integration.
 
-    :class:`QUDevMonitorObserver` integrates device monitoring into the PySide\_
-    mainloop by turing device events into Qt signals.
+    :class:`QUDevMonitorObserver` integrates device monitoring into the
+    PySide\\_ mainloop by turing device events into Qt signals.
 
-    :mod:`PySide.QtCore` from PySide\_ must be available when importing this
+    :mod:`PySide.QtCore` from PySide\\_ must be available when importing this
     module.
 
     .. _PySide: http://www.pyside.org

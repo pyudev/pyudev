@@ -133,12 +133,11 @@ class Monitor(object):
         return self._started
 
     def fileno(self):
-        # pylint: disable=anomalous-backslash-in-string
         """
         Return the file description associated with this monitor as integer.
 
         This is really a real file descriptor ;), which can be watched and
-        :func:`select.select`\ ed.
+        :func:`select.select`\\ ed.
         """
         return self._libudev.udev_monitor_get_fd(self)
 
