@@ -23,9 +23,6 @@
     .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: STDLIB
 from ctypes import CDLL
 from ctypes.util import find_library

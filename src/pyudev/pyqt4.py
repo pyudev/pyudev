@@ -32,9 +32,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 from PyQt4 import QtCore  # pylint: disable=import-error
 

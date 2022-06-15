@@ -32,9 +32,6 @@
 
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 from gi.repository import GLib, GObject  # pylint: disable=import-error
 
