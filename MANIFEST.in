@@ -6,3 +6,4 @@ include .isort.cfg
 include CHANGES.rst COPYING README.rst
 include setup.py
 include pytest.ini
+include tox.ini
