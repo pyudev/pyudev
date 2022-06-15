@@ -53,6 +53,7 @@ setuptools.setup(
     long_description_content_type="text/x-rst",
     platforms=["Linux"],
     license="LGPL 2.1+",
+    python_requires=">=3.7",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
