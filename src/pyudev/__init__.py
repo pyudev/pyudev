@@ -32,9 +32,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: LOCAL
 from pyudev._errors import (
     DeviceNotFoundAtPathError,

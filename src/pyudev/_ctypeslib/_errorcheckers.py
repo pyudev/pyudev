@@ -21,9 +21,6 @@
     Error checkers for ctypes wrappers.
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: STDLIB
 import errno
 import os

@@ -20,9 +20,6 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 import pytest
 from hypothesis import given, settings, strategies

@@ -20,9 +20,6 @@ Tests methods belonging to Device class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: STDLIB
 import gc
 import operator

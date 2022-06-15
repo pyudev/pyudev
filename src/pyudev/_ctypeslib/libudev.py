@@ -24,9 +24,6 @@
     .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: STDLIB
 from ctypes import POINTER, Structure, c_char, c_char_p, c_int, c_uint, c_ulonglong
 

@@ -29,9 +29,6 @@
     .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 from PyQt5 import QtCore  # pylint: disable=import-error
 

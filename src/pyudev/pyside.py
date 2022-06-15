@@ -33,9 +33,6 @@
     .. versionadded:: 0.6
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 from PySide import QtCore  # pylint: disable=import-error
 

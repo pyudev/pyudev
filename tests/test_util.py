@@ -15,9 +15,6 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: STDLIB
 import sys
 
@@ -195,12 +192,6 @@ def test_eintr_retry_call(tmpdir):
 
     try:
         signal.signal(signal.SIGALRM, handle_alarm)
-
-        # Ensure that a signal raises EINTR on Python < 3.5
-        if sys.version_info < (3, 5):
-            with pytest.raises(select.error):
-                signal.alarm(1)
-                select.select([], [], [fd], 2)
 
         # Ensure that wrapping the call does not raise EINTR
         signal.alarm(1)

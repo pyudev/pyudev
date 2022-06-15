@@ -28,9 +28,6 @@
 
 """
 
-# isort: FUTURE
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 # isort: THIRDPARTY
 from wx import EvtHandler, PostEvent  # pylint: disable=import-error
 from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
