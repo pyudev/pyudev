@@ -193,12 +193,6 @@ def test_eintr_retry_call(tmpdir):
     try:
         signal.signal(signal.SIGALRM, handle_alarm)
 
-        # Ensure that a signal raises EINTR on Python < 3.5
-        if sys.version_info < (3, 5):
-            with pytest.raises(select.error):
-                signal.alarm(1)
-                select.select([], [], [fd], 2)
-
         # Ensure that wrapping the call does not raise EINTR
         signal.alarm(1)
         assert _util.eintr_retry_call(select.select, [], [], [3], 2) == ([], [], [])
