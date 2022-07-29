@@ -64,12 +64,8 @@ features, but respect the following guidelines:
   <http://gun.io/blog/how-to-github-fork-branch-and-pull-request/>`_.
 - Understand the `branching model
   <http://nvie.com/posts/a-successful-git-branching-model/>`_.
-- Use a topic branch based on the ``develop`` branch to easily amend a pull
-  request later, if necessary.
 - Write `good commit messages
   <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_.
-- Squash commits on the topic branch before opening a pull request.
-- Respect :pep:`8` (use pep8_ to check your coding style compliance).
 - Add unit tests if possible (refer to the `testsuite documentation
   <http://pyudev.readthedocs.org/en/latest/tests/index.html>`_).
 - Add API documentation in docstrings.
@@ -86,7 +82,6 @@ features, but respect the following guidelines:
 .. _website: http://pyudev.readthedocs.org
 .. _user guide: http://pyudev.readthedocs.org/en/latest/guide.html
 .. _api reference: http://pyudev.readthedocs.org/en/latest/api/index.html
-.. _issue tracker: http://github.com/lunaryorn/pyudev/issues
-.. _GitHub: http://github.com/lunaryorn/pyudev
+.. _issue tracker: http://github.com/pyudev/pyudev/issues
+.. _GitHub: http://github.com/pyudev/pyudev
 .. _git: http://www.git-scm.com/
-.. _pep8: http://pypi.python.org/pypi/pep8/
