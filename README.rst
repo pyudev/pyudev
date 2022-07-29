@@ -85,3 +85,15 @@ features, but respect the following guidelines:
 .. _issue tracker: http://github.com/pyudev/pyudev/issues
 .. _GitHub: http://github.com/pyudev/pyudev
 .. _git: http://www.git-scm.com/
+
+
+Request a New Release
+---------------------
+I continue to maintain this project, but I do not schedule regular releases.
+
+If you believe a new release would help you in some way, please file an issue,
+explaining why you need the new release, and I expect I'll put one up.
+
+Why should you explain why you need the new release? Well, it is helpful to me,
+because pyudev is not at all part of my regular work, and I tend not to know
+very much about how it is used these days.
