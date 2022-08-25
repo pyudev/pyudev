@@ -89,10 +89,11 @@ features, but respect the following guidelines:
 
 Request a New Release
 ---------------------
-I continue to maintain this project, but I do not schedule regular releases.
+I will be doing regular releases of this project every August and October,
+shortly after Fedora releases are branched from rawhide.
 
-If you believe a new release would help you in some way, please file an issue,
-explaining why you need the new release, and I expect I'll put one up.
+If you believe an extra release would help you in some way, please file an
+issue, explaining why you need the new release, and I expect I'll put one up.
 
 Why should you explain why you need the new release? Well, it is helpful to me,
 because pyudev is not at all part of my regular work, and I tend not to know
