@@ -1,3 +1,28 @@
+0.24.0
+======
+Recommended development release: Fedora 36
+
+- Remove a bunch of Python 2 code:
+  https://github.com/pyudev/pyudev/pull/468
+  https://github.com/pyudev/pyudev/pull/460
+  https://github.com/pyudev/pyudev/pull/455
+  https://github.com/pyudev/pyudev/pull/358
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/471
+  https://github.com/pyudev/pyudev/pull/466
+  https://github.com/pyudev/pyudev/pull/465
+  https://github.com/pyudev/pyudev/pull/464
+  https://github.com/pyudev/pyudev/pull/462
+  https://github.com/pyudev/pyudev/pull/461
+  https://github.com/pyudev/pyudev/pull/459
+  https://github.com/pyudev/pyudev/pull/458
+  https://github.com/pyudev/pyudev/pull/456
+  https://github.com/pyudev/pyudev/pull/454
+  https://github.com/pyudev/pyudev/pull/447
+  https://github.com/pyudev/pyudev/pull/445
+
+
 0.23.2
 ======
 Recommended development release: Fedora 35
