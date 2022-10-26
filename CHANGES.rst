@@ -1,3 +1,23 @@
+0.24.1
+======
+Recommended development release: Fedora 37
+
+- Add support for PySide6:
+  https://github.com/pyudev/pyudev/pull/487
+
+- Add missing 'priority' argument for GLib.to_add_watch()
+  https://github.com/pyudev/pyudev/pull/479
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/486
+  https://github.com/pyudev/pyudev/pull/485
+  https://github.com/pyudev/pyudev/pull/484
+  https://github.com/pyudev/pyudev/pull/481
+  https://github.com/pyudev/pyudev/pull/480
+  https://github.com/pyudev/pyudev/pull/477
+  https://github.com/pyudev/pyudev/pull/474
+
+
 0.24.0
 ======
 Recommended development release: Fedora 36
