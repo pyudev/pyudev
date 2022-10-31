@@ -21,7 +21,7 @@ jobs:
           - dependencies: pylint
             task: lint
     runs-on: ubuntu-latest
-    container: fedora:36  # NEXT DEVELOPMENT ENVIRONMENT
+    container: fedora:37  # NEXT DEVELOPMENT ENVIRONMENT
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
