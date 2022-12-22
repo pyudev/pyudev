@@ -124,27 +124,3 @@ class TestAttributes(object):
                         device.attributes.asbool(key)
                     except KeyError:
                         pass
-
-    @_UDEV_TEST(167, "test_available_attributes")
-    @given(strategies.sampled_from(_DEVICES))
-    @settings(max_examples=5)
-    def test_available_attributes(self, a_device):
-        """
-        Test that the available attributes are exactly the names of files
-        in the sysfs directory that are regular files or softlinks.
-        """
-        available_attributes = sorted(a_device.attributes.available_attributes)
-
-        attribute_filenames = []
-        sys_path = a_device.sys_path
-        for filename in sorted(os.listdir(sys_path)):
-            filepath = os.path.join(sys_path, filename)
-            status = os.lstat(filepath)
-            mode = status.st_mode
-            if not stat.S_ISLNK(mode) and not stat.S_ISREG(mode):
-                continue
-            if not stat.S_IRUSR & mode:
-                continue
-            attribute_filenames.append(filename)
-
-        assert available_attributes == attribute_filenames

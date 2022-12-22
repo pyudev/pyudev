@@ -38,7 +38,6 @@ except ImportError:
 _CONTEXT = Context()
 
 
-@pytest.mark.conversion
 def test_ensure_byte_string():
     assert isinstance(_util.ensure_byte_string("hello world"), bytes)
     assert _util.ensure_byte_string("hello world") == b"hello world"
@@ -46,13 +45,11 @@ def test_ensure_byte_string():
     assert _util.ensure_byte_string(hello) is hello
 
 
-@pytest.mark.conversion
 def test_ensure_byte_string_none():
     with pytest.raises(AttributeError):
         _util.ensure_byte_string(None)
 
 
-@pytest.mark.conversion
 def test_ensure_unicode_string():
     assert is_unicode_string(_util.ensure_unicode_string(b"hello world"))
     assert _util.ensure_unicode_string(b"hello world") == "hello world"
@@ -60,13 +57,11 @@ def test_ensure_unicode_string():
     assert _util.ensure_unicode_string(hello) is hello
 
 
-@pytest.mark.conversion
 def test_ensure_unicode_string_none():
     with pytest.raises(AttributeError):
         _util.ensure_unicode_string(None)
 
 
-@pytest.mark.conversion
 def test_property_value_to_bytes_string():
     hello = "hello world".encode(sys.getfilesystemencoding())
     assert _util.property_value_to_bytes(hello) is hello
@@ -74,13 +69,11 @@ def test_property_value_to_bytes_string():
     assert _util.property_value_to_bytes("hello world") == hello
 
 
-@pytest.mark.conversion
 def test_property_value_to_bytes_int():
     assert _util.property_value_to_bytes(10000) == b"10000"
     assert isinstance(_util.property_value_to_bytes(10000), bytes)
 
 
-@pytest.mark.conversion
 def test_property_value_to_bytes_bool():
     assert _util.property_value_to_bytes(True) == b"1"
     assert isinstance(_util.property_value_to_bytes(True), bytes)
@@ -88,19 +81,16 @@ def test_property_value_to_bytes_bool():
     assert isinstance(_util.property_value_to_bytes(False), bytes)
 
 
-@pytest.mark.conversion
 def test_string_to_bool_true():
     assert isinstance(_util.string_to_bool("1"), bool)
     assert _util.string_to_bool("1")
 
 
-@pytest.mark.conversion
 def test_string_to_bool_false():
     assert isinstance(_util.string_to_bool("0"), bool)
     assert not _util.string_to_bool("0")
 
 
-@pytest.mark.conversion
 def test_string_to_bool_invalid_value():
     with pytest.raises(ValueError) as exc_info:
         _util.string_to_bool("foo")
