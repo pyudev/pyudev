@@ -78,7 +78,7 @@ features, but respect the following guidelines:
 .. _Python: http://www.python.org/
 .. _CPython: http://www.python.org/
 .. _PyPy: http://www.pypy.org/
-.. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
+.. _libudev: https://www.freedesktop.org/software/systemd/man/libudev.html
 .. _website: http://pyudev.readthedocs.org
 .. _user guide: http://pyudev.readthedocs.org/en/latest/guide.html
 .. _api reference: http://pyudev.readthedocs.org/en/latest/api/index.html
