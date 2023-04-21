@@ -1,3 +1,15 @@
+0.24.1 (UNRELEASED)
+===================
+Recommended development release: Fedora 36
+
+- Add missing 'priority' argument for GLib.to_add_watch()
+  https://github.com/pyudev/pyudev/pull/479
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/477
+  https://github.com/pyudev/pyudev/pull/474
+
+
 0.24.0
 ======
 Recommended development release: Fedora 36
