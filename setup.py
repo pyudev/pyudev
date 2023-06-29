@@ -45,7 +45,7 @@ with open(local_file("README.rst"), encoding="utf-8") as o:
 setuptools.setup(
     name="pyudev",
     version=__version__,  # pylint: disable=undefined-variable
-    url="http://pyudev.readthedocs.org/",
+    url="http://github.com/pyudev/pyudev",
     author="Sebastian Wiesner",
     author_email="lunaryorn@gmail.com",
     description="A libudev binding",
