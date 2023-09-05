@@ -352,11 +352,15 @@ class TestDevice(object):
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
             if prop == "DEVLINKS":
-                assert sorted(device.properties[prop].split(),) == sorted(
+                assert sorted(
+                    device.properties[prop].split(),
+                ) == sorted(
                     device_datum.properties[prop].split(),
                 )
             elif prop == "TAGS":
-                assert sorted(device.properties[prop].split(":"),) == sorted(
+                assert sorted(
+                        device.properties[prop].split(":"),
+                ) == sorted(
                     device_datum.properties[prop].split(":"),
                 )
             else:
