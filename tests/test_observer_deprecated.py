@@ -112,7 +112,6 @@ class DeprecatedObserverTestBase(object):
 
 
 class DeprecatedQtObserverTestBase(DeprecatedObserverTestBase):
-
     ACTION_SIGNAL_MAP = {
         "add": "deviceAdded",
         "remove": "deviceRemoved",
@@ -158,7 +157,6 @@ class TestDeprecatedPyQt4Observer(DeprecatedQtObserverTestBase):
 
 
 class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
-
     ACTION_SIGNAL_MAP = {
         "add": "device-added",
         "remove": "device-removed",
