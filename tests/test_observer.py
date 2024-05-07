@@ -57,7 +57,7 @@ def test_fake_monitor(fake_monitor, fake_monitor_device):
     assert device == fake_monitor_device
 
 
-class ObserverTestBase(object):
+class ObserverTestBase:
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0

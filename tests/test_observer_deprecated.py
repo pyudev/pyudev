@@ -43,7 +43,7 @@ def fake_monitor_device(request):
 ACTIONS = ("add", "remove", "change", "move")
 
 
-class DeprecatedObserverTestBase(object):
+class DeprecatedObserverTestBase:
     def setup_method(self, method):
         self.observer = None
         self.no_emitted_signals = 0

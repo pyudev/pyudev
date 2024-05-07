@@ -35,7 +35,7 @@ from ..utils import is_unicode_string
 from ._device_tests import _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
 
 
-class TestAttributes(object):
+class TestAttributes:
     """
     Test ``Attributes`` class methods.
     """

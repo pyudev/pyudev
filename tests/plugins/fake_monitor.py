@@ -35,7 +35,7 @@ from select import select
 import pytest
 
 
-class FakeMonitor(object):
+class FakeMonitor:
     """
     A fake :class:`~pyudev.Monitor` which allows you to trigger arbitrary
     events.
