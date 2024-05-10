@@ -2,11 +2,6 @@
 pyudev
 ######
 
-.. image:: https://secure.travis-ci.org/pyudev/pyudev.png?branch=develop
-   :target: http://travis-ci.org/pyudev/pyudev
-
-http://pyudev.readthedocs.org
-
 pyudev is a LGPL_ licensed, pure Python_ binding for libudev_, the device and
 hardware management and information library for Linux.  It supports almost all
 libudev_ functionality. You can enumerate devices, query device properties and
