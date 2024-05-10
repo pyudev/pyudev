@@ -1,3 +1,7 @@
+0.24.3
+======
+Recommended development release: Fedora 40
+
 0.24.2
 ======
 Recommended development release: Fedora 40
