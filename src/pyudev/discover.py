@@ -54,7 +54,7 @@ def wrap_exception(func):
     return the_func
 
 
-class Hypothesis(object):
+class Hypothesis:
     """
     Represents a hypothesis about the meaning of the device identifier.
     """
@@ -342,7 +342,7 @@ class DeviceFileHypothesis(Hypothesis):
         return frozenset(d for d in devices if d is not None)
 
 
-class Discovery(object):
+class Discovery:
     # pylint: disable=too-few-public-methods
     """
     Provides discovery methods for devices.

@@ -36,7 +36,7 @@ from pyudev._util import (
 from pyudev.device import Devices
 
 
-class Context(object):
+class Context:
     """
     A device database connection.
 
@@ -141,7 +141,7 @@ class Context(object):
         return Enumerator(self).match(**kwargs)
 
 
-class Enumerator(object):
+class Enumerator:
     """
     A filtered iterable of devices.
 

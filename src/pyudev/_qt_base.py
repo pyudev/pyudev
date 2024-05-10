@@ -27,7 +27,7 @@
 from pyudev.device import Device
 
 
-class MonitorObserverMixin(object):
+class MonitorObserverMixin:
     """
     Base mixin for pyqt monitor observers.
     """
@@ -121,7 +121,7 @@ def make_init(qobject, socket_notifier):
     return __init__
 
 
-class MonitorObserverGenerator(object):
+class MonitorObserverGenerator:
     """
     Class to generate a MonitorObserver class.
     """
@@ -160,7 +160,7 @@ class MonitorObserverGenerator(object):
         )
 
 
-class QUDevMonitorObserverGenerator(object):
+class QUDevMonitorObserverGenerator:
     """
     Class to generate a MonitorObserver class.
     """

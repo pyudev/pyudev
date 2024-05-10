@@ -35,7 +35,7 @@ from pyudev._util import eintr_retry_call, ensure_byte_string
 from pyudev.device import Device
 
 
-class Monitor(object):
+class Monitor:
     """
     A synchronous device event monitor.
 

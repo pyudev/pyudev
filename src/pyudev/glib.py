@@ -36,7 +36,7 @@
 from gi.repository import GLib, GObject  # pylint: disable=import-error
 
 
-class _ObserverMixin(object):
+class _ObserverMixin:
     """Mixin to provide observer behavior to the old and the new API."""
 
     # pylint: disable=too-few-public-methods
