@@ -42,7 +42,7 @@ def test_udev_version():
     assert udev_version() > 150
 
 
-class TestContext(object):
+class TestContext:
     def test_sys_path(self, context):
         assert is_unicode_string(context.sys_path)
         assert context.sys_path == "/sys"

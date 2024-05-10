@@ -46,7 +46,7 @@ except ImportError:
     import mock
 
 
-class TestDevice(object):
+class TestDevice:
     """
     Test ``Device`` methods.
     """

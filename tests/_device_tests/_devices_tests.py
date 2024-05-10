@@ -48,7 +48,7 @@ from .._constants import (
 from ..utils import failed_health_check_wrapper
 
 
-class TestDevices(object):
+class TestDevices:
     """
     Test ``Devices`` methods.
     """

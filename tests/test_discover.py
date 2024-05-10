@@ -46,7 +46,7 @@ _DEVICES = [d for d in _CONTEXT.list_devices()]
 NUM_TESTS = 5
 
 
-class TestUtilities(object):
+class TestUtilities:
     """
     Some utilities used by the actual tests.
     """
@@ -99,7 +99,7 @@ class TestUtilities(object):
         return links
 
 
-class TestDiscovery(object):
+class TestDiscovery:
     """
     Test discovery of an object from limited bits of its description.
     """

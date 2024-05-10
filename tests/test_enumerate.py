@@ -81,7 +81,7 @@ def _test_intersection_and_union(context, matches, nomatches):
     assert matches | nomatches == frozenset(context.list_devices())
 
 
-class TestEnumerator(object):
+class TestEnumerator:
     """
     Test the Enumerator class.
     """
@@ -164,7 +164,7 @@ class TestEnumerator(object):
         assert device in children
 
 
-class TestEnumeratorMatchCombinations(object):
+class TestEnumeratorMatchCombinations:
     """
     Test combinations of matches.
     """
@@ -196,7 +196,7 @@ class TestEnumeratorMatchCombinations(object):
         )
 
 
-class TestEnumeratorMatchMethod(object):
+class TestEnumeratorMatchMethod:
     """
     Test the behavior of Enumerator.match.
 

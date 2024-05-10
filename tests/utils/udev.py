@@ -34,7 +34,7 @@ import subprocess
 import sys
 
 
-class UDevAdm(object):
+class UDevAdm:
     """
     Wrap ``udevadm`` utility.
     """
@@ -188,7 +188,7 @@ class UDevAdm(object):
             return None
 
 
-class DeviceData(object):
+class DeviceData:
     """
     Data for a single device.
     """

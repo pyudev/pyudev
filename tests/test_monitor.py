@@ -69,7 +69,7 @@ def patch_filter_by(type):
             yield add_match, filter_update
 
 
-class TestMonitor(object):
+class TestMonitor:
     def test_from_netlink_invalid_source(self, context):
         with pytest.raises(ValueError) as exc_info:
             Monitor.from_netlink(context, source="invalid_source")
@@ -252,7 +252,7 @@ class TestMonitor(object):
             assert event[1] is device
 
 
-class TestMonitorObserver(object):
+class TestMonitorObserver:
     def callback(self, device):
         self.events.append(device)
         if len(self.events) >= 2:

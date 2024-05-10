@@ -43,7 +43,7 @@ except ImportError:
 Node = namedtuple("Node", "name value next")
 
 
-class LinkedList(object):
+class LinkedList:
     """
     Linked list class to mock libudev list functions.
     """

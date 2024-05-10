@@ -38,7 +38,7 @@ except ImportError:
     import mock
 
 
-class TestTags(object):
+class TestTags:
     """
     Test methods of the ``Tags`` class.
     """
