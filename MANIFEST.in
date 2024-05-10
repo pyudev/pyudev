@@ -1,8 +1,0 @@
-recursive-include src/pyudev *.py
-recursive-include doc *.rst *.py *.html
-recursive-include tests *.py
-recursive-exclude tests/.hypothesis *.py
-include .isort.cfg
-include CHANGES.rst COPYING README.rst
-include setup.py
-include pytest.ini

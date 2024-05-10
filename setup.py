@@ -20,53 +20,7 @@
 setup.py
 """
 
-# isort: STDLIB
-import os
-
 # isort: THIRDPARTY
 import setuptools
 
-
-def local_file(name):
-    """
-    Function to obtain the relative path of a filename.
-    """
-    return os.path.relpath(os.path.join(os.path.dirname(__file__), name))
-
-
-README = local_file("README.rst")
-
-with open(local_file("src/pyudev/version.py"), encoding="utf-8") as o:
-    exec(o.read())  # pylint: disable=exec-used
-
-with open(local_file("README.rst"), encoding="utf-8") as o:
-    long_description = o.read()
-
-setuptools.setup(
-    name="pyudev",
-    version=__version__,  # pylint: disable=undefined-variable
-    url="http://github.com/pyudev/pyudev",
-    author="Sebastian Wiesner",
-    author_email="lunaryorn@gmail.com",
-    description="A libudev binding",
-    long_description=long_description,
-    long_description_content_type="text/x-rst",
-    platforms=["Linux"],
-    license="LGPL 2.1+",
-    python_requires=">=3.7",
-    classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
-        "Operating System :: POSIX :: Linux",
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
-        "Topic :: Software Development :: Libraries",
-        "Topic :: System :: Hardware",
-        "Topic :: System :: Operating System Kernels :: Linux",
-    ],
-    package_dir={"": "src"},
-    packages=setuptools.find_packages("src"),
-)
+setuptools.setup()
