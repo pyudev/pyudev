@@ -1,3 +1,22 @@
+0.24.2
+======
+Recommended development release: Fedora 40
+
+- Update release infrastructure:
+  https://github.com/pyudev/pyudev/pull/508
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/507
+  https://github.com/pyudev/pyudev/pull/506
+  https://github.com/pyudev/pyudev/pull/505
+  https://github.com/pyudev/pyudev/pull/503
+  https://github.com/pyudev/pyudev/pull/498
+  https://github.com/pyudev/pyudev/pull/497
+  https://github.com/pyudev/pyudev/pull/492
+  https://github.com/pyudev/pyudev/pull/491
+  https://github.com/pyudev/pyudev/pull/489
+
+
 0.24.1
 ======
 Recommended development release: Fedora 37
