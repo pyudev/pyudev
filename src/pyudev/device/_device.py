@@ -51,7 +51,7 @@ from pyudev._util import (
 # pylint: disable=too-many-lines
 
 
-class Devices(object):
+class Devices:
     """
     Class for constructing :class:`Device` objects from various kinds of data.
     """
@@ -1133,7 +1133,7 @@ class Properties(collections.abc.Mapping):
         return string_to_bool(self[prop])
 
 
-class Attributes(object):
+class Attributes:
     """
     udev attributes for :class:`Device` objects.
 

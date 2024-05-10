@@ -28,7 +28,7 @@ sys.path.append(os.path.normpath(os.path.join(doc_directory, os.pardir)))
 sys.path.append(os.path.normpath(os.path.join(doc_directory, os.pardir, "tests")))
 
 
-class Mock(object):
+class Mock:
     """
     Mock modules.
 
