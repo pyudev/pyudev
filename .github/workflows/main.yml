@@ -19,15 +19,15 @@ jobs:
         include:
           # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
           - python-version: "3.12"
-            dependencies: pytest=="7" hypothesis
+            dependencies: pytest hypothesis
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
           - python-version: "3.10"
-            dependencies: pytest=="7" hypothesis
+            dependencies: pytest hypothesis
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING PYPY INTERPRETER
           - python-version: pypy-3.9
-            dependencies: pytest=="7" hypothesis
+            dependencies: pytest hypothesis
             task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
     steps:

@@ -277,10 +277,10 @@ class TestMonitorObserver:
             self.observer = MonitorObserver(monitor, callback=self.callback)
         return self.observer
 
-    def setup(self):
+    def setup_method(self):
         self.events = []
 
-    def teardown(self):
+    def teardown_method(self):
         self.events = None
 
     def test_deprecated_handler(self, fake_monitor, fake_monitor_device):
