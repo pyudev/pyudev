@@ -57,7 +57,7 @@ jobs:
           - dependencies: pylint python3-setuptools
             task: lint
     runs-on: ubuntu-latest
-    container: fedora:40  # CURRENT DEVELOPMENT ENVIRONMENT
+    container: fedora:41  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
