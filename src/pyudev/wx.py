@@ -116,34 +116,3 @@ DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()  # pylint: disable=invalid-name
 DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()  # pylint: disable=invalid-name
 DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()  # pylint: disable=invalid-name
 DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()  # pylint: disable=invalid-name
-
-
-class WxUDevMonitorObserver(MonitorObserver):
-    """An observer for device events integrating into the :mod:`wx` mainloop.
-
-    .. deprecated:: 0.17
-       Will be removed in 1.0.  Use :class:`MonitorObserver` instead.
-    """
-
-    _action_event_map = {
-        "add": DeviceAddedEvent,
-        "remove": DeviceRemovedEvent,
-        "change": DeviceChangedEvent,
-        "move": DeviceMovedEvent,
-    }
-
-    def __init__(self, monitor):
-        MonitorObserver.__init__(self, monitor)
-        # isort: STDLIB
-        import warnings
-
-        warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.wx.MonitorObserver instead.",
-            DeprecationWarning,
-        )
-
-    def _emit_event(self, device):
-        PostEvent(self, DeviceEvent(action=device.action, device=device))
-        event_class = self._action_event_map.get(device.action)
-        if event_class is not None:
-            PostEvent(self, event_class(device=device))
