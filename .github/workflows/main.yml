@@ -31,7 +31,7 @@ jobs:
             task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -59,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:41  # CURRENT DEVELOPMENT ENVIRONMENT
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install dependencies
         run: >
           dnf install -y
