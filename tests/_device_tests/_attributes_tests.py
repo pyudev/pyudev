@@ -130,3 +130,13 @@ class TestAttributes:
                     pass
                 except ValueError:
                     pass
+
+    @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
+    @settings(max_examples=5)
+    def test_unsetitem(self, a_context, device_datum):
+        """
+        Test that attribute value can be unset.
+        """
+        device = Devices.from_path(a_context, device_datum.device_path)
+        for key in device_datum.attributes.keys():
+            device.attributes.unset(key)
