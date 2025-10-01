@@ -225,7 +225,7 @@ class Monitor:
            Will be removed in 1.0. Use :meth:`start()` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.start() instead.", DeprecationWarning
@@ -388,7 +388,7 @@ class Monitor:
            Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.poll() instead.", DeprecationWarning
@@ -415,7 +415,7 @@ class Monitor:
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use an explicit loop over "
@@ -508,7 +508,7 @@ class MonitorObserver(Thread):
         self._stop_event = None
         if event_handler is not None:
             # isort: STDLIB
-            import warnings
+            import warnings  # pylint: disable=import-outside-toplevel
 
             warnings.warn(
                 '"event_handler" argument will be removed in 1.0. '

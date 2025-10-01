@@ -135,7 +135,7 @@ class WxUDevMonitorObserver(MonitorObserver):
     def __init__(self, monitor):
         MonitorObserver.__init__(self, monitor)
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.wx.MonitorObserver instead.",

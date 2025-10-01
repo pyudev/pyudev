@@ -145,7 +145,7 @@ def eintr_retry_call(func, *args, **kwargs):
 
     # select.error inherits from Exception instead of OSError in Python 2
     # isort: STDLIB
-    import select
+    import select  # pylint: disable=import-outside-toplevel
 
     while True:
         try:
