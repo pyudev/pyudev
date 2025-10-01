@@ -101,7 +101,6 @@ class Hypothesis:
 
         :param Context context: the pyudev context
         """
-        pass
 
     @classmethod
     def get_devices(cls, context, value):
