@@ -138,7 +138,7 @@ class WxUDevMonitorObserver(MonitorObserver):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.wx.MonitorObserver instead.",
+            "Will be removed in 1.0. Use pyudev.wx.MonitorObserver instead.",
             DeprecationWarning,
         )
 

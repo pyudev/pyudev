@@ -92,7 +92,7 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.pyqt4.MonitorObserver instead.",
+            "Will be removed in 1.0. Use pyudev.pyqt4.MonitorObserver instead.",
             DeprecationWarning,
         )
 

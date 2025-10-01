@@ -184,7 +184,7 @@ class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.glib.MonitorObserver instead.",
+            "Will be removed in 1.0. Use pyudev.glib.MonitorObserver instead.",
             DeprecationWarning,
         )
 
