@@ -63,7 +63,7 @@ class DeviceNotFoundAtPathError(DeviceNotFoundError):
         return self.args[0]
 
     def __str__(self):
-        return "No device at {0!r}".format(self.sys_path)
+        return f"No device at {self.sys_path!r}"
 
 
 class DeviceNotFoundByFileError(DeviceNotFoundError):
@@ -114,7 +114,7 @@ class DeviceNotFoundByNameError(DeviceNotFoundError):
         return self.args[1]
 
     def __str__(self):
-        return "No device {0.sys_name!r} in {0.subsystem!r}".format(self)
+        return f"No device {self.sys_name!r} in {self.subsystem!r}"
 
 
 class DeviceNotFoundByNumberError(DeviceNotFoundError):
@@ -142,7 +142,7 @@ class DeviceNotFoundByNumberError(DeviceNotFoundError):
         return self.args[1]
 
     def __str__(self):
-        return "No {0.device_type} device with number " "{0.device_number}".format(self)
+        return f"No {self.device_type} device with number {self.device_number}"
 
 
 class DeviceNotFoundInEnvironmentError(DeviceNotFoundError):

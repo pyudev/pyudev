@@ -89,10 +89,10 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
             "move": self.deviceMoved,
         }
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.pyqt4.MonitorObserver instead.",
+            "Will be removed in 1.0. Use pyudev.pyqt4.MonitorObserver instead.",
             DeprecationWarning,
         )
 

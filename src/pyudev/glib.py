@@ -181,10 +181,10 @@ class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
         GObject.Object.__init__(self)
         self._setup_observer(monitor)
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
-            "Will be removed in 1.0. " "Use pyudev.glib.MonitorObserver instead.",
+            "Will be removed in 1.0. Use pyudev.glib.MonitorObserver instead.",
             DeprecationWarning,
         )
 

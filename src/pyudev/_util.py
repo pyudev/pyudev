@@ -86,7 +86,7 @@ def string_to_bool(value):
     :exc:`~exceptions.ValueError`.
     """
     if value not in ("1", "0"):
-        raise ValueError("Not a boolean value: {0!r}".format(value))
+        raise ValueError(f"Not a boolean value: {value!r}")
     return value == "1"
 
 
@@ -122,10 +122,9 @@ def get_device_type(filename):
     mode = os.stat(filename).st_mode
     if stat.S_ISCHR(mode):
         return "char"
-    elif stat.S_ISBLK(mode):
+    if stat.S_ISBLK(mode):
         return "block"
-    else:
-        raise ValueError("not a device file: {0!r}".format(filename))
+    raise ValueError(f"not a device file: {filename!r}")
 
 
 def eintr_retry_call(func, *args, **kwargs):
@@ -145,7 +144,7 @@ def eintr_retry_call(func, *args, **kwargs):
 
     # select.error inherits from Exception instead of OSError in Python 2
     # isort: STDLIB
-    import select
+    import select  # pylint: disable=import-outside-toplevel
 
     while True:
         try:

@@ -109,10 +109,9 @@ class Monitor:
         """
         if source not in ("kernel", "udev"):
             raise ValueError(
-                'Invalid source: {0!r}. Must be one of "udev" '
-                'or "kernel"'.format(source)
+                f'Invalid source: {source!r}. Must be one of "udev" or "kernel"'
             )
-        monitor = context._libudev.udev_monitor_new_from_netlink(
+        monitor = context._libudev.udev_monitor_new_from_netlink(  # pylint: disable=protected-access
             context, ensure_byte_string(source)
         )
         if not monitor:
@@ -225,7 +224,7 @@ class Monitor:
            Will be removed in 1.0. Use :meth:`start()` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.start() instead.", DeprecationWarning
@@ -297,11 +296,12 @@ class Monitor:
                 if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
                     # No data available
                     return None
-                elif error.errno == errno.EINTR:
+
+                if error.errno == errno.EINTR:
                     # Try again if our system call was interrupted
                     continue
-                else:
-                    raise
+
+                raise
 
     def poll(self, timeout=None):
         """
@@ -388,7 +388,7 @@ class Monitor:
            Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.poll() instead.", DeprecationWarning
@@ -415,7 +415,7 @@ class Monitor:
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use an explicit loop over "
@@ -498,7 +498,7 @@ class MonitorObserver(Thread):
         """
         if callback is None and event_handler is None:
             raise ValueError("callback missing")
-        elif callback is not None and event_handler is not None:
+        if callback is not None and event_handler is not None:
             raise ValueError("Use either callback or event handler")
 
         Thread.__init__(self, *args, **kwargs)
@@ -508,14 +508,16 @@ class MonitorObserver(Thread):
         self._stop_event = None
         if event_handler is not None:
             # isort: STDLIB
-            import warnings
+            import warnings  # pylint: disable=import-outside-toplevel
 
             warnings.warn(
                 '"event_handler" argument will be removed in 1.0. '
                 "Use Monitor.poll() instead.",
                 DeprecationWarning,
             )
-            callback = lambda d: event_handler(d.action, d)
+            callback = lambda d: event_handler(  # pylint: disable=unnecessary-lambda-assignment
+                d.action, d
+            )
         self._callback = callback
 
     def start(self):
@@ -536,7 +538,8 @@ class MonitorObserver(Thread):
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno() and event == "r":
+
+                if file_descriptor == self.monitor.fileno() and event == "r":
                     read_device = partial(
                         eintr_retry_call, self.monitor.poll, timeout=0
                     )
