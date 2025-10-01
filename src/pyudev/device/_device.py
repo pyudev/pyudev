@@ -1244,6 +1244,17 @@ class Attributes:
         """
         return string_to_bool(self.asstring(attribute))
 
+    def unset(self, attribute):
+        """
+        Clear the attribute's cached value in udev.
+
+        :param attribute: the key for an attribute value
+        :type attribute: unicode or byte string
+        """
+        self._libudev.udev_device_set_sysattr_value(
+            self.device, ensure_byte_string(attribute), None
+        )
+
 
 class Tags(collections.abc.Iterable, collections.abc.Container):
     """
