@@ -23,7 +23,7 @@
     .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-__version_info__ = (0, 24, 3, "")
+__version_info__ = (0, 24, 4, "")
 __version__ = (
     f'{".".join(str(x) for x in __version_info__[:3])}'
     f'{"".join(str(x) for x in __version_info__[3:])}'
