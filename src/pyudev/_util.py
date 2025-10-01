@@ -122,10 +122,9 @@ def get_device_type(filename):
     mode = os.stat(filename).st_mode
     if stat.S_ISCHR(mode):
         return "char"
-    elif stat.S_ISBLK(mode):
+    if stat.S_ISBLK(mode):
         return "block"
-    else:
-        raise ValueError("not a device file: {0!r}".format(filename))
+    raise ValueError("not a device file: {0!r}".format(filename))
 
 
 def eintr_retry_call(func, *args, **kwargs):

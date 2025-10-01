@@ -297,11 +297,12 @@ class Monitor:
                 if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
                     # No data available
                     return None
-                elif error.errno == errno.EINTR:
+
+                if error.errno == errno.EINTR:
                     # Try again if our system call was interrupted
                     continue
-                else:
-                    raise
+
+                raise
 
     def poll(self, timeout=None):
         """
@@ -498,7 +499,7 @@ class MonitorObserver(Thread):
         """
         if callback is None and event_handler is None:
             raise ValueError("callback missing")
-        elif callback is not None and event_handler is not None:
+        if callback is not None and event_handler is not None:
             raise ValueError("Use either callback or event handler")
 
         Thread.__init__(self, *args, **kwargs)
@@ -536,7 +537,8 @@ class MonitorObserver(Thread):
                     # return from the thread
                     self._stop_event.source.close()
                     return
-                elif file_descriptor == self.monitor.fileno() and event == "r":
+
+                if file_descriptor == self.monitor.fileno() and event == "r":
                     read_device = partial(
                         eintr_retry_call, self.monitor.poll, timeout=0
                     )
