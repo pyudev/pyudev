@@ -111,7 +111,7 @@ class Monitor:
             raise ValueError(
                 f'Invalid source: {source!r}. Must be one of "udev" or "kernel"'
             )
-        monitor = context._libudev.udev_monitor_new_from_netlink(
+        monitor = context._libudev.udev_monitor_new_from_netlink(  # pylint: disable=protected-access
             context, ensure_byte_string(source)
         )
         if not monitor:
