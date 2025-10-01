@@ -515,7 +515,9 @@ class MonitorObserver(Thread):
                 "Use Monitor.poll() instead.",
                 DeprecationWarning,
             )
-            callback = lambda d: event_handler(d.action, d)
+            callback = lambda d: event_handler(  # pylint: disable=unnecessary-lambda-assignment
+                d.action, d
+            )
         self._callback = callback
 
     def start(self):
