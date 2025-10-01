@@ -109,8 +109,7 @@ class Monitor:
         """
         if source not in ("kernel", "udev"):
             raise ValueError(
-                'Invalid source: {0!r}. Must be one of "udev" '
-                'or "kernel"'.format(source)
+                f'Invalid source: {source!r}. Must be one of "udev" or "kernel"'
             )
         monitor = context._libudev.udev_monitor_new_from_netlink(
             context, ensure_byte_string(source)
