@@ -370,7 +370,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_path method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -392,7 +393,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_sys_path method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -409,7 +411,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_name method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -426,7 +429,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_device_number method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -443,7 +447,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_device_file method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -460,7 +465,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use equivalent Devices method instead.",
+            "The from_device_file method is deprecated and "
+            "will be removed in 1.0. Use equivalent Devices method instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -582,7 +588,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use Device.ancestors instead.",
+            "The traverse method is deprecated and "
+            "will be removed in 1.0. Use Device.ancestors instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -925,7 +932,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Access properties with Device.properties.",
+            "The use of iter(Device) is deprecated and "
+            "will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -942,7 +950,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Access properties with Device.properties.",
+            "The use of len(Device) is deprecated and "
+            "will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -966,7 +975,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Access properties with Device.properties.",
+            "The use of Device[prop] is deprecated and "
+            "will be removed in 1.0. Access properties with Device.properties.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -991,7 +1001,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use Device.properties.asint instead.",
+            "The asint method is deprecated and "
+            "will be removed in 1.0. Use Device.properties.asint instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -1020,7 +1031,8 @@ class Device(collections.abc.Mapping):
         import warnings
 
         warnings.warn(
-            "Will be removed in 1.0. Use Device.properties.asbool instead.",
+            "The asbool method is deprecated and "
+            "will be removed in 1.0. Use Device.properties.asbool instead.",
             DeprecationWarning,
             stacklevel=2,
         )
