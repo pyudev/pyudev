@@ -65,8 +65,7 @@ def check_negative_errorcode(result, _func, *_args):
         # udev returns the *negative* errno code at this point
         errnum = -result
         raise exception_from_errno(errnum)
-    else:
-        return result
+    return result
 
 
 def check_errno_on_nonzero_return(result, _func, *_args):
