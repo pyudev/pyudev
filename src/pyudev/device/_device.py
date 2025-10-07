@@ -27,7 +27,6 @@
 import collections
 import os
 import re
-import sys
 from datetime import timedelta
 
 # isort: LOCAL
@@ -101,7 +100,7 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_syspath(
+        device = context._libudev.udev_device_new_from_syspath(  # pylint: disable=protected-access
             context, ensure_byte_string(sys_path)
         )
         if not device:
@@ -132,7 +131,7 @@ class Devices:
         .. versionadded:: 0.18
         """
         sys_name = sys_name.replace("/", "!")
-        device = context._libudev.udev_device_new_from_subsystem_sysname(
+        device = context._libudev.udev_device_new_from_subsystem_sysname(  # pylint: disable=protected-access
             context, ensure_byte_string(subsystem), ensure_byte_string(sys_name)
         )
         if not device:
@@ -176,7 +175,7 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_devnum(
+        device = context._libudev.udev_device_new_from_devnum(  # pylint: disable=protected-access
             context, ensure_byte_string(typ[0]), number
         )
         if not device:
@@ -221,7 +220,7 @@ class Devices:
             device_type = get_device_type(filename)
             device_number = os.stat(filename).st_rdev
         except (EnvironmentError, ValueError) as err:
-            raise DeviceNotFoundByFileError(err)
+            raise DeviceNotFoundByFileError(err) from err
 
         return cls.from_device_number(context, device_type, device_number)
 
@@ -243,8 +242,7 @@ class Devices:
         )
         if dev is not None:
             return dev
-        else:
-            raise DeviceNotFoundByInterfaceIndexError(ifindex)
+        raise DeviceNotFoundByInterfaceIndexError(ifindex)
 
     @classmethod
     def from_kernel_device(cls, context, kernel_device):
@@ -266,18 +264,15 @@ class Devices:
                     int(match.group("major")), int(match.group("minor"))
                 )
                 return cls.from_device_number(context, switch_char, number)
-            else:
-                raise DeviceNotFoundByKernelDeviceError(kernel_device)
-        elif switch_char == "n":
+            raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        if switch_char == "n":
             return cls.from_interface_index(context, rest)
-        elif switch_char == "+":
+        if switch_char == "+":
             (subsystem, _, kernel_device_name) = rest.partition(":")
             if kernel_device_name and subsystem:
                 return cls.from_name(context, subsystem, kernel_device_name)
-            else:
-                raise DeviceNotFoundByKernelDeviceError(kernel_device)
-        else:
             raise DeviceNotFoundByKernelDeviceError(kernel_device)
+        raise DeviceNotFoundByKernelDeviceError(kernel_device)
 
     @classmethod
     def from_environment(cls, context):
@@ -300,7 +295,9 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_environment(context)
+        device = context._libudev.udev_device_new_from_environment(  # pylint: disable=protected-access
+            context
+        )
         if not device:
             raise DeviceNotFoundInEnvironmentError()
         return Device(context, device)
@@ -367,7 +364,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_path` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -389,7 +386,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_sys_path` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -406,7 +403,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_name` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -423,7 +420,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_device_number` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -440,7 +437,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_device_file` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -457,7 +454,7 @@ class Device(collections.abc.Mapping):
            Use :class:`Devices.from_environment` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -476,7 +473,7 @@ class Device(collections.abc.Mapping):
         self._libudev.udev_device_unref(self)
 
     def __repr__(self):
-        return "Device({0.sys_path!r})".format(self)
+        return f"Device({self.sys_path!r})"
 
     @property
     def parent(self):
@@ -579,7 +576,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.ancestors instead.",
@@ -922,7 +919,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -939,7 +936,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -963,7 +960,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Access properties with Device.properties.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -988,7 +985,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Use Device.properties.asint() instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.properties.asint instead.",
@@ -1017,7 +1014,7 @@ class Device(collections.abc.Mapping):
            Will be removed in 1.0. Use Device.properties.asbool() instead.
         """
         # isort: STDLIB
-        import warnings
+        import warnings  # pylint: disable=import-outside-toplevel
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.properties.asbool instead.",

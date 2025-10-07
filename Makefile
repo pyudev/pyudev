@@ -21,6 +21,7 @@ lint:
 	pylint setup.py
 	pylint src/pyudev/core.py
 	pylint src/pyudev/_ctypeslib
+	pylint src/pyudev/device
 	pylint src/pyudev/discover.py
 	pylint src/pyudev/_errors.py
 	pylint src/pyudev/glib.py
