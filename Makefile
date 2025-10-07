@@ -19,22 +19,7 @@ package:
 
 lint:
 	pylint setup.py
-	pylint src/pyudev/core.py
-	pylint src/pyudev/_ctypeslib
-	pylint src/pyudev/device
-	pylint src/pyudev/discover.py
-	pylint src/pyudev/_errors.py
-	pylint src/pyudev/glib.py
-	pylint src/pyudev/monitor.py
-	pylint src/pyudev/_os
-	pylint src/pyudev/pyqt4.py
-	pylint src/pyudev/pyqt5.py
-	pylint src/pyudev/pyside6.py
-	pylint src/pyudev/pyside.py
-	pylint src/pyudev/_qt_base.py
-	pylint src/pyudev/_util.py
-	pylint src/pyudev/version.py
-	pylint src/pyudev/wx.py
+	pylint src/pyudev
 
 PYREVERSE_OPTS = --output=pdf
 view:
