@@ -1,3 +1,24 @@
+0.24.4
+======
+Recommended development release: Fedora 41
+
+- Add device attributes unset():
+  https://github.com/pyudev/pyudev/pull/525
+
+- Remove license classifier deprecated by PEP 639:
+  https://github.com/pyudev/pyudev/pull/522
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/529
+  https://github.com/pyudev/pyudev/pull/528
+  https://github.com/pyudev/pyudev/pull/526
+  https://github.com/pyudev/pyudev/pull/524
+  https://github.com/pyudev/pyudev/pull/521
+  https://github.com/pyudev/pyudev/pull/520
+  https://github.com/pyudev/pyudev/pull/518
+  https://github.com/pyudev/pyudev/pull/512
+  https://github.com/pyudev/pyudev/pull/511
+
 0.24.3
 ======
 Recommended development release: Fedora 40
