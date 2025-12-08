@@ -325,8 +325,6 @@ implemented by :class:`MonitorObserver`.
 pyudev supports all major GUI toolkits available for Python:
 
 - Qt_ 5 using :mod:`pyudev.pyqt5`
-- Qt_ 4 using :mod:`pyudev.pyqt4` for the PyQt4_ binding or :mod:`pyudev.pyside`
-  for the PySide_ binding
 - PyGtk_ 2 using :mod:`pyudev.glib`
 - wxWidgets_ and wxPython_ using :mod:`pyudev.wx`
 
@@ -355,7 +353,6 @@ interpreted as False in a boolean context.
 .. _libudev: http://www.kernel.org/pub/linux/utils/kernel/hotplug/libudev/
 .. _Qt: http://qt.io/developers/
 .. _PyQt5: https://riverbankcomputing.co.uk/software/pyqt/intro
-.. _PyQt4: https://riverbankcomputing.co.uk/software/pyqt/intro
 .. _PySide: http://wiki.qt.io/PySide
 .. _PyGtk: http://www.pygtk.org/
 .. _wxWidgets: http://wxwidgets.org

@@ -8,7 +8,6 @@ This document provides API reference documentation for pyudev.  Refer to the
    :toctree: .
 
    pyudev
-   pyudev.pyqt4
    pyudev.pyqt5
    pyudev.pyside
    pyudev.glib
