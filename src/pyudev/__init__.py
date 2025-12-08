@@ -25,7 +25,7 @@
     :class:`Device` class.
 
     Device monitoring is provided by :class:`Monitor` and
-    :class:`MonitorObserver`.  With :mod:`pyudev.pyqt4`, :mod:`pyudev.pyside`,
+    :class:`MonitorObserver`.  With :mod:`pyudev.pyside`,
     :mod:`pyudev.glib` and :mod:`pyudev.wx` device monitoring can be integrated
     into the event loop of various GUI toolkits.
 

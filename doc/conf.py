@@ -65,8 +65,6 @@ class Mock:
 Mock.mock_modules(
     "PyQt5",
     "PyQt5.QtCore",
-    "PyQt4",
-    "PyQt4.QtCore",
     "PySide",
     "PySide.QtCore",
     "glib",

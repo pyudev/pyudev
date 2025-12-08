@@ -152,10 +152,6 @@ class TestDeprecatedPysideObserver(DeprecatedQtObserverTestBase):
     BINDING_NAME = "PySide"
 
 
-class TestDeprecatedPyQt4Observer(DeprecatedQtObserverTestBase):
-    BINDING_NAME = "PyQt4"
-
-
 class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
     ACTION_SIGNAL_MAP = {
         "add": "device-added",

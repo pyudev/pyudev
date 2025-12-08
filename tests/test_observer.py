@@ -140,10 +140,6 @@ class TestPysideObserver(QtObserverTestBase):
     BINDING_NAME = "PySide"
 
 
-class TestPyQt4Observer(QtObserverTestBase):
-    BINDING_NAME = "PyQt4"
-
-
 class TestPyQt5Observer(QtObserverTestBase):
     BINDING_NAME = "PyQt5"
 
