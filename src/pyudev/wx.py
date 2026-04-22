@@ -12,19 +12,19 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """pyudev.wx
-    =========
+=========
 
-    Wx integration.
+Wx integration.
 
-    :class:`MonitorObserver` integrates device monitoring into the wxPython\\_
-    mainloop by turing device events into wx events.
+:class:`MonitorObserver` integrates device monitoring into the wxPython\\_
+mainloop by turing device events into wx events.
 
-    :mod:`wx` from wxPython\\_ must be available when importing this module.
+:mod:`wx` from wxPython\\_ must be available when importing this module.
 
-    .. _wxPython: http://wxpython.org/
+.. _wxPython: http://wxpython.org/
 
-    .. moduleauthor::  Tobias Eberle  <tobias.eberle@gmx.de>
-    .. versionadded:: 0.14
+.. moduleauthor::  Tobias Eberle  <tobias.eberle@gmx.de>
+.. versionadded:: 0.14
 
 """
 

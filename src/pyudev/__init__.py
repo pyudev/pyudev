@@ -15,21 +15,21 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev
-    ======
+pyudev
+======
 
-    A binding to libudev.
+A binding to libudev.
 
-    The :class:`Context` provides the connection to the udev device database
-    and enumerates devices.  Individual devices are represented by the
-    :class:`Device` class.
+The :class:`Context` provides the connection to the udev device database
+and enumerates devices.  Individual devices are represented by the
+:class:`Device` class.
 
-    Device monitoring is provided by :class:`Monitor` and
-    :class:`MonitorObserver`.  With :mod:`pyudev.pyside`,
-    :mod:`pyudev.glib` and :mod:`pyudev.wx` device monitoring can be integrated
-    into the event loop of various GUI toolkits.
+Device monitoring is provided by :class:`Monitor` and
+:class:`MonitorObserver`.  With :mod:`pyudev.pyside`,
+:mod:`pyudev.glib` and :mod:`pyudev.wx` device monitoring can be integrated
+into the event loop of various GUI toolkits.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: LOCAL

@@ -15,20 +15,20 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """pyudev.glib
-    ===========
+===========
 
-    Glib integration.
+Glib integration.
 
-    :class:`MonitorObserver` integrates device monitoring into the Glib
-    mainloop by turing device events into Glib signals.
+:class:`MonitorObserver` integrates device monitoring into the Glib
+mainloop by turing device events into Glib signals.
 
-    :mod:`gi.repository.GLib` and :mod:`gi.repository.GObject` from PyGObject_
-    must be available when importing this module. PyGtk is not required.
+:mod:`gi.repository.GLib` and :mod:`gi.repository.GObject` from PyGObject_
+must be available when importing this module. PyGtk is not required.
 
-    .. _PyGObject: http://www.pygtk.org/
+.. _PyGObject: http://www.pygtk.org/
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
-    .. versionadded:: 0.7
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. versionadded:: 0.7
 
 """
 

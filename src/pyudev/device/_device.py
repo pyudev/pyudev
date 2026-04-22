@@ -15,12 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev.device._device
-    =====================
+pyudev.device._device
+=====================
 
-    Device class implementation of :mod:`pyudev`.
+Device class implementation of :mod:`pyudev`.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: STDLIB

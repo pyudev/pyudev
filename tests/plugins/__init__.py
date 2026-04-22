@@ -15,10 +15,10 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev.tests.plugins
-    ====================
+pyudev.tests.plugins
+====================
 
-    Plugins to support the pyudev testsuite.
+Plugins to support the pyudev testsuite.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
