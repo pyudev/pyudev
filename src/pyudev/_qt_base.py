@@ -15,12 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev._qt_base
-    ===============
+pyudev._qt_base
+===============
 
-    Base mixin class for Qt5 support.
+Base mixin class for Qt5 support.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: LOCAL

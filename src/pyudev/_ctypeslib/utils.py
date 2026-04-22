@@ -15,12 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev._ctypeslib.utils
-    =======================
+pyudev._ctypeslib.utils
+=======================
 
-    Utilities for loading ctypeslib.
+Utilities for loading ctypeslib.
 
-    .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
+.. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
 # isort: STDLIB

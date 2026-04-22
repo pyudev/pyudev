@@ -15,12 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev.device._errors
-    =====================
+pyudev.device._errors
+=====================
 
-    Errors raised by Device methods.
+Errors raised by Device methods.
 
-    .. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
+.. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
 """
 
 # isort: STDLIB

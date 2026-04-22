@@ -15,12 +15,12 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev._os
-    ==========
+pyudev._os
+==========
 
-    Extras to compensate for deficiencies in python os module.
+Extras to compensate for deficiencies in python os module.
 
-    .. moduleauthor::  mulhern  <amulhern@redhat.com>
+.. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
 from . import pipe, poll

@@ -15,10 +15,10 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev.tests._device_tests
-    ==========================
+pyudev.tests._device_tests
+==========================
 
-    Tests on devices.
+Tests on devices.
 
-    .. moduleauthor::  mulhern  <amulhern@redhat.com>
+.. moduleauthor::  mulhern  <amulhern@redhat.com>
 """

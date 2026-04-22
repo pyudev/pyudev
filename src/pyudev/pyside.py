@@ -16,21 +16,21 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 """
-    pyudev.pyside
-    =============
+pyudev.pyside
+=============
 
-    PySide integration.
+PySide integration.
 
-    :class:`QUDevMonitorObserver` integrates device monitoring into the
-    PySide\\_ mainloop by turing device events into Qt signals.
+:class:`QUDevMonitorObserver` integrates device monitoring into the
+PySide\\_ mainloop by turing device events into Qt signals.
 
-    :mod:`PySide.QtCore` from PySide\\_ must be available when importing this
-    module.
+:mod:`PySide.QtCore` from PySide\\_ must be available when importing this
+module.
 
-    .. _PySide: http://www.pyside.org
+.. _PySide: http://www.pyside.org
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
-    .. versionadded:: 0.6
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. versionadded:: 0.6
 """
 
 # isort: THIRDPARTY

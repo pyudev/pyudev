@@ -15,13 +15,13 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev._ctypeslib.libudev
-    =========================
+pyudev._ctypeslib.libudev
+=========================
 
-    Wrapper types for libudev.  Use ``libudev`` attribute to access libudev
-    functions.
+Wrapper types for libudev.  Use ``libudev`` attribute to access libudev
+functions.
 
-    .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: STDLIB

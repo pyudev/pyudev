@@ -15,18 +15,18 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
-    pyudev._os.pipe
-    ===============
+pyudev._os.pipe
+===============
 
-    Fallback implementations for pipe.
+Fallback implementations for pipe.
 
-    1. pipe2 from python os module
-    2. pipe2 from libc
-    3. pipe from python os module
+1. pipe2 from python os module
+2. pipe2 from libc
+3. pipe from python os module
 
-    The Pipe class wraps the chosen implementation.
+The Pipe class wraps the chosen implementation.
 
-    .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
+.. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
 # isort: STDLIB
