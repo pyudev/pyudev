@@ -23,7 +23,6 @@ Errors raised by Device methods.
 .. moduleauthor:: Sebastian Wiesner <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import abc
 
 
@@ -172,7 +171,7 @@ class DeviceValueError(DeviceError):
         :param str param: the parameter
         :param str msg: an explanatory message
         """
-        # pylint: disable=super-init-not-called
+
         self._value = value
         self._param = param
         self._msg = msg

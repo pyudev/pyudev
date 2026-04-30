@@ -21,7 +21,6 @@ pyudev._ctypeslib._errorcheckers
 Error checkers for ctypes wrappers.
 """
 
-# isort: STDLIB
 import errno
 import os
 from ctypes import get_errno
@@ -91,7 +90,7 @@ def check_errno_on_null_pointer_return(result, _func, *_args):
     raised.  Otherwise nothing happens.
 
     """
-    # pylint: disable=invalid-name
+
     if not result:
         errnum = get_errno()
         if errnum != 0:

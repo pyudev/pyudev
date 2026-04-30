@@ -33,12 +33,10 @@ module.
 .. versionadded:: 0.6
 """
 
-# isort: THIRDPARTY
-from PySide6 import QtCore  # pylint: disable=import-error
+from PySide6 import QtCore
 
 from ._qt_base import MonitorObserverGenerator
 
-# pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
     QtCore.QObject, QtCore.Signal, QtCore.QSocketNotifier
 )

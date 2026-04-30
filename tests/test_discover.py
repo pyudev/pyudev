@@ -23,14 +23,11 @@ Tests discovering what device is meant by somewhat unspecific information.
 .. moduleauthor:: mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 import os
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import assume, given, settings, strategies
 
-# isort: LOCAL
 import pyudev
 from pyudev import (
     DeviceFileHypothesis,

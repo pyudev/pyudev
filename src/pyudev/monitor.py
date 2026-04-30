@@ -23,13 +23,11 @@ Monitor implementation.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import errno
 import os
 from functools import partial
 from threading import Thread
 
-# isort: LOCAL
 from pyudev._os import pipe, poll
 from pyudev._util import eintr_retry_call, ensure_byte_string
 from pyudev.device import Device
@@ -111,7 +109,7 @@ class Monitor:
             raise ValueError(
                 f'Invalid source: {source!r}. Must be one of "udev" or "kernel"'
             )
-        monitor = context._libudev.udev_monitor_new_from_netlink(  # pylint: disable=protected-access
+        monitor = context._libudev.udev_monitor_new_from_netlink(
             context, ensure_byte_string(source)
         )
         if not monitor:
@@ -223,8 +221,8 @@ class Monitor:
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :meth:`start()` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.start() instead.", DeprecationWarning
@@ -387,8 +385,8 @@ class Monitor:
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :meth:`Monitor.poll()` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use Monitor.poll() instead.", DeprecationWarning
@@ -414,8 +412,8 @@ class Monitor:
            Will be removed in 1.0. Use an explicit loop over :meth:`poll()`
            instead, or monitor asynchronously with :class:`MonitorObserver`.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use an explicit loop over "
@@ -472,9 +470,7 @@ class MonitorObserver(Thread):
        :meth:`Monitor.start()` is implicitly called when the thread is started.
     """
 
-    def __init__(
-        self, monitor, event_handler=None, callback=None, *args, **kwargs
-    ):  # pylint: disable=keyword-arg-before-vararg
+    def __init__(self, monitor, event_handler=None, callback=None, *args, **kwargs):
         """
         Create a new observer for the given ``monitor``.
 
@@ -507,17 +503,14 @@ class MonitorObserver(Thread):
         self.daemon = True
         self._stop_event = None
         if event_handler is not None:
-            # isort: STDLIB
-            import warnings  # pylint: disable=import-outside-toplevel
+            import warnings  # noqa: PLC0415
 
             warnings.warn(
                 '"event_handler" argument will be removed in 1.0. '
                 "Use Monitor.poll() instead.",
                 DeprecationWarning,
             )
-            callback = lambda d: event_handler(  # pylint: disable=unnecessary-lambda-assignment
-                d.action, d
-            )
+            callback = lambda d: event_handler(d.action, d)
         self._callback = callback
 
     def start(self):

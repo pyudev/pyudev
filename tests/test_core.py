@@ -15,22 +15,17 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-# isort: STDLIB
+
 import random
 import syslog
 
-# isort: FIRSTPARTY
+from pyudev import udev_version
 from tests._constants import _UDEV_TEST
 from tests.utils import is_unicode_string
 
-# isort: LOCAL
-from pyudev import udev_version
-
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 

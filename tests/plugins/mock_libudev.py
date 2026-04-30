@@ -25,19 +25,15 @@ This plugin adds :func:`libudev_list()` to the :mod:`pytest` namespace.
 
 """
 
-# isort: STDLIB
 from collections import namedtuple
 from contextlib import contextmanager
 from operator import attrgetter
 
-# isort: THIRDPARTY
 import pytest
 
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 Node = namedtuple("Node", "name value next")

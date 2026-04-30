@@ -23,13 +23,11 @@ Device class implementation of :mod:`pyudev`.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import collections
 import os
 import re
 from datetime import timedelta
 
-# isort: LOCAL
 from pyudev._errors import (
     DeviceNotFoundAtPathError,
     DeviceNotFoundByFileError,
@@ -46,8 +44,6 @@ from pyudev._util import (
     string_to_bool,
     udev_list_iterate,
 )
-
-# pylint: disable=too-many-lines
 
 
 class Devices:
@@ -100,7 +96,7 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_syspath(  # pylint: disable=protected-access
+        device = context._libudev.udev_device_new_from_syspath(
             context, ensure_byte_string(sys_path)
         )
         if not device:
@@ -131,7 +127,7 @@ class Devices:
         .. versionadded:: 0.18
         """
         sys_name = sys_name.replace("/", "!")
-        device = context._libudev.udev_device_new_from_subsystem_sysname(  # pylint: disable=protected-access
+        device = context._libudev.udev_device_new_from_subsystem_sysname(
             context, ensure_byte_string(subsystem), ensure_byte_string(sys_name)
         )
         if not device:
@@ -175,7 +171,7 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_devnum(  # pylint: disable=protected-access
+        device = context._libudev.udev_device_new_from_devnum(
             context, ensure_byte_string(typ[0]), number
         )
         if not device:
@@ -295,15 +291,13 @@ class Devices:
 
         .. versionadded:: 0.18
         """
-        device = context._libudev.udev_device_new_from_environment(  # pylint: disable=protected-access
-            context
-        )
+        device = context._libudev.udev_device_new_from_environment(context)
         if not device:
             raise DeviceNotFoundInEnvironmentError()
         return Device(context, device)
 
     @classmethod
-    def METHODS(cls):  # pylint: disable=invalid-name
+    def METHODS(cls):
         """
         Return methods that obtain a :class:`Device` from a variety of
         different data.
@@ -323,7 +317,6 @@ class Devices:
 
 
 class Device(collections.abc.Mapping):
-    # pylint: disable=too-many-public-methods
     """
     A single device with attached attributes and properties.
 
@@ -363,8 +356,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_path` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -385,8 +378,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_sys_path` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -402,8 +395,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_name` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -419,8 +412,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_number` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -436,8 +429,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_device_file` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -453,8 +446,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.18
            Use :class:`Devices.from_environment` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use equivalent Devices method instead.",
@@ -575,8 +568,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.16
            Will be removed in 1.0. Use :attr:`ancestors` instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.ancestors instead.",
@@ -918,8 +911,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -935,8 +928,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -959,8 +952,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Access properties with Device.properties.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Access properties with Device.properties.",
@@ -984,8 +977,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Use Device.properties.asint() instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.properties.asint instead.",
@@ -1013,8 +1006,8 @@ class Device(collections.abc.Mapping):
         .. deprecated:: 0.21
            Will be removed in 1.0. Use Device.properties.asbool() instead.
         """
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use Device.properties.asbool instead.",
@@ -1260,10 +1253,8 @@ class Tags(collections.abc.Iterable, collections.abc.Container):
     Subclasses the ``Container`` and the ``Iterable`` ABC.
     """
 
-    # pylint: disable=too-few-public-methods
-
     def __init__(self, device):
-        # pylint: disable=super-init-not-called
+
         collections.abc.Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev

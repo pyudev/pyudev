@@ -25,7 +25,6 @@ Parses the udev device database from :program:`udevadm`.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 import collections
 import errno
 import os
@@ -288,7 +287,7 @@ class DeviceDatabase(collections.abc.Iterable, collections.abc.Sized):
     _db = None
 
     @classmethod
-    def db(cls, renew=False):  # pylint: disable=invalid-name
+    def db(cls, renew=False):
         """
         Get a database object.
 

@@ -20,15 +20,12 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 import os
 import stat
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import assume, given, settings
 
-# isort: LOCAL
 from pyudev import (
     DeviceNotFoundAtPathError,
     DeviceNotFoundByFileError,
@@ -52,8 +49,6 @@ class TestDevices:
     """
     Test ``Devices`` methods.
     """
-
-    # pylint: disable=invalid-name
 
     @given(_CONTEXT_STRATEGY, device_strategy())
     @settings(max_examples=5)

@@ -29,12 +29,10 @@ The Pipe class wraps the chosen implementation.
 .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import fcntl
 import os
 from functools import partial
 
-# isort: LOCAL
 from pyudev._ctypeslib.libc import ERROR_CHECKERS, FD_PAIR, SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
 
@@ -84,7 +82,7 @@ def _get_pipe2_implementation():
 
     Return a function implementing ``pipe2``."""
     if hasattr(os, "pipe2"):
-        return os.pipe2  # pylint: disable=no-member
+        return os.pipe2
     try:
         libc = load_ctypes_library("libc", SIGNATURES, ERROR_CHECKERS)
         return (
@@ -97,7 +95,7 @@ def _get_pipe2_implementation():
 _PIPE2 = _get_pipe2_implementation()
 
 
-def set_fd_flag(fd, flag):  # pylint: disable=invalid-name
+def set_fd_flag(fd, flag):
     """Set a flag on a file descriptor.
 
     ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.
@@ -107,7 +105,7 @@ def set_fd_flag(fd, flag):  # pylint: disable=invalid-name
     fcntl.fcntl(fd, fcntl.F_SETFD, flags | flag)
 
 
-def set_fd_status_flag(fd, flag):  # pylint: disable=invalid-name
+def set_fd_status_flag(fd, flag):
     """Set a status flag on a file descriptor.
 
     ``fd`` is the file descriptor or file object, ``flag`` the flag as integer.

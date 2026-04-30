@@ -15,27 +15,21 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-# isort: STDLIB
+
 import random
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 from select import select
 
-# isort: THIRDPARTY
 import pytest
 
-# isort: FIRSTPARTY
+from pyudev import Devices, Monitor, MonitorObserver
 from tests._constants import _UDEV_TEST
 from tests.utils.udev import DeviceDatabase
 
-# isort: LOCAL
-from pyudev import Devices, Monitor, MonitorObserver
-
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 
@@ -73,7 +67,7 @@ class TestMonitor:
     def test_from_netlink_invalid_source(self, context):
         with pytest.raises(ValueError) as exc_info:
             Monitor.from_netlink(context, source="invalid_source")
-        message = 'Invalid source: {0!r}. Must be one of "udev" ' 'or "kernel"'.format(
+        message = 'Invalid source: {0!r}. Must be one of "udev" or "kernel"'.format(
             "invalid_source"
         )
         assert str(exc_info.value) == message

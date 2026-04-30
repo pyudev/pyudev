@@ -20,18 +20,15 @@ Tests methods belonging to Device class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 import gc
 import operator
 import os
 import re
 from datetime import timedelta
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import given, settings, strategies
 
-# isort: LOCAL
 from pyudev import Device, Devices
 from pyudev.device import Attributes, Tags
 
@@ -39,10 +36,8 @@ from .._constants import _CONTEXT, _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _U
 from ..utils import is_unicode_string
 
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 
@@ -352,16 +347,12 @@ class TestDevice:
         device = Devices.from_path(a_context, device_datum.device_path)
         for prop in device_datum.properties:
             if prop == "DEVLINKS":
-                assert sorted(
-                    device.properties[prop].split(),
-                ) == sorted(
-                    device_datum.properties[prop].split(),
+                assert sorted(device.properties[prop].split()) == sorted(
+                    device_datum.properties[prop].split()
                 )
             elif prop == "TAGS":
-                assert sorted(
-                    device.properties[prop].split(":"),
-                ) == sorted(
-                    device_datum.properties[prop].split(":"),
+                assert sorted(device.properties[prop].split(":")) == sorted(
+                    device_datum.properties[prop].split(":")
                 )
             else:
                 # Do not test equality of device properties with udevadm oracle.
@@ -389,7 +380,6 @@ class TestDevice:
     @settings(max_examples=5)
     def test_getitem_nonexisting(self, a_device):
         with pytest.raises(KeyError) as excinfo:
-            # pylint: disable=pointless-statement
             a_device.properties["a non-existing property"]
         assert str(excinfo.value) == repr("a non-existing property")
 
@@ -439,13 +429,13 @@ class TestDevice:
         assert a_device == a_device.device_path
         assert a_device == a_device
         assert a_device.parent == a_device.parent
-        # pylint: disable=superfluous-parens
+
         assert not (a_device == a_device.parent)
 
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
     def test_inequality(self, a_device):
-        # pylint: disable=superfluous-parens
+
         assert not (a_device != a_device.device_path)
         assert not (a_device != a_device)
         assert not (a_device.parent != a_device.parent)

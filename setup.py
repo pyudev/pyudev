@@ -20,7 +20,6 @@
 setup.py
 """
 
-# isort: THIRDPARTY
 import setuptools
 
 setuptools.setup()

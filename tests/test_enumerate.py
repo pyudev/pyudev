@@ -15,7 +15,7 @@
 # along with this library; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-# isort: THIRDPARTY
+
 from hypothesis import given, settings, strategies
 
 from ._constants import (
@@ -31,10 +31,8 @@ from ._constants import (
 from .utils import failed_health_check_wrapper
 
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 
@@ -190,9 +188,11 @@ class TestEnumeratorMatchCombinations:
         _test_direct_and_complement(
             context,
             devices,
-            lambda d: d.subsystem == subsystem
-            and d.sys_name == sysname
-            and d.properties.get(prop_name) == prop_value,
+            lambda d: (
+                d.subsystem == subsystem
+                and d.sys_name == sysname
+                and d.properties.get(prop_name) == prop_value
+            ),
         )
 
 

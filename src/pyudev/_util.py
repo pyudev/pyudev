@@ -23,7 +23,6 @@ Internal utilities
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import errno
 import os
 import stat
@@ -143,8 +142,8 @@ def eintr_retry_call(func, *args, **kwargs):
     """
 
     # select.error inherits from Exception instead of OSError in Python 2
-    # isort: STDLIB
-    import select  # pylint: disable=import-outside-toplevel
+
+    import select  # noqa: PLC0415
 
     while True:
         try:

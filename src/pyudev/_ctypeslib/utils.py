@@ -23,7 +23,6 @@ Utilities for loading ctypeslib.
 .. moduleauthor::  Anne Mulhern  <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 from ctypes import CDLL
 from ctypes.util import find_library
 

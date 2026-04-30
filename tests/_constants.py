@@ -23,11 +23,9 @@ Tests for devices.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import strategies
 
-# isort: LOCAL
 from pyudev import Context, DeviceNotFoundError, Devices
 
 from .utils import udev
@@ -107,9 +105,11 @@ _ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
 
 if _UDEV_VERSION <= 230:
     _ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(
-        lambda p: not p[1].startswith(b"\\")
-        and not p[1][-1:] == b" "
-        and not p[1].startswith(b"[")
+        lambda p: (
+            not p[1].startswith(b"\\")
+            and not p[1][-1:] == b" "
+            and not p[1].startswith(b"[")
+        )
     )
 
 # the tags object for a given device
@@ -121,7 +121,7 @@ _TAG_STRATEGY = _TAGS_STRATEGY.filter(lambda t: t != []).flatmap(
 )
 
 
-def _UDEV_TEST(version, node=None):  # pylint: disable=invalid-name
+def _UDEV_TEST(version, node=None):
     fmt_str = "%s: udev version must be at least %s, is %s"
     return pytest.mark.skipif(
         _UDEV_VERSION < version, reason=fmt_str % (node, version, _UDEV_VERSION)

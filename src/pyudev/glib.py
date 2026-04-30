@@ -32,17 +32,14 @@ must be available when importing this module. PyGtk is not required.
 
 """
 
-# isort: THIRDPARTY
-from gi.repository import GLib, GObject  # pylint: disable=import-error
+from gi.repository import GLib, GObject
 
 
 class _ObserverMixin:
     """Mixin to provide observer behavior to the old and the new API."""
 
-    # pylint: disable=too-few-public-methods
-
     def _setup_observer(self, monitor):
-        # pylint: disable=attribute-defined-outside-init
+
         self.monitor = monitor
         self.event_source = None
         self.enabled = True
@@ -62,8 +59,6 @@ class _ObserverMixin:
     @enabled.setter
     def enabled(self, value):
         if value and self.event_source is None:
-            # pylint: disable=attribute-defined-outside-init
-            # pylint: disable=no-member
             self.event_source = GLib.io_add_watch(
                 self.monitor,
                 GLib.PRIORITY_DEFAULT,
@@ -71,12 +66,10 @@ class _ObserverMixin:
                 self._process_udev_event,
             )
         elif not value and self.event_source is not None:
-            # pylint: disable=no-member
             GLib.source_remove(self.event_source)
 
     def _process_udev_event(self, source, condition):
-        # pylint: disable=unused-argument
-        # pylint: disable=no-member
+
         if condition == GLib.IO_IN:
             device = self.monitor.poll(timeout=0)
             if device is not None:
@@ -88,7 +81,6 @@ class _ObserverMixin:
 
 
 class MonitorObserver(GObject.Object, _ObserverMixin):
-    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`gi.repository.GLib`
     mainloop.
@@ -121,7 +113,7 @@ class MonitorObserver(GObject.Object, _ObserverMixin):
             GObject.SIGNAL_RUN_LAST,
             GObject.TYPE_NONE,
             (GObject.TYPE_PYOBJECT,),
-        ),
+        )
     }
 
     def __init__(self, monitor):
@@ -133,7 +125,6 @@ GObject.type_register(MonitorObserver)
 
 
 class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
-    # pylint: disable=too-few-public-methods
     """
     An observer for device events integrating into the :mod:`gi.repository.GLib`
     mainloop.
@@ -180,8 +171,8 @@ class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
     def __init__(self, monitor):
         GObject.Object.__init__(self)
         self._setup_observer(monitor)
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.glib.MonitorObserver instead.",
