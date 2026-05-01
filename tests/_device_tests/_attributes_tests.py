@@ -20,15 +20,12 @@ Tests methods belonging to Attributes class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 import os
 import stat
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import given, settings, strategies
 
-# isort: LOCAL
 from pyudev import Devices
 
 from ..utils import is_unicode_string
@@ -73,7 +70,7 @@ class TestAttributes:
         """
         Test that the attributes object can not be iterated over.
         """
-        # pylint: disable=pointless-statement
+
         with pytest.raises(TypeError):
             "key" in a_device.attributes
         with pytest.raises(TypeError):

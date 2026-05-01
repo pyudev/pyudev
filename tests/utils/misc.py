@@ -23,10 +23,8 @@ Miscellaneous useful methods.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: STDLIB
 from functools import wraps
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis.core import FailedHealthCheck
 

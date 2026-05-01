@@ -28,15 +28,12 @@ mainloop by turing device events into wx events.
 
 """
 
-# isort: THIRDPARTY
-from wx import EvtHandler, PostEvent  # pylint: disable=import-error
-from wx.lib.newevent import NewEvent  # pylint: disable=import-error, no-name-in-module
+from wx import EvtHandler, PostEvent
+from wx.lib.newevent import NewEvent
 
-# isort: LOCAL
-# for some reason, pylint thinks pyudev is a third party import
-import pyudev  # pylint: disable=wrong-import-order
+import pyudev
 
-DeviceEvent, EVT_DEVICE_EVENT = NewEvent()  # pylint: disable=invalid-name
+DeviceEvent, EVT_DEVICE_EVENT = NewEvent()
 
 
 class MonitorObserver(EvtHandler):
@@ -112,10 +109,10 @@ class MonitorObserver(EvtHandler):
         PostEvent(self, DeviceEvent(device=device))
 
 
-DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()  # pylint: disable=invalid-name
-DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()  # pylint: disable=invalid-name
-DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()  # pylint: disable=invalid-name
-DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()  # pylint: disable=invalid-name
+DeviceAddedEvent, EVT_DEVICE_ADDED = NewEvent()
+DeviceRemovedEvent, EVT_DEVICE_REMOVED = NewEvent()
+DeviceChangedEvent, EVT_DEVICE_CHANGED = NewEvent()
+DeviceMovedEvent, EVT_DEVICE_MOVED = NewEvent()
 
 
 class WxUDevMonitorObserver(MonitorObserver):
@@ -134,8 +131,8 @@ class WxUDevMonitorObserver(MonitorObserver):
 
     def __init__(self, monitor):
         MonitorObserver.__init__(self, monitor)
-        # isort: STDLIB
-        import warnings  # pylint: disable=import-outside-toplevel
+
+        import warnings  # noqa: PLC0415
 
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.wx.MonitorObserver instead.",

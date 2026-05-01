@@ -21,10 +21,8 @@ plugins.travis
 Support for Travis CI.
 """
 
-# isort: STDLIB
 import os
 
-# isort: THIRDPARTY
 import pytest
 
 

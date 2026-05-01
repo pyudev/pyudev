@@ -20,21 +20,17 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-# isort: THIRDPARTY
 import pytest
 from hypothesis import given, settings, strategies
 
-# isort: LOCAL
 from pyudev import Devices
 
 from ..utils import is_unicode_string
 from ._device_tests import _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
 
 try:
-    # isort: STDLIB
     from unittest import mock
 except ImportError:
-    # isort: THIRDPARTY
     import mock
 
 

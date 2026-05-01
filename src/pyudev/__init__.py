@@ -32,7 +32,6 @@ into the event loop of various GUI toolkits.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: LOCAL
 from pyudev._errors import (
     DeviceNotFoundAtPathError,
     DeviceNotFoundByFileError,

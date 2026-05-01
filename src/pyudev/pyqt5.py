@@ -29,12 +29,10 @@ module.
 .. moduleauthor::  Tobias Gehring  <mail@tobiasgehring.de>
 """
 
-# isort: THIRDPARTY
-from PyQt5 import QtCore  # pylint: disable=import-error
+from PyQt5 import QtCore
 
 from ._qt_base import MonitorObserverGenerator
 
-# pylint: disable=invalid-name
 MonitorObserver = MonitorObserverGenerator.make_monitor_observer(
     QtCore.QObject, QtCore.pyqtSignal, QtCore.QSocketNotifier
 )

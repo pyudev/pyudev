@@ -50,13 +50,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - dependencies: black python3-isort
+          - dependencies: ruff
             task: fmt-travis
           - dependencies: yamllint
             task: yamllint
           - dependencies: python python3-build twine
             task: package
-          - dependencies: pylint python3-setuptools
+          - dependencies: ruff
             task: lint
     runs-on: ubuntu-latest
     container: fedora:43  # CURRENT DEVELOPMENT ENVIRONMENT

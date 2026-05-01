@@ -23,7 +23,6 @@ Core types and functions of :mod:`pyudev`.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: LOCAL
 from pyudev._ctypeslib.libudev import ERROR_CHECKERS, SIGNATURES
 from pyudev._ctypeslib.utils import load_ctypes_library
 from pyudev._errors import DeviceNotFoundAtPathError

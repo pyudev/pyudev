@@ -23,10 +23,8 @@ Operating system interface for pyudev.
 .. moduleauthor:: Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-# isort: STDLIB
 import select
 
-# isort: LOCAL
 from pyudev._util import eintr_retry_call
 
 
@@ -55,7 +53,7 @@ class Poll:
 
         """
         notifier = eintr_retry_call(select.poll)
-        for fd, event in events:  # pylint: disable=invalid-name
+        for fd, event in events:
             mask = cls._EVENT_TO_MASK.get(event)
             if not mask:
                 raise ValueError(f"Unknown event type: {repr(event)}")
@@ -99,7 +97,7 @@ class Poll:
         Yield all parsed events.
 
         """
-        for fd, event_mask in events:  # pylint: disable=invalid-name
+        for fd, event_mask in events:
             if self._has_event(event_mask, select.POLLNVAL):
                 raise IOError(f"File descriptor not open: {repr(fd)}")
             if self._has_event(event_mask, select.POLLERR):
