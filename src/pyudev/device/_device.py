@@ -778,7 +778,7 @@ class Device(collections.abc.Mapping):
         UDev can create symlinks to the original device node (see
         :attr:`device_node`) inside the device directory.  This is often
         used to assign a constant, fixed device node to devices like
-        removeable media, which technically do not have a constant device
+        removable media, which technically do not have a constant device
         node, or to map a single device into multiple device hierarchies.
         The property provides access to all such symbolic links, which were
         created by UDev for this device.

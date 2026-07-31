@@ -79,7 +79,7 @@ class TestDevices:
 
     def test_from_sys_path_device_not_found(self):
         """
-        Verify that a non-existant sys_path causes an exception.
+        Verify that a non-existent sys_path causes an exception.
         """
         sys_path = "there_will_not_be_such_a_device"
         with pytest.raises(DeviceNotFoundAtPathError) as exc_info:
@@ -101,7 +101,7 @@ class TestDevices:
     @settings(max_examples=5)
     def test_from_name_no_device_in_existing_subsystem(self, a_context, subsys):
         """
-        Verify that a real subsystem and non-existant name causes an
+        Verify that a real subsystem and non-existent name causes an
         exception to be raised.
         """
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
@@ -112,7 +112,7 @@ class TestDevices:
 
     def test_from_name_nonexisting_subsystem(self):
         """
-        Verify that a non-existant subsystem causes an exception.
+        Verify that a non-existent subsystem causes an exception.
         """
         with pytest.raises(DeviceNotFoundByNameError) as exc_info:
             Devices.from_name(_CONTEXT, "no_such_subsystem", "foobar")
@@ -165,7 +165,7 @@ class TestDevices:
 
     def test_from_device_number_invalid_type(self):
         """
-        Verify that a non-existant subsystem always results in an exception.
+        Verify that a non-existent subsystem always results in an exception.
         """
         with pytest.raises(DeviceNotFoundByNumberError):
             Devices.from_device_number(_CONTEXT, "foobar", 100)

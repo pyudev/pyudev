@@ -64,7 +64,7 @@ class TestTags:
             func = a_device._libudev.udev_device_get_tags_list_entry
             func.assert_called_once_with(a_device)
 
-    @_UDEV_TEST(172, "test_contans_mock")
+    @_UDEV_TEST(172, "test_contains_mock")
     @given(strategies.sampled_from(_DEVICES))
     @settings(max_examples=5)
     def test_contains_mock(self, a_device):
