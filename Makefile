@@ -49,3 +49,12 @@ fmt-travis:
 .PHONY: yamllint
 yamllint:
 	yamllint --strict .github/workflows/*.yml
+
+.PHONY: check-typos
+check-typos:
+	typos
+
+.PHONY: fix-typos
+fix-typos:
+	typos -w
+
