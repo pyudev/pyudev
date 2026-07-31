@@ -188,7 +188,7 @@ gives you access to these attributes, but generally you should not need these.
 Use the device properties whenever possible.
 
 
-Examing the device hierarchy
+Examining the device hierarchy
 ----------------------------
 
 A :class:`Device` is part of a device hierarchy, and can have a

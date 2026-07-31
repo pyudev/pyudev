@@ -119,7 +119,7 @@ class Pipe:
     """A unix pipe.
 
     A pipe object provides two file objects: :attr:`source` is a readable file
-    object, and :attr:`sink` a writeable.  Bytes written to :attr:`sink` appear
+    object, and :attr:`sink` a writable.  Bytes written to :attr:`sink` appear
     at :attr:`source`.
 
     Open a pipe with :meth:`open()`.
@@ -138,7 +138,7 @@ class Pipe:
         """Create a new pipe object from the given file descriptors.
 
         ``source_fd`` is a file descriptor for the readable side of the pipe,
-        ``sink_fd`` is a file descriptor for the writeable side."""
+        ``sink_fd`` is a file descriptor for the writable side."""
         self.source = os.fdopen(source_fd, "rb", 0)
         self.sink = os.fdopen(sink_fd, "wb", 0)
 

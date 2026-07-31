@@ -175,7 +175,7 @@ class TestDevice:
     @settings(max_examples=5)
     def test_sys_number(self, a_device):
         match = re.search(r"\d+$", a_device.sys_name)
-        # filter out devices with completely nummeric names (first character
+        # filter out devices with completely numeric names (first character
         # doesn't count according to the implementation of libudev)
         if match and match.start() > 1:
             assert a_device.sys_number == match.group(0)

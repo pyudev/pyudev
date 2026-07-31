@@ -569,7 +569,7 @@ class MonitorObserver(Thread):
            This method can safely be called from the observer thread. In this
            case it is equivalent to :meth:`send_stop()`.
 
-        Send a stop signal to the backgroud (see :meth:`send_stop`), and waits
+        Send a stop signal to the background (see :meth:`send_stop`), and waits
         for the background thread to exit (see :meth:`~threading.Thread.join`)
         if the current thread is *not* the observer thread.
 

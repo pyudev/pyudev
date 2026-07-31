@@ -53,7 +53,7 @@ class TestAttributes:
     @settings(max_examples=5)
     def test_getitem_nonexisting(self, a_device):
         """
-        Test behavior when corresponding value is non-existant.
+        Test behavior when corresponding value is non-existent.
         """
         not_key = "a non-existing attribute"
         assert a_device.attributes.get(not_key) is None
