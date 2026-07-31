@@ -55,7 +55,7 @@ def device_strategy(require_existing=True, filter_func=lambda x: True):
     The devices are filtered before being sampled to reduce the number
     of health failures.
 
-    :param bool require_existing: at the very last, verify existance
+    :param bool require_existing: at the very last, verify existence
     :param filter_func: a function to be used as a filter
     :type filter_func: Device -> bool
     """

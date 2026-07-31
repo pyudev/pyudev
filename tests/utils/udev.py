@@ -209,7 +209,7 @@ class DeviceData:
     @property
     def exists(self):
         """
-        Whether this device has some real existance on machine.
+        Whether this device has some real existence on machine.
 
         :returns: True if the device does exist, otherwise False.
         :rtype: bool
