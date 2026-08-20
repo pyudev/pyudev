@@ -1,14 +1,12 @@
 ---
 name: pyudev CI
 
-# yamllint disable-line rule:truthy
 on:
   push:
     branches: [master]
   pull_request:
     branches: [master]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 
@@ -52,8 +50,6 @@ jobs:
         include:
           - dependencies: ruff
             task: fmt-travis
-          - dependencies: yamllint
-            task: yamllint
           - dependencies: python python3-build twine
             task: package
           - dependencies: ruff
@@ -72,20 +68,7 @@ jobs:
       - name: Run test
         run: make -f Makefile ${{ matrix.task }}
 
-  rust_dependent_checks:
-    runs-on: ubuntu-latest
-    container: fedora:43  # CURRENT DEVELOPMENT ENVIRONMENT
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-      - name: Install dependencies
-        run: dnf install -y clang curl make
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          components: cargo
-      - uses: baptiste0928/cargo-install@v3
-        with:
-          crate: typos-cli
-      - name: Run test
-        run: make -f Makefile check-typos
+  general_checks:
+    uses: stratis-storage/github-actions/.github/workflows/reusable_general.yml@master
+    with:
+      fedora-container-image-number: 43  # CURRENT DEVELOPMENT ENVIRONMENT
