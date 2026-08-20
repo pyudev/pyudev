@@ -49,6 +49,7 @@ fmt-travis:
 .PHONY: yamllint
 yamllint:
 	yamllint --strict .github/workflows/*.yml
+	yamllint --strict .yamllint.yaml
 
 .PHONY: check-typos
 check-typos:
