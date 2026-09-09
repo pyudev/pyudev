@@ -1,3 +1,32 @@
+0.24.5
+======
+Recommended development release: Fedora 44
+
+- Remove PyQt4 support:
+  https://github.com/pyudev/pyudev/issues/533
+  https://github.com/pyudev/pyudev/pull/534
+
+- docs: clarify binary nature of sysfs attributes:
+  https://github.com/pyudev/pyudev/pull/542
+
+- Remove last vestiges of Python 2:
+  https://github.com/pyudev/pyudev/pull/545
+  https://github.com/pyudev/pyudev/pull/544
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/547
+  https://github.com/pyudev/pyudev/pull/546
+  https://github.com/pyudev/pyudev/pull/541
+  https://github.com/pyudev/pyudev/pull/540
+  https://github.com/pyudev/pyudev/pull/539
+  https://github.com/pyudev/pyudev/pull/538
+  https://github.com/pyudev/pyudev/pull/537
+  https://github.com/pyudev/pyudev/pull/536
+  https://github.com/pyudev/pyudev/pull/535
+  https://github.com/pyudev/pyudev/pull/531
+  https://github.com/pyudev/pyudev/pull/530
+
+
 0.24.4
 ======
 Recommended development release: Fedora 41
