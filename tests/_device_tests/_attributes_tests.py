@@ -93,9 +93,9 @@ class TestAttributes:
         Test that integer result is an int or ValueError raised.
         """
         device = Devices.from_path(a_context, device_datum.device_path)
-        for key, value in device_datum.attributes.items():
+        for key, val in device_datum.attributes.items():
             try:
-                value = int(value)
+                value = int(val)
             except ValueError:
                 try:
                     device.attributes.asint(key)

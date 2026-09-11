@@ -387,9 +387,9 @@ class TestDevice:
     @settings(max_examples=5)
     def test_asint(self, a_context, device_datum):
         device = Devices.from_path(a_context, device_datum.device_path)
-        for prop, value in device_datum.properties.items():
+        for prop, val in device_datum.properties.items():
             try:
-                value = int(value)
+                value = int(val)
             except ValueError:
                 with pytest.raises(ValueError):
                     device.properties.asint(prop)
