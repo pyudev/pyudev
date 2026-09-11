@@ -140,8 +140,8 @@ object.  For instance, you can directly query the :attr:`device_node` and the
 /dev/sda2 (partition)
 /dev/sda3 (partition)
 
-For other udev properties, :class:`Device` provides a mapping interface
-to access the device properties by means of its properties attribute.
+For other udev properties, :class:Device exposes them as object attributes.
+You can also access them via the properties mapping.
 
 >>> for device in context.list_devices(subsystem='block'):
 ...    print('{0} ({1})'.format(device.properties['DEVNAME'], device.properties['DEVTYPE']))
