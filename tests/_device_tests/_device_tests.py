@@ -427,7 +427,7 @@ class TestDevice:
     @settings(max_examples=5)
     def test_equality(self, a_device):
         assert a_device == a_device.device_path
-        assert a_device == a_device
+        assert a_device == a_device  # noqa: PLR0124
         assert a_device.parent == a_device.parent
 
         assert not (a_device == a_device.parent)
@@ -437,7 +437,7 @@ class TestDevice:
     def test_inequality(self, a_device):
 
         assert not (a_device != a_device.device_path)
-        assert not (a_device != a_device)
+        assert not (a_device != a_device)  # noqa: PLR0124
         assert not (a_device.parent != a_device.parent)
         assert a_device != a_device.parent
 

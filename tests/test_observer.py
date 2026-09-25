@@ -150,7 +150,7 @@ class TestGlibObserver(ObserverTestBase):
 
     def create_observer(self, monitor):
 
-        from pyudev.glib import MonitorObserver
+        from pyudev.glib import MonitorObserver  # noqa: PLC0415
 
         self.observer = MonitorObserver(monitor)
 
@@ -189,13 +189,13 @@ class TestWxObserver(ObserverTestBase):
 
     def create_observer(self, monitor):
 
-        from pyudev import wx
+        from pyudev import wx  # noqa: PLC0415
 
         self.observer = wx.MonitorObserver(monitor)
 
     def connect_signal(self, callback):
 
-        from pyudev.wx import EVT_DEVICE_EVENT
+        from pyudev.wx import EVT_DEVICE_EVENT  # noqa: PLC0415
 
         def _wrapper(event):
             return callback(event.device)

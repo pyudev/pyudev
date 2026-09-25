@@ -168,7 +168,7 @@ class TestDeprecatedGlibObserver(DeprecatedObserverTestBase):
 
     def create_observer(self, monitor):
 
-        from pyudev.glib import GUDevMonitorObserver
+        from pyudev.glib import GUDevMonitorObserver  # noqa: PLC0415
 
         self.observer = GUDevMonitorObserver(monitor)
 
@@ -210,7 +210,7 @@ class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
 
     def create_observer(self, monitor):
 
-        from pyudev import wx
+        from pyudev import wx  # noqa: PLC0415
 
         self.observer = wx.WxUDevMonitorObserver(monitor)
         self.action_event_map = {
@@ -222,7 +222,7 @@ class TestDeprecatedWxObserver(DeprecatedObserverTestBase):
 
     def connect_signal(self, callback, action=None):
         if action is None:
-            from pyudev.wx import EVT_DEVICE_EVENT
+            from pyudev.wx import EVT_DEVICE_EVENT  # noqa: PLC0415
 
             def _wrapper(event):
                 return callback(event.action, event.device)
