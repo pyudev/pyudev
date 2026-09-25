@@ -1,0 +1,23 @@
+---
+name: pyudev dummy CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dummy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run dummy test
+        run: echo "I exist to be Required in Github branch protection rules"
