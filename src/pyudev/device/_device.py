@@ -23,9 +23,9 @@ Device class implementation of :mod:`pyudev`.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-import collections
 import os
 import re
+from collections.abc import Container, Iterable, Mapping
 from datetime import timedelta
 
 from pyudev._errors import (
@@ -316,7 +316,7 @@ class Devices:
         ]
 
 
-class Device(collections.abc.Mapping):
+class Device(Mapping):
     """
     A single device with attached attributes and properties.
 
@@ -457,7 +457,7 @@ class Device(collections.abc.Mapping):
         return Devices.from_environment(context)
 
     def __init__(self, context, _device):
-        collections.abc.Mapping.__init__(self)
+        Mapping.__init__(self)
         self.context = context
         self._as_parameter_ = _device
         self._libudev = context._libudev
@@ -1042,7 +1042,7 @@ class Device(collections.abc.Mapping):
         raise TypeError("Device not orderable")
 
 
-class Properties(collections.abc.Mapping):
+class Properties(Mapping):
     """
     udev properties :class:`Device` objects.
 
@@ -1050,7 +1050,7 @@ class Properties(collections.abc.Mapping):
     """
 
     def __init__(self, device):
-        collections.abc.Mapping.__init__(self)
+        Mapping.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
@@ -1246,7 +1246,7 @@ class Attributes:
         )
 
 
-class Tags(collections.abc.Iterable, collections.abc.Container):
+class Tags(Iterable, Container):
     """
     A iterable over :class:`Device` tags.
 
@@ -1255,7 +1255,7 @@ class Tags(collections.abc.Iterable, collections.abc.Container):
 
     def __init__(self, device):
 
-        collections.abc.Iterable.__init__(self)
+        Iterable.__init__(self)
         self.device = device
         self._libudev = device._libudev
 
