@@ -23,4 +23,5 @@ Extras to compensate for deficiencies in python os module.
 .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import pipe, poll
+from . import pipe as pipe
+from . import poll as poll
