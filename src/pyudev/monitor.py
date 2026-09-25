@@ -225,7 +225,9 @@ class Monitor:
         import warnings  # noqa: PLC0415
 
         warnings.warn(
-            "Will be removed in 1.0. Use Monitor.start() instead.", DeprecationWarning
+            "Will be removed in 1.0. Use Monitor.start() instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         self.start()
 
@@ -389,7 +391,9 @@ class Monitor:
         import warnings  # noqa: PLC0415
 
         warnings.warn(
-            "Will be removed in 1.0. Use Monitor.poll() instead.", DeprecationWarning
+            "Will be removed in 1.0. Use Monitor.poll() instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
         device = self.poll()
         return device.action, device
@@ -420,6 +424,7 @@ class Monitor:
             '"poll()" instead, or monitor asynchronously with '
             '"MonitorObserver".',
             DeprecationWarning,
+            stacklevel=2,
         )
         self.start()
         while True:
@@ -509,6 +514,7 @@ class MonitorObserver(Thread):
                 '"event_handler" argument will be removed in 1.0. '
                 "Use Monitor.poll() instead.",
                 DeprecationWarning,
+                stacklevel=2,
             )
             callback = lambda d: event_handler(d.action, d)
         self._callback = callback

@@ -171,6 +171,7 @@ class GUDevMonitorObserver(GObject.Object, _ObserverMixin):
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.glib.MonitorObserver instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
     def _emit_event(self, device):

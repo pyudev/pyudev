@@ -89,6 +89,7 @@ class QUDevMonitorObserverMixin(MonitorObserverMixin):
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.pyqt5.MonitorObserver instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
     def _emit_event(self, device):
