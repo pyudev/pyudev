@@ -25,12 +25,12 @@ Parses the udev device database from :program:`udevadm`.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
-import collections
 import errno
 import os
 import re
 import subprocess
 import sys
+from collections.abc import Iterable, Sized
 
 
 class UDevAdm:
@@ -272,7 +272,7 @@ class DeviceData:
         return 0 if device_node is None else os.stat(device_node).st_rdev
 
 
-class DeviceDatabase(collections.abc.Iterable, collections.abc.Sized):
+class DeviceDatabase(Iterable, Sized):
     """
     The udev device database.
 
