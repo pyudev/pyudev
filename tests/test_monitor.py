@@ -19,7 +19,6 @@
 import random
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from select import select
 
 import pytest
 

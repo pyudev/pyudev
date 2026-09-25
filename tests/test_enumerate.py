@@ -16,15 +16,13 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
-from hypothesis import given, settings, strategies
+from hypothesis import given, settings
 
 from ._constants import (
-    _ATTRIBUTE_STRATEGY,
     _CONTEXT_STRATEGY,
     _MATCH_PROPERTY_STRATEGY,
     _SUBSYSTEM_STRATEGY,
     _SYSNAME_STRATEGY,
-    _TAG_STRATEGY,
     _UDEV_TEST,
     device_strategy,
 )
