@@ -262,8 +262,9 @@ class TestEnumeratorMatchMethod:
         with mock.patch.object(
             enumerator, "match_property", autospec=True
         ) as match_property:
-            enumerator.match(eggs=mock.sentinel.eggs, spam=mock.sentinel.spam)
-            assert match_property.call_count == 2
+            match_args = {"eggs": mock.sentinel.eggs, "spam": mock.sentinel.spam}
+            enumerator.match(**match_args)
+            assert match_property.call_count == len(match_args)
             posargs = [args for args, _ in match_property.call_args_list]
             assert ("spam", mock.sentinel.spam) in posargs
             assert ("eggs", mock.sentinel.eggs) in posargs
