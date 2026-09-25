@@ -77,7 +77,7 @@ class DeprecatedObserverTestBase:
 
     def stop_when_done(self, *args, **kwargs):
         self.no_emitted_signals += 1
-        if self.no_emitted_signals >= 2:
+        if self.no_emitted_signals >= 2:  # noqa: PLR2004
             self.stop_event_loop()
 
     def prepare_test(self, monitor):

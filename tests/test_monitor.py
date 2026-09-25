@@ -249,12 +249,12 @@ class TestMonitor:
 class TestMonitorObserver:
     def callback(self, device):
         self.events.append(device)
-        if len(self.events) >= 2:
+        if len(self.events) >= 2:  # noqa: PLR2004
             self.observer.send_stop()
 
     def event_handler(self, action, device):
         self.events.append((action, device))
-        if len(self.events) >= 2:
+        if len(self.events) >= 2:  # noqa: PLR2004
             self.observer.send_stop()
 
     def make_observer(self, monitor, use_deprecated=False):
