@@ -146,7 +146,7 @@ def eintr_retry_call(func, *args, **kwargs):
     while True:
         try:
             return func(*args, **kwargs)
-        except (OSError, IOError, select.error) as err:
+        except (OSError, select.error) as err:
             if err.errno == errno.EINTR:
                 continue
             raise
