@@ -243,8 +243,9 @@ class TestDevice:
         funcname = "udev_device_get_usec_since_initialized"
         spec = lambda d: None
         with mock.patch.object(a_device._libudev, funcname, autospec=spec) as func:
-            func.return_value = 100
-            assert a_device.time_since_initialized.microseconds == 100
+            sentinel_time_value = 100
+            func.return_value = sentinel_time_value
+            assert a_device.time_since_initialized.microseconds == sentinel_time_value
             func.assert_called_once_with(a_device)
 
     @given(_CONTEXT_STRATEGY, strategies.sampled_from(_DEVICE_DATA))
