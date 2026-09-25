@@ -39,7 +39,7 @@ def test_negative_errorcode_or_errno_ignores_stale_errno(monkeypatch):
     earlier call.
     """
     monkeypatch.setattr(_errorcheckers, "get_errno", lambda: errno.ENOENT)
-    with pytest.raises(EnvironmentError) as excinfo:
+    with pytest.raises(OSError) as excinfo:
         _errorcheckers.check_negative_errorcode_or_errno(-errno.E2BIG, None)
     assert excinfo.value.errno == errno.E2BIG
 
@@ -50,7 +50,7 @@ def test_negative_errorcode_or_errno_old_udev(monkeypatch):
     as returned by old versions of udev.
     """
     monkeypatch.setattr(_errorcheckers, "get_errno", lambda: errno.EBUSY)
-    with pytest.raises(EnvironmentError) as excinfo:
+    with pytest.raises(OSError) as excinfo:
         _errorcheckers.check_negative_errorcode_or_errno(-1, None)
     assert excinfo.value.errno == errno.EBUSY
 
@@ -60,7 +60,7 @@ def test_negative_errorcode_or_errno_eperm(monkeypatch):
     A negative error code is raised, if the function did not set ``errno``.
     """
     monkeypatch.setattr(_errorcheckers, "get_errno", lambda: 0)
-    with pytest.raises(EnvironmentError) as excinfo:
+    with pytest.raises(OSError) as excinfo:
         _errorcheckers.check_negative_errorcode_or_errno(-errno.EPERM, None)
     assert excinfo.value.errno == errno.EPERM
 

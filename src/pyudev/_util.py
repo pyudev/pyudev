@@ -113,7 +113,7 @@ def get_device_type(filename):
     Return ``'char'`` if ``filename`` is a character device, or ``'block'`` if
     ``filename`` is a block device.  Raise :exc:`~exceptions.ValueError` if
     ``filename`` is no device file at all.  Raise
-    :exc:`~exceptions.EnvironmentError` if ``filename`` does not exist or if
+    :exc:`~exceptions.OSError` if ``filename`` does not exist or if
     its metadata was inaccessible.
 
     .. versionadded:: 0.15
@@ -146,7 +146,7 @@ def eintr_retry_call(func, *args, **kwargs):
     while True:
         try:
             return func(*args, **kwargs)
-        except (OSError, IOError, select.error) as err:
+        except (OSError, select.error) as err:
             if err.errno == errno.EINTR:
                 continue
             raise
@@ -164,13 +164,13 @@ def udev_version():
 
     As libudev itself does not provide a function to query the version number,
     this function calls the ``udevadm`` utility, so be prepared to catch
-    :exc:`~exceptions.EnvironmentError` and
+    :exc:`~exceptions.OSError` and
     :exc:`~subprocess.CalledProcessError` if you call this function.
 
     Return the version number as single integer.  Raise
     :exc:`~exceptions.ValueError`, if the version number retrieved from udev
     could not be converted to an integer.  Raise
-    :exc:`~exceptions.EnvironmentError`, if ``udevadm`` was not found, or could
+    :exc:`~exceptions.OSError`, if ``udevadm`` was not found, or could
     not be executed.  Raise :exc:`subprocess.CalledProcessError`, if
     ``udevadm`` returned a non-zero exit code.
 

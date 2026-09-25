@@ -48,7 +48,7 @@ class UDevAdm:
 
         :returns: a working :class:`UDevAdm` object
         :rtype: :class:`UDevAdm`
-        :raises EnvironmentError:
+        :raises OSError:
         """
         for candidate in cls.CANDIDATES:
             try:
@@ -57,7 +57,7 @@ class UDevAdm:
                 # executable
                 udevadm.query_udev_version()
                 return udevadm
-            except EnvironmentError as error:
+            except OSError as error:
                 if error.errno != errno.ENOENT:
                     raise
 
@@ -72,7 +72,7 @@ class UDevAdm:
         if cls._adm is None:
             try:
                 cls._adm = cls.find()
-            except EnvironmentError:
+            except OSError:
                 pass
         return cls._adm
 

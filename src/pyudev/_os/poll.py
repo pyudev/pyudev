@@ -99,9 +99,9 @@ class Poll:
         """
         for fd, event_mask in events:
             if self._has_event(event_mask, select.POLLNVAL):
-                raise IOError(f"File descriptor not open: {repr(fd)}")
+                raise OSError(f"File descriptor not open: {repr(fd)}")
             if self._has_event(event_mask, select.POLLERR):
-                raise IOError(f"Error while polling fd: {repr(fd)}")
+                raise OSError(f"Error while polling fd: {repr(fd)}")
 
             if self._has_event(event_mask, select.POLLIN):
                 yield fd, "r"
