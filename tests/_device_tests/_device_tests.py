@@ -414,7 +414,7 @@ class TestDevice:
             elif value == "0":
                 assert not device.properties.asbool(prop)
             else:
-                with pytest.raises(ValueError) as exc_info:
+                with pytest.raises(ValueError):
                     device.properties.asbool(prop)
 
     @given(strategies.sampled_from(_DEVICES))
