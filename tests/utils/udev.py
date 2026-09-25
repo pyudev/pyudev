@@ -163,8 +163,8 @@ class UDevAdm:
         output = self._execute("info", "--attribute-walk", "--path", device_path)
         attribute_dump = output.decode(sys.getfilesystemencoding()).splitlines()
         attributes = {}
-        for line in attribute_dump:
-            line = line.strip()
+        for ln in attribute_dump:
+            line = ln.strip()
             if line.startswith("looking at parent device"):
                 # we don't continue with attributes of parent devices, we only
                 # want the attributes of the given device
