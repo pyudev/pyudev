@@ -43,7 +43,7 @@ def exception_from_errno(errnum):
     exception = ERRNO_EXCEPTIONS.get(errnum)
     errorstr = os.strerror(errnum)
     if exception is None:
-        return EnvironmentError(errnum, errorstr)
+        return OSError(errnum, errorstr)
     return exception(errorstr)
 
 
@@ -55,7 +55,7 @@ def check_negative_errorcode(result, _func, *_args):
 
     - ``-ENOMEM`` raises a :exc:`~exceptions.MemoryError`
     - ``-EOVERFLOW`` raises a :exc:`~exceptions.OverflowError`
-    - all other error codes raise :exc:`~exceptions.EnvironmentError`
+    - all other error codes raise :exc:`~exceptions.OSError`
 
     If result is greater or equal to ``0``, it is returned unchanged.
 

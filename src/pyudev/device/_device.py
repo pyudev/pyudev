@@ -215,7 +215,7 @@ class Devices:
         try:
             device_type = get_device_type(filename)
             device_number = os.stat(filename).st_rdev
-        except (EnvironmentError, ValueError) as err:
+        except (OSError, ValueError) as err:
             raise DeviceNotFoundByFileError(err) from err
 
         return cls.from_device_number(context, device_type, device_number)

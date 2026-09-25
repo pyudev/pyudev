@@ -102,7 +102,7 @@ class Monitor:
         Return a new :class:`Monitor` object, which is connected to the
         given source.  Raise :exc:`~exceptions.ValueError`, if an invalid
         source has been specified.  Raise
-        :exc:`~exceptions.EnvironmentError`, if the creation of the monitor
+        :exc:`~exceptions.OSError`, if the creation of the monitor
         failed.
         """
         if source not in ("kernel", "udev"):
@@ -113,7 +113,7 @@ class Monitor:
             context, ensure_byte_string(source)
         )
         if not monitor:
-            raise EnvironmentError("Could not create udev monitor")
+            raise OSError("Could not create udev monitor")
         return cls(context, monitor)
 
     @property
@@ -197,7 +197,7 @@ class Monitor:
            affected versions this method always raises
            :exc:`~exceptions.ValueError`.
 
-        Raise :exc:`~exceptions.EnvironmentError` if removal of installed
+        Raise :exc:`~exceptions.OSError` if removal of installed
         filters failed.
 
         .. versionadded:: 0.15
@@ -262,7 +262,7 @@ class Monitor:
 
            The CAP_NET_ADMIN capability must be contained in the effective
            capability set of the caller for this method to succeed.  Otherwise
-           :exc:`~exceptions.EnvironmentError` will be raised, with ``errno``
+           :exc:`~exceptions.OSError` will be raised, with ``errno``
            set to :data:`~errno.EPERM`.  Unprivileged processes typically lack
            this capability.  You can check the capabilities of the current
            process with the python-prctl_ module:
@@ -270,7 +270,7 @@ class Monitor:
            >>> import prctl
            >>> prctl.cap_effective.net_admin
 
-        Raise :exc:`~exceptions.EnvironmentError`, if the buffer size could not
+        Raise :exc:`~exceptions.OSError`, if the buffer size could not
         bet set.
 
         .. versionadded:: 0.13
@@ -290,7 +290,7 @@ class Monitor:
             try:
                 device_p = self._libudev.udev_monitor_receive_device(self)
                 return Device(self.context, device_p) if device_p else None
-            except EnvironmentError as error:
+            except OSError as error:
                 if error.errno in (errno.EAGAIN, errno.EWOULDBLOCK):
                     # No data available
                     return None
@@ -332,7 +332,7 @@ class Monitor:
            This method implicitly calls :meth:`start()`.
 
         Return the received :class:`Device`, or ``None`` if a timeout
-        occurred. Raise :exc:`~exceptions.EnvironmentError` if event retrieval
+        occurred. Raise :exc:`~exceptions.OSError` if event retrieval
         failed.
 
         .. seealso::
@@ -379,7 +379,7 @@ class Monitor:
         ``'offline'``
           The device is offline now
 
-        Raise :exc:`~exceptions.EnvironmentError`, if no device could be
+        Raise :exc:`~exceptions.OSError`, if no device could be
         read.
 
         .. deprecated:: 0.16
@@ -539,7 +539,7 @@ class MonitorObserver(Thread):
                     for device in iter(read_device, None):
                         self._callback(device)
                 else:
-                    raise EnvironmentError("Observed monitor hung up")
+                    raise OSError("Observed monitor hung up")
 
     def send_stop(self):
         """
