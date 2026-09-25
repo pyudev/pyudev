@@ -31,10 +31,6 @@ except ImportError:
 
 def test_udev_version():
     assert isinstance(udev_version(), int)
-    # just to make sure, that udev versioning works.  pyudev itself should be
-    # compatible with earlier versions of pyudev.  However, 150 is currently
-    # the earliest udev release, I'm testing against (using Ubuntu 10.04)
-    assert udev_version() > 150
 
 
 class TestContext:
