@@ -137,6 +137,7 @@ class WxUDevMonitorObserver(MonitorObserver):
         warnings.warn(
             "Will be removed in 1.0. Use pyudev.wx.MonitorObserver instead.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
     def _emit_event(self, device):

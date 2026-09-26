@@ -16,10 +16,10 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+import errno
 import random
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from select import select
 
 import pytest
 
@@ -177,12 +177,14 @@ class TestMonitor:
 
     def test_remove_filter(self, monitor):
         """
-        The underlying ``udev_monitor_filter_remove()`` is apparently broken.
-        It always causes ``EINVAL`` from ``setsockopt()``. In some version
-        it changed and it now raises FileNotFoundError.
+        Test that removing a non-existent filter raises OSError.
+
+        Calling remove_filter() on a monitor with no filters installed
+        raises OSError with ENOENT, since no filter found.
         """
-        with pytest.raises(Exception):
+        with pytest.raises(OSError) as excinfo:
             monitor.remove_filter()
+        assert excinfo.value.errno == errno.ENOENT
 
     def test_remove_filter_mock(self, monitor):
         funcname = "udev_monitor_filter_remove"
@@ -249,12 +251,12 @@ class TestMonitor:
 class TestMonitorObserver:
     def callback(self, device):
         self.events.append(device)
-        if len(self.events) >= 2:
+        if len(self.events) >= 2:  # noqa: PLR2004
             self.observer.send_stop()
 
     def event_handler(self, action, device):
         self.events.append((action, device))
-        if len(self.events) >= 2:
+        if len(self.events) >= 2:  # noqa: PLR2004
             self.observer.send_stop()
 
     def make_observer(self, monitor, use_deprecated=False):

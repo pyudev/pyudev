@@ -69,7 +69,7 @@ class TestAttributes:
         """
 
         with pytest.raises(TypeError):
-            "key" in a_device.attributes
+            "key" in a_device.attributes  # noqa: B015
         with pytest.raises(TypeError):
             a_device.attributes["key"]
 
@@ -95,7 +95,7 @@ class TestAttributes:
         device = Devices.from_path(a_context, device_datum.device_path)
         for key, val in device_datum.attributes.items():
             try:
-                value = int(val)
+                int(val)
             except ValueError:
                 try:
                     device.attributes.asint(key)

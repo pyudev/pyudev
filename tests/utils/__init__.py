@@ -23,5 +23,6 @@ Utils to support pyudev testing.
 .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import udev
-from .misc import failed_health_check_wrapper, is_unicode_string
+from . import udev as udev
+from .misc import failed_health_check_wrapper as failed_health_check_wrapper
+from .misc import is_unicode_string as is_unicode_string

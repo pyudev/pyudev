@@ -7,7 +7,7 @@ target-version = "py312"
 line-length = 88
 
 [tool.ruff.lint]
-select = ["PL"]
+select = ["B", "F", "PL"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false

@@ -20,6 +20,7 @@ package:
 lint:
 	ruff check setup.py
 	ruff check src/pyudev
+	ruff check tests
 
 PYREVERSE_OPTS = --output=pdf
 view:

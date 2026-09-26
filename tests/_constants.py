@@ -86,7 +86,7 @@ _PROPERTY_STRATEGY = device_strategy().flatmap(
 
 _MATCH_PROPERTY_STRATEGY = _PROPERTY_STRATEGY.filter(lambda p: p[0][-4:] != "_ENC")
 
-if _UDEV_VERSION <= 230:
+if _UDEV_VERSION <= 230:  # noqa: PLR2004
     _MATCH_PROPERTY_STRATEGY = _MATCH_PROPERTY_STRATEGY.filter(
         lambda p: "[" not in p[1]
     )
@@ -103,7 +103,7 @@ _ATTRIBUTE_STRATEGY = _ATTRIBUTES_STRATEGY.flatmap(
 
 _ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(lambda p: p[1] is not None)
 
-if _UDEV_VERSION <= 230:
+if _UDEV_VERSION <= 230:  # noqa: PLR2004
     _ATTRIBUTE_STRATEGY = _ATTRIBUTE_STRATEGY.filter(
         lambda p: (
             not p[1].startswith(b"\\")

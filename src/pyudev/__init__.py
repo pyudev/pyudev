@@ -32,23 +32,27 @@ into the event loop of various GUI toolkits.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
+from pyudev._errors import DeviceNotFoundAtPathError as DeviceNotFoundAtPathError
+from pyudev._errors import DeviceNotFoundByFileError as DeviceNotFoundByFileError
+from pyudev._errors import DeviceNotFoundByNameError as DeviceNotFoundByNameError
+from pyudev._errors import DeviceNotFoundByNumberError as DeviceNotFoundByNumberError
+from pyudev._errors import DeviceNotFoundError as DeviceNotFoundError
 from pyudev._errors import (
-    DeviceNotFoundAtPathError,
-    DeviceNotFoundByFileError,
-    DeviceNotFoundByNameError,
-    DeviceNotFoundByNumberError,
-    DeviceNotFoundError,
-    DeviceNotFoundInEnvironmentError,
+    DeviceNotFoundInEnvironmentError as DeviceNotFoundInEnvironmentError,
 )
-from pyudev._util import udev_version
-from pyudev.core import Context, Enumerator
-from pyudev.device import Attributes, Device, Devices, Tags
-from pyudev.discover import (
-    DeviceFileHypothesis,
-    DeviceNameHypothesis,
-    DeviceNumberHypothesis,
-    DevicePathHypothesis,
-    Discovery,
-)
-from pyudev.monitor import Monitor, MonitorObserver
-from pyudev.version import __version__, __version_info__
+from pyudev._util import udev_version as udev_version
+from pyudev.core import Context as Context
+from pyudev.core import Enumerator as Enumerator
+from pyudev.device import Attributes as Attributes
+from pyudev.device import Device as Device
+from pyudev.device import Devices as Devices
+from pyudev.device import Tags as Tags
+from pyudev.discover import DeviceFileHypothesis as DeviceFileHypothesis
+from pyudev.discover import DeviceNameHypothesis as DeviceNameHypothesis
+from pyudev.discover import DeviceNumberHypothesis as DeviceNumberHypothesis
+from pyudev.discover import DevicePathHypothesis as DevicePathHypothesis
+from pyudev.discover import Discovery as Discovery
+from pyudev.monitor import Monitor as Monitor
+from pyudev.monitor import MonitorObserver as MonitorObserver
+from pyudev.version import __version__ as __version__
+from pyudev.version import __version_info__ as __version_info__

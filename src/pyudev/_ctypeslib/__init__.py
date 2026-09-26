@@ -23,4 +23,5 @@ Wrappers for libraries.
 .. moduleauthor::  mulhern  <amulhern@redhat.com>
 """
 
-from . import libc, libudev
+from . import libc as libc
+from . import libudev as libudev

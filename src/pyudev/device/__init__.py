@@ -23,4 +23,7 @@ Device class implementation of :mod:`pyudev`.
 .. moduleauthor::  Sebastian Wiesner  <lunaryorn@gmail.com>
 """
 
-from ._device import Attributes, Device, Devices, Tags
+from ._device import Attributes as Attributes
+from ._device import Device as Device
+from ._device import Devices as Devices
+from ._device import Tags as Tags

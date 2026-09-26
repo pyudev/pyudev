@@ -25,12 +25,10 @@ Tests discovering what device is meant by somewhat unspecific information.
 
 import os
 
-import pytest
 from hypothesis import assume, given, settings, strategies
 
 import pyudev
 from pyudev import (
-    DeviceFileHypothesis,
     DeviceNameHypothesis,
     DeviceNumberHypothesis,
     DevicePathHypothesis,

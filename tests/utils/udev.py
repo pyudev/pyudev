@@ -148,7 +148,7 @@ class UDevAdm:
             for l in self._execute_query(device_path, "property").splitlines()
         ]
 
-        if self.adm().query_udev_version() < 230:
+        if self.adm().query_udev_version() < 230:  # noqa: PLR2004
             num_pairs = len(pairs)
             indices = [i for i in range(num_pairs) if pairs[i][1] == ""]
             pairs = [

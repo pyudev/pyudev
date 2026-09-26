@@ -24,7 +24,7 @@ import os
 import stat
 
 import pytest
-from hypothesis import assume, given, settings
+from hypothesis import given, settings
 
 from pyudev import (
     DeviceNotFoundAtPathError,
