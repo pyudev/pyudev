@@ -69,7 +69,7 @@ class TestAttributes:
         """
 
         with pytest.raises(TypeError):
-            "key" in a_device.attributes  # noqa: B015
+            "key" in a_device.attributes  # noqa: B015  # pyright: ignore[reportUnusedExpression]
         with pytest.raises(TypeError):
             a_device.attributes["key"]
 
