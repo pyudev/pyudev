@@ -18,9 +18,7 @@ package:
 	(umask 0022; python -m build; python -m twine check --strict ./dist/*)
 
 lint:
-	ruff check setup.py
-	ruff check src/pyudev
-	ruff check tests
+	ruff check
 
 PYREVERSE_OPTS = --output=pdf
 view:
