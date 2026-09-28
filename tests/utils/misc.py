@@ -26,7 +26,7 @@ Miscellaneous useful methods.
 from functools import wraps
 
 import pytest
-from hypothesis.core import FailedHealthCheck
+from hypothesis.errors import FailedHealthCheck
 
 
 def is_unicode_string(value):
