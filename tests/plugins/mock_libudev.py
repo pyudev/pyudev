@@ -28,13 +28,9 @@ This plugin adds :func:`libudev_list()` to the :mod:`pytest` namespace.
 from collections import namedtuple
 from contextlib import contextmanager
 from operator import attrgetter
+from unittest import mock
 
 import pytest
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 Node = namedtuple("Node", "name value next")
 

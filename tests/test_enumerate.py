@@ -16,6 +16,8 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from unittest import mock
+
 from hypothesis import given, settings
 
 from ._constants import (
@@ -27,11 +29,6 @@ from ._constants import (
     device_strategy,
 )
 from .utils import failed_health_check_wrapper
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 def _is_int(value):

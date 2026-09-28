@@ -20,18 +20,13 @@ import errno
 import random
 from contextlib import contextmanager
 from datetime import datetime, timedelta
+from unittest import mock
 
 import pytest
 
 from pyudev import Devices, Monitor, MonitorObserver
 from tests._constants import _UDEV_TEST
 from tests.utils.udev import DeviceDatabase
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 
 # many tests just consist of some monkey patching to test, that the Monitor
 # class actually calls out to udev, correctly passing arguments and handling

@@ -18,15 +18,11 @@
 
 import random
 import syslog
+from unittest import mock
 
 from pyudev import udev_version
 from tests._constants import _UDEV_TEST
 from tests.utils import is_unicode_string
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 def test_udev_version():

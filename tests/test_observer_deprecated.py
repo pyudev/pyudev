@@ -16,14 +16,11 @@
 # Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 
+from unittest import mock
+
 import pytest
 
 from pyudev import Devices, Monitor
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 @pytest.fixture

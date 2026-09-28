@@ -25,6 +25,7 @@ import operator
 import os
 import re
 from datetime import timedelta
+from unittest import mock
 
 import pytest
 from hypothesis import given, settings, strategies
@@ -34,11 +35,6 @@ from pyudev.device import Attributes, Tags
 
 from .._constants import _CONTEXT, _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
 from ..utils import is_unicode_string
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 class TestDevice:
