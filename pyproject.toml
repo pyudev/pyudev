@@ -1,6 +1,57 @@
 [build-system]
-requires = ["setuptools"]
+requires = [
+    "setuptools>=77",
+]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyudev"
+authors = [
+    { name = "Sebastian Wiesner", email = "lunaryorn@gmail.com" },
+]
+description = "A libudev binding"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: System :: Hardware",
+    "Topic :: System :: Operating System Kernels :: Linux",
+]
+requires-python = ">=3.9"
+license = "LGPL-2.1-or-later"
+dynamic = [
+    "version",
+]
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.urls]
+Homepage = "http://github.com/pyudev/pyudev"
+
+[tool.setuptools]
+packages = [
+    "pyudev",
+    "pyudev._ctypeslib",
+    "pyudev.device",
+    "pyudev._os",
+]
+platforms = [
+    "Linux",
+]
+include-package-data = false
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.dynamic.version]
+attr = "pyudev.version.__version__"
 
 [tool.ruff]
 target-version = "py312"
