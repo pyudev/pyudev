@@ -24,7 +24,7 @@ jobs:
             dependencies: pytest hypothesis
             task: PYTHONPATH=./src make -f Makefile test-travis
           # MANDATORY CHECKS USING PYPY INTERPRETER
-          - python-version: pypy-3.10
+          - python-version: pypy-3.11
             dependencies: pytest hypothesis
             task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
