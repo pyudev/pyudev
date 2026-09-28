@@ -1,3 +1,47 @@
+0.24.5
+======
+Recommended development release: Fedora 44
+
+- Use the returned error code for udev_monitor functions:
+  https://github.com/pyudev/pyudev/issues/548
+  https://github.com/pyudev/pyudev/pull/549
+
+- Remove PyQt4 support:
+  https://github.com/pyudev/pyudev/issues/533
+  https://github.com/pyudev/pyudev/pull/534
+
+- Require at least Python 3.10:
+  https://github.com/pyudev/pyudev/pull/561
+
+- Use exclusively pyproject.toml for project metadata:
+  https://github.com/pyudev/pyudev/pull/560
+
+- docs: clarify binary nature of sysfs attributes:
+  https://github.com/pyudev/pyudev/pull/542
+
+- Remove last vestiges of Python 2:
+  https://github.com/pyudev/pyudev/pull/555
+  https://github.com/pyudev/pyudev/pull/545
+  https://github.com/pyudev/pyudev/pull/544
+
+- Tidies and Maintenance:
+  https://github.com/pyudev/pyudev/pull/559
+  https://github.com/pyudev/pyudev/pull/554
+  https://github.com/pyudev/pyudev/pull/553
+  https://github.com/pyudev/pyudev/pull/551
+  https://github.com/pyudev/pyudev/pull/547
+  https://github.com/pyudev/pyudev/pull/546
+  https://github.com/pyudev/pyudev/pull/541
+  https://github.com/pyudev/pyudev/pull/540
+  https://github.com/pyudev/pyudev/pull/539
+  https://github.com/pyudev/pyudev/pull/538
+  https://github.com/pyudev/pyudev/pull/537
+  https://github.com/pyudev/pyudev/pull/536
+  https://github.com/pyudev/pyudev/pull/535
+  https://github.com/pyudev/pyudev/pull/531
+  https://github.com/pyudev/pyudev/pull/530
+
+
 0.24.4
 ======
 Recommended development release: Fedora 41
