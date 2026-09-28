@@ -133,7 +133,7 @@ class UDevVersion(Directive):
 
 
 def setup(app):
-    from sphinx.ext.autodoc import cut_lines
+    from sphinx.ext.autodoc import cut_lines  # noqa: PLC0415
 
     app.connect("autodoc-process-docstring", cut_lines(2, what=["module"]))
     app.add_directive("udevversion", UDevVersion)
