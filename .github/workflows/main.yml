@@ -15,18 +15,9 @@ jobs:
     strategy:
       matrix:
         include:
-          # MANDATORY CHECKS USING CURRENT DEVELOPMENT INTERPRETER
           - python-version: "3.12"
-            dependencies: pytest hypothesis
-            task: PYTHONPATH=./src make -f Makefile test-travis
-          # MANDATORY CHECKS USING LOWEST SUPPORTED INTERPRETER
           - python-version: "3.10"
-            dependencies: pytest hypothesis
-            task: PYTHONPATH=./src make -f Makefile test-travis
-          # MANDATORY CHECKS USING PYPY INTERPRETER
           - python-version: pypy-3.11
-            dependencies: pytest hypothesis
-            task: PYTHONPATH=./src make -f Makefile test-travis
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -40,9 +31,9 @@ jobs:
           sudo apt-get -q update
           sudo apt-get -y install libudev-dev
       - name: Install dependencies
-        run: pip3 install ${{ matrix.dependencies }}
+        run: pip3 install pytest hypothesis
       - name: Run test
-        run: ${{ matrix.task }}
+        run: PYTHONPATH=./src make -f Makefile test-travis
 
   development_environment_checks:
     strategy:
