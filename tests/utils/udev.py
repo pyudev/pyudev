@@ -31,6 +31,7 @@ import re
 import subprocess
 import sys
 from collections.abc import Iterable, Sized
+from typing import Self
 
 
 class UDevAdm:
@@ -38,11 +39,11 @@ class UDevAdm:
     Wrap ``udevadm`` utility.
     """
 
-    CANDIDATES = ["/sbin/udevadm", "udevadm"]
+    CANDIDATES: list[str] = ["/sbin/udevadm", "udevadm"]
     _adm = None
 
     @classmethod
-    def find(cls):
+    def find(cls) -> Self | None:
         """
         Construct a valid :class:`UDevAdm` object.
 
@@ -51,8 +52,8 @@ class UDevAdm:
         :raises OSError:
         """
         for candidate in cls.CANDIDATES:
+            udevadm = cls(candidate)
             try:
-                udevadm = cls(candidate)
                 # try to execute udev to make sure that it's actually
                 # executable
                 udevadm.query_udev_version()
@@ -62,7 +63,7 @@ class UDevAdm:
                     raise
 
     @classmethod
-    def adm(cls):
+    def adm(cls) -> Self | None:
         """
         Returns the singleton object of this class, if one can be found.
 
@@ -76,7 +77,7 @@ class UDevAdm:
                 pass
         return cls._adm
 
-    def __init__(self, udevadm):
+    def __init__(self, udevadm: str):
         """
         Create a new ``udevadm`` wrapper for the given udevadm executable.
 
@@ -85,7 +86,7 @@ class UDevAdm:
         """
         self.udevadm = udevadm
 
-    def query_udev_version(self):
+    def query_udev_version(self) -> int:
         """
         Return the version of udevadm.
 
@@ -94,7 +95,7 @@ class UDevAdm:
         """
         return int(self._execute("--version"))
 
-    def _execute(self, *args):
+    def _execute(self, *args) -> bytes:
         """
         Execute a udevadm command.
 
@@ -107,7 +108,7 @@ class UDevAdm:
             raise subprocess.CalledProcessError(proc.returncode, command)
         return output
 
-    def _execute_query(self, device_path, query_type="all"):
+    def _execute_query(self, device_path, query_type="all") -> str:
         """
         Execute a "udevadm info" query.
 
@@ -287,7 +288,7 @@ class DeviceDatabase(Iterable, Sized):
     _db = None
 
     @classmethod
-    def db(cls, renew=False):
+    def db(cls, renew: bool = False):
         """
         Get a database object.
 
@@ -297,7 +298,7 @@ class DeviceDatabase(Iterable, Sized):
         """
         if cls._db is None or renew:
             udevadm = UDevAdm.adm()
-            if udevadm:
+            if udevadm is not None:
                 cls._db = DeviceDatabase(udevadm)
         return cls._db
 
