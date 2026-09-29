@@ -17,16 +17,12 @@
 
 
 import random
+from unittest import mock
 
 import pytest
 
 from pyudev import Devices, Monitor
 from tests.utils.udev import DeviceDatabase
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 @pytest.fixture

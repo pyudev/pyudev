@@ -17,6 +17,7 @@
 
 
 import sys
+from unittest.mock import Mock
 
 import pytest
 from hypothesis import given, settings, strategies
@@ -24,12 +25,6 @@ from hypothesis import given, settings, strategies
 from pyudev import Context, _util
 
 from .utils import is_unicode_string
-
-try:
-    from unittest.mock import Mock
-except ImportError:
-    from mock import Mock
-
 
 _CONTEXT = Context()
 

@@ -20,6 +20,8 @@ Tests methods belonging to Devices class.
 .. moduleauthor::  mulhern <amulhern@redhat.com>
 """
 
+from unittest import mock
+
 import pytest
 from hypothesis import given, settings, strategies
 
@@ -27,11 +29,6 @@ from pyudev import Devices
 
 from ..utils import is_unicode_string
 from ._device_tests import _CONTEXT_STRATEGY, _DEVICE_DATA, _DEVICES, _UDEV_TEST
-
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 
 class TestTags:
